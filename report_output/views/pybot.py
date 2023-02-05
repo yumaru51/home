@@ -8,7 +8,7 @@ from .pybot_datetime import today_command, now_command, weekday_command
 
 
 # command_file = open('C:\\python_tool_development\\isk-tools\\report_output\\views\\pybot.txt', encoding='utf-8')
-command_file = open('C:\\Users\\yumaru51\\PycharmProjects\\django\\report_output\\views\\pybot.txt', encoding='utf-8')
+command_file = open('C:\\Users\\yumaru51\\PycharmProjects\\home\\report_output\\views\\pybot.txt', encoding='utf-8')
 # command_file = open('./yumarusystem/pybot.txt', encoding='utf-8')
 raw_data = command_file.read()
 command_file.close()

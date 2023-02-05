@@ -24,6 +24,6 @@ urlpatterns = [
     # TEST
     path('川内/report/', kawauchi.report, name='report'),
     path('川内/chatwindow/', kawauchi.chatwindow, name='chatwindow'),
-    path('川内/bootstrap/', kawauchi.bootstrap, name='bootstrap'),
+    path('川内/bootstrap2/', kawauchi.bootstrap, name='bootstrap'),
 
 ]

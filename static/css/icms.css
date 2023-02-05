@@ -1,0 +1,313 @@
+<style type="text/css">
+/* HEADER */
+#header {
+    width: auto;
+    height: 40px;
+    padding: 10px 40px;
+    background: #417690;
+    line-height: 40px;
+    color: #ffc;
+    overflow: hidden;
+}
+#header a:link, #header a:visited {
+    color: #fff;
+}
+#header a:focus , #header a:hover {
+    text-decoration: underline;
+}
+#branding {
+    float: left;
+}
+#branding h1 {
+    padding: 0;
+    margin: 0 20px 0 0;
+    font-weight: 300;
+    font-size: 24px;
+    color: #f5dd5d;
+
+}
+#branding h1, #branding h1 a:link, #branding h1 a:visited {
+    color: #f5dd5d;
+    text-decoration: none;
+}
+#branding h2 {
+    padding: 0 10px;
+    font-size: 14px;
+    margin: -8px 0 8px 0;
+    font-weight: normal;
+    color: #ffc;
+}
+#branding a:hover {
+    text-decoration: underline;
+}
+#user-tools {
+    float: right;
+    padding: 0;
+    margin: 0 0 0 20px;
+    font-weight: 300;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-align: right;
+}
+#user-tools a {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+}
+#user-tools a:focus, #user-tools a:hover {
+    text-decoration: none;
+    border-bottom-color: #79aec8;
+    color: #79aec8;
+}
+
+/* SIDEBAR */
+.side-bar{
+    width: 160px;
+    height: auto;
+    background: #b0c4de;
+    padding-top : 5px;
+}
+.sidebar-list{
+    list-style: none;
+    margin: 10px 0px 0px -35px;
+}
+a   {
+    text-decoration:none;
+}
+a:hover {
+    text-decoration: underline;
+    color: #ffffe0;
+}
+#content-related {
+    background: #f8f8f8;
+}
+#content-related .module {
+    background: none;
+}
+#content-related h3 {
+    font-size: 14px;
+    color: #666;
+    padding: 0 16px;
+    margin: 0 0 16px;
+}
+#content-related h4 {
+    font-size: 13px;
+}
+#content-related p {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+#content-related .actionlist {
+    padding: 0;
+    margin: 16px;
+}
+#content-related .actionlist li {
+    line-height: 1.2;
+    margin-bottom: 10px;
+    padding-left: 18px;
+}
+#content-related .module h2 {
+    background: none;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #eaeaea;
+    font-size: 18px;
+    color: #333;
+}
+.delete-confirmation form input[type="submit"] {
+    background: #ba2121;
+    border-radius: 4px;
+    padding: 10px 15px;
+    color: #fff;
+}
+.delete-confirmation form input[type="submit"]:active,
+.delete-confirmation form input[type="submit"]:focus,
+.delete-confirmation form input[type="submit"]:hover {
+    background: #a41515;
+}
+.delete-confirmation form .cancel-link {
+    display: inline-block;
+    vertical-align: middle;
+    height: 15px;
+    line-height: 15px;
+    background: #ddd;
+    border-radius: 4px;
+    padding: 10px 15px;
+    color: #333;
+    margin: 0 0 0 10px;
+}
+.delete-confirmation form .cancel-link:active,
+.delete-confirmation form .cancel-link:focus,
+.delete-confirmation form .cancel-link:hover {
+    background: #ccc;
+}
+
+/* LOGIN FORM */
+body.login {
+    background: #f8f8f8;
+}
+.login #header {
+    height: auto;
+    padding: 5px 16px;
+}
+.login #header h1 {
+    font-size: 18px;
+}
+.login #header h1 a {
+    color: #fff;
+}
+#login-box {
+    border: 1px solid #eaeaea;
+    width: 398px;
+    height: auto;
+    margin:0 auto;
+    color: #fff;
+}
+#page-header {
+    width: 369px;
+    height: 30px;
+    padding: 10px 15px;
+    background: #417690;
+    line-height: 40px;
+    color: #ffc;
+    overflow: hidden;
+    float: center;
+}
+#page-header a:link, #page-header a:visited {
+    color: #fff;
+}
+#page-header a:focus , #page-header a:hover {
+    text-decoration: underline;
+}
+#page-branding {
+    float: left;
+}
+#page-branding h1 {
+    padding: 0;
+    margin: 0 10px 0 0;
+    font-weight: 300;
+    font-size: 18px;
+    color: #fff;
+}
+#page-branding h1, #page-branding h1 a:link, #page-branding h1 a:visited {
+    color: #fff;
+    text-decoration: none;
+}
+#page-branding h2 {
+    padding: 0 10px;
+    font-size: 14px;
+    margin: -8px 0 8px 0;
+    font-weight: normal;
+    color: #ffc;
+}
+#page-branding a:hover {
+    text-decoration: underline;
+}
+.login #content {
+    padding: 20px 20px 0;
+}
+.login #container {
+    background: #fff;
+    border: 1px solid #eaeaea;
+    border-radius: 4px;
+    overflow: hidden;
+    width: 28em;
+    min-width: 300px;
+    margin: 100px auto;
+}
+.login #content-main {
+    width: 100%;
+}
+.login {
+    padding: 4px 0;
+    float: left;
+    width: 100%;
+    border-bottom: none;
+}
+.form-row {
+    width: 370px;
+    height: 70px;
+    padding: 4px 0;
+    float: left;
+    border-bottom: none;
+    padding: 5px 20px;
+}
+.login  {
+    padding-right: 0.5em;
+    line-height: 2em;
+    font-size: 1em;
+    clear: both;
+    color: #333;
+}
+.form-row label {
+    padding-right: 0.5em;
+    line-height: 2em;
+    font-size: 1em;
+    clear: both;
+    color: #333;
+    padding: 10px 0px;
+}
+.login  {
+    clear: both;
+    padding: 8px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+.form-row #id_username {
+    clear: both;
+    padding: 8px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+.form-row #id_password {
+    clear: both;
+    padding: 8px;
+    width: 100%;
+    -webkit-box-sizing: border-box;
+       -moz-box-sizing: border-box;
+            box-sizing: border-box;
+}
+.login span.help {
+    font-size: 10px;
+    display: block;
+}
+.login{
+    clear: both;
+    padding: 1em 0 0 9.4em;
+    margin: 0;
+    border: none;
+    background: none;
+    text-align: left;
+    float: center;
+}
+.submit-row {
+    clear: both;
+    padding: 1em 0 0 9.4em;
+    margin: 0;
+    border: none;
+    background: none;
+    text-align: left;
+    float: center;
+    width: 100px;
+    height: 50px;
+}
+.submit-btn {
+    background: #79aec8;
+    border-radius: 4px;
+    color: #fff;
+    width: 100px;
+    height: 40px;
+    cursor: pointer;
+    border: none;
+}
+.submit-btn:hover {
+    background: #417690;
+}
+.login .password-reset-link {
+    text-align: center;
+}
+
+</style>

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+<script>
+
+</script>
+<style type="text/css">
+
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 450px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">ISK ツール　トップページ</h2>
+    </div>
+    <div id="fms_img" class="tool_box" >
+        <div class="tool_title">
+            設備管理システム
+        </div>
+        <div>
+            <a href="/isk_tools/fms/"><img src="/static/img/top_page/fms_img.jpg" width="400" height="200"></a>
+        </div>
+        <div>
+            PDCAでスパイラルアップ！！
+        </div>
+    </div>
+    <div>　</div>
+    <div id="cpexcel_img" class="tool_box" >
+        <div class="tool_title">
+            エクセルコピペツール
+        </div>
+        <div>
+            <a href="/isk_tools/cpexcel/"><img src="/static/img/top_page/cpexcel_img.jpg" width="400" height="200"></a>
+        </div>
+        <div>
+            エクセルファイル間でコピー＆ペースト！！
+        </div>
+    </div>
+    <br>
+
+    <div id="quality_change_management" class="tool_box" >
+        <div class="tool_title">
+            品質・安全変更管理ツール
+        </div>
+        <div>
+            <a href="/isk_tools/quality_change_management/"><img src="/static/img/top_page/quality_change_management2.png" width="400" height="200"></a>
+        </div>
+    </div>
+    <br>
+
+{% endblock %}

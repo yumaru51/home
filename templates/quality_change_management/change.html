@@ -1,0 +1,22 @@
+{% load staticfiles %}
+
+<div class="container">
+    <div class="form-control">
+        <div class="row">
+            <div class="col-6">
+                <table clase="table">
+                    {{ request_form.as_table }}
+                </table>
+            </div>
+            <div class="col-6">
+                コメント：{{ log_form.comment }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('id_division').onchange = function(){department();};
+document.getElementById('id_department').onclick = function(){user();};
+
+</script>

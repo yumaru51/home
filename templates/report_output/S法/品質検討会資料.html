@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ja">
+{% load staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>品質検討会資料(S法)</title>
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+    <!-- JQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <!-- Favicons -->
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+    <!-- Custom styles for this template -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/navbar-top-fixed.css' %}">
+</head>
+<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+<script>
+function __select__brand(value){
+    $.ajax({
+        url: "/isk_tools/reportoutput/S法/品質検討会資料/__select__brand/",
+        type: "POST",
+        data : {
+            'value': value,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(data){
+        $('#while').empty();
+        $('#while').html(data.select);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $('#while').empty();
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+//function trace_report_download(brand, from_to1, from_to2, from_to3){
+function trace_report_download(brand, run_no1, run_no2, run_no3){
+	var now = new Date();
+	var timestamp = String(now.getFullYear()) + String(('0' + (now.getMonth() + 1)).slice(-2)) + String(('0' + now.getDate()).slice(-2)) +
+	 String(now.getHours()) + String(now.getMinutes())
+    var link_str = "/isk_tools/reportoutput/S法/品質検討会資料/download/" + brand + "/" + run_no1 + "/" + run_no2 + "/" + run_no3 + "/";
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = timestamp + "_品質検討会資料(S法).xlsx";
+    downLoadLink.href = link_str;
+    downLoadLink.click();
+}
+
+function trace_report() {
+    if($('#brand option:selected').length != 1){
+        alert('銘柄を選択してください');
+        return;
+    }
+    if($('#while option:selected').length > 3){
+        alert('条件は3つまでです');
+        return;
+    }
+    brand = document.getElementById('brand').value;
+    selectedVals = $('#while').val();
+
+    if(selectedVals.length == 1){
+        run_no1 = selectedVals[0]
+        run_no2 = selectedVals[0]
+        run_no3 = selectedVals[0]
+    }else if(selectedVals.length == 2){
+        run_no1 = selectedVals[0]
+        run_no2 = selectedVals[1]
+        run_no3 = selectedVals[0]
+    }else if(selectedVals.length == 3){
+        run_no1 = selectedVals[0]
+        run_no2 = selectedVals[1]
+        run_no3 = selectedVals[2]
+    }
+
+    trace_report_download(brand, run_no1, run_no2, run_no3);
+
+}
+
+</script>
+<style>
+</style>
+<body>
+
+<h1>品質検討会資料</h1>
+
+<form action="#" method="post">
+
+    <div class="container">
+        <div class="row">
+            <div class="col-4">
+                銘柄を選択してください：<br>
+                <select class="form-control" id="brand" name="brand" size="30" onclick="__select__brand(this.value);">
+                    {% for tracereport1 in tracereport1 %}
+                    <option value="{{ tracereport1.銘柄 }}">{{ tracereport1.銘柄 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-4">
+                ランNoを3つまで選択して下さい：<br>
+                <select class="form-control" id="while" name="while" size="30" multiple>
+                </select>
+            </div>
+            <div class="col-4">
+                <input class="form-control" type="button" value="帳票出力" onclick="trace_report();">
+            </div>
+        </div>
+    </div>
+
+</form><br>
+
+</body>
+
+</html>

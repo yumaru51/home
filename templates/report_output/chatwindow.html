@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="jp">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Bootstrap -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<script>
+
+function input() {
+//const input = () => {
+    $.ajax({
+//        url: "/yumarusystem/川内/chatwindow/",
+        url: "/isk_tools/reportoutput/川内/chatwindow/",
+        type: "POST",
+        data : {
+//            'userInput': $('#userInput').val(),
+            'userInput': document.getElementById('userInput').value,
+            'status': {{ status }},
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(params){
+        document.getElementById('output').innerHTML = document.getElementById('output').innerHTML
+                                    + '<dt align = "right">' + params.user_input_output + '</dt>'
+                                    + '<dt align = "left">' + params.robot_output + '</dt>';
+        $('#user_input_output').empty();
+        $('#user_input_output').html(params.user_input_output);
+        $('#robot_output').empty();
+        $('#robot_output').html(params.robot_output);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $('#output').empty();
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+    $('#userInput').val('');
+    // actionで指定した先に遷移させない
+    return false;
+}
+
+</script>
+
+<style>
+  .form-group.required .control-label:after {
+    content: "*";
+    color: red;
+  }
+  body {
+    margin: 20px;
+  }
+  .form-privacy-policy {
+    margin: 10px auto 10px;
+  }
+  .form-header {
+    clear: both;
+  }
+  .form-headline h1 {
+    font-size: 30px;
+    margin: 20px auto;
+  }
+  .form-footer {
+    clear: both;
+  }
+  .btn {
+    margin-left: 10px;
+  }
+  .form-result {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+  .msg {
+    text-align: right;
+    color: #9F3C3A;
+  }
+</style>
+
+<title>Form</title>
+
+</head>
+
+<!--<body onLoad="document.form.userInput.focus();">-->
+<body onLoad="document.getElementById('userInput').focus();">
+
+
+<div class="col-lg-12 form-header">
+    <img src="https://1.bp.blogspot.com/-awAJZa7LZpc/X5OcMDf2M6I/AAAAAAABb6Y/yayar6adMIIf1XmToUB1jR3rM6KgVFSDACNcBGAsYHQ/s839/computer_income_man.png"
+    width="120" height="120">
+</div>
+
+
+<dl id="output" style="background-color:yellow;">
+    <dt>どのようなお問い合わせですか？</dt>
+</dl>
+
+<form method="post" action="#" onsubmit="return input()">
+    ◆問い合わせ：
+    <dl>
+        <dt>
+            &emsp;<input type="text" id="userInput" value="" autocomplete="off">
+            <input type="submit" value="質問">
+        </dt>
+    </dl>
+
+    ◆回答：
+    <dl style="background-color:yellow;">
+        <dt style="float: left;">&emsp;入力メッセージ：</dt>
+            <dd id="user_input_output" style="margin-left: 60px;">&emsp;</dd>
+        <dt style="float: left;">&emsp;応答メッセージ：</dt>
+            <dd id="robot_output" style="margin-left: 60px;">&emsp;</dd>
+    </dl>
+</form>
+
+<input name="sample" value="TEST入力" hidden >
+
+
+
+</body>
+</html>

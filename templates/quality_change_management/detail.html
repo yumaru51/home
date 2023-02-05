@@ -1,0 +1,93 @@
+{% extends 'quality_change_management/layout.html' %}
+{% load staticfiles %}
+{% block title %}変更管理ツール{% endblock %}
+
+{% block header %}
+<script>
+
+//読み込み時処理、タブ毎にするかdetailでよいか。
+window.onload = function() {
+    next_step();
+    department();
+    user();
+};
+
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ step_name }}</h1>
+
+<form action="{% url 'action' entry_dict.action %}" method="post">{% csrf_token %}
+
+    <br>
+
+    <!--次作業者フォーム-->
+    <div class="row">
+        <div class="col-2">次工程：<select id="next_step" name="next_step" class="form-select"></select></div>
+        <div class="col-3">次部署：<select id="next_department" name="next_department" class="form-select"></select></div>
+        <div class="col-3">次作業者：<select id="next_operator" name="next_operator" class="form-select"></select></div>
+    </div>
+    <script>document.getElementById("next_step").onchange = function(){next_step();};</script>
+    <script>document.getElementById("next_department").onchange = function(){next_step();};</script>
+    <script>document.getElementById("next_operator").onchange = function(){next_step();};</script>
+
+    <br>
+
+    <!--ボタン制御-->
+    {% if authority_flag == 1 %}
+        {% if entry_dict.action_name != '' %}
+        <input type="submit" value="{{ entry_dict.action_name }}" class="btn btn-primary mt-2">
+        {% endif %}
+
+        {% for key, value in function_dict.items %}
+<!--        <button type="button" onclick="location.href='{% url 'action' value.action %}'" class="btn btn-primary mt-2">{{ value.action_name }}</button>-->
+        <input type="submit" value="{{ value.action_name }}" formaction="{% url 'action' value.action %}" class="btn btn-primary mt-2">
+        {% endfor %}
+    {% endif %}
+
+    <br><br>
+
+    <!--タブ生成処理-->
+    <ul class="nav nav-tabs">
+        {% for key, value in page_dict.items %}
+        {% if value.default_page == 1 %}
+        <li class="nav-item">
+            <a href="#info_{{ value.page_id }}" class="nav-link active" data-toggle="tab">{{ value.page_name }}</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+            <a href="#info_{{ value.page_id }}" class="nav-link" data-toggle="tab">{{ value.page_name }}</a>
+        </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+
+    <!--タブ内容生成処理-->
+    <div class="tab-content">
+        {% for key, value in page_dict.items %}
+        {% if value.default_page == 1 %}
+        <div id="info_{{ value.page_id }}" class="tab-pane active">
+        {% else %}
+        <div id="info_{{ value.page_id }}" class="tab-pane">
+        {% endif %}
+            {{ value.page | safe }}
+        </div>
+        {% endfor %}
+    </div>
+
+<!--todo ココのレイアウト気になる        -->
+</form>
+
+<!--javascript処理-->
+<script type="text/javascript">
+    var ajax_next_step = '{% url 'ajax_next_step' %}';
+    var ajax_department = '{% url 'ajax_department' %}';
+    var ajax_user = '{% url 'ajax_user' %}';
+    var csrf_token = '{{ csrf_token }}';
+</script>
+<script src="{% static 'js/quality_change_management.js' %}"></script>
+
+{% endblock %}

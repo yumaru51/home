@@ -1,5 +1,5 @@
-# command_file = open('C:\\python_tool_development\\isk-tools\\report_output\\views\\extension_number.txt', encoding='utf-8')
-command_file = open('C:\\Users\\yumaru51\\PycharmProjects\\home\\report_output\\views\\extension_number.txt', encoding='utf-8')
+command_file = open('C:\\Users\\y-kawauchi\\python_tool_development\\home\\report_output\\views\\extension_number.txt', encoding='utf-8')  # 会社
+# command_file = open('C:\\Users\\yumaru51\\PycharmProjects\\home\\report_output\\views\\extension_number.txt', encoding='utf-8')  # 自宅
 
 raw_data = command_file.read()
 command_file.close()

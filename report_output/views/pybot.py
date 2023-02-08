@@ -7,9 +7,8 @@ from .pybot_random import choice_command, dice_command
 from .pybot_datetime import today_command, now_command, weekday_command
 
 
-# command_file = open('C:\\python_tool_development\\isk-tools\\report_output\\views\\pybot.txt', encoding='utf-8')
-command_file = open('C:\\Users\\yumaru51\\PycharmProjects\\home\\report_output\\views\\pybot.txt', encoding='utf-8')
-# command_file = open('./yumarusystem/pybot.txt', encoding='utf-8')
+command_file = open('C:\\Users\\y-kawauchi\\python_tool_development\\home\\report_output\\views\\pybot.txt', encoding='utf-8')  # 会社
+# command_file = open('C:\\Users\\yumaru51\\PycharmProjects\\home\\report_output\\views\\pybot.txt', encoding='utf-8')  # 自宅
 raw_data = command_file.read()
 command_file.close()
 # 1行ずつ辞書型にする

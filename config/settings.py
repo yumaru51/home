@@ -83,8 +83,8 @@ DATABASES = {
         'NAME': 'isk_tools_base',
         'USER': 'isk_tools_user',
         'PASSWORD': 'iskisk6117',
-        # 'HOST': 'localhost\SQLEXPRESS',
-        'HOST': 'localhost\SQLEXPRESS',
+        'HOST': 'Y0033OUT\SQLEXPRESS',  # 会社
+        # 'HOST': 'localhost\SQLEXPRESS',  # 自宅
         'PORT': '',
 
         'OPTIONS': {
@@ -97,8 +97,8 @@ DATABASES = {
         'NAME': 'fms',
         'USER': 'isk_tools_user',
         'PASSWORD': 'iskisk6117',
-        # 'HOST': 'localhost\SQLEXPRESS',
-        'HOST': 'localhost\SQLEXPRESS',  # テストDB
+        'HOST': 'Y0033OUT\SQLEXPRESS',  # 会社
+        # 'HOST': 'localhost\SQLEXPRESS',  # 自宅
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 13 for SQL Server',
@@ -110,7 +110,8 @@ DATABASES = {
         'NAME': 'quality_change_management',
         'USER': 'isk_tools_user',
         'PASSWORD': 'iskisk6117',
-        'HOST': 'localhost\SQLEXPRESS',
+        'HOST': 'Y0033OUT\SQLEXPRESS',  # 会社
+        # 'HOST': 'localhost\SQLEXPRESS',  # 自宅
         'PORT': '',
 
         'OPTIONS': {

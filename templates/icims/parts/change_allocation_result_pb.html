@@ -1,0 +1,6 @@
+    {% if pb_disp == 1 %}
+        <div style=width:150px;">
+            <input type="hidden" id="item_code_oe" value="{{ item_code }}">
+            <input type="button" value=" 引当変更画面 " onclick="allocation_result_change({{ order_id }});" >
+        </div>
+    {% endif %}

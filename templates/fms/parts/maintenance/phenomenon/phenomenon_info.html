@@ -1,0 +1,128 @@
+<script>
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+}
+//画面表示時コンボックス同期処理
+function phenomenon_display_open() {
+    var file_folder = $('#phenomenon_file_folder').val();
+    var div_id_name = $('#phenomenon_div_id_name').val();
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag_phenomenon').val();
+    var file_class = $('#phenomenon_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+}
+
+</script>
+<style type="text/css">
+div.scroll_maintenance_order_info_div {
+  width: 1880px;
+  height: 780px;
+  overflow: scroll;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <input type="hidden" id="budget_detail_id" value="{{ budget_lists.id }}">
+    <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+    <input type="hidden" id="last_operator" value="{{ last_operator }}">
+    <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">
+    <input type="hidden" id="action" value="{{ action }}">
+    <input type="hidden" id="action_sub" value="{{ action_sub }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="budget_rev_no" value="{{ budget_rev_no }}">
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+    <font size="5">
+        <div>発見者入力情報</div>
+    </font>
+    <div class="scroll_maintenance_order_info_div">
+    <div style=width:1800px;">
+        <div style="float:left;">
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">依頼ID</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ phenomenon_data.phenomenon_id }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">案件名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ phenomenon_data.project_title }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">発見日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ phenomenon_data.discovery_date }}</font></div></td>
+            </tr>
+<!--            <tr>-->
+<!--                <td><div style="padding: 5px 0px;"><font size="4">部署</font></div></td>-->
+<!--                <td><div style="padding: 5px 0px;"><font size="5">：　</font></div></td>-->
+<!--                <td><div style="padding: 5px 0px;"><font size="5">{{ phenomenon_data.department.department_name }}</font>-->
+<!--                </div></td>-->
+<!--            </tr>-->
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">発見者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ phenomenon_data.user }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">状況詳細</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4" color="black"><textarea name="purpose" rows="8" cols="45" style="color:black;" readonly>{{ phenomenon_data.condition_detail}}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">改善提案</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4" color="black"><textarea name="purpose" rows="8" cols="45" style="color:black;" readonly>{{ phenomenon_data.improvement_proposal }}</textarea></font></div></td>
+            </tr>
+        </table>
+        </div>
+        <div style="float:left;">　　</div>
+        <div style="float:left;">
+
+        <table>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                {% for mgt_cls_lists in mgt_cls_lists %}
+                    {% if mgt_cls_lists.m_mgt_cls_skey == phenomenon_data.m_mgt_cls_skey %}
+                        <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ mgt_cls_lists.mgt_cls_nm_1 }}</font></div></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">状況</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                {% for condition_list in condition_list %}
+                    {% if condition_list.m_condition_cd_skey == phenomenon_data.m_condition_cd_skey %}
+                        <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ condition_list.condition_nm_1 }}</font></div></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工場</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                {% for facility_lists in facility_lists %}
+                    {% if facility_lists.m_location_skey == phenomenon_data.m_location_skey%}
+                        <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ facility_lists.location_nm_1 }}</font></div></td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        </table>
+
+        <p><font size="4">機器一覧：</font>
+        <div id="equipment_list" name="equipment_list">
+            {{ equipment_list | safe }}
+        </div>
+        </p>
+
+            <input type="hidden" id="delete_pb_disp_flag_phenomenon" value="0">
+            <input type="hidden" id="phenomenon_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+            <input type="hidden" id="phenomenon_div_id_name" name="div_id_name" value="phenomenon">
+            <input type="hidden" id="phenomenon_file_class" name="file_class" value="AbnormalityReport">
+
+            <div id="upload_file_list_phenomenon">添付ファイル無し</div>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+<script>
+function file_download(file_name,data_id){
+    var link_str = "/isk_tools/fms/action/file_download/" + data_id + "/";
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = file_name;
+    downLoadLink.href = link_str ;
+//不要
+//    downLoadLink.dataset.downloadurl = ["text/plain", downLoadLink.download, downLoadLink.href].join(":");
+    downLoadLink.click();
+}
+
+function attached_file_download(phenomenon_id,file_name){
+    var link_str = "/isk_tools/fms/action/attached_file_download/" + phenomenon_id + "/"+ file_name;
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = file_name;
+    downLoadLink.href = link_str ;
+    downLoadLink.click();
+}
+
+</script>
+<br>
+<h1 style="margin: 0 0;">ファイル一覧</h1>
+{% if uploadfile_list_num > 0 %}
+
+{% comment %}リスト選択処理1月以降対応
+    {% if uploadfile_list_num > 1 %}
+    <select id="file_data_{{ div_id_name }}" name="file_data_{{ div_id_name }}" onchange="upload_file_list('{{ div_id_name }}');">
+        {% for data_list in data_list %}
+            <option value="{{ data_list.data }}">{{ data_list.data }}</option>
+        {% endfor %}
+    </select>
+    {% endif %}
+{% endcomment %}
+
+    <table>
+    {% for uploadfile in uploadfile_list %}
+        <tr>
+            <td><font size="4">{{ uploadfile.file_name }}</font></td>
+            <td><font size="3"><input type="button" value=" 取出 " onclick="file_download('{{ uploadfile.file_name }}',{{ uploadfile.id }});"></font></td>
+            {% if delete_pb_disp_flag == 1 %}
+            <td><font size="3"><input type="button" value=" 削除 " onclick="file_delete({{ uploadfile.id }});"></font></td>
+            {% endif %}
+        </tr>
+    {% endfor %}
+    </table>
+{% else %}
+    保存添付ファイル無し
+{% endif %}
+
+{% if attached_file_list_num > 0 %}
+<br><br><br>
+<h1 style="margin: 0 0;">IEP報告資料一覧</h1>
+    <table>
+    {% for attached_file in attached_file_list %}
+        <tr>
+            <td><font size="4">{{ attached_file }} (機器管理添付ファイル)</font></td>
+            <td><font size="3"><input type="button" value=" 取出 " onclick="attached_file_download({{ phenomenon_id }},'{{ attached_file }}');"></font></td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endif %}

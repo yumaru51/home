@@ -1,0 +1,125 @@
+<script>
+//予算関連機器詳細表示
+function budget_equipment_detail(a) {
+    var budget_equipment_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/budget_equipment_detail/",
+                type: "POST",
+                data : {
+                    'budget_equipment_id' : budget_equipment_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#equipment_no').val(data.equipment_no);
+                    $('#equipment_name').val(data.equipment_name);
+                    $('#management_class').val(data.management_class);
+                    $('#equip_family_nm').val(data.equip_family);
+                    $('#equip_type_nm').val(data.equip_type);
+                    $('#facility').val(data.facility);
+                    $('#budget_equipment_id').val(data.budget_equipment_id);
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("budget_equipment_add_button_div") != null){
+                        const p1 = document.getElementById("budget_equipment_add_button_div");
+                        p1.style.display ="none";
+                    }
+                    if(document.getElementById("budget_equipment_edit_button_div") != null){
+                        const p2 = document.getElementById("budget_equipment_edit_button_div");
+                        p2.style.display ="block";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.budget_equipment_scrollHead,tbody.budget_equipment_scrollBody{
+    display:block;
+}
+tbody.budget_equipment_scrollBody{
+    overflow-y:scroll;
+    height:280px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.budget_equipment_no{
+    width:200px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.budget_equipment_name{
+    width:280px;
+    font-size: 120%;
+    padding: 5px 5px 5px 5px;
+}
+.budget_equip_family_nm{
+    width:200px;
+    font-size: 120%;
+    padding: 5px 5px 5px 5px;
+}
+.budget_equip_type_nm{
+    width:200px;
+    font-size: 120%;
+    padding: 5px 5px 5px 5px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+    {% if budget_equipment_lists_num > 0 %}
+        <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+            <thead class="budget_equipment_scrollHead">
+                <tr>
+                    {% comment %}
+                    「select_pb_disp_flag」選択リンクを表示するか否か。「法令/機器タブ」と「予算基本情報タブ」でパラメータ分けしている。
+                    データの変更を行う際に選択リンクをクリックしてフォームに表示し書き換えを行う。
+                    {% endcomment %}
+                    {% if select_pb_disp_flag != 0 %}
+                        <th class="detail_pb"></th>
+                    {% endif %}
+                    <th class="budget_equipment_no">関係機器NO</th>
+                    <th class="budget_equipment_name">関係機器名</th>
+                    <th class="budget_equip_family_nm">機器ファミリ</th>
+                    <th class="budget_equip_type_nm">機器タイプ</th>
+                </tr>
+            </thead>
+            <tbody class="budget_equipment_scrollBody">
+            {% for budget_equipment_lists in budget_equipment_lists %}
+                <tr>
+                    {% if select_pb_disp_flag != 0 %}
+                        <td class="detail_pb">
+                            <a href="#budget_equipment_scrollBody" id="{{ budget_equipment_lists.id }}" class="detailpb" onclick="budget_equipment_detail(id);">選択</a>
+                        </td>
+                    {% endif %}
+                    <td class="budget_equipment_no">{{ budget_equipment_lists.equip_no }}</td>
+                    <td class="budget_equipment_name" style="overflow:hidden;">{{ budget_equipment_lists.equip_name | default_if_none:''}}</td>
+                    {% for eqptfmlymst_list in eqptfmlymst_list %}
+                        {% if eqptfmlymst_list.eqpt_id == budget_equipment_lists.equip_no and eqptfmlymst_list.mgt_cls == budget_equipment_lists.management_class and eqptfmlymst_list.family_cd == budget_equipment_lists.equip_family %}
+                            <td class="budget_equip_family_nm" style="overflow:hidden;">{{ eqptfmlymst_list.family_nm }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    {% for eqptfmlymst_list in eqptfmlymst_list %}
+                        {% if eqptfmlymst_list.eqpt_id == budget_equipment_lists.equip_no and eqptfmlymst_list.mgt_cls == budget_equipment_lists.management_class and eqptfmlymst_list.family_cd == budget_equipment_lists.equip_family and eqptfmlymst_list.type_cd == budget_equipment_lists.equip_type %}
+                            <td class="budget_equip_type_nm" style="overflow:hidden;">{{ eqptfmlymst_list.type_nm }}</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div>対象データなし</div>
+    {% endif %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+<script language="javascript" type="text/javascript"  charset="UTF-8">
+function stock_filter_call() {
+    var from_page = 11001;
+    $.ajax({
+        url: "/imsds/parts/stock_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#stock_filter').empty();
+            $('#stock_filter').html(data);
+            getstockdata(11001);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#stock_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+function getorderdetail(a) {
+        var order_id = a;
+        var from_page = 11001 ;
+        //alert(order_id);
+        $.ajax({
+                url: "/imsds/parts/order_detail/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#order_detail').empty();
+                    $('#order_detail').html(data);
+
+                    $("#floatBox1Dialog").dialog({
+                        modal:true,
+                        width: 1600,
+                        height: 500,
+                        title:"詳細受注画面",
+                    });
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+window.onload = function() {
+        stock_filter_call();
+        //getstockdata();
+};
+</script>
+<style type="text/css">
+#stocklist{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:150px;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">在庫管理</h2>
+    </div>
+
+    <div class="pagetitle">
+        <input type="hidden" id="this_page" value="2">
+        <div>
+            <input type="button" name="getstockdata" value="在庫データ更新" onclick="getstockdata(11001);">
+        </div>
+    </div>
+    <div id="stock_filter"></div>
+    <div>
+        在庫リスト　
+    </div>
+
+    <div id="loading2">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+
+    <div id="stock_list"></div>
+
+    <div id="floatBox2Dialog" style="display:none;">
+        <div id="stock_detail">
+        </div>
+    </div>
+
+    <div id="floatBox1Dialog" style="display:none;">
+        <div id="order_detail">
+        </div>
+    </div>
+
+{% endblock %}

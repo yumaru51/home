@@ -1,0 +1,59 @@
+<div>
+    <input type="hidden" id="target_id" value="{{ id }}">
+    <div style="float:left;margin-left:15px;">工事ID/小口依頼ID：{{ construction_id }}</div>
+    <div style="float:left;margin-left:30px;">工事区分：{{ construction_class }}</div>
+    <div style="float:left;margin-left:30px;">工事名：{{ construction_name }}</div>
+    <div style="float:left;margin-left:30px;">工事日：{{ construction_date }}</div>
+</div>
+<div style="clear: both;"></div>
+<div>
+    <div style="float:left;margin-left:15px;">
+        {% if fire_flag == 1 %}
+                <input type="checkbox" name="fire_flag" value="1" checked="checked">火気使用
+            {% else %}
+                <input type="checkbox" name="fire_flag" value="0">火気使用
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if high_place_flag == 1 %}
+                <input type="checkbox" name="high_place_flag" value="1" checked="checked">高所作業
+            {% else %}
+                <input type="checkbox" name="high_place_flag" value="0">高所作業
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if entering_the_tank_flag == 1 %}
+                <input type="checkbox" name="entering_the_tank_flag" value="1" checked="checked">入槽作業
+            {% else %}
+                <input type="checkbox" name="entering_the_tank_flag" value="0">入槽作業
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if heavy_equipment_flag == 1 %}
+                <input type="checkbox" name="heavy_equipment_flag" value="1" checked="checked">重機
+            {% else %}
+                <input type="checkbox" name="heavy_equipment_flag" value="0">重機
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if brake_off_flag == 1 %}
+                <input type="checkbox" name="brake_off_flag" value="1" checked="checked">縁切
+            {% else %}
+                <input type="checkbox" name="brake_off_flag" value="0">縁切
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if contamination_flag == 1 %}
+                <input type="checkbox" name="contamination_flag" value="1" checked="checked">異物
+            {% else %}
+                <input type="checkbox" name="contamination_flag" value="0">異物
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if blockage_flag == 1 %}
+                <input type="checkbox" name="blockage_flag" value="1" checked="checked">交通遮断
+            {% else %}
+                <input type="checkbox" name="blockage_flag" value="0">交通遮断
+            {% endif %}
+    </div>
+</div>

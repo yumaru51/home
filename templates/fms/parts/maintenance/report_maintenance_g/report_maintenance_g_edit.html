@@ -1,0 +1,655 @@
+<script>
+
+//機器リストソース取得
+function equipment_list_change() {
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/input_select_equipment_list/",
+        type: "POST",
+        data : {
+            'mgt_cls': {{ mgt_class.m_mgt_cls_skey }},
+            'facility' : {{ facility.m_location_skey }},
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#equipment_no').empty();
+            $('#equipment_no').html(data);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('#equipment_no').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+
+}
+
+//入力チェック・背景色変更処理
+function equipment_history_report_mast_check() {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    //入力チェック対象リスト　val_id=該当id、set_id=背景色変更対象id、
+    //must_flg=必須項目フラグ(1で必須)、max_length=上限文字数(0はチェックしない)
+    let check_object_list =
+    { 0: { val_id:'#time_of_occurrence',    set_id:'time_of_occurrence',   must_flg:1, max_length:0},
+      1: { val_id:'#phenomenon_details',    set_id:'phenomenon_details',   must_flg:1, max_length:0},
+      2: { val_id:'#exe_cls_skey',          set_id:'exe_cls_skey',         must_flg:1, max_length:0},
+      3: { val_id:'#failure_work_type',     set_id:'failure_work_type',    must_flg:1, max_length:0},
+      4: { val_id:'#report_detail',         set_id:'report_detail',        must_flg:0, max_length:200},
+      5: { val_id:'#cause_detail',          set_id:'cause_detail',         must_flg:0, max_length:200},
+      6: { val_id:'#countermeasure',        set_id:'countermeasure',       must_flg:0, max_length:200},
+      7: { val_id:'#phenomenon_details',    set_id:'phenomenon_details',   must_flg:1, max_length:200},
+      8: { val_id:'#special_mention',       set_id:'special_mention',      must_flg:0, max_length:200},
+      9: { val_id:'#message',               set_id:'message',              must_flg:0, max_length:200},
+    };
+
+    for (let check_index in check_object_list){
+        var check_object = check_object_list[check_index];
+        var check_val = $(check_object.val_id).val();
+        var set_element = document.getElementById(check_object.set_id);
+        var ng_element_flag = 0;
+
+        //必須項目チェック
+        if(check_object.must_flg == 1 && check_val == ""){
+            set_element.style.backgroundColor = 'orange';
+            ng_element_flag =  1;
+            ng_flag = ng_flag + ng_element_flag;
+        }
+
+        //文字数上限チェック
+        if ( check_object.max_length > 0 && count_char(check_val) > check_object.max_length){
+           if(ng_element_flag == 0){
+             set_element.style.backgroundColor = 'silver';
+           }
+           ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else if(ng_element_flag == 0){
+           set_element.style.backgroundColor = 'white';
+        }
+    }
+    return { 1:ng_flag , 2:ng_str_count_flag };
+}
+
+//入力チェックの実施、対応処理
+function input_check(a,b,d) {
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+
+    var { 1:ng_flag , 2:ng_str_count_flag  } = equipment_history_report_mast_check();
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+    //正常処理を先に判定
+    if ( ng_all_flag == 0) {
+        equipment_history_report_entry(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+//機器履歴登録処理
+function equipment_history_report_entry(a,b) {
+    var phenomenon_id = $('#target_phenomenon_id').val();
+    if (phenomenon_id == 0){
+        alert("案件データを先に登録(一時保存)してください！！");
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }else{
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var equipment_history_report_id = $('#equipment_history_report_id').val();
+        var phenomenon_id = $('#target_phenomenon_id').val();
+
+        //不要かも
+        var phenomenon_class = $('#phenomenon_class').val();
+        var cause_class = $('#cause_class').val();
+        var result = $('#result').val();
+
+        $.ajax({
+                url: "/isk_tools/fms/action/equipment_history_report_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'this_division' : this_division,
+                    'this_department' : this_department,
+                    'user_attribute_id' : user_attribute_id,
+                    'equipment_history_report_id' : equipment_history_report_id,
+                    'phenomenon_id' : phenomenon_id,
+                    'equipment_no': $('#equipment_no').val(),
+                    'completion_date': $('#completion_date').val(),
+                    'cycle_reference_date': $('#cycle_reference_date').val(),
+                    'start_date': $('#start_date').val(),
+                    'user_nm': $('#user_nm').val(),
+                    //不要かも
+                    'phenomenon_class' : phenomenon_class,
+                    'cause_class' : cause_class,
+                    'result' : result,
+
+                    'time_of_occurrence': $('#time_of_occurrence').val(),
+                    'exe_cls_skey': $('#exe_cls_skey').val(),
+                    'failure_work_type': $('#failure_work_type').val(),
+                    'maintenance_classification': $('#maintenance_classification').val(),
+                    'condition_skey': $('#condition_skey').val(),
+                    'condition_position_cd_skey': $('#condition_position_cd_skey').val(),
+                    'phenomenon_cd_skey': $('#phenomenon_cd_skey').val(),
+                    'phenomenon_position_cd_skey': $('#phenomenon_position_cd_skey').val(),
+                    'cause_cd_skey': $('#cause_cd_skey').val(),
+                    'cause_position_cd_skey': $('#cause_position_cd_skey').val(),
+                    'treatment_cd_skey': $('#treatment_cd_skey').val(),
+                    'treatment_position_cd_skey': $('#treatment_position_cd_skey').val(),
+                    'result_cd_skey': $('#result_cd_skey').val(),
+                    'repair_time': $('#repair_time').val(),
+                    'report_detail': $('#report_detail').val(),
+                    'cause_detail': $('#cause_detail').val(),
+                    'countermeasure': $('#countermeasure').val(),
+                    'phenomenon_details': $('#phenomenon_details').val(),
+                    'special_mention': $('#special_mention').val(),
+                    'message': $('#message').val(),
+
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    if(data.equipment_history_report_unique_id != 0){
+                        $('#equipment_history_report_id').val(data.equipment_history_report_unique_id);
+                        if ( this_step != next_step ){
+                            $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                        }
+                        //equipment_history_report_lists('phenomenon_id', '');//機器履歴一覧を表示するJS起動(？？？detail_template.html内にプログラム有)
+                        if($("#action_pb_loading") != null){
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+                        alert(data.msg);
+                        $('#report_equipment_list').html(data.equipment_list);
+                        // アクションボタン有効化
+                        $(".button").prop("disabled", false);
+                    }else{
+                        //内部エラー発生、警告表示
+                        alert(data.msg);
+                        // アクションボタン有効化
+                        $(".button").prop("disabled", false);
+                    }
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+    }
+}
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+}
+
+//工事関連機器削除処理
+function equipment_delete(id) {
+            $.ajax({
+                url: "/isk_tools/fms/action/phenomenon_equipment_delete/",
+                type: "POST",
+                data : {
+                    'id': id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#report_equipment_list').html(data.equipment_list);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                });
+}
+
+//画面表示時チェックボックス同期処理
+function report_maintenance_g_display_open() {
+    var file_folder = $('#equipment_history_file_folder').val();
+    var div_id_name = $('#equipment_history_div_id_name').val();
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag_equipment_history').val();
+    var file_class = $('#equipment_history_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+    equipment_list_change();
+}
+
+//停止/修理時間説明表示
+const repair_time_input = document.getElementById('repair_time');
+repair_time_input.addEventListener('focusin', (e) => {
+    $("#repair_time_popup_table").css("display", "block");
+});
+repair_time_input.addEventListener('focusout', (e) => {
+    $("#repair_time_popup_table").css("display", "none");
+});
+
+//初期状態設定
+$("#repair_time_popup_table").css("display", "none");
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_maintenance_order_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+
+<body>
+
+<div>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+    </div>
+    <div>
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="equipment_history_report_id" value="{{ equipment_history_report_data.id }}">
+    </div>
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div class="scroll_equipment_history_report_div" style="float: left;">
+        <div style="float: left;">
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ mgt_class.mgt_cls_nm_1 }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">工場名</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ facility.location_nm_1 }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">機器番号</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><font size="3">
+                        <select id="equipment_no" name="equipment_no">
+                            <option value=""></option>
+                        </select>
+                    </font></td>
+                </tr>
+            </table>
+            {% if equipment_add_button_display_flag == 1 %}
+                <input type="button" id="equipment_add_button" value="　追加　" onclick="action(232004001,232004001,'entry','temporarily_saved');" >
+
+            {% endif %}
+
+            <br><br>
+            機器一覧：
+            <div id="report_equipment_list" name="equipment_list">
+                {{ equipment_list | safe }}
+            </div>
+            <br>
+
+            <div><font size="4">報告内容：　</font></div>
+            <div><font size="3"><textarea id="report_detail" name="report_detail" rows="8" cols="45">{{ equipment_history_report_data.report_detail | default_if_none:"" }}</textarea></font></div>
+            <div><font size="4">原因詳細：　</font></div>
+            <div><font size="3"><textarea id="cause_detail" name="cause_detail" rows="8" cols="45">{{ equipment_history_report_data.cause_detail | default_if_none:"" }}</textarea></font></div>
+            <div><font size="4">対策：　</font></div>
+            <div><font size="3"><textarea id="countermeasure" name="countermeasure" rows="8" cols="45">{{ equipment_history_report_data.countermeasure | default_if_none:"" }}</textarea></font></div>
+        </div>
+        <div style="float: left;" size="5px">　</div>
+
+        <div style="float: left;"><br>
+
+            <div>
+                <table>
+                    <tr>
+                        <td><div><font size="4">発見日時</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            {% if equipment_history_report_data_num == 0 %}
+                                <input type="date" id="time_of_occurrence" name="time_of_occurrence" value="{{ phenomenon_data.discovery_date | date:'Y-m-d' }}">
+                            {% else %}
+                                <input type="date" id="time_of_occurrence" name="time_of_occurrence" value="{{ equipment_history_report_data.time_of_occurrence | date:'Y-m-d' }}">
+                            {% endif %}
+                        </font></div></td>
+                        <td><div><font size="4">工事完了日</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <input type="date" id="completion_date" name="completion_date" value="{{ equipment_history_report_data.completion_date | date:'Y-m-d' }}">
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">案件区分</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="exe_cls_skey" name="exe_cls_skey">
+                                        <option value=""></option>
+                                {% for exe_cls_lists in exe_cls_lists %}
+                                    {% if equipment_history_report_data_num == 0 %}
+                                        {% if exe_cls_lists.m_exe_cls_skey == measure_data.m_exe_cls_skey %}
+                                            <option value="{{ exe_cls_lists.m_exe_cls_skey }}" selected>{{ exe_cls_lists.exe_cls_nm_1 }}</option>
+                                        {% else %}
+                                            <option value="{{ exe_cls_lists.m_exe_cls_skey }}">{{ exe_cls_lists.exe_cls_nm_1 }}</option>
+                                        {% endif %}
+                                    {% else %}
+                                        {% if exe_cls_lists.m_exe_cls_skey == equipment_history_report_data.m_exe_cls_skey %}
+                                            <option value="{{ exe_cls_lists.m_exe_cls_skey }}" selected>{{ exe_cls_lists.exe_cls_nm_1 }}</option>
+                                        {% else %}
+                                            <option value="{{ exe_cls_lists.m_exe_cls_skey }}">{{ exe_cls_lists.exe_cls_nm_1 }}</option>
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            </select>　※必須
+                        </font></div></td>
+                        <td><div><font size="4">周期基準日</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <input type="date" id="cycle_reference_date" name="cycle_reference_date" value="{{ equipment_history_report_data.cycle_reference_date | date:'Y-m-d' }}">
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">故障/作業種別</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="failure_work_type" name="failure_work_type">
+                                {% if equipment_history_report_data_num == 0 %}
+                                    <option value="{{ measure_data.malfunction_class | default_if_none:'' }}" hidden>{{ measure_data.malfunction_class | default_if_none:"" }}</option>
+                                {% else %}
+                                    <option value="{{ equipment_history_report_data.failure_work_type | default_if_none:'' }}" hidden>{{ equipment_history_report_data.failure_work_type | default_if_none:"" }}</option>
+                                {% endif %}
+                                    <option value="重故障修理">重故障修理</option>
+                                    <option value="軽故障修理">軽故障修理</option>
+                                    <option value="整備点検">整備点検</option>
+                                    <option value="点検検査">点検検査</option>
+                                    <option value="土建工事">土建工事</option>
+                                    <option value="その他-保全G関連">その他-保全G関連</option>
+                                    <option value="その他-調達G関連">その他-調達G関連</option>
+                            </select>　※必須
+                        </font></div></td>
+                        <td><div><font size="4">工事着工日</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <input type="date" id="start_date" name="start_date" value="{{ equipment_history_report_data.start_date | date:'Y-m-d' }}">
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">保全区分</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="maintenance_classification" name="maintenance_classification">
+                                        <option value=""></option>
+                                {% for maintenance_classification_lists in maintenance_classification_lists %}
+                                    {% if maintenance_classification_lists.internal_value == equipment_history_report_data.s_specman_list_value_skey %}
+                                        <option value="{{ maintenance_classification_lists.internal_value }}" selected>{{ maintenance_classification_lists.display_value_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ maintenance_classification_lists.internal_value }}">{{ maintenance_classification_lists.display_value_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                        <td><div><font size="4">工事担当者</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <input type="text" id="user_nm" name="user_nm" value="{{ construction_representative.user_nm | default_if_none:'' }}" readonly="readonly" >
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">状況</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="condition_skey" name="condition_skey">
+                                        <option value=""></option>
+                                {% for condition_lists in condition_lists %}
+                                    {% if condition_lists.m_condition_cd_skey == equipment_history_report_data.m_condition_cd_skey %}
+                                        <option value="{{ condition_lists.m_condition_cd_skey }}" selected>{{ condition_lists.condition_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ condition_lists.m_condition_cd_skey }}">{{ condition_lists.condition_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                        <td><div><font size="4">状況部位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="condition_position_cd_skey" name="condition_position_cd_skey">
+                                        <option value=""></option>
+                                {% for position_lists in position_lists %}
+                                    {% if position_lists.m_position_cd_skey == equipment_history_report_data.m_position_cd_skey_condition %}
+                                        <option value="{{ position_lists.m_position_cd_skey }}" selected>{{ position_lists.position_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ position_lists.m_position_cd_skey }}">{{ position_lists.position_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">現象</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="phenomenon_cd_skey" name="phenomenon_cd_skey">
+                                        <option value=""></option>
+                                {% for phenomenon_lists in phenomenon_lists %}
+                                    {% if phenomenon_lists.m_phenomenon_cd_skey == equipment_history_report_data.m_phenomenon_cd_skey %}
+                                        <option value="{{ phenomenon_lists.m_phenomenon_cd_skey }}" selected>{{ phenomenon_lists.phenomenon_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ phenomenon_lists.m_phenomenon_cd_skey }}">{{ phenomenon_lists.phenomenon_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                        <td><div><font size="4">現象部位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="phenomenon_position_cd_skey" name="phenomenon_position_cd_skey">
+                                        <option value=""></option>
+                                {% for position_lists in position_lists %}
+                                    {% if position_lists.m_position_cd_skey == equipment_history_report_data.m_position_cd_skey_phenomenon %}
+                                        <option value="{{ position_lists.m_position_cd_skey }}" selected>{{ position_lists.position_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ position_lists.m_position_cd_skey }}">{{ position_lists.position_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">原因</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="cause_cd_skey" name="cause_cd_skey">
+                                        <option value=""></option>
+                                {% for cause_lists in cause_lists %}
+                                    {% if cause_lists.m_cause_cd_skey == equipment_history_report_data.m_cause_cd_skey %}
+                                        <option value="{{ cause_lists.m_cause_cd_skey }}" selected>{{ cause_lists.cause_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ cause_lists.m_cause_cd_skey }}">{{ cause_lists.cause_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                        <td><div><font size="4">原因部位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="cause_position_cd_skey" name="cause_position_cd_skey">
+                                        <option value=""></option>
+                                {% for position_lists in position_lists %}
+                                    {% if position_lists.m_position_cd_skey == equipment_history_report_data.m_position_cd_skey_cause %}
+                                        <option value="{{ position_lists.m_position_cd_skey }}" selected>{{ position_lists.position_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ position_lists.m_position_cd_skey }}">{{ position_lists.position_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">処置</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="treatment_cd_skey" name="treatment_cd_skey">
+                                        <option value=""></option>
+                                {% for treatment_lists in treatment_lists %}
+                                    {% if treatment_lists.m_treatment_cd_skey == equipment_history_report_data.m_treatment_cd_skey %}
+                                        <option value="{{ treatment_lists.m_treatment_cd_skey }}" selected>{{ treatment_lists.treatment_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ treatment_lists.m_treatment_cd_skey }}">{{ treatment_lists.treatment_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                        <td><div><font size="4">処置部位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="treatment_position_cd_skey" name="treatment_position_cd_skey">
+                                        <option value=""></option>
+                                {% for position_lists in position_lists %}
+                                    {% if position_lists.m_position_cd_skey == equipment_history_report_data.m_position_cd_skey_treatment %}
+                                        <option value="{{ position_lists.m_position_cd_skey }}" selected>{{ position_lists.position_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ position_lists.m_position_cd_skey }}">{{ position_lists.position_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">結果</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="result_cd_skey" name="result_cd_skey">
+                                        <option value=""></option>
+                                {% for result_lists in result_lists %}
+                                    {% if result_lists.m_result_cd_skey == equipment_history_report_data.m_result_cd_skey %}
+                                        <option value="{{ result_lists.m_result_cd_skey }}" selected>{{ result_lists.result_nm_1 }}</option>
+                                    {% else %}
+                                        <option value="{{ result_lists.m_result_cd_skey }}">{{ result_lists.result_nm_1 }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                        <td><div><font size="4">修理時間(h)</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <input type="text" id="repair_time" name="repair_time" value="{{ equipment_history_report_data.repair_time | default_if_none:'' }}">
+                        </font></div></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="repair_time_popup_table" >
+                <font size="5">停止/修理時間説明：</font>
+                <table border="1" style="border-collapse: collapse; border-color: black">
+                    <tr><td></td><td></td></tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">
+                            停止時間
+                        </font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">
+                            重故障時に記載、減損時間のこと。
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4" color="red">
+                            修理時間
+                        </font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4" color="red">
+                            ライン内作業時間のこと。
+                        </font></div></td>
+                    </tr>
+                    <tr><td></td><td></td></tr>
+                </table>
+            </div>
+
+            <div><font size="4">現象詳細：　　※必須</font></div>
+            {% if equipment_history_report_data_num == 0 %}
+                <div><font size="3"><textarea id="phenomenon_details" name="phenomenon_details" rows="8" cols="45">{{ phenomenon_data.condition_detail | default_if_none:"" }}　{{ measure_data.measure_order_detail | default_if_none:"" }}</textarea></font></div>
+            {% else %}
+                <div><font size="3"><textarea id="phenomenon_details" name="phenomenon_details" rows="8" cols="45">{{ equipment_history_report_data.phenomenon_details | default_if_none:"" }}</textarea></font></div>
+            {% endif %}
+            <div><font size="4">特記：　</font></div>
+            <div><font size="3"><textarea id="special_mention" name="special_mention" rows="8" cols="45">{{ equipment_history_report_data.special_note_construction_work | default_if_none:"" }}</textarea></font></div>
+            <div><font size="4">申送事項：　</font></div>
+            <div><font size="3"><textarea id="message" name="message" rows="8" cols="45">{{ equipment_history_report_data.message | default_if_none:"" }}</textarea></font></div>
+
+        </div>
+        <div style="float: left;" size="5px">　</div>
+        <div style="float: left;">
+            <form id="equipment_history_file_upload_form" name="file_upload_form" action="/isk_tools/fms/action/file_upload_other_type/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group"><font size="4">
+                        資料データ選択　　　　　　　：　<input type="file" id="attachment_file" name="file" onchange="get_attachment_file();" />
+                    <input type="hidden" id="file_target" name="file_target" value="FailureCorrespondence">
+                    <input type="hidden" id="equipment_history_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_data.phenomenon_id }}\">
+                    <input type="hidden" id="equipment_history_div_id_name" name="div_id_name" value="equipment_history">
+                    <input type="hidden" id="delete_pb_disp_flag_equipment_history" name="delete_pb_disp_flag" value="1">
+                    <input type="hidden" id="equipment_history_check_item" name="check_item" value="{{ phenomenon_data.phenomenon_id }}">
+                    <input type="hidden" id="file_first_layer_id" name="file_first_layer_id" value="{{ phenomenon_data.phenomenon_id }}">
+                    <input type="hidden" id="file_second_layer_id" name="file_second_layer_id" value="">
+                    <input type="hidden" id="equipment_history_file_class" name="file_class" value="Evaluation">
+                    <input type="button" class="button" value="送信" onclick="file_upload_other_type('equipment_history');">
+                </font></div>
+            </form>
+
+            <div id="upload_file_list_equipment_history">添付ファイル無し</div>
+        </div>
+    </div>
+
+    </div><!--ng_character_checkここまで-->
+
+</div>
+
+</body>

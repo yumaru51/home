@@ -1,0 +1,26 @@
+<div class="scrool_budget_equipment_master_div">
+<ul id="equipment">
+    {% if filtered_equipment_list_num > 0 %}
+        {% for equipment_list in equipment_list %}
+            <li class="fms_sidebar-list">
+                <font size="4">
+                    <a href="#equipment"
+                       data-management_class="{{ equipment_list.mgt_cls }}"
+                       data-facility_code="{{ equipment_list.location_cd }}"
+                       data-equip_no="{{ equipment_list.eqpt_id }}"
+                       data-equip_name="{{ equipment_list.fclty_nm }}"
+                       data-equip_family="{{ equipment_list.family_cd }}"
+                       data-equip_family_nm="{{ equipment_list.family_nm }}"
+                       data-equip_type="{{ equipment_list.type_cd }}"
+                       data-equip_type_nm="{{ equipment_list.type_nm }}"
+                       onclick="select_equipment(this);">
+                        {{ equipment_list.eqpt_id }} : {{ equipment_list.fclty_nm }} : {{ equipment_list.type_nm }}
+                    </a>
+                </font>
+            </li>
+        {% endfor %}
+    {% else %}
+        <div>対象データなし</div>
+    {% endif %}
+</ul>
+</div>

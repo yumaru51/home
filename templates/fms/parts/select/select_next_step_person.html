@@ -1,0 +1,10 @@
+<script>
+
+</script>
+            次作業者：<select id="sel_next_person" name="sel_next_person" style="font-size: 110%">
+                        <!-- action_pbの次作業者のみ、user_attribute_idをvalueとするので注意 -->
+                        <option value=""></option>
+                {% for next_person in next_person_list %}
+                        <option value="{{ next_person.id }}" {% if next_person.username == next_person_username %} selected {% endif %}>{{ next_department_name }}:{{ next_person.full_name }}</option>
+                {% endfor %}
+                </select>※差戻時は自動判定

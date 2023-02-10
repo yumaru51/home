@@ -1,0 +1,341 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+</script>
+<style type="text/css">
+
+/*20201205y-kawauchi フォームレイアウト*/
+dl {
+    height: auto;
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+dt{
+    width: 200px;
+    height: auto;
+    float:left;
+    clear:both;
+    font-weight: normal;
+    font-size: 24px;
+}
+dd{
+    height: 30px;
+    padding: 5px 0px;
+    font-size: 24px;
+}
+dd:nth-child(4n+2) {
+background-color:#dddddd
+}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-400px;
+	margin-top:100px;
+}
+
+</style>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+<!--        <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">-->
+<!--        <input type="hidden" id="this_work_id" value="{{ work_lists.work_id }}">-->
+<!--        <input type="hidden" id="this_work_rev_no" value="{{ work_lists.work_rev_no }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_proindividualcontractdoc_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+
+<!--        <div id="{{ action_button_id }}" style="width: auto;"></div>-->
+
+        <div class="scroll_div" style="float: left;">
+
+<!--            <dl>-->
+<!--                <dt>注文分類</dt><dd>：{{ order_classification }}</dd>-->
+<!--                <dt>課税</dt><dd>：{{ tax_kbn }}</dd>-->
+<!--                </dd>-->
+<!--                <dt>注文書発行日</dt><dd>：{{ order_issuance_date }}</dd>-->
+<!--                <dt>注文書作成者</dt><dd>：{{ order_creator }}</dd>-->
+<!--                <dt>品目コード</dt><dd>：{{ item_code }}</dd>-->
+<!--                <dt>品目グループ</dt><dd>：{{ item_group }}</dd>-->
+<!--                <dt>支払い条件</dt><dd>：{{ payment_terms }}</dd>-->
+<!--                <dt>個別契約条件</dt><dd>：{{ individual_contract_terms }}</dd>-->
+<!--                <dt>注文番号</dt><dd>：{{ order_no }}</dd>-->
+<!--                <dt>工事分類</dt><dd>：{{ construction_classification }}</dd>-->
+<!--                <dt>注文書データ</dt><dd>：{{ order_data }}</dd>-->
+<!--                <dt>注文請書データ</dt><dd>：{{ order_confirmation_data }}</dd>-->
+<!--            </dl>-->
+
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">注文分類</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ order_classification }}</font>
+                        {% elif proindividualcontractdoc_data.order_classification == old_proindividualcontractdoc_data.order_classification %}
+                            <font size="5" color="black">{{ order_classification }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ order_classification }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">仕入先</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            {% if vendor_code == '' %}
+                                <font size="5" color="black"></font>
+                            {% else %}
+                                <font size="5" color="black">{{ vendor_code }}：{{ vendor_code_textcontent }}</font>
+                            {% endif %}
+                        {% elif proindividualcontractdoc_data.vendor_code == old_proindividualcontractdoc_data.vendor_code %}
+                            {% if vendor_code == '' %}
+                                <font size="5" color="black"></font>
+                            {% else %}
+                                <font size="5" color="black">{{ vendor_code }}：{{ vendor_code_textcontent }}</font>
+                            {% endif %}
+                        {% else %}
+                            <font size="5" color="red">{{ vendor_code }}：{{ vendor_code_textcontent }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">課税</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ tax_kbn_textcontent }}</font>
+                        {% elif proindividualcontractdoc_data.tax_kbn == old_proindividualcontractdoc_data.tax_kbn %}
+                            <font size="5" color="black">{{ tax_kbn_textcontent }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ tax_kbn_textcontent }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">着工予定日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ order_issuance_date }}</font>
+                        {% elif proindividualcontractdoc_data.order_issuance_date == old_proindividualcontractdoc_data.order_issuance_date %}
+                            <font size="5" color="black">{{ order_issuance_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ order_issuance_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">発注日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ order_issuance_date }}</font>
+                        {% elif proindividualcontractdoc_data.order_issuance_date == old_proindividualcontractdoc_data.order_issuance_date %}
+                            <font size="5" color="black">{{ order_issuance_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ order_issuance_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">注文書作成者</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ order_creator_text }}</font>
+                        {% elif proindividualcontractdoc_data.order_creator == old_proindividualcontractdoc_data.order_creator %}
+                            <font size="5" color="black">{{ order_creator_text }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ order_creator_text }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+
+{% comment %}削除予定
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">品目コード</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ item_code }}</font>
+                        {% elif proindividualcontractdoc_data.item_code == old_proindividualcontractdoc_data.item_code %}
+                            <font size="5" color="black">{{ item_code }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ item_code }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">品目グループ</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ item_group }}</font>
+                        {% elif proindividualcontractdoc_data.item_group == old_proindividualcontractdoc_data.item_group %}
+                            <font size="5" color="black">{{ item_group }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ item_group }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">支払い条件</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ payment_terms }}</font>
+                        {% elif proindividualcontractdoc_data.payment_terms == old_proindividualcontractdoc_data.payment_terms %}
+                            <font size="5" color="black">{{ payment_terms }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ payment_terms }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% endcomment %}
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">個別契約条件</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ individual_contract_terms }}</font>
+                        {% elif proindividualcontractdoc_data.individual_contract_terms == old_proindividualcontractdoc_data.individual_contract_terms %}
+                            <font size="5" color="black">{{ individual_contract_terms }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ individual_contract_terms }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">注文番号</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ order_no }}</font>
+                        {% elif proindividualcontractdoc_data.order_no == old_proindividualcontractdoc_data.order_no %}
+                            <font size="5" color="black">{{ order_no }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ order_no }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">工事分類</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ construction_classification }}</font>
+                        {% elif proindividualcontractdoc_data.construction_classification == old_proindividualcontractdoc_data.construction_classification %}
+                            <font size="5" color="black">{{ construction_classification }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ construction_classification }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">調達備考</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ item_detail_text }}</font>
+                        {% elif proindividualcontractdoc_data.item_detail_text == old_proindividualcontractdoc_data.item_detail_text %}
+                            <font size="5" color="black">{{ item_detail_text }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ item_detail_text }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">納入保管場所注記</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ storage_space_rem }}</font>
+                        {% elif proindividualcontractdoc_data.storage_space_rem == old_proindividualcontractdoc_data.storage_space_rem %}
+                            <font size="5" color="black">{{ storage_space_rem }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ storage_space_rem }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">購買発注NO</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proindividualcontractdoc_data_num == 0 %}
+                            <font size="5" color="black">{{ purchase_order_no }}</font>
+                        {% elif proindividualcontractdoc_data.purchase_order_no == old_proindividualcontractdoc_data.purchase_order_no %}
+                            <font size="5" color="black">{{ purchase_order_no }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ purchase_order_no }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+            </table>
+        <!--UploadFileList        -->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+<!--        {% if file_upload_flag == 1 %}-->
+<!--        <form id="file_upload_form_{{ div_id_name }}" name="file_upload_form_{{ div_id_name }}" action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">-->
+<!--            <div>-->
+<!--                <table>-->
+<!--                    <tr>-->
+<!--                        <td><div><font size="4">注文書データ</font></div></td>-->
+<!--                        <td><div><font size="4">：　</font></div></td>-->
+<!--                        <td><input type="file" id="order_data" name="order_data"></td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <td><div><font size="4">注文請書データ</font></div></td>-->
+<!--                        <td><div><font size="4">：　</font></div></td>-->
+<!--                        <td><input type="file" id="order_confirmation_data" name="order_confirmation_data"></td>-->
+<!--                    </tr>-->
+<!--                </table>-->
+<!--            </div>-->
+<!--            <div class="form-group"><font size="4">-->
+<!--                <input type="hidden" id="file_target" name="file_target" value="{{ target }}">-->
+<!--                <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">-->
+<!--                <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">-->
+<!--                <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">-->
+<!--                {% csrf_token %}-->
+<!--                <input type="button" value=" 格納 " onclick="file_upload('{{ div_id_name }}');">-->
+<!--            </font></div>-->
+<!--        </form>-->
+<!--        {% endif %}-->
+
+<!--        <div id="upload_file_list_{{ div_id_name }}"></div>-->
+
+
+
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+{% endblock %}

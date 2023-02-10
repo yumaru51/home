@@ -1,0 +1,8 @@
+                <font size="4">
+                    <select id="sel_{{ div_add_name }}process" name="sel_{{ div_add_name }}process" onchange="{{ div_add_name }}process_change(value);">
+                        <option value=""></option>
+                        {% for process_lists in process_lists %}
+                            <option value="{{ process_lists.process_cd2 }}">{{ process_lists.process_cd }} : {{ process_lists.process_name }}</option>
+                        {% endfor %}
+                    </select>
+                </font>

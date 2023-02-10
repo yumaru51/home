@@ -1,0 +1,107 @@
+<script>
+//一覧から選択した提出書類の詳細の表示処理
+function document_detail(a) {
+    var document_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/document_detail/",
+                type: "POST",
+                data : {
+                    'document_id' : document_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#document_name').val(data.document_name);
+                    $('#submission_deadline').val(data.submission_deadline);
+                    $('#number_of_copies').val(data.number_of_copies);
+                    $('#display_order').val(data.display_order);
+                    $('#document_id').val(data.document_id);
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("document_add_button_div") != null){
+                        const p5 = document.getElementById("document_add_button_div");
+                        p5.style.display ="none";
+                    }
+                    if(document.getElementById("document_edit_button_div") != null){
+                        const p6 = document.getElementById("document_edit_button_div");
+                        p6.style.display ="block";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.document_lists_scrollHead,tbody.document_lists_scrollBody{
+    display:block;
+}
+tbody.document_lists_scrollBody{
+    overflow-y:scroll;
+    height: 760px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.document_name{
+    width:200px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.submission_deadline{
+    width:160px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.number_of_copies{
+    width:80px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if document_lists_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="document_lists_scrollHead">
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <th class="detail_pb"></th>
+                        {% endif %}
+                        <th class="document_name">書類名</th>
+                        <th class="submission_deadline">提出期限</th>
+                        <th class="number_of_copies">部数</th>
+                    </tr>
+                </thead>
+                <tbody class="document_lists_scrollBody" id="document_lists_table">
+                {% for document_lists in document_lists %}
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <td class="detail_pb">
+                                <a href="#" id="{{ document_lists.id }}" class="detailpb" onclick="document_detail(id);">選択</a>
+                            </td>
+                        {% endif %}
+                        <td class="document_name">{{ document_lists.document_name }}</td>
+                        <td class="submission_deadline">{{ document_lists.submission_deadline }}</td>
+                        <td class="number_of_copies">{{ document_lists.number_of_copies }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

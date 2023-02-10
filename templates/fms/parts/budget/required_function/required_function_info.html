@@ -1,0 +1,285 @@
+        <div><h2 class="page-header">要求仕様</h2></div>
+        <div style="float: left;">
+            <div>
+                <input type="hidden" id="required_function" value="{{ budget_required_function_data.required_function }}" >
+                <input type="hidden" id="rf_sub_no" value="{{ budget_required_function_data.sub_no }}" >
+                <input type="hidden" id="required_function_id" value="{{ budget_required_function_data.id }}" >
+                <table>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">要求機能</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_required_function_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_required_function_data.required_function }}</font>
+                            {% elif budget_required_function_data.required_function == old_budget_required_function_data.required_function %}
+                                <font size="5" color="black">{{ budget_required_function_data.required_function }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_required_function_data.required_function }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">サブNO</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_required_function_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_required_function_data.sub_no }}</font>
+                            {% elif budget_required_function_data.sub_no == old_budget_required_function_data.sub_no %}
+                                <font size="5" color="black">{{ budget_required_function_data.sub_no }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_required_function_data.sub_no }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    {% if display_required_item_for_function_list.display_material_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">取扱物質</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.material }}</font>
+                                {% elif budget_required_function_data.material == old_budget_required_function_data.material %}
+                                    <font size="5" color="black">{{ budget_required_function_data.material }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.material }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_material_capacity_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求(処理)量</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_material_capacity }}</font>
+                                {% elif budget_required_function_data.required_material_capacity == old_budget_required_function_data.required_material_capacity %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_material_capacity }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_material_capacity }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_material_capacity_unit_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">量単位</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.material_capacity_unit }}</font>
+                                {% elif budget_required_function_data.material_capacity_unit == old_budget_required_function_data.material_capacity_unit %}
+                                    <font size="5" color="black">{{ budget_required_function_data.material_capacity_unit }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.material_capacity_unit }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_cooling_temperature_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求冷却温度</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_cooling_temperature }} ℃</font>
+                                {% elif budget_required_function_data.required_cooling_temperature == old_budget_required_function_data.required_cooling_temperature %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_cooling_temperature }} ℃</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_cooling_temperature }} ℃</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_heating_temperature_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求加熱温度</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_heating_temperature }} ℃</font>
+                                {% elif budget_required_function_data.required_heating_temperature == old_budget_required_function_data.required_heating_temperature %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_heating_temperature }} ℃</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_heating_temperature }} ℃</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_temperature_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">温度</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.temperature }} ℃</font>
+                                {% elif budget_required_function_data.temperature == old_budget_required_function_data.temperature %}
+                                    <font size="5" color="black">{{ budget_required_function_data.temperature }} ℃</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.temperature }} ℃</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_compress_pressure_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求圧縮圧</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_compress_pressure }}</font>
+                                {% elif budget_required_function_data.required_compress_pressure == old_budget_required_function_data.required_compress_pressure %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_compress_pressure }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_compress_pressure }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_vacuum_pressure_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求減圧</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_vacuum_pressure }}</font>
+                                {% elif budget_required_function_data.required_vacuum_pressure == old_budget_required_function_data.required_vacuum_pressure %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_vacuum_pressure }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_vacuum_pressure }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_pressure_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">圧力</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.pressure }}</font>
+                                {% elif budget_required_function_data.pressure == old_budget_required_function_data.pressure %}
+                                    <font size="5" color="black">{{ budget_required_function_data.pressure }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.pressure }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_pressure_unit_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">圧力単位</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.pressure_unit }}</font>
+                                {% elif budget_required_function_data.pressure_unit == old_budget_required_function_data.pressure_unit %}
+                                    <font size="5" color="black">{{ budget_required_function_data.pressure_unit }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.pressure_unit }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_moisture_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求水分</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_moisture }}</font>
+                                {% elif budget_required_function_data.required_moisture == old_budget_required_function_data.required_moisture %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_moisture }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_moisture }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_concentration_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求濃度</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_concentration }}</font>
+                                {% elif budget_required_function_data.required_concentration == old_budget_required_function_data.required_concentration %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_concentration }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_concentration }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_concentration_unit_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">濃度単位'</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.concentration_unit }}</font>
+                                {% elif budget_required_function_data.concentration_unit == old_budget_required_function_data.concentration_unit %}
+                                    <font size="5" color="black">{{ budget_required_function_data.concentration_unit }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.concentration_unit }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_particle_size_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求粒径'</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_particle_size }}</font>
+                                {% elif budget_required_function_data.required_particle_size == old_budget_required_function_data.required_particle_size %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_particle_size }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_particle_size }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_required_item_for_function_list.display_required_transfer_length_flag == 1 %}
+                        <tr>
+                            <td><div style="padding: 5px 0px;"><font size="4">要求輸送距離'</font></div></td>
+                            <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                            <td><div style="padding: 5px 0px;">
+                                {% if old_budget_required_function_data_num == 0 %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_transfer_length }}</font>
+                                {% elif budget_required_function_data.required_transfer_length == old_budget_required_function_data.required_transfer_length %}
+                                    <font size="5" color="black">{{ budget_required_function_data.required_transfer_length }}</font>
+                                {% else %}
+                                    <font size="5" color="red">{{ budget_required_function_data.required_transfer_length }}</font>
+                                {% endif %}
+                            </div></td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">その他要求</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div>
+                            {% if old_budget_required_function_data_num == 0 %}
+                                <font size="4" color="black"><textarea name="required_others" rows="6" cols="25" style="color:black;" readonly>{{ budget_required_function_data.required_others }}</textarea></font>
+                            {% elif budget_required_function_data.required_others == old_budget_required_function_data.required_others %}
+                                <font size="4" color="black"><textarea name="required_others" rows="6" cols="25" style="color:black;" readonly>{{ budget_required_function_data.required_others }}</textarea></font>
+                            {% else %}
+                                <font size="4" color="red"><textarea name="required_others" rows="6" cols="25" style="color:red;" readonly>{{ budget_required_function_data.required_others }}</textarea></font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                {% if work_entry_pb_disp_flag == 1 %}
+                    {% if budget_required_function_data.required_function != None %}
+                        <input type="button" id="copy_item_to_work" value=" 工事紐付 " onclick="required_function_choice()" >
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div style="float: left;">
+            <div id="budget_function1_lists" style="width: auto;">
+            </div>
+        </div>

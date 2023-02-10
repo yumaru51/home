@@ -1,0 +1,91 @@
+<script>
+//対象の進捗工程の関係工程の詳細の表示処理
+function step_relation_detail(a) {
+    var id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/step_relation_detail/",
+                type: "POST",
+                data : {
+                    'id' : id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#step_relation_id').val(data.step_relation_id);
+                    $('#step_relation_step_id').val(data.step_relation_step_id);
+                    $('#step_relation_next_step').val(data.step_relation_next_step);
+                    $('#step_relation_display_order').val(data.step_relation_display_order);
+                    $('#step_relation_lost_flag').val(data.step_relation_lost_flag);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.step_id{
+    width:100px;
+}
+.next_step{
+    width:100px;
+}
+.display_order{
+    width:80px;
+}
+.lost_flag{
+    width:50px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if step_relation_lists_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="step_id">ステップID</th>
+                        <th class="next_step">次ステップ</th>
+                        <th class="display_order">表示順</th>
+                        <th class="lost_flag">無効FL</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for step_relation_lists in step_relation_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" class="detailpb" onclick="step_relation_detail({{ step_relation_lists.id }});">詳細</a>
+                        </td>
+                        <td class="step_id">{{ step_relation_lists.step_id }}</td>
+                        <td class="next_step">{{ step_relation_lists.next_step }}</td>
+                        <td class="display_order">{{ step_relation_lists.display_order }}</td>
+                        <td class="lost_flag">{{ step_relation_lists.lost_flag }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

@@ -1,0 +1,63 @@
+<script>
+//予算一覧から選択された予算データの詳細の表示処理
+function cs_detail_next(a,b,c,d,e) {   //a:cs_unique_id, b:cs_no, c:budget_id, d:budget_id_edit_flg, e:this_step
+    if (e == 999999999) {
+        alert('工程完了の情報は「MotionBoard」で確認してください！！');
+    }else{
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1
+        $('<form/>', {action: '/isk_tools/fms/parts/check_sheet/cs_detail_template/', method: 'post'})
+        .append($('<input/>', {type: 'hidden', name: 'cs_unique_id', value: a}))
+        .append($('<input/>', {type: 'hidden', name: 'cs_no', value: b}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_id', value: c}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_id_edit_flg', value: d}))
+        .append($('<input/>', {type: 'hidden', name: 'target', value: 'cs'}))
+        .append($('<input/>', {type: 'hidden', name: 'this_step', value: e}))
+        .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+        .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+        .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+        .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+        .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+        .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+        .appendTo(document.body)
+        .submit();
+    }
+}
+</script>
+<style type="text/css">
+.button {
+    margin: 2px 0;
+    padding: 2px 3px;
+    vertical-align: middle;
+    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    font-weight: normal;
+    font-size: 13px;
+    width: 100px
+}
+</style>
+        <div>
+           {% if pre_cs == None %}
+            <input type="button" class="detailpb" value="　　↑:無し　　" disabled='disabled'>
+           {% else %}
+            <input type="button" onclick="cs_detail_next({{ pre_cs.id }},{{ pre_cs.cs_no }},{{ pre_cs.budget_id }},
+             0,{{ pre_cs.present_step }})" value="　↑:予算ID={{ pre_cs.budget_id }}　" />
+           {% endif %}
+
+           {% if next_cs == None %}
+            <input type="button" class="detailpb" value="　　↓:無し　　" disabled='disabled'>
+           {% else %}
+            <input type="button" onclick="cs_detail_next({{ next_cs.id }},{{ next_cs.cs_no }},{{ next_cs.budget_id }},
+            0,{{ next_cs.present_step }})" value="　↓:予算ID={{ next_cs.budget_id }}　" />
+           {% endif %}
+
+        </div>
+
+

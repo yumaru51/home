@@ -1,0 +1,128 @@
+<script>
+function charge_radio_check() {
+    var charge_obj = document.getElementsByClassName( "charge" ) ;
+    var charge = charge_obj[0].value;
+
+    var elements = document.getElementsByName( "charge" ) ;
+    if(charge == "1"){
+        elements[0].checked = true ;
+    }
+    if(charge == "2"){
+        elements[1].checked = true ;
+    }
+    if(charge == "3"){
+        elements[2].checked = true ;
+    }
+
+}
+function measure_radio_check() {
+    var measure_obj = document.getElementsByClassName( "measure" ) ;
+    var measure = measure_obj[0].value;
+
+    var elements = document.getElementsByName( "measure" ) ;
+    if(measure == "232001001"){
+        elements[0].checked = true ;
+    }
+    if(measure == "232002001"){
+        elements[1].checked = true ;
+    }
+    if(measure == "232003001"){
+        elements[2].checked = true ;
+    }
+    if(measure == "1"){
+        elements[3].checked = true ;
+    }
+    if(measure == "232004001"){
+        elements[4].checked = true ;
+    }
+    if(measure == "999999999"){
+        elements[5].checked = true ;
+    }
+
+}
+//画面表示時処理
+function inspection_display_open() {
+    var file_folder = $('#inspection_file_folder').val();
+    var div_id_name = $('#inspection_div_id_name').val();
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag_inspection').val();
+    var file_class = $('#inspection_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+
+    measure_radio_check();
+    charge_radio_check();
+}
+
+window.onload = function() {
+        inspection_display_open();
+};
+</script>
+
+<div>
+    <div>
+        <input type="hidden" id="charge" class="charge" value="{{ inspection_data.charge_team }}">
+        <input type="hidden" id="measure" class="measure" value="{{ inspection_data.measure }}">
+    </div>
+
+    <div><font size="5">検査診断</font></div>
+    <div style="float:left;">
+        <div style="padding: 5px 0px;"><font size="4">検診断内容：　</font></div>
+        <div style="padding: 5px 0px;"><font size="3"><textarea id="inspection_detail" name="inspection_detail" rows="9" cols="45" readonly>{{ inspection_data.inspection_detail }}</textarea></font></div>
+        <div>
+            <table>
+                <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">検査診断結果</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{{ inspection_result_str }}</font>
+                        </div></td>
+                </tr>
+            </table>
+        </div>
+        <div style="border: 1px solid #000000;">
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">対応方針</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">
+                        <input type="radio" name="measure" value="232001001" disabled="">小口工事　
+                        <input type="radio" name="measure" value="232002001" disabled="">建設/改修工事
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">
+                        <input type="radio" name="measure" value="232003001" disabled="">企画計画　
+                        <input type="radio" name="measure" value="1" disabled="">経過観察
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">
+                        <input type="radio" name="measure" value="232004001" disabled="">保全G対応
+                        <input type="radio" name="measure" value="999999999" disabled="">不要
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">保全G対応</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">
+                        <input type="radio" name="charge" value="1" disabled="">計装メンテ
+                        <input type="radio" name="charge" value="2" disabled="">電気メンテ
+                        <input type="radio" name="charge" value="3" disabled="">機械メンテ
+                    </font></div></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+        <input type="hidden" id="delete_pb_disp_flag_inspection" value="0">
+        <input type="hidden" id="inspection_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+        <input type="hidden" id="inspection_div_id_name" name="div_id_name" value="inspection">
+        <input type="hidden" id="inspection_file_class" name="file_class" value="LaboratoryDiagnosis">
+
+        <div id="upload_file_list_inspection">添付ファイル無し</div>
+    </div>
+    <div style="clear: both;"></div>
+</div>

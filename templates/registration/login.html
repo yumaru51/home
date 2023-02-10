@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <br>
+        <div id="login-box">
+            <div id="page-header">
+                <div id="page-branding">
+                    <h1 class="page-header">ログイン</h1>
+                </div>
+            </div>
+            <div class="cpl-md-5">
+                <form action="{% url 'login' %}" method="post">
+                    <div class="form-group">
+                        {% csrf_token %}
+                        <br>
+                        <div class="form-row">
+                            <label for="{{ form.username.id_for_label }}">{{ form.username.label }}:</label>
+                            {{ form.username }}
+                        </div>
+                        <div class="form-row">
+                            <label for="{{ form.password.id_for_label }}" class="sr-only">{{ form.password.label }}:</label>
+                            {{ form.password }}
+                        </div>
+                        <input name="next" type="hidden" value="{{ next }}"/>
+                        <input name="dpt_cd" type="hidden" value=""/>
+                    </div>
+                    <div class="submit-row">
+                        <label>&nbsp;</label><button type="submit" class="submit-btn">ログイン</button>
+                    </div><br>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

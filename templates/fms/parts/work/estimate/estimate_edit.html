@@ -1,0 +1,338 @@
+<script>
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+//対象の見積に対してのネゴ実績一覧表示の処理
+function get_this_discount_list(a) {
+            var target_discount_display_id_name = "#discount_list_" + a;
+            var target_estimate_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/parts/estimate/discount_list/",
+                type: "POST",
+                data : {
+                    'target_estimate_id' : target_estimate_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(target_discount_display_id_name).empty();
+                    $(target_discount_display_id_name).html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(target_discount_display_id_name).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+
+//入力項目チェック
+function estimate_input_check() {
+    var alert_input_check_msg = "";
+    var estimate_rem = $('#add_estimate_rem').val();
+    if (estimate_rem.length > 400) {
+        alert_input_check_msg = "備考が文字数オーバーです！！\n"
+        return;
+    }
+    //禁止文字チェック
+    var alert_ng_ch_msg = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+    alert_input_check_msg += alert_ng_ch_msg;
+
+    return alert_input_check_msg;
+}
+
+//見積情報の登録･更新処理
+function estimate_edit(a,b) {
+    var action_type = a;
+    var estimate_id = b;
+    var work_id = $('#work_id').val();
+    if (work_id == 0){
+        alert("工事データを先に登録(一時保存)してください！！");
+        return;
+    }
+
+    //入力チェック
+    var alert_input_check_msg = estimate_input_check();
+    if ( alert_input_check_msg.length > 0 ) {
+        alert(alert_input_check_msg);
+        return;
+    }
+
+    var rev_no = $('#work_rev_no').val();
+    var this_step = $('#this_step').val();
+    var this_budget_id = $('#target_budget_id').val();
+    var this_department = $('#user_department_cd').val();
+    var this_division = $('#user_division_cd').val();
+
+    if (action_type == 'add') {
+        var vendor = $('#add_vendor').val();
+        var estimate_price = $('#add_estimate_price').val();
+        var prospect_price = $('#add_prospect_price').val();
+        var start_date = $('#add_start_date').val();
+        var end_date = $('#add_end_date').val();
+        var adoption_flag = 0;
+        var estimate_rem = $('#add_estimate_rem').val();
+    } else if (action_type == 'edit') {
+        var adoption_flag = $('#adoption_flag_' + estimate_id).val();
+        var prospect_price = $('#prospect_price_' + String(b)).val();
+        if (adoption_flag == 1 && prospect_price == "") {
+            alert("採用する場合は、査定額を入力してください！！");
+            return;
+        }else if (adoption_flag == 1 && prospect_price == "None") {
+            alert("採用する場合は、査定額を入力してください！！");
+            return;
+        }
+        var target_vendor_id_name = '#vendor_' + estimate_id;
+        var target_estimate_price_id_name = '#estimate_price_' + estimate_id;
+        var target_prospect_price_id_name = '#prospect_price_' + estimate_id;
+        var vendor = $(target_vendor_id_name).val();
+        var estimate_price = $(target_estimate_price_id_name).val();
+        var start_date = $('#start_date_' + estimate_id).val();
+        var end_date = $('#end_date_' + estimate_id).val();
+        var estimate_rem = $('#estimate_rem_' + estimate_id).val();
+    } else { ///'delete'
+        var prospect_price = $('#prospect_price_' + String(b)).val();
+        var target_vendor_id_name = '#vendor_' + estimate_id;
+        var target_estimate_price_id_name = '#estimate_price_' + estimate_id;
+        var target_prospect_price_id_name = '#prospect_price_' + estimate_id;
+        var vendor = $(target_vendor_id_name).val();
+        var estimate_price = $(target_estimate_price_id_name).val();
+        var start_date = $('#start_date_' + estimate_id).val();
+        var end_date = $('#end_date_' + estimate_id).val();
+        var adoption_flag = 1;//見積再計算を指示
+        var estimate_rem = $('#estimate_rem_' + estimate_id).val();
+    }
+
+    $.ajax({
+        url: "/isk_tools/fms/action/estimate_entry/",
+        type: "POST",
+        data : {
+            'action_type' : action_type,
+            'work_id' : work_id,
+            'rev_no' : rev_no,
+            'estimate_id' : estimate_id,
+            'vendor' : vendor,
+            'estimate_price' : estimate_price.replace(/,/g, ""),
+            'prospect_price' : prospect_price.replace(/,/g, ""),
+            'adoption_flag' : adoption_flag,
+            'this_step' : this_step,
+            'this_budget_id' : this_budget_id,
+            'this_department' : this_department,
+            'this_division' : this_division,
+            'start_date' : start_date,
+            'end_date' : end_date,
+            'estimate_rem' : estimate_rem,
+            'csrfmiddlewaretoken': "{{ csrf_token }}",
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache : false,
+        })
+        .done(function(data){
+            alert(data.msg);
+            estimate_info(work_id, estimate_id);//見積関係の情報を表示するJSを起動(detail_template.html内にプログラム有)
+            budget_detail_info();//予算詳細情報を表示するJSを起動
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+//採用FL選択した時の処理
+function adoption_flag_change(a, b) {
+    var value = a;
+    $('#adoption_flag_' + b).val(value);
+}
+window.onload = function() {
+
+};
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+.mgrl-10{
+    margin-left : 10px;
+}
+</style>
+
+    <div id="work_work_estimate_detail_action_button" style="width: auto;"></div>
+
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">見積関係</h2>
+    </div>
+    <div>
+        <input type="hidden" id="estimate_list_num" value="{{ estimate_list_num }}" >
+        <input type="hidden" id="adoption_flag" value="{{ adopted_estimate_num }}" >
+    </div>
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+    <div style="float:left; border-style: ridge;"><h2 class="page-header">新規登録</h2>
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;">
+            <table>
+                <tr>
+                    <td><div><font size="4">見積ID</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="add" size="5" value="" readonly="readonly">※自動取得</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">業者</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="add_vendor" size="16" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">個別予算見積額</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="add_estimate_price" size="10"
+                                                   onblur="add_comma_value(this)" value=""></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">個別予算見積調整額</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="add_prospect_price" size="10"
+                                                   onblur="add_comma_value(this)" value=""></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">工事納入予定</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="add_start_date" class="datepicker" value=""><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('add_start_date');"><br> ～ <input type="text" id="add_end_date" class="datepicker" value=""><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('add_end_date');"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">備考</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><textarea id="add_estimate_rem" name="work_rem" rows="5" cols="45"></textarea></font></div></td>
+                </tr>
+            </table>
+            <input type="button" value="　追加　" onclick="estimate_edit('add',0)" >
+        </div>
+    </div>
+    <div style="float:left;size=10px">　</div>
+    {% for estimate_list in estimate_list %}
+        <div style="float:left; border-style: ridge;"><h2 class="page-header">登録済</h2>
+            <div style="float:left;size=5px">　</div>
+            <div style="float:left;">
+                <div>
+                    <table>
+                        <tr>
+                            <td><div><font size="4">見積ID</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="estimate_id_{{ estimate_list.id }}" size="5" value="{{ estimate_list.id }}" readonly="readonly">※自動取得</font></div></td>
+                        </tr>
+                        <tr>
+                            <td><div><font size="4">業者</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="vendor_{{ estimate_list.id }}" size="10"
+                                                           value={% if estimate_list.vendor == None %} {% else %} {{ estimate_list.vendor }} {% endif %}></font></div></td>
+                        </tr>
+                        <tr>
+                            <td><div><font size="4">個別予算見積額</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="estimate_price_{{ estimate_list.id }}"
+                                                           size="10" onblur="add_comma_value(this)"
+                                                           value={% if estimate_list.estimate_price == None %} {% else %} {{ estimate_list.estimate_price }} {% endif %}></font></div></td>
+                        </tr>
+                        <tr>
+                            <td><div><font size="4">個別予算見積調整額</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="prospect_price_{{ estimate_list.id }}"
+                                                           size="10" onblur="add_comma_value(this)"
+                                                           value={% if estimate_list.prospect_price == None %} {% else %} {{ estimate_list.prospect_price }} {% endif %}></font>　※採用する場合は必須</div></td>
+                        </tr>
+                        <tr>
+                            <td><div><font size="4">工事納入予定</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="start_date_{{ estimate_list.id }}"
+                                                           class="datepicker" value={% if estimate_list.start_date == None %} {% else %} {{ estimate_list.start_date}} {% endif %}>
+                                                    <input type="button" class="date_clear_button" value="クリア" onclick="date_clear('start_date_{{ estimate_list.id }}');">
+                                                    <br> ～ <input type="text" id="end_date_{{ estimate_list.id }}" class="datepicker" value={% if estimate_list.end_date == None %} {% else %} {{ estimate_list.end_date}} {% endif %}>
+                                                    <input type="button" class="date_clear_button" value="クリア" onclick="date_clear('end_date_{{ estimate_list.id }}');">
+                            </font></div></td>
+                        </tr>
+                        <tr>
+                            <td><div><font size="4">備考</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><textarea id="estimate_rem_{{ estimate_list.id }}"
+                                                              rows="5" cols="45">{% if estimate_list.rem == None %}{% else %}{{estimate_list.rem}}{% endif %}</textarea></font></div></td>
+                        </tr>
+                        <tr>
+                            <td><div><font size="4">採用可否</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4">
+                                <input type="hidden" id="adoption_flag_{{ estimate_list.id }}" size="10"
+                                       value="{{ estimate_list.adoption_flag }}">
+                                <select id="sel_adoption_flag_{{ estimate_list.id }}"
+                                        name="sel_adoption_flag_{{ estimate_list.id }}"
+                                        onchange="adoption_flag_change(value, {{ estimate_list.id }});">
+                                {% if estimate_list.adoption_flag == 0 %}
+                                    <option value="0" selected></option>
+                                    <option value="1">採用</option>
+                                {% else %}
+                                    <option value="0"></option>
+                                    <option value="1" selected>採用</option>
+                                {% endif %}
+                                </select>
+                            </font></div></td>
+                        </tr>
+
+                    </table>
+                    <div style="float:left;"><input type="button" value="　更新　" onclick="estimate_edit('edit',{{ estimate_list.id }})" ></div>
+                    <div style="float:left;" class="mgrl-10"><input type="button" value="　削除　" onclick="estimate_edit('delete',{{ estimate_list.id }})" ></div>
+                    {% if estimate_list.discount_num > 0 %}
+<!--                        <div style="float:right;"><input type="button" value="値引結果" onclick="get_this_discount_list({{ estimate_list.id }})" ></div>-->
+<!--                        <div id="discount_list_{{ estimate_list.id }}" style="width: auto; float:right;"></div>-->
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div><!--ng_character_checkここまで-->
+
+   <div style="float:left;">
+        <!--FileUploadForm        -->
+            <form id="file_upload_form_{{ div_id_name }}" name="file_upload_form_{{ div_id_name }}" action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">
+            見積資料：<input type="file" id="estimated_data" name="estimated_data">
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            {% csrf_token %}
+            <input type="button" value=" 格納 " onclick="file_upload('{{ div_id_name }}');">
+            </form><br>
+        <!--FileUploadForm        -->
+        <!--UploadFileList        -->
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+    </div>

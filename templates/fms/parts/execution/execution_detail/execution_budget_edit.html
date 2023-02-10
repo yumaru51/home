@@ -1,0 +1,287 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//入力項目チェック
+function budget_edit_input_check() {
+    var alert_input_check_msg = "";
+
+    //禁止文字チェック
+    var alert_ng_ch_msg = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+    alert_input_check_msg += alert_ng_ch_msg;
+
+    return alert_input_check_msg;
+}
+
+//入力項目の未入力、文字数オーバーをチェック
+function input_check(a,b,d) {
+        var area_person_in_charge = $('#sel_area_person_in_charge').val();
+        var jurisdiction_area = $('#jurisdiction_area').val();
+        var ng_flag = 0;
+        var ng_str_count_flag = 0;
+        var action_cd = d;
+        var msg = '';
+
+        if (a != b) {
+            if (jurisdiction_area == "" ){
+                $('#jurisdiction_area').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#jurisdiction_area').css('background-color','white');
+            }
+            if (area_person_in_charge == "" ){
+                $('#sel_area_person_in_charge').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#sel_area_person_in_charge').css('background-color','white');
+            }
+        }
+        // 全て正常時のみ禁止文字チェック
+        var ng_all_flag = ng_flag + ng_str_count_flag;
+        var alert_ng_ch_msg_str = ""
+        if ( ng_all_flag == 0) {
+            alert_ng_ch_msg_str = budget_edit_input_check();
+            if ( alert_ng_ch_msg_str.length > 0 ) {
+                ng_all_flag += 1;
+            }
+        }
+
+        //正常時処理
+        if ( ng_all_flag == 0) {
+            budget_edit(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+        }else{
+            if($("#action_pb_loading") != null){
+                $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            }
+            // メッセージを結合して表示
+            if ( ng_flag > 0) {
+                msg += '未入力項目があります！！\n';
+            }
+            if ( ng_str_count_flag > 0 ) {
+                msg += '文字数オーバーです！！\n';
+            }
+            if ( alert_ng_ch_msg_str.length > 0) {
+                msg += alert_ng_ch_msg_str;
+            }
+            alert(msg);
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+        }
+}
+//データ登録･更新処理
+function budget_edit(a,b) {
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var budget_id = $('#budget_id').val();
+        var rev_no = $('#rev_no').val();
+        var budget_no = $('#budget_no').val();
+        var budget_name = $('#budget_name').val();
+        var department = $('#department').val();
+        var division = $('#division').val();
+        var jurisdiction_area = $('#jurisdiction_area').val();
+        var area_person_in_charge = $('#sel_area_person_in_charge').val();
+        var original_sec_person_in_charge = $('#sel_original_sec_person_in_charge').val();
+        var construction_detail = $('#construction_detail').val();
+        var sche_gov_inspection_date = $('#sche_gov_inspection_date').val();
+        var comment = $('#comment').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/execution_budget_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'budget_id' : budget_id,
+                    'rev_no' : rev_no,
+                    'budget_no' : budget_no,
+                    'budget_name' : budget_name,
+                    'department' : department,
+                    'division' : division,
+                    'jurisdiction_area' : jurisdiction_area,
+                    'area_person_in_charge' : area_person_in_charge,
+                    'original_sec_person_in_charge' : original_sec_person_in_charge,
+                    'construction_detail' : construction_detail,
+                    'sche_gov_inspection_date' : sche_gov_inspection_date,
+                    'comment' : comment,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    var this_budget_id = data.budget_id
+                    $('#budget_id').val(this_budget_id);
+                    var crev_no = data.rev_no
+                    $('#rev_no').val(crev_no);
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#probudgetunit4_action_button').empty();//別の場合は、「操作」ボタンを非表示に
+                    }
+                    log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert(data.msg);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+}
+
+window.onload = function() {
+        //action_button_display();･･･削除予定
+};
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:170px;
+}
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+div.scroll_material_div {
+  width: auto;
+  height: 360px;
+  overflow: scroll;
+}
+
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_budget_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="rev_no" value="{{ rev_no }}">
+        <input type="hidden" id="execution_budget_edit">
+    </div>
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+        <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+        <table>
+            <tr>
+                <td><div><font size="4">予算ＩＤ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_id" value="{{ budget_id }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">RevNO</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">{{ rev_no }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算ＮＯ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_no" size="10" value="{{ budget_no }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算名</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_name" size="38" value="{{ budget_name }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <input type="hidden" id="division" value="{{ division }}">
+                <td><div><font size="4">部門</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="division_name" size="20" value="{{ division_name }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <input type="hidden" id="department" value="{{ department }}">
+                <td><div><font size="4">部署</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="department_name" size="20" value="{{ department_name }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">所管エリア</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="jurisdiction_area" value="{{ jurisdiction_area }}">※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">エリア管理者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    <select id="sel_area_person_in_charge" name="sel_area_person_in_charge" list="area_person_in_charge_list">
+                        <option value=""></option>
+                        <option hidden></option>
+                    <datalist id="area_person_in_charge_list">
+                        {{ area_person_in_charge_list | safe }}
+                    </datalist>
+                    </select>※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">原課担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    <select id="sel_original_sec_person_in_charge" name="sel_original_sec_person_in_charge" list="original_sec_person_in_charge_list">
+                        <option hidden></option>
+                    <datalist id="original_sec_person_in_charge_list">
+                        {{ original_sec_person_in_charge_list | safe }}
+                    </datalist>
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">官庁検査予定日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="sche_gov_inspection_date" class="datepicker" value="{{ sche_gov_inspection_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('sche_gov_inspection_date');"></font></div></td>
+            </tr>
+        </table>
+        </div><!--ng_character_checkここまで-->
+    </div>

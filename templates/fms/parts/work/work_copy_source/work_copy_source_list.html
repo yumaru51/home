@@ -1,0 +1,656 @@
+<script>
+//工事一覧から選択されたコピー元工事データの詳細を別タブでの表示処理
+function work_detail(a,b,c,d, present_operator) {
+    //window.open('', 'work_copy_source');
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var level5_step_id = $('#level5_step_id').val();
+    var new_step = Number(level5_step_id) + 1;
+    //var target_url ="";
+    var target_url ='';
+    //var sel_copy_target_table = Number($('#sel_copy_target_table').val());
+    var sel_copy_target_table = $('#selected_copy_target_table').val();
+    var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+    if(sel_copy_target_table == 1){
+        target_url = '/isk_tools/fms/parts/common/detail_template/';
+        target_val = 'work';
+    }else if(sel_copy_target_table == 2){
+        target_url = '/isk_tools/fms/parts/execution/execution_detail_template/';
+        target_val = 'prospecificationunit';
+    }else if(sel_copy_target_table == 3){
+        target_url = '/isk_tools/fms/parts/common/detail_template/';
+        target_val = 'work';
+    }
+    window.open('', 'work_copy_source');
+    if(target_url !=""){
+        $('<form/>', {action: target_url, target: 'work_copy_source', method: 'post'})
+        .append($('<input/>', {type: 'hidden', name: 'id', value: a}))
+        .append($('<input/>', {type: 'hidden', name: 'work_id', value: b}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: c}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_id', value: d}))
+        .append($('<input/>', {type: 'hidden', name: 'target', value: target_val}))
+        .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+        .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+        .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+        .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+        .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: '920000000'}))
+        .append($('<input/>', {type: 'hidden', name: 'present_operator', value: present_operator}))
+        .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+        .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 1}))
+        .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+        .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+        .appendTo(document.body)
+        .submit();
+    }
+}
+
+//工事内容コピー選択時の処理
+function work_copy(work_unique_id , copy_work_id, present_step, target){
+    var work_id = $('#work_id').val();
+    if (work_id == 0){
+        alert("工事データを先に登録(一時保存)してください！！");
+        return;
+    }
+    if (target == 'e') {
+        // 本仕様書コピー処理
+        execution_work_copy(work_unique_id, copy_work_id, present_step);
+    }
+    else if(target == 'w'){
+        // 工事基本情報コピー処理
+        plan_work_copy(work_unique_id, copy_work_id, present_step);
+    }
+    else{
+        alert('内部エラー! 第2引数の値がおかしいです!!');
+    }
+}
+
+//単年度計画工程での工事内容コピー選択時の処理
+function plan_work_copy(work_unique_id , copy_work_id, present_step){
+    var target_work_unique_id = work_unique_id ;
+    var target = $('#target').val();
+    work_rev_no = $('#work_rev_no').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/plan_work_copy/",
+                type: "POST",
+                data : {
+                    'target_work_unique_id' : target_work_unique_id,
+                    'target': target,
+                    'work_rev_no': work_rev_no,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    //$('#work_name').val(data.work_name);                                    // 共用
+                    if(target == "work"){ // コピー先のstepにあわせてコピー項目を変更
+                        //$('#sel_work_charge_division').val(data.work_charge_division);              // 予算専用
+                        //$('#work_charge_division_name').val(data.work_charge_division_name);    // 予算専用
+                        //$('#sel_work_charge_department').val(data.work_charge_department);          // 予算専用
+                        $('#sel_management_class_cd').val(data.management_class_cd);                // 予算専用
+                        //$('#sel_work_charge_process').val(data.work_charge_process);                // 予算専用
+                        $('#sel_work_class_cd').val(data.work_class);                                  // 予算専用
+                        $('#delivery_location').val(data.delivery_location);                    // 共用(予算側のみコピー)
+                        $('#sel_fixed_form').val(data.fixed_form);                              // 予算専用(実行側:sel_format_kbn)
+                        $('#work_last_plan_id').val(copy_work_id);                              // コピー元の工事IDを保存
+
+                    }else{
+                        //if($('#division_name').val() == "" || $('#division_name').val() == null){
+                        //$('#division_name').val(data.work_charge_division);                     // 実行専用
+                        //}
+                        //if($('#department_name').val() == "" || $('#department_name').val() == null){
+                        //    $('#department_name').val(data.work_charge_department);             // 実行専用
+                        //}
+                        //if($('#work_charge_process_name').val() == "" || $('#work_charge_process_name').val() == null){
+                        //    $('#work_charge_process_name').val(data.work_charge_process);       // 実行専用
+                        //}
+                        if($('#sel_work_class_cd').val() == "" || $('#sel_work_class_cd').val() == null){
+                            $('#sel_work_class_cd').val(data.work_class);                       // 実行専用
+                        }
+                        if($('#sel_management_class_cd').val() == "" || $('#sel_management_class_cd').val() == null){
+                            $('#sel_management_class_cd').val(data.management_class_cd);        // 実行専用
+                        }
+                        if($('#sel_format_kbn').val() == "" || $('#sel_format_kbn').val() == null){
+                            $('#sel_format_kbn').val(data.fixed_form);                          // 予算側:sel_fixed_form
+                        }
+                    }
+                    alert(data.msg);
+
+                    if(data.law_list_num > 0 || data.work_supplies_lists_num > 0){
+                        if(window.confirm('法令/支給品をコピーしますか？')){
+                            copy_law_supplies_list_entry(copy_work_id, present_step);
+                        }
+                    }
+
+                    // 仕様詳細コピー
+                    copy_free_spec_list_entry(copy_work_id, present_step);
+
+                    if(data.free_spec_list_num > 0 && target == "work"){
+                        if(window.confirm('関係機器情報をコピーしますか？')){
+                            copy_equipment_list_entry(data.budget_id, copy_work_id, present_step); //予算のみ
+                        }
+                    }
+                    // 提出書類コピー
+                    copy_document_list_entry(copy_work_id, present_step);
+
+                    if(data.uploadfile_list_num > 0){
+                        if(window.confirm('添付ファイルをコピーしますか？')){
+                            copy_uploadfile_list_entry(data.budget_id, copy_work_id, present_step);
+                        }
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//実行工程での工事内容コピー選択時の処理
+function execution_work_copy(work_unique_id , copy_work_id, present_step){
+    var target_work_unique_id = work_unique_id;
+    var work_id = $('#work_id').val();
+    var target = $('#target').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/execution_work_copy/",
+                type: "POST",
+                data : {
+                    'target_work_unique_id': target_work_unique_id,
+                    'this_step': present_step,
+                    'target': target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    //if($('#work_name').val() == "" || $('#work_name').val() == null){
+                    //    $('#work_name').val(data.work_name);                                // 共用
+                    //}
+                    if(target == "prospecificationunit"){
+                        //$('#work_required_function').val(data.work_required_function);
+                        //$('#sub_id').val(data.sub_id);
+                        //if($('#division_name').val() == "" || $('#division_name').val() == null){
+                        //    $('#division_name').val(data.division);                             // 実行専用
+                        //}
+                        //if($('#department_name').val() == "" || $('#department_name').val() == null){
+                        //    $('#department_name').val(data.department);                         // 実行専用
+                        //}
+                        //if($('#work_charge_process_name').val() == "" || $('#work_charge_process_name').val() == null){
+                        //    $('#work_charge_process_name').val(data.work_charge_process);       // 実行専用
+                        //}
+                        if($('#sel_work_class_cd').val() == "" || $('#sel_work_class_cd').val() == null){
+                            $('#sel_work_class_cd').val(data.goods_construct_kbn);                    // 実行専用
+                        }
+                        //$('#work_planning_charge_person').val(data.work_planning_charge_person.username);
+                        //$('#specification_person_in_charge').val(data.specification_person_in_charge);
+                        //$('#procurement_person_in_charge').val(data.procurement_person_in_charge);
+                        if($('#sel_management_class_cd').val() == "" || $('#sel_management_class_cd').val() == null){
+                            $('#sel_management_class_cd').val(data.management_class_cd);        // 実行専用
+                        }
+                        //$('#work_order_department_charge_person').val(data.work_order_department_charge_person.username);
+                        //$('#delivery_location').val(data.delivery_location);                  // 共用(予算側のみコピー)
+                        //$('#specification_data').val(data.specification_data);                // 実行専用(以下同様)
+                        //$('#construction_outline').val(data.construction_outline);
+                        if($('#contents_detail1').val() == "" || $('#contents_detail1').val() == null){
+                            $('#contents_detail1').val(data.contents_detail1);
+                        }
+                        if($('#contents_detail2').val() == "" || $('#contents_detail2').val() == null){
+                            $('#contents_detail2').val(data.contents_detail2);
+                        }
+                        if($('#contents_detail3').val() == "" || $('#contents_detail3').val() == null){
+                            $('#contents_detail3').val(data.contents_detail3);
+                        }
+                        if($('#contents_detail4').val() == "" || $('#contents_detail4').val() == null){
+                            $('#contents_detail4').val(data.contents_detail4);
+                        }
+                        if($('#contents_detail5').val() == "" || $('#contents_detail5').val() == null){
+                            $('#contents_detail5').val(data.contents_detail5);
+                        }
+                        if($('#sel_format_kbn').val() == "" || $('#sel_format_kbn').val() == null){
+                            $('#sel_format_kbn').val(data.format_kbn);                          // 予算側:sel_fixed_form
+                        }
+                        if($('#candidate_vendor1').val() == "" || $('#candidate_vendor1').val() == null){
+                            $('#candidate_vendor1').val(data.candidate_vendor1);
+                        }
+                        if($('#candidate_vendor2').val() == "" || $('#candidate_vendor2').val() == null){
+                            $('#candidate_vendor2').val(data.candidate_vendor2);
+                        }
+                        if($('#candidate_vendor3').val() == "" || $('#candidate_vendor3').val() == null){
+                            $('#candidate_vendor3').val(data.candidate_vendor3);
+                        }
+                        if($('#candidate_vendor4').val() == "" || $('#candidate_vendor4').val() == null){
+                            $('#candidate_vendor4').val(data.candidate_vendor4);
+                        }
+                        if($('#candidate_vendor5').val() == "" || $('#candidate_vendor5').val() == null){
+                            $('#candidate_vendor5').val(data.candidate_vendor5);
+                        }
+                        //$('#estimate_range').val(data.estimate_range);
+                        //$('#confidentiality').val(data.confidentiality);
+                        //$('#warranty').val(data.warranty);
+                        //$('#acceptance_conditions').val(data.acceptance_conditions);
+                        //var sel_witness_inspection = data.witness_inspection;
+                        //var sel_acceptance_inspection = data.acceptance_inspection;
+                        //var sel_test_run = data.test_run;
+                        //$('#test_run_pass').val(data.test_run_pass);
+                        //$('#inspection_period').val(data.inspection_period);
+                        //$('#work_rem').val(data.work_rem);
+                    }else{
+                        //$('#sel_work_charge_division').val(data.division);                          // 予算専用
+                        //$('#work_charge_division_name').val(data.division_name);                // 予算専用
+                        //$('#sel_work_charge_department').val(data.department);                      // 予算専用
+                        $('#sel_management_class_cd').val(data.management_class_cd);                // 予算専用
+                        //$('#sel_work_charge_process').val(data.work_charge_process);                // 予算専用
+                        $('#delivery_location').val(data.delivery_location);                    // 共用(予算側のみコピー)
+                        $('#sel_work_class_cd').val(data.goods_construct_kbn);                         // 予算専用
+                        $('#sel_fixed_form').val(data.format_kbn);
+                        // 仕様詳細コピー
+                        copy_free_spec_list_entry(copy_work_id, present_step);
+                    }
+                    alert(data.msg);
+
+                    if(data.law_list_num > 0 || data.supplies_list_num > 0){
+                        if(window.confirm('法令/支給品をコピーしますか？')){
+                            copy_law_supplies_list_entry(copy_work_id, present_step);
+                        }
+                    }
+
+                    if(data.document_lists_num > 0){
+                        if(window.confirm('提出書類をコピーしますか？')){
+                            copy_document_list_entry(copy_work_id, present_step);
+                        }
+                    }
+
+                    if(data.uploadfile_list_num > 0){
+                        if(window.confirm('添付ファイルをコピーしますか？')){
+                            copy_uploadfile_list_entry(data.budget_id, copy_work_id, present_step);
+                        }
+                    }
+
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+// 法令/支給品コピー処理
+function copy_law_supplies_list_entry(copy_work_id, present_step){
+    var work_id = $('#work_id').val();
+    var this_step = $('#this_step').val();
+    var copy_work_id = copy_work_id;
+    var copy_step_no = present_step;
+    var rev_no = $('#target_work_rev_no').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_law_supplies_list_entry/",
+            type: "POST",
+            data : {
+                'work_id': work_id,
+                'copy_step_no': copy_step_no,
+                'copy_work_id': copy_work_id,
+                'this_step': this_step,
+                'rev_no': rev_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                get_work_law_list(work_id);
+                get_work_supplies_list(work_id);
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#document_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+// 仕様詳細コピー処理
+function copy_free_spec_list_entry(copy_work_id, present_step){
+    var work_id = $('#work_id').val();
+    var this_step = $('#this_step').val();
+    var copy_work_id = copy_work_id;
+    var copy_step_no = present_step;
+    var rev_no = $('#target_work_rev_no').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_free_spec_list_entry/",
+            type: "POST",
+            data : {
+                'work_id': work_id,
+                'copy_step_no': copy_step_no,
+                'copy_work_id': copy_work_id,
+                'this_step': this_step,
+                'rev_no': rev_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                if(Number(this_step) < 200000000){
+                    work_free_spec_info();
+                }else if(data.copy_free_spec_detail_detail_data.length != 0){
+                    for(loop = 0; loop < data.copy_free_spec_detail_detail_data.length; loop++){
+                        target_item_name = 'contents_detail' + (loop + 1);
+                        $('#' + target_item_name).val(data.copy_free_spec_detail_detail_data[loop]);
+                    }
+                }
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#document_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+// 関係機器情報コピー処理
+function copy_equipment_list_entry(budget_id, copy_work_id, present_step){
+    var work_id = $('#work_id').val();
+    var this_step = $('#this_step').val();
+    var copy_work_id = copy_work_id;
+    var copy_step_no = present_step;
+    var rev_no = $('#target_work_rev_no').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_equipment_list_entry/",
+            type: "POST",
+            data : {
+                'work_id': work_id,
+                'copy_step_no': copy_step_no,
+                'copy_work_id': copy_work_id,
+                'this_step': this_step,
+                'rev_no': rev_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                get_work_equipment_list(budget_id, work_id);
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#document_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+// 提出書類コピー処理
+function copy_document_list_entry(copy_work_id, present_step){
+    var work_id = $('#work_id').val();
+    var this_step = $('#this_step').val();
+    var copy_work_id = copy_work_id;
+    var copy_step_no = present_step;
+    var rev_no = $('#target_work_rev_no').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_document_list_entry/",
+            type: "POST",
+            data : {
+                'work_id': work_id,
+                'copy_step_no': copy_step_no,
+                'copy_work_id': copy_work_id,
+                'this_step': this_step,
+                'rev_no': rev_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                get_document_list(work_id);//登録済提出書類一覧を表示するJSを起動(このhtml内にプログラム有)
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#document_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+// 添付ファイルコピー処理
+function copy_uploadfile_list_entry(copy_budget_id, copy_work_id, present_step){
+    var this_step = $('#this_step').val();
+    if(this_step > 200000000){
+        var budget_id = $('#budget_id').val();
+    }else{
+        var budget_id = $('#target_budget_id').val();
+    }
+    var work_id = $('#work_id').val();
+    var target = $('#target').val();
+    var copy_work_id = copy_work_id;
+    var copy_step_no = present_step;
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_uploadfile_list_entry/",
+            type: "POST",
+            data : {
+                'budget_id': budget_id,
+                'work_id': work_id,
+                'this_step': this_step,
+                'target': target,
+                'copy_budget_id': copy_budget_id,
+                'copy_work_id': copy_work_id,
+                'copy_step_no': copy_step_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                upload_file_list(target);
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#document_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+</script>
+
+<style type="text/css">
+thead.copy_work_scrollHead,tbody.copy_work_scrollBody{
+    display:block;
+}
+tbody.copy_work_scrollBody{
+    overflow-y:scroll;
+    height:570px;
+}
+td,th{
+    table-layout:fixed;
+}
+.copy_work_detail_pb{
+    width:40px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.copy_work_copy_pb{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.copy_work_budget_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_id{
+    width:65px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_name{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.specification_person_in_charge{
+    width:90px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.planning_charge_person{
+    width:90px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_budget_no{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_condition{
+    width:140px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_step{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_next_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_business_year{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_budget_name{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_department{
+    width:150px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_construction_name{
+    width:280px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_order_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_desired_date{
+    width:220px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_plan_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_work_days_stay{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+        {% if execution_work_lists_num > 0 %}
+            表示件数：{{ execution_work_lists_num }}件
+
+            <table >
+                <thead class="copy_work_scrollHead">
+                    <tr>
+                        <th class="copy_work_detail_pb"></th>
+                        <th class="copy_work_copy_pb"></th>
+<!--                        <th class="work_detail_pb"></th>-->
+                        <th class="copy_work_id">工事ID</th>
+                        <th class="copy_work_step">工程</th>
+                        <th class="copy_work_next_person">次作業者</th>
+                        <th class="copy_work_name">工事名</th>
+                        <th class="specification_person_in_charge">仕様書担当</th>
+                        <th class="planning_charge_person">計画担当</th>
+                        <th class="copy_work_budget_id">予算ID</th>
+                        <th class="copy_work_budget_no">予算NO</th>
+                        <th class="copy_work_condition">予算状態</th>
+                        <th class="copy_work_business_year">年度</th>
+                        <th class="copy_work_budget_name">{{ budget_name_text }}</th>
+                        <th class="copy_work_department">部署</th>
+<!--                        <th class="work_days_stay">滞留日数</th>-->
+                    </tr>
+                </thead>
+                <tbody class="copy_work_scrollBody">
+                {% for work_lists in execution_work_lists %}
+                    <tr>
+                        <td class="copy_work_detail_pb">
+                            {% if level5_step_id > 200000000 %}
+                                <a href="#" class="detailpb"
+                                   onclick="work_detail({{ work_lists.id }},{{ work_lists.construction_id }},{{ work_lists.budget_unique_id }},{{ work_lists.budget_id }},'{{ work_lists.present_operator }}');">詳細</a>
+                            {% else %}
+                                <a href="#" class="detailpb"
+                                   onclick="work_detail({{ work_lists.id }},{{ work_lists.work_id }},{{ work_lists.budget_unique_id }},{{ work_lists.budget_id }},'{{ work_lists.present_operator }}');">詳細</a>
+                            {% endif %}
+                        </td>
+                        <td class="copy_work_copy_pb">
+                            {% if level5_step_id > 200000000 %}
+                                <a href="#" class="detailpb"
+                                    onclick="work_copy({{ work_lists.id }}, {{ work_lists.construction_id }}, {{ work_lists.present_step }}, 'e');">コピー</a>
+                            {% else %}
+                                <a href="#" class="detailpb"
+                                    onclick="work_copy({{ work_lists.id }}, {{ work_lists.work_id }}, {{ work_lists.step_id }}, 'w');">コピー</a>
+                            {% endif %}
+                        </td>
+<!--                        <td class="work_detail_pb">-->
+<!--                            <a href="#" class="detailpb"
+                                   onclick="work_copy({{ work_lists.id }}, {{ work_lists.construction_id }}, 'w');">工事基本情報コピー</a>-->
+<!--                        </td>-->
+                        <td class="copy_work_id">{% if level5_step_id > 200000000 %}{{ work_lists.construction_id }}{% else %}{{ work_lists.work_id }}{% endif %}</td>
+                        <td class="copy_work_step">{{ work_lists.step_name }}</td>
+                        <td class="copy_work_next_person">{% if level5_step_id > 200000000 %}{{ work_lists.U1_last_name }}{{ work_lists.U1_first_name }}{% else %}{{ work_lists.last_name }}{{ work_lists.first_name }}{% endif %}</td>
+                        <td class="copy_work_name">{{ work_lists.work_name }}</td>
+                        <td class="specification_person_in_charge">
+                            {% if work_lists.U2_last_name is not None and work_lists.U2_first_name is not None %}
+                                {{ work_lists.U2_last_name }}{{ work_lists.U2_first_name }}
+                            {% endif %}
+                        </td>
+                        <td class="planning_charge_person">
+                            {% if work_lists.planningchargepersondata_last_name is not None and work_lists.planningchargepersondata_first_name is not None %}
+                                {{ work_lists.planningchargepersondata_last_name }}{{ work_lists.planningchargepersondata_first_name }}
+                            {% endif %}
+                        </td>
+                        <td class="copy_work_budget_id">{{ work_lists.budget_id }}</td>
+                        <td class="copy_work_budget_no">{{ work_lists.bd_no }}</td>
+                        <td class="copy_work_condition">{{ work_lists.condition_name }}</td>
+                        <td class="copy_work_business_year">{% if level5_step_id > 200000000 %}{{ work_lists.business_year_id }}{% else %}{{ work_lists.business_year }}{% endif %}</td>
+                        {% if is_mplan_flag %}
+                            <td class="copy_work_budget_name">{{ work_lists.request_name }}</td>
+                        {% else %}
+                            <td class="copy_work_budget_name">{{ work_lists.budget_name }}</td>
+                        {% endif %}
+                        <td class="copy_work_department">{{ work_lists.department_name }}</td>
+<!--                        {% if work_lists.days_stay == None %}-->
+<!--                            <td class="work_days_stay"></td>-->
+<!--                        {% else %}-->
+<!--                            <td class="work_days_stay">{{ work_lists.days_stay }}</td>-->
+<!--                        {% endif %}-->
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

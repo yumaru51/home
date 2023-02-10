@@ -1,0 +1,10 @@
+次作業者部署：<select id="sel_{{ target }}_next_department" name="sel_next_department" onchange="{{ target }}_select_next_department(value);">
+                    <option value=""></option>
+                        {% for next_departments_list in next_departments_list %}
+                            {% if next_departments_list.department_cd == target_department %}
+                                <option value="{{ next_departments_list.department_cd }}" selected>{{ next_departments_list.department_name }}</option>
+                            {% else %}
+                                <option value="{{ next_departments_list.department_cd }}">{{ next_departments_list.department_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>

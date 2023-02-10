@@ -1,0 +1,1763 @@
+<script>
+//消防法_危険物承認申請_場所のコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_service_app_place_value_change() {
+    var target_fire_service_app_place = $('#fire_service_app_place').val();
+    if (target_fire_service_app_place != "") {
+        var pulldown_option = document.getElementById("sel_fire_service_app_place").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_service_app_place){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//消防法_危険物承認申請_扱いのコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_service_app_action_value_change() {
+    var target_fire_service_app_action = $('#fire_service_app_action').val();
+    if (target_fire_service_app_action != "") {
+        var pulldown_option = document.getElementById("sel_fire_service_app_action").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_service_app_action){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//消防法_危険物届_場所のコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_service_ntfc_place_value_change() {
+    var target_fire_service_ntfc_place = $('#fire_service_ntfc_place').val();
+    if (target_fire_service_ntfc_place != "") {
+        var pulldown_option = document.getElementById("sel_fire_service_ntfc_place").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_service_ntfc_place){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//消防法_危険物届_改廃のコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_service_ntfc_amendment_value_change() {
+    var target_fire_service_ntfc_amendment = $('#fire_service_ntfc_amendment').val();
+    if (target_fire_service_ntfc_amendment != "") {
+        var pulldown_option = document.getElementById("sel_fire_service_ntfc_amendment").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_service_ntfc_amendment){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//消防法_危険物品名数量倍数変更届_場所のコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_service_quantity_ntfc_place_value_change() {
+    var target_fire_service_quantity_ntfc_place = $('#fire_service_quantity_ntfc_place').val();
+    if (target_fire_service_quantity_ntfc_place != "") {
+        var pulldown_option = document.getElementById("sel_fire_service_quantity_ntfc_place").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_service_quantity_ntfc_place){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//消防法_圧縮アセチレンガス等貯蔵取扱届_改廃のコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_service_acetylene_gas_ntfc_amendment_value_change() {
+    var target_fire_service_acetylene_gas_ntfc_amendment = $('#fire_service_acetylene_gas_ntfc_amendment').val();
+    if (target_fire_service_acetylene_gas_ntfc_amendment != "") {
+        var pulldown_option = document.getElementById("sel_fire_service_acetylene_gas_ntfc_amendment").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_service_acetylene_gas_ntfc_amendment){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//消防法_危険物仮承認申請_扱いのコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_service_tentative_app_action_value_change() {
+    var target_fire_service_tentative_app_action = $('#fire_service_tentative_app_action').val();
+    if (target_fire_service_tentative_app_action != "") {
+        var pulldown_option = document.getElementById("sel_fire_service_tentative_app_action").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_service_tentative_app_action){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//市火災予防条例_危険物貯蔵取扱届_危険物種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_prevent_storage_ntfc_category_value_change() {
+    var target_fire_prevent_storage_ntfc_category = $('#fire_prevent_storage_ntfc_category').val();
+    if (target_fire_prevent_storage_ntfc_category != "") {
+        var pulldown_option = document.getElementById("sel_fire_prevent_storage_ntfc_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_prevent_storage_ntfc_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//市火災予防条例_危険物貯蔵取扱届_改廃のコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_prevent_storage_ntfc_amendment_value_change() {
+    var target_fire_prevent_storage_ntfc_amendment = $('#fire_prevent_storage_ntfc_amendment').val();
+    if (target_fire_prevent_storage_ntfc_amendment != "") {
+        var pulldown_option = document.getElementById("sel_fire_prevent_storage_ntfc_amendment").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_prevent_storage_ntfc_amendment){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//市火災予防条例_設備設置届_設備種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function fire_prevent_equip_ntfc_category_value_change() {
+    var target_fire_prevent_equip_ntfc_category = $('#fire_prevent_equip_ntfc_category').val();
+    if (target_fire_prevent_equip_ntfc_category != "") {
+        var pulldown_option = document.getElementById("sel_fire_prevent_equip_ntfc_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_fire_prevent_equip_ntfc_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//劇毒物取締法_劇毒物変更届_取扱のコンボボックスの選択を呼び出した値(引数?)と同期
+function deleterious_substances_ntfc_purpose_value_change() {
+    var target_deleterious_substances_ntfc_purpose = $('#deleterious_substances_ntfc_purpose').val();
+    if (target_deleterious_substances_ntfc_purpose != "") {
+        var pulldown_option = document.getElementById("sel_deleterious_substances_ntfc_purpose").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_deleterious_substances_ntfc_purpose){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//高圧ガス保安法_特定高圧ガス設備申請_設置/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function press_gas_app_motive_value_change() {
+    var target_press_gas_app_motive = $('#press_gas_app_motive').val();
+    if (target_press_gas_app_motive != "") {
+        var pulldown_option = document.getElementById("sel_press_gas_app_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_press_gas_app_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//高圧ガス保安法_液化石油高圧ガス設備申請_設置/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function press_gas_lpg_app_motive_value_change() {
+    var target_press_gas_lpg_app_motive = $('#press_gas_lpg_app_motive').val();
+    if (target_press_gas_lpg_app_motive != "") {
+        var pulldown_option = document.getElementById("sel_press_gas_lpg_app_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_press_gas_lpg_app_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//高圧ガス保安法_冷凍高圧ガス設備申請_設置/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function press_gas_frozen_gas_app_motive_value_change() {
+    var target_press_gas_frozen_gas_app_motive = $('#press_gas_frozen_gas_app_motive').val();
+    if (target_press_gas_frozen_gas_app_motive != "") {
+        var pulldown_option = document.getElementById("sel_press_gas_frozen_gas_app_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_press_gas_frozen_gas_app_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//高圧ガス保安法_特定高圧ガス設備届_改廃のコンボボックスの選択を呼び出した値(引数?)と同期
+function press_gas_ntfc_amendment_value_change() {
+    var target_press_gas_ntfc_amendment = $('#press_gas_ntfc_amendment').val();
+    if (target_press_gas_ntfc_amendment != "") {
+        var pulldown_option = document.getElementById("sel_press_gas_ntfc_amendment").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_press_gas_ntfc_amendment){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//高圧ガス保安法_液化石油高圧ガス設備届_改廃のコンボボックスの選択を呼び出した値(引数?)と同期
+function press_gas_lpg_ntfc_amendment_value_change() {
+    var target_press_gas_lpg_ntfc_amendment = $('#press_gas_lpg_ntfc_amendment').val();
+    if (target_press_gas_lpg_ntfc_amendment != "") {
+        var pulldown_option = document.getElementById("sel_press_gas_lpg_ntfc_amendment").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_press_gas_lpg_ntfc_amendment){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//高圧ガス保安法_冷凍高圧ガス設備届_改廃のコンボボックスの選択を呼び出した値(引数?)と同期
+function press_gas_frozen_gas_ntfc_amendment_value_change() {
+    var target_press_gas_frozen_gas_ntfc_amendment = $('#press_gas_frozen_gas_ntfc_amendment').val();
+    if (target_press_gas_frozen_gas_ntfc_amendment != "") {
+        var pulldown_option = document.getElementById("sel_press_gas_frozen_gas_ntfc_amendment").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_press_gas_frozen_gas_ntfc_amendment){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//高圧ガス保安法_特定高圧ガス消費設備届_改廃のコンボボックスの選択を呼び出した値(引数?)と同期
+function press_gas_consumption_ntfc_amendment_value_change() {
+    var target_press_gas_consumption_ntfc_amendment = $('#press_gas_consumption_ntfc_amendment').val();
+    if (target_press_gas_consumption_ntfc_amendment != "") {
+        var pulldown_option = document.getElementById("sel_press_gas_consumption_ntfc_amendment").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_press_gas_consumption_ntfc_amendment){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//労働安全衛生法_設置物届_設置物種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function safety_health_equip_ntfc_category_value_change() {
+    var target_safety_health_equip_ntfc_category = $('#safety_health_equip_ntfc_category').val();
+    if (target_safety_health_equip_ntfc_category != "") {
+        var pulldown_option = document.getElementById("sel_safety_health_equip_ntfc_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_safety_health_equip_ntfc_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//労働安全衛生法_設置物届_設置/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function safety_health_equip_ntfc_motive_value_change() {
+    var target_safety_health_equip_ntfc_motive = $('#safety_health_equip_ntfc_motive').val();
+    if (target_safety_health_equip_ntfc_motive != "") {
+        var pulldown_option = document.getElementById("sel_safety_health_equip_ntfc_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_safety_health_equip_ntfc_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//労働安全衛生法_有害物質届_有害物質種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function safety_health_deleterious_ntfc_category_value_change() {
+    var target_safety_health_deleterious_ntfc_category = $('#safety_health_deleterious_ntfc_category').val();
+    if (target_safety_health_deleterious_ntfc_category != "") {
+        var pulldown_option = document.getElementById("sel_safety_health_deleterious_ntfc_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_safety_health_deleterious_ntfc_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//労働安全衛生法_有害物質届_設置/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function safety_health_deleterious_ntfc_motive_value_change() {
+    var target_safety_health_deleterious_ntfc_motive = $('#safety_health_deleterious_ntfc_motive').val();
+    if (target_safety_health_deleterious_ntfc_motive != "") {
+        var pulldown_option = document.getElementById("sel_safety_health_deleterious_ntfc_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_safety_health_deleterious_ntfc_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//労働安全衛生法_設備届_設備種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function safety_health_specified_equip_ntfc_category_value_change() {
+    var target_safety_health_specified_equip_ntfc_category = $('#safety_health_specified_equip_ntfc_category').val();
+    if (target_safety_health_specified_equip_ntfc_category != "") {
+        var pulldown_option = document.getElementById("sel_safety_health_specified_equip_ntfc_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_safety_health_specified_equip_ntfc_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//労働安全衛生法_設備届_設置/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function safety_health_specified_equip_ntfc_motive_value_change() {
+    var target_safety_health_specified_equip_ntfc_motive = $('#safety_health_specified_equip_ntfc_motive').val();
+    if (target_safety_health_specified_equip_ntfc_motive != "") {
+        var pulldown_option = document.getElementById("sel_safety_health_specified_equip_ntfc_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_safety_health_specified_equip_ntfc_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//労働安全衛生法_設備設置報告_設備種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function safety_health_installation_report_category_value_change() {
+    var target_safety_health_installation_report_category = $('#safety_health_installation_report_category').val();
+    if (target_safety_health_installation_report_category != "") {
+        var pulldown_option = document.getElementById("sel_safety_health_installation_report_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_safety_health_installation_report_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//放射線障害防止法_放射性同位元素申請_使用/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function radiation_hazards_app_motive_value_change() {
+    var target_radiation_hazards_app_motive = $('#radiation_hazards_app_motive').val();
+    if (target_radiation_hazards_app_motive != "") {
+        var pulldown_option = document.getElementById("sel_radiation_hazards_app_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_radiation_hazards_app_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//消防法_危険物承認申請_場所のコンボボックスを変更したときに選択値と格納値を同期
+function fire_service_app_place_change(a) {
+    var value = a;
+    $('#fire_service_app_place').val(value);
+}
+
+//消防法_危険物承認申請_場所のコンボボックスを変更したときに選択値と格納値を同期
+function fire_service_app_action_change(a) {
+    var value = a;
+    $('#fire_service_app_action').val(value);
+}
+
+//消防法_危険物届_場所のコンボボックスを変更したときに選択値と格納値を同期
+function fire_service_ntfc_place_change(a) {
+    var value = a;
+    $('#fire_service_ntfc_place').val(value);
+}
+
+//消防法_危険物届_改廃のコンボボックスを変更したときに選択値と格納値を同期
+function fire_service_ntfc_amendment_change(a) {
+    var value = a;
+    $('#fire_service_ntfc_amendment').val(value);
+}
+
+//消防法_危険物品名数量倍数変更届_場所のコンボボックスを変更したときに選択値と格納値を同期
+function fire_service_quantity_ntfc_place_change(a) {
+    var value = a;
+    $('#fire_service_quantity_ntfc_place').val(value);
+}
+
+//消防法_圧縮アセチレンガス等貯蔵取扱届_改廃のコンボボックスを変更したときに選択値と格納値を同期
+function fire_service_acetylene_gas_ntfc_amendment_change(a) {
+    var value = a;
+    $('#fire_service_acetylene_gas_ntfc_amendment').val(value);
+}
+
+//消防法_危険物仮承認申請_扱いのコンボボックスを変更したときに選択値と格納値を同期
+function fire_service_tentative_app_action_change(a) {
+    var value = a;
+    $('#fire_service_tentative_app_action').val(value);
+}
+
+//市火災予防条例_危険物貯蔵取扱届_危険物種類のコンボボックスを変更したときに選択値と格納値を同期
+function fire_prevent_storage_ntfc_category_change(a) {
+    var value = a;
+    $('#fire_prevent_storage_ntfc_category').val(value);
+}
+
+//市火災予防条例_危険物貯蔵取扱届_改廃のコンボボックスを変更したときに選択値と格納値を同期
+function fire_prevent_storage_ntfc_amendment_change(a) {
+    var value = a;
+    $('#fire_prevent_storage_ntfc_category').val(value);
+}
+
+//市火災予防条例_設備設置届_設備種類のコンボボックスを変更したときに選択値と格納値を同期
+function fire_prevent_equip_ntfc_category_change(a) {
+    var value = a;
+    $('#fire_prevent_equip_ntfc_category').val(value);
+}
+
+//劇毒物取締法_劇毒物変更届_取扱のコンボボックスを変更したときに選択値と格納値を同期
+function deleterious_substances_ntfc_purpose_change(a) {
+    var value = a;
+    $('#deleterious_substances_ntfc_purpose').val(value);
+}
+
+//高圧ガス保安法_特定高圧ガス設備申請_設置/変更のコンボボックスを変更したときに選択値と格納値を同期
+function press_gas_app_motive_change(a) {
+    var value = a;
+    $('#press_gas_app_motive').val(value);
+}
+
+//高圧ガス保安法_液化石油高圧ガス設備申請_設置/変更のコンボボックスを変更したときに選択値と格納値を同期
+function press_gas_lpg_app_motive_change(a) {
+    var value = a;
+    $('#press_gas_lpg_app_motive').val(value);
+}
+
+//高圧ガス保安法_冷凍高圧ガス設備申請_設置/変更のコンボボックスを変更したときに選択値と格納値を同期
+function press_gas_frozen_gas_app_motive_change(a) {
+    var value = a;
+    $('#press_gas_frozen_gas_app_motive').val(value);
+}
+
+//高圧ガス保安法_特定高圧ガス設備届_改廃のコンボボックスを変更したときに選択値と格納値を同期
+function press_gas_ntfc_amendment_change(a) {
+    var value = a;
+    $('#press_gas_ntfc_amendment').val(value);
+}
+
+//高圧ガス保安法_液化石油高圧ガス設備届_改廃のコンボボックスを変更したときに選択値と格納値を同期
+function press_gas_lpg_ntfc_amendment_change(a) {
+    var value = a;
+    $('#press_gas_lpg_ntfc_amendment').val(value);
+}
+
+//高圧ガス保安法_冷凍高圧ガス設備届_改廃のコンボボックスを変更したときに選択値と格納値を同期
+function press_gas_frozen_gas_ntfc_amendment_change(a) {
+    var value = a;
+    $('#press_gas_frozen_gas_ntfc_amendment').val(value);
+}
+
+//高圧ガス保安法_特定高圧ガス消費設備届_改廃のコンボボックスを変更したときに選択値と格納値を同期
+function press_gas_consumption_ntfc_amendment_change(a) {
+    var value = a;
+    $('#press_gas_consumption_ntfc_amendment').val(value);
+}
+
+//労働安全衛生法_設置物届_設置物種類のコンボボックスを変更したときに選択値と格納値を同期
+function safety_health_equip_ntfc_category_change(a) {
+    var value = a;
+    $('#safety_health_equip_ntfc_category').val(value);
+}
+
+//労働安全衛生法_設置物届_設置/変更のコンボボックスを変更したときに選択値と格納値を同期
+function safety_health_equip_ntfc_motive_change(a) {
+    var value = a;
+    $('#safety_health_equip_ntfc_motive').val(value);
+}
+
+//労働安全衛生法_有害物質届_設置物種類のコンボボックスを変更したときに選択値と格納値を同期
+function safety_health_deleterious_ntfc_category_change(a) {
+    var value = a;
+    $('#safety_health_deleterious_ntfc_category').val(value);
+}
+
+//労働安全衛生法_有害物質届_設置/変更のコンボボックスを変更したときに選択値と格納値を同期
+function safety_health_deleterious_ntfc_motive_change(a) {
+    var value = a;
+    $('#safety_health_deleterious_ntfc_motive').val(value);
+}
+
+//労働安全衛生法_設備届_設置物種類のコンボボックスを変更したときに選択値と格納値を同期
+function safety_health_specified_equip_ntfc_category_change(a) {
+    var value = a;
+    $('#safety_health_specified_equip_ntfc_category').val(value);
+}
+
+//労働安全衛生法_設備届_設置/変更のコンボボックスを変更したときに選択値と格納値を同期
+function safety_health_specified_equip_ntfc_motive_change(a) {
+    var value = a;
+    $('#safety_health_specified_equip_ntfc_motive').val(value);
+}
+
+//労働安全衛生法_設備設置報告_設置物種類のコンボボックスを変更したときに選択値と格納値を同期
+function safety_health_installation_report_category_change(a) {
+    var value = a;
+    $('#safety_health_installation_report_category').val(value);
+}
+
+//放射線障害防止法_放射性同位元素申請_使用/変更のコンボボックスを変更したときに選択値と格納値を同期
+function radiation_hazards_app_motive_change(a) {
+    var value = a;
+    $('#radiation_hazards_app_motive').val(value);
+}
+
+// チェックボックスの状態同期
+function cs_sh_check_box_change(){
+    if($('#fire_service_app').val() == "True")
+    {
+        document.getElementById("sel_fire_service_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_app").checked = 0;
+    }
+    if($('#fire_service_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_service_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_ntfc").checked = 0;
+    }
+    if($('#fire_service_quantity_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_service_quantity_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_quantity_ntfc").checked = 0;
+    }
+    if($('#fire_service_acetylene_gas_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_service_acetylene_gas_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_acetylene_gas_ntfc").checked = 0;
+    }
+    if($('#fire_service_tentative_app').val() == "True")
+    {
+        document.getElementById("sel_fire_service_tentative_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_tentative_app").checked = 0;
+    }
+    if($('#fire_prevent_storage_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_storage_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_storage_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_equip_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_commencement_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_commencement_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_commencement_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_construction_plan').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_construction_plan").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_construction_plan").checked = 0;
+    }
+    if($('#fire_prevent_installation_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_installation_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_installation_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_hazardous_work_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_hazardous_work_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_hazardous_work_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_fires_smoke_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_fires_smoke_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_fires_smoke_ntfc").checked = 0;
+    }
+    if($('#deleterious_substances_list_app').val() == "True")
+    {
+        document.getElementById("sel_deleterious_substances_list_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_deleterious_substances_list_app").checked = 0;
+    }
+    if($('#deleterious_substances_ntfc').val() == "True")
+    {
+        document.getElementById("sel_deleterious_substances_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_deleterious_substances_ntfc").checked = 0;
+    }
+    if($('#press_gas_app').val() == "True")
+    {
+        document.getElementById("sel_press_gas_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_app").checked = 0;
+    }
+    if($('#press_gas_lpg_app').val() == "True")
+    {
+        document.getElementById("sel_press_gas_lpg_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_lpg_app").checked = 0;
+    }
+    if($('#press_gas_frozen_gas_app').val() == "True")
+    {
+        document.getElementById("sel_press_gas_frozen_gas_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_frozen_gas_app").checked = 0;
+    }
+    if($('#press_gas_ntfc').val() == "True")
+    {
+        document.getElementById("sel_press_gas_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_ntfc").checked = 0;
+    }
+    if($('#press_gas_lpg_ntfc').val() == "True")
+    {
+        document.getElementById("sel_press_gas_lpg_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_lpg_ntfc").checked = 0;
+    }
+    if($('#press_gas_frozen_gas_ntfc').val() == "True")
+    {
+        document.getElementById("sel_press_gas_frozen_gas_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_frozen_gas_ntfc").checked = 0;
+    }
+    if($('#press_gas_consumption_ntfc').val() == "True")
+    {
+        document.getElementById("sel_press_gas_consumption_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_consumption_ntfc").checked = 0;
+    }
+    if($('#safety_health_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_safety_health_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_equip_ntfc").checked = 0;
+    }
+    if($('#safety_health_deleterious_ntfc').val() == "True")
+    {
+        document.getElementById("sel_safety_health_deleterious_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_deleterious_ntfc").checked = 0;
+    }
+    if($('#safety_health_asbestos').val() == "True")
+    {
+        document.getElementById("sel_safety_health_asbestos").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_asbestos").checked = 0;
+    }
+    if($('#safety_health_specified_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_safety_health_specified_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_specified_equip_ntfc").checked = 0;
+    }
+    if($('#safety_health_installation_report').val() == "True")
+    {
+        document.getElementById("sel_safety_health_installation_report").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_installation_report").checked = 0;
+    }
+    if($('#radiation_hazards_app').val() == "True")
+    {
+        document.getElementById("sel_radiation_hazards_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_radiation_hazards_app").checked = 0;
+    }
+    if($('#petroleum_complexes_act').val() == "True")
+    {
+        document.getElementById("sel_petroleum_complexes_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_petroleum_complexes_act").checked = 0;
+    }
+
+}
+
+//入力項目の未入力、文字数オーバーをチェック
+function input_sh_check(a,b,d) {  // a:自工程id, b:次工程id,  d:action_cd
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var ng_count = 0;
+    var msg = "";
+    var alert_ng_ch_msg_str = ""
+
+    //必須入力チェック
+
+    // 消防法_危険物承認申請
+    var fire_service_app = $('#sel_fire_service_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_fire_service_app_place').val() == "" && fire_service_app){
+        $('#sel_fire_service_app_place').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_service_app_place').css('background-color','white');
+    }
+    if ($('#sel_fire_service_app_action').val() == "" && fire_service_app){
+        $('#sel_fire_service_app_action').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_service_app_action').css('background-color','white');
+    }
+
+    // 消防法_危険物届
+    var fire_service_ntfc = $('#sel_fire_service_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_fire_service_ntfc_place').val() == "" && fire_service_ntfc){
+        $('#sel_fire_service_ntfc_place').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_service_ntfc_place').css('background-color','white');
+    }
+    if ($('#sel_fire_service_ntfc_amendment').val() == "" && fire_service_ntfc){
+        $('#sel_fire_service_ntfc_amendment').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_service_ntfc_amendment').css('background-color','white');
+    }
+
+    // 消防法_危険物品名数量倍数変更届
+    var fire_service_quantity_ntfc = $('#sel_fire_service_quantity_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_fire_service_quantity_ntfc_place').val() == "" && fire_service_quantity_ntfc){
+        $('#sel_fire_service_quantity_ntfc_place').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_service_quantity_ntfc_place').css('background-color','white');
+    }
+
+    // 消防法_圧縮アセチレンガス等貯蔵取扱届出
+    var fire_service_acetylene_gas_ntfc = $('#sel_fire_service_acetylene_gas_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_fire_service_acetylene_gas_ntfc_amendment').val() == "" && fire_service_acetylene_gas_ntfc){
+        $('#sel_fire_service_acetylene_gas_ntfc_amendment').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_service_acetylene_gas_ntfc_amendment').css('background-color','white');
+    }
+
+    // 消防法_危険物仮承認申請
+    var fire_service_tentative_app = $('#sel_fire_service_tentative_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_fire_service_tentative_app_action').val() == "" && fire_service_tentative_app){
+        $('#sel_fire_service_tentative_app_action').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_service_tentative_app_action').css('background-color','white');
+    }
+
+    // 市火災予防条例_危険物貯蔵取扱届
+    var fire_prevent_storage_ntfc = $('#sel_fire_prevent_storage_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_fire_prevent_storage_ntfc_category').val() == "" && fire_prevent_storage_ntfc){
+        $('#sel_fire_prevent_storage_ntfc_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_prevent_storage_ntfc_category').css('background-color','white');
+    }
+    if ($('#sel_fire_prevent_storage_ntfc_amendment').val() == "" && fire_prevent_storage_ntfc){
+        $('#sel_fire_prevent_storage_ntfc_amendment').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_prevent_storage_ntfc_amendment').css('background-color','white');
+    }
+
+    // 市火災予防条例_設備設置届
+    var fire_prevent_equip_ntfc = $('#sel_fire_prevent_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_fire_prevent_equip_ntfc_category').val() == "" && fire_prevent_equip_ntfc){
+        $('#sel_fire_prevent_equip_ntfc_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_fire_prevent_equip_ntfc_category').css('background-color','white');
+    }
+
+    // 劇毒物取締法_劇毒物変更届
+    var deleterious_substances_ntfc = $('#sel_deleterious_substances_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_deleterious_substances_ntfc_purpose').val() == "" && deleterious_substances_ntfc){
+        $('#sel_deleterious_substances_ntfc_purpose').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_deleterious_substances_ntfc_purpose').css('background-color','white');
+    }
+
+    // 高圧ガス保安法_特定高圧ガス設備申請
+    var press_gas_app = $('#sel_press_gas_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_press_gas_app_motive').val() == "" && press_gas_app){
+        $('#sel_press_gas_app_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_press_gas_app_motive').css('background-color','white');
+    }
+
+    // 高圧ガス保安法_液化石油高圧ガス設備申請
+    var press_gas_lpg_app = $('#sel_press_gas_lpg_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_press_gas_lpg_app_motive').val() == "" && press_gas_lpg_app){
+        $('#sel_press_gas_lpg_app_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_press_gas_lpg_app_motive').css('background-color','white');
+    }
+
+    // 高圧ガス保安法_冷凍高圧ガス設備申請
+    var press_gas_frozen_gas_app = $('#sel_press_gas_frozen_gas_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_press_gas_frozen_gas_app_motive').val() == "" && press_gas_frozen_gas_app){
+        $('#sel_press_gas_frozen_gas_app_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_press_gas_frozen_gas_app_motive').css('background-color','white');
+    }
+
+    // 高圧ガス保安法_特定高圧ガス設備届
+    var press_gas_ntfc = $('#sel_press_gas_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_press_gas_ntfc_amendment').val() == "" && press_gas_ntfc){
+        $('#sel_press_gas_ntfc_amendment').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_press_gas_ntfc_amendment').css('background-color','white');
+    }
+
+    // 高圧ガス保安法_液化石油高圧ガス設備届
+    var press_gas_lpg_ntfc = $('#sel_press_gas_lpg_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_press_gas_lpg_ntfc_amendment').val() == "" && press_gas_lpg_ntfc){
+        $('#sel_press_gas_lpg_ntfc_amendment').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_press_gas_lpg_ntfc_amendment').css('background-color','white');
+    }
+
+    // 高圧ガス保安法_冷凍高圧ガス設備届
+    var press_gas_frozen_gas_ntfc = $('#sel_press_gas_frozen_gas_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_press_gas_frozen_gas_ntfc_amendment').val() == "" && press_gas_frozen_gas_ntfc){
+        $('#sel_press_gas_frozen_gas_ntfc_amendment').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_press_gas_frozen_gas_ntfc_amendment').css('background-color','white');
+    }
+
+    // 高圧ガス保安法_特定高圧ガス消費設備届
+    var press_gas_consumption_ntfc = $('#sel_press_gas_consumption_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_press_gas_consumption_ntfc_amendment').val() == "" && press_gas_consumption_ntfc){
+        $('#sel_press_gas_consumption_ntfc_amendment').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_press_gas_consumption_ntfc_amendment').css('background-color','white');
+    }
+
+    // 労働安全衛生法_設置物届
+    var safety_health_equip_ntfc = $('#sel_safety_health_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_safety_health_equip_ntfc_category').val() == "" && safety_health_equip_ntfc){
+        $('#sel_safety_health_equip_ntfc_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_safety_health_equip_ntfc_category').css('background-color','white');
+    }
+    if ($('#sel_safety_health_equip_ntfc_motive').val() == "" && safety_health_equip_ntfc){
+        $('#sel_safety_health_equip_ntfc_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_safety_health_equip_ntfc_motive').css('background-color','white');
+    }
+
+    // 労働安全衛生法_有害物質届
+    var safety_health_deleterious_ntfc = $('#sel_safety_health_deleterious_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_safety_health_deleterious_ntfc_category').val() == "" && safety_health_deleterious_ntfc){
+        $('#sel_safety_health_deleterious_ntfc_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_safety_health_deleterious_ntfc_category').css('background-color','white');
+    }
+    if ($('#sel_safety_health_deleterious_ntfc_motive').val() == "" && safety_health_deleterious_ntfc){
+        $('#sel_safety_health_deleterious_ntfc_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_safety_health_deleterious_ntfc_motive').css('background-color','white');
+    }
+
+    // 労働安全衛生法_設備届
+    var safety_health_specified_equip_ntfc = $('#sel_safety_health_specified_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_safety_health_specified_equip_ntfc_category').val() == "" && safety_health_specified_equip_ntfc){
+        $('#sel_safety_health_specified_equip_ntfc_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_safety_health_specified_equip_ntfc_category').css('background-color','white');
+    }
+    if ($('#sel_safety_health_specified_equip_ntfc_motive').val() == "" && safety_health_specified_equip_ntfc){
+        $('#sel_safety_health_specified_equip_ntfc_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_safety_health_specified_equip_ntfc_motive').css('background-color','white');
+    }
+
+    // 労働安全衛生法_設備設置報告
+    var safety_health_installation_report = $('#sel_safety_health_installation_report').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_safety_health_installation_report_category').val() == "" && safety_health_installation_report){
+        $('#sel_safety_health_installation_report_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_safety_health_installation_report_category').css('background-color','white');
+    }
+
+    // 放射線障害防止法_放射性同位元素申請
+    var radiation_hazards_app = $('#sel_radiation_hazards_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_radiation_hazards_app_motive').val() == "" && radiation_hazards_app){
+        $('#sel_radiation_hazards_app_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_radiation_hazards_app_motive').css('background-color','white');
+    }
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //警告表示
+    if ( ng_flag > 0 ) {
+        msg += '安全衛生管轄タブに未入力項目があります！！\n';
+    }
+    if ( ng_str_count_flag > 0 ) {
+        msg += '安全衛生管轄タブにて文字数オーバーの項目があります！！\n';
+    }
+    if ( alert_ng_ch_msg_str.length > 0 ) {
+        msg += '安全衛生管轄タブにて' + alert_ng_ch_msg_str;
+    }
+    if ( msg.length > 0 ) {
+        alert(msg);
+    }
+    ng_count = ng_all_flag;
+    return ng_count;
+}
+
+//データ登録･更新処理
+function cs_sh_edit(a,b) {  // a:自工程id, b:次工程id
+        //完了を通知するためのDeferredオブジェクトを作成
+        var deferred = new $.Deferred();
+        if ($('#sh_edit_flag').val() != 1){
+            deferred.resolve();
+            //完了を知らせるためにpromiseオブジェクトを返す
+            return deferred.promise();
+        }
+
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var budget_id = $('#target_budget_id').val();
+        var work_id = $('#work_id').val();
+        var cs_no = $('#cs_no').val();
+        var cs_rev_no = $('#cs_rev_no').val();
+        var fire_service_app = $('#sel_fire_service_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_service_app_place = $('#sel_fire_service_app_place').val();
+        var fire_service_app_action = $('#sel_fire_service_app_action').val();
+        var fire_service_ntfc = $('#sel_fire_service_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_service_ntfc_place = $('#sel_fire_service_ntfc_place').val();
+        var fire_service_ntfc_amendment = $('#sel_fire_service_ntfc_amendment').val();
+        var fire_service_quantity_ntfc = $('#sel_fire_service_quantity_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_service_quantity_ntfc_place = $('#sel_fire_service_quantity_ntfc_place').val();
+        var fire_service_acetylene_gas_ntfc = $('#sel_fire_service_acetylene_gas_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_service_acetylene_gas_ntfc_amendment = $('#sel_fire_service_acetylene_gas_ntfc_amendment').val();
+        var fire_service_tentative_app = $('#sel_fire_service_tentative_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_service_tentative_app_action = $('#sel_fire_service_tentative_app_action').val();
+        var fire_prevent_storage_ntfc = $('#sel_fire_prevent_storage_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_prevent_storage_ntfc_category = $('#sel_fire_prevent_storage_ntfc_category').val();
+        var fire_prevent_storage_ntfc_amendment = $('#sel_fire_prevent_storage_ntfc_amendment').val();
+        var fire_prevent_equip_ntfc = $('#sel_fire_prevent_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_prevent_equip_ntfc_category = $('#sel_fire_prevent_equip_ntfc_category').val();
+        var fire_prevent_commencement_ntfc = $('#sel_fire_prevent_commencement_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_prevent_construction_plan = $('#sel_fire_prevent_construction_plan').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_prevent_installation_ntfc = $('#sel_fire_prevent_installation_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_prevent_hazardous_work_ntfc = $('#sel_fire_prevent_hazardous_work_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var fire_prevent_fires_smoke_ntfc = $('#sel_fire_prevent_fires_smoke_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var deleterious_substances_list_app = $('#sel_deleterious_substances_list_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var deleterious_substances_ntfc = $('#sel_deleterious_substances_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var deleterious_substances_ntfc_purpose = $('#sel_deleterious_substances_ntfc_purpose').val();
+        var press_gas_app = $('#sel_press_gas_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var press_gas_app_motive = $('#sel_press_gas_app_motive').val();
+        var press_gas_lpg_app = $('#sel_press_gas_lpg_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var press_gas_lpg_app_motive = $('#sel_press_gas_lpg_app_motive').val();
+        var press_gas_frozen_gas_app = $('#sel_press_gas_frozen_gas_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var press_gas_frozen_gas_app_motive = $('#sel_press_gas_frozen_gas_app_motive').val();
+        var press_gas_ntfc = $('#sel_press_gas_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var press_gas_ntfc_amendment = $('#sel_press_gas_ntfc_amendment').val();
+        var press_gas_lpg_ntfc = $('#sel_press_gas_lpg_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var press_gas_lpg_ntfc_amendment = $('#sel_press_gas_lpg_ntfc_amendment').val();
+        var press_gas_frozen_gas_ntfc = $('#sel_press_gas_frozen_gas_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var press_gas_frozen_gas_ntfc_amendment = $('#sel_press_gas_frozen_gas_ntfc_amendment').val();
+        var press_gas_consumption_ntfc = $('#sel_press_gas_consumption_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var press_gas_consumption_ntfc_amendment = $('#sel_press_gas_consumption_ntfc_amendment').val();
+        var safety_health_equip_ntfc = $('#sel_safety_health_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var safety_health_equip_ntfc_category = $('#sel_safety_health_equip_ntfc_category').val();
+        var safety_health_equip_ntfc_motive = $('#sel_safety_health_equip_ntfc_motive').val();
+        var safety_health_deleterious_ntfc = $('#sel_safety_health_deleterious_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var safety_health_deleterious_ntfc_category = $('#sel_safety_health_deleterious_ntfc_category').val();
+        var safety_health_deleterious_ntfc_motive = $('#sel_safety_health_deleterious_ntfc_motive').val();
+        var safety_health_asbestos = $('#sel_safety_health_asbestos').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var safety_health_specified_equip_ntfc = $('#sel_safety_health_specified_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var safety_health_specified_equip_ntfc_category = $('#sel_safety_health_specified_equip_ntfc_category').val();
+        var safety_health_specified_equip_ntfc_motive = $('#sel_safety_health_specified_equip_ntfc_motive').val();
+        var safety_health_installation_report = $('#sel_safety_health_installation_report').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var safety_health_installation_report_category = $('#sel_safety_health_installation_report_category').val();
+        var radiation_hazards_app = $('#sel_radiation_hazards_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var radiation_hazards_app_motive = $('#sel_radiation_hazards_app_motive').val();
+        var petroleum_complexes_act = $('#sel_petroleum_complexes_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var comment = $('#comment').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if(document.getElementById("ga_edit_flag").value != 1){
+            var sh_edit_flag = $('#sh_edit_flag').val();
+        }
+        else{
+            var sh_edit_flag = 0;
+        }
+        $.ajax({
+                url: "/isk_tools/fms/action/cs_safety_health_entry/",
+                type: "POST",
+                data : {
+                    'user_attribute_id' : user_attribute_id,
+                    'this_step' : this_step,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'next_step' : next_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'budget_id' : budget_id,
+                    'work_id' : work_id,
+                    'sh_edit_flag': sh_edit_flag,
+                    'cs_no': cs_no,
+                    'cs_rev_no': cs_rev_no,
+                    'fire_service_app': fire_service_app,
+                    'fire_service_app_place': fire_service_app_place,
+                    'fire_service_app_action': fire_service_app_action,
+                    'fire_service_ntfc': fire_service_ntfc,
+                    'fire_service_ntfc_place': fire_service_ntfc_place,
+                    'fire_service_ntfc_amendment': fire_service_ntfc_amendment,
+                    'fire_service_quantity_ntfc': fire_service_quantity_ntfc,
+                    'fire_service_quantity_ntfc_place': fire_service_quantity_ntfc_place,
+                    'fire_service_acetylene_gas_ntfc': fire_service_acetylene_gas_ntfc,
+                    'fire_service_acetylene_gas_ntfc_amendment': fire_service_acetylene_gas_ntfc_amendment,
+                    'fire_service_tentative_app': fire_service_tentative_app,
+                    'fire_service_tentative_app_action': fire_service_tentative_app_action,
+                    'fire_prevent_storage_ntfc': fire_prevent_storage_ntfc,
+                    'fire_prevent_storage_ntfc_category': fire_prevent_storage_ntfc_category,
+                    'fire_prevent_storage_ntfc_amendment': fire_prevent_storage_ntfc_amendment,
+                    'fire_prevent_equip_ntfc': fire_prevent_equip_ntfc,
+                    'fire_prevent_equip_ntfc_category': fire_prevent_equip_ntfc_category,
+                    'fire_prevent_commencement_ntfc': fire_prevent_commencement_ntfc,
+                    'fire_prevent_construction_plan': fire_prevent_construction_plan,
+                    'fire_prevent_installation_ntfc': fire_prevent_installation_ntfc,
+                    'fire_prevent_hazardous_work_ntfc': fire_prevent_hazardous_work_ntfc,
+                    'fire_prevent_fires_smoke_ntfc': fire_prevent_fires_smoke_ntfc,
+                    'deleterious_substances_list_app': deleterious_substances_list_app,
+                    'deleterious_substances_ntfc': deleterious_substances_ntfc,
+                    'deleterious_substances_ntfc_purpose': deleterious_substances_ntfc_purpose,
+                    'press_gas_app': press_gas_app,
+                    'press_gas_app_motive': press_gas_app_motive,
+                    'press_gas_lpg_app': press_gas_lpg_app,
+                    'press_gas_lpg_app_motive': press_gas_lpg_app_motive,
+                    'press_gas_frozen_gas_app': press_gas_frozen_gas_app,
+                    'press_gas_frozen_gas_app_motive': press_gas_frozen_gas_app_motive,
+                    'press_gas_ntfc': press_gas_ntfc,
+                    'press_gas_ntfc_amendment': press_gas_ntfc_amendment,
+                    'press_gas_lpg_ntfc': press_gas_lpg_ntfc,
+                    'press_gas_lpg_ntfc_amendment': press_gas_lpg_ntfc_amendment,
+                    'press_gas_frozen_gas_ntfc': press_gas_frozen_gas_ntfc,
+                    'press_gas_frozen_gas_ntfc_amendment': press_gas_frozen_gas_ntfc_amendment,
+                    'press_gas_consumption_ntfc': press_gas_consumption_ntfc,
+                    'press_gas_consumption_ntfc_amendment': press_gas_consumption_ntfc_amendment,
+                    'safety_health_equip_ntfc': safety_health_equip_ntfc,
+                    'safety_health_equip_ntfc_category': safety_health_equip_ntfc_category,
+                    'safety_health_equip_ntfc_motive': safety_health_equip_ntfc_motive,
+                    'safety_health_deleterious_ntfc': safety_health_deleterious_ntfc,
+                    'safety_health_deleterious_ntfc_category': safety_health_deleterious_ntfc_category,
+                    'safety_health_deleterious_ntfc_motive': safety_health_deleterious_ntfc_motive,
+                    'safety_health_asbestos': safety_health_asbestos,
+                    'safety_health_specified_equip_ntfc': safety_health_specified_equip_ntfc,
+                    'safety_health_specified_equip_ntfc_category': safety_health_specified_equip_ntfc_category,
+                    'safety_health_specified_equip_ntfc_motive': safety_health_specified_equip_ntfc_motive,
+                    'safety_health_installation_report': safety_health_installation_report,
+                    'safety_health_installation_report_category': safety_health_installation_report_category,
+                    'radiation_hazards_app': radiation_hazards_app,
+                    'radiation_hazards_app_motive': radiation_hazards_app_motive,
+                    'petroleum_complexes_act': petroleum_complexes_act,
+                    'comment' : comment,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                async: false,
+                cache : false,
+                })
+                .done(function(data){
+                    //新規登録、リビジョン変更時 画面のinputに反映
+                    var this_cs_id = data.cs_no
+                    $('#cs_no').val(this_cs_id);
+                    var this_cs_rev_no = data.cs_rev_no
+                    $('#cs_rev_no').val(this_cs_rev_no);
+                    var this_work_id = data.work_id;
+                    var this_budget_id = data.budget_id;
+                    $('#target_budget_id').val(this_budget_id);
+                    $('#work_id').val(this_work_id);
+
+                    //完了を通知
+                    deferred.resolve();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    //失敗を通知
+                    deferred.reject();
+                });
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+
+
+</script>
+
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+
+select {
+    font-size: 100%;
+    height:auto;
+}
+
+input[type=checkbox] {
+    width: 20px;
+    height: 20px;
+}
+
+table {
+    line-height: initial;
+    font-size: 100%;
+    height:100px;
+}
+
+/*
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+*/
+</style>
+
+<!--    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">-->
+    <div class="fms_col" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="cs_no" value="{{ cs_no }}">
+<!--    <input type="hidden" id="target_budget_id" value="{{ budget_id }}">-->
+    <input type="hidden" id="work_id" value="{{ work_id }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="cs_rev_no" value="{{cs_rev_no}}">
+    <input type="hidden" id="fire_service_app" value="{{ fire_service_app }}">
+    <input type="hidden" id="fire_service_ntfc" value="{{ fire_service_ntfc }}">
+    <input type="hidden" id="fire_service_quantity_ntfc" value="{{ fire_service_quantity_ntfc }}">
+    <input type="hidden" id="fire_service_acetylene_gas_ntfc" value="{{ fire_service_acetylene_gas_ntfc }}">
+    <input type="hidden" id="fire_service_tentative_app" value="{{ fire_service_tentative_app }}">
+    <input type="hidden" id="fire_prevent_storage_ntfc" value="{{ fire_prevent_storage_ntfc }}">
+    <input type="hidden" id="fire_prevent_equip_ntfc" value="{{ fire_prevent_equip_ntfc }}">
+    <input type="hidden" id="fire_prevent_commencement_ntfc" value="{{ fire_prevent_commencement_ntfc }}">
+    <input type="hidden" id="fire_prevent_construction_plan" value="{{ fire_prevent_construction_plan }}">
+    <input type="hidden" id="fire_prevent_installation_ntfc" value="{{ fire_prevent_installation_ntfc }}">
+    <input type="hidden" id="fire_prevent_hazardous_work_ntfc" value="{{ fire_prevent_hazardous_work_ntfc }}">
+    <input type="hidden" id="fire_prevent_fires_smoke_ntfc" value="{{ fire_prevent_fires_smoke_ntfc }}">
+    <input type="hidden" id="deleterious_substances_list_app" value="{{ deleterious_substances_list_app }}">
+    <input type="hidden" id="deleterious_substances_ntfc" value="{{ deleterious_substances_ntfc }}">
+    <input type="hidden" id="press_gas_app" value="{{ press_gas_app }}">
+    <input type="hidden" id="press_gas_lpg_app" value="{{ press_gas_lpg_app }}">
+    <input type="hidden" id="press_gas_frozen_gas_app" value="{{ press_gas_frozen_gas_app }}">
+    <input type="hidden" id="press_gas_ntfc" value="{{ press_gas_ntfc }}">
+    <input type="hidden" id="press_gas_lpg_ntfc" value="{{ press_gas_lpg_ntfc }}">
+    <input type="hidden" id="press_gas_frozen_gas_ntfc" value="{{ press_gas_frozen_gas_ntfc }}">
+    <input type="hidden" id="press_gas_consumption_ntfc" value="{{ press_gas_consumption_ntfc }}">
+    <input type="hidden" id="safety_health_equip_ntfc" value="{{ safety_health_equip_ntfc }}">
+    <input type="hidden" id="safety_health_deleterious_ntfc" value="{{ safety_health_deleterious_ntfc }}">
+    <input type="hidden" id="safety_health_asbestos" value="{{ safety_health_asbestos }}">
+    <input type="hidden" id="safety_health_specified_equip_ntfc" value="{{ safety_health_specified_equip_ntfc }}">
+    <input type="hidden" id="safety_health_installation_report" value="{{ safety_health_installation_report }}">
+    <input type="hidden" id="radiation_hazards_app" value="{{ radiation_hazards_app }}">
+    <input type="hidden" id="petroleum_complexes_act" value="{{ petroleum_complexes_act }}">
+    <input type="hidden" id="sh_edit_flag" value="{{sh_edit_flag}}">
+    </div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div style="float:left;">
+
+        <table class=cs_safety_health_edit_table">
+            <tr>
+                <th><div><font size="6" style="line-height:130%">消防法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_app" value="1">危険物</label></font>
+                <font size="4">
+                    <input type="hidden" id="fire_service_app_place" value="{{ fire_service_app_place }}">
+                    <select id="sel_fire_service_app_place" name="sel_fire_service_app_place" onchange="fire_service_app_place_change(value);">
+                    <option hidden value="">場所</option>
+                        {% for fire_service_app_place_list in fire_service_app_place_list %}
+                            <option value="{{ fire_service_app_place_list.place }}">{{ fire_service_app_place_list.place }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="4">
+                <input type="hidden" id="fire_service_app_action" value="{{ fire_service_app_action }}">
+                <select id="sel_fire_service_app_action" name="sel_fire_service_app_action" onchange="fire_service_app_action_change(value);">
+                <option hidden value="">扱い</option>
+                    {% for fire_service_app_action_list in fire_service_app_action_list %}
+                        <option value="{{ fire_service_app_action_list.action }}">{{ fire_service_app_action_list.action }}</option>
+                    {% endfor %}
+                </select>
+                </font>
+                <font size="5"><label for="sel_fire_service_app">承認申請</label></font></div></td>
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_ntfc" value="1">危険物</label></font>
+                <font size="4">
+                    <input type="hidden" id="fire_service_ntfc_place" value="{{ fire_service_ntfc_place }}">
+                    <select id="sel_fire_service_ntfc_place" name="sel_fire_service_ntfc_place" onchange="fire_service_ntfc_place_change(value);">
+                    <option hidden value="">場所</option>
+                        {% for fire_service_ntfc_place_list in fire_service_ntfc_place_list %}
+                            <option value="{{ fire_service_ntfc_place_list.place }}">{{ fire_service_ntfc_place_list.place }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="4">
+                <input type="hidden" id="fire_service_ntfc_amendment" value="{{ fire_service_ntfc_amendment }}">
+                <select id="sel_fire_service_ntfc_amendment" name="sel_fire_service_ntfc_amendment" onchange="fire_service_ntfc_amendment_change(value);">
+                <option hidden value="">改廃</option>
+                    {% for fire_service_ntfc_amendment_list in fire_service_ntfc_amendment_list %}
+                        <option value="{{ fire_service_ntfc_amendment_list.amendment }}">{{ fire_service_ntfc_amendment_list.amendment }}</option>
+                    {% endfor %}
+                </select>
+                </font>
+                    <font size="5"><label for="sel_fire_service_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_quantity_ntfc" value="1">危険物</label></font>
+                <font size="4">
+                    <input type="hidden" id="fire_service_quantity_ntfc_place" value="{{ fire_service_quantity_ntfc_place }}">
+                    <select id="sel_fire_service_quantity_ntfc_place" name="sel_fire_service_quantity_ntfc_place" onchange="fire_service_quantity_ntfc_place_change(value);">
+                    <option hidden value="">場所</option>
+                        {% for fire_service_quantity_ntfc_place_list in fire_service_quantity_ntfc_place_list %}
+                            <option value="{{ fire_service_quantity_ntfc_place_list.place }}">{{ fire_service_quantity_ntfc_place_list.place }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_fire_service_quantity_ntfc">品名数量倍数変更届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_acetylene_gas_ntfc" value="1">圧縮アセチレンガス等貯蔵取扱</label></font>
+                <font size="4">
+                    <input type="hidden" id="fire_service_acetylene_gas_ntfc_amendment" value="{{ fire_service_acetylene_gas_ntfc_amendment }}">
+                    <select id="sel_fire_service_acetylene_gas_ntfc_amendment" name="sel_fire_service_acetylene_gas_ntfc_amendment" onchange="fire_service_acetylene_gas_ntfc_amendment_change(value);">
+                    <option hidden value="">改廃</option>
+                        {% for fire_service_acetylene_gas_ntfc_amendment_list in fire_service_acetylene_gas_ntfc_amendment_list %}
+                            <option value="{{ fire_service_acetylene_gas_ntfc_amendment_list.amendment }}">{{ fire_service_acetylene_gas_ntfc_amendment_list.amendment }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_fire_service_acetylene_gas_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_tentative_app" value="1">危険物仮</label></font>
+                <font size="4">
+                    <input type="hidden" id="fire_service_tentative_app_action" value="{{ fire_service_tentative_app_action }}">
+                    <select id="sel_fire_service_tentative_app_action" name="sel_fire_service_tentative_app_action" onchange="fire_service_tentative_app_action_change(value);">
+                    <option hidden value="">扱い</option>
+                        {% for fire_service_tentative_app_action_list in fire_service_tentative_app_action_list %}
+                            <option value="{{ fire_service_tentative_app_action_list.action }}">{{ fire_service_tentative_app_action_list.action }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="5"><label for="sel_fire_service_tentative_app">承認申請</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">市火災予防条例</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_fire_prevent_storage_ntfc" value="1"></font>
+                <font size="4">
+                    <input type="hidden" id="fire_prevent_storage_ntfc_category" value="{{ fire_prevent_storage_ntfc_category }}">
+                    <select id="sel_fire_prevent_storage_ntfc_category" name="sel_fire_prevent_storage_ntfc_category" onchange="fire_prevent_storage_ntfc_category_change(value);">
+                    <option hidden value="">危険物種類</option>
+                        {% for fire_prevent_storage_ntfc_category_list in fire_prevent_storage_ntfc_category_list %}
+                            <option value="{{ fire_prevent_storage_ntfc_category_list.category }}">{{ fire_prevent_storage_ntfc_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="5"><label for="sel_fire_prevent_storage_ntfc">貯蔵取扱</label></font>
+                <font size="4">
+                <input type="hidden" id="fire_prevent_storage_ntfc_amendment" value="{{ fire_prevent_storage_ntfc_amendment }}">
+                <select id="sel_fire_prevent_storage_ntfc_amendment" name="sel_fire_prevent_storage_ntfc_amendment" onchange="fire_prevent_storage_ntfc_amendment_change(value);">
+                <option hidden value="">改廃</option>
+                    {% for fire_prevent_storage_ntfc_amendment_list in fire_prevent_storage_ntfc_amendment_list %}
+                        <option value="{{ fire_prevent_storage_ntfc_amendment_list.amendment }}">{{ fire_prevent_storage_ntfc_amendment_list.amendment }}</option>
+                    {% endfor %}
+                </select>
+                </font>
+                    <font size="5"><label for="sel_fire_prevent_storage_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_fire_prevent_equip_ntfc" value="1"></font>
+                <font size="4">
+                    <input type="hidden" id="fire_prevent_equip_ntfc_category" value="{{ fire_prevent_equip_ntfc_category }}">
+                    <select id="sel_fire_prevent_equip_ntfc_category" name="sel_fire_prevent_equip_ntfc_category" onchange="fire_prevent_equip_ntfc_category_change(value);">
+                    <option hidden value="">設備種類</option>
+                        {% for fire_prevent_equip_ntfc_category_list in fire_prevent_equip_ntfc_category_list %}
+                            <option value="{{ fire_prevent_equip_ntfc_category_list.category }}">{{ fire_prevent_equip_ntfc_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_fire_prevent_equip_ntfc">設置届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_prevent_commencement_ntfc" value="1">防火対象物　使用開始届</label></font></div></td>
+                <td><div><font size="5">・・・7日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_prevent_construction_plan" value="1">消防用設備等　工事計画書</label></font></div></td>
+                <td><div><font size="5">・・・建築申請と同時</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_prevent_installation_ntfc" value="1">消防用設備等　設置届</label></font></div></td>
+                <td><div><font size="5">・・・7日以内(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_prevent_hazardous_work_ntfc" value="1">危険作業　開始届</label></font></div></td>
+                <td><div><font size="5">・・・3日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_fire_prevent_fires_smoke_ntfc" value="1"></font>
+                    <font size="5"><label for="sel_fire_prevent_fires_smoke_ntfc">火災と紛らわしい煙</label></font><br/>
+                    <font size="5"><label for="sel_fire_prevent_fires_smoke_ntfc">　又は火災を発するおそれのある行為</label></font>
+                    <font size="5"><label for="sel_fire_prevent_fires_smoke_ntfc">届出書</label></font></div>
+                </td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">劇毒物取締法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_deleterious_substances_list_app" value="1">危劇毒物製造業品目登録 申請</label></font></div></td>
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_deleterious_substances_ntfc" value="1">劇毒物</label></font>
+                <font size="4">
+                    <input type="hidden" id="deleterious_substances_ntfc_purpose" value="{{ deleterious_substances_ntfc_purpose }}">
+                    <select id="sel_deleterious_substances_ntfc_purpose" name="sel_deleterious_substances_ntfc_purpose" onchange="deleterious_substances_ntfc_purpose_change(value);">
+                    <option hidden value="">取扱</option>
+                        {% for deleterious_substances_ntfc_purpose_list in deleterious_substances_ntfc_purpose_list %}
+                            <option value="{{ deleterious_substances_ntfc_purpose_list.purpose }}">{{ deleterious_substances_ntfc_purpose_list.purpose }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_deleterious_substances_ntfc">変更届</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">高圧ガス保安法</font></div></th>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_app" value="1">特定高圧ガス設備</label></font>
+                <font size="4">
+                    <input type="hidden" id="press_gas_app_motive" value="{{ press_gas_app_motive }}">
+                    <select id="sel_press_gas_app_motive" name="sel_press_gas_app_motive" onchange="press_gas_app_motive_change(value);">
+                    <option hidden value="">設置/変更</option>
+                        {% for press_gas_app_motive_list in press_gas_app_motive_list %}
+                            <option value="{{ press_gas_app_motive_list.motive }}">{{ press_gas_app_motive_list.motive }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_press_gas_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_lpg_app" value="1">液化石油高圧ガス設備</label></font>
+                <font size="4">
+                    <input type="hidden" id="press_gas_lpg_app_motive" value="{{ press_gas_lpg_app_motive }}">
+                    <select id="sel_press_gas_lpg_app_motive" name="sel_press_gas_lpg_app_motive" onchange="press_gas_lpg_app_motive_change(value);">
+                    <option hidden value="">設置/変更</option>
+                        {% for press_gas_lpg_app_motive_list in press_gas_lpg_app_motive_list %}
+                            <option value="{{ press_gas_lpg_app_motive_list.motive }}">{{ press_gas_lpg_app_motive_list.motive }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_press_gas_lpg_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_frozen_gas_app" value="1">冷凍高圧ガス設備</label></font>
+                <font size="4">
+                    <input type="hidden" id="press_gas_frozen_gas_app_motive" value="{{ press_gas_frozen_gas_app_motive }}">
+                    <select id="sel_press_gas_frozen_gas_app_motive" name="sel_press_gas_frozen_gas_app_motive" onchange="press_gas_frozen_gas_app_motive_change(value);">
+                    <option hidden value="">設置/変更</option>
+                        {% for press_gas_frozen_gas_app_motive_list in press_gas_frozen_gas_app_motive_list %}
+                            <option value="{{ press_gas_frozen_gas_app_motive_list.motive }}">{{ press_gas_frozen_gas_app_motive_list.motive }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_press_gas_frozen_gas_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_ntfc" value="1">特定高圧ガス設備</label></font>
+                <font size="4">
+                    <input type="hidden" id="press_gas_ntfc_amendment" value="{{ press_gas_ntfc_amendment }}">
+                    <select id="sel_press_gas_ntfc_amendment" name="sel_press_gas_ntfc_amendment" onchange="press_gas_ntfc_amendment_change(value);">
+                    <option hidden value="">改廃</option>
+                        {% for press_gas_ntfc_amendment_list in press_gas_ntfc_amendment_list %}
+                            <option value="{{ press_gas_ntfc_amendment_list.amendment }}">{{ press_gas_ntfc_amendment_list.amendment }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_press_gas_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・遅滞なく</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_lpg_ntfc" value="1">液化石油高圧ガス設備</label></font>
+                <font size="4">
+                    <input type="hidden" id="press_gas_lpg_ntfc_amendment" value="{{ press_gas_lpg_ntfc_amendment }}">
+                    <select id="sel_press_gas_lpg_ntfc_amendment" name="sel_press_gas_lpg_ntfc_amendment" onchange="press_gas_lpg_ntfc_amendment_change(value);">
+                    <option hidden value="">改廃</option>
+                        {% for press_gas_lpg_ntfc_amendment_list in press_gas_lpg_ntfc_amendment_list %}
+                            <option value="{{ press_gas_lpg_ntfc_amendment_list.amendment }}">{{ press_gas_lpg_ntfc_amendment_list.amendment }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_press_gas_lpg_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・遅滞なく</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_frozen_gas_ntfc" value="1">冷凍高圧ガス設備</label></font>
+                <font size="4">
+                    <input type="hidden" id="press_gas_frozen_gas_ntfc_amendment" value="{{ press_gas_frozen_gas_ntfc_amendment }}">
+                    <select id="sel_press_gas_frozen_gas_ntfc_amendment" name="sel_press_gas_frozen_gas_ntfc_amendment" onchange="press_gas_frozen_gas_ntfc_amendment_change(value);">
+                    <option hidden value="">改廃</option>
+                        {% for press_gas_frozen_gas_ntfc_amendment_list in press_gas_frozen_gas_ntfc_amendment_list %}
+                            <option value="{{ press_gas_frozen_gas_ntfc_amendment_list.amendment }}">{{ press_gas_frozen_gas_ntfc_amendment_list.amendment }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_press_gas_frozen_gas_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・遅滞なく</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_consumption_ntfc" value="1">特定高圧ガス消費設備</label></font>
+                <font size="4">
+                    <input type="hidden" id="press_gas_consumption_ntfc_amendment" value="{{ press_gas_consumption_ntfc_amendment }}">
+                    <select id="sel_press_gas_consumption_ntfc_amendment" name="sel_press_gas_consumption_ntfc_amendment" onchange="press_gas_consumption_ntfc_amendment_change(value);">
+                    <option hidden value="">改廃</option>
+                        {% for press_gas_consumption_ntfc_amendment_list in press_gas_consumption_ntfc_amendment_list %}
+                            <option value="{{ press_gas_consumption_ntfc_amendment_list.amendment }}">{{ press_gas_consumption_ntfc_amendment_list.amendment }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_press_gas_consumption_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・20日前</font></div></td>
+            </tr>
+        </table>
+    </div>
+    <div style="float:left;width:30px;" >　　</div>
+    <div style="float:left;" >
+        <table>
+            <tr>
+                <th><div><font size="6" style="line-height:130%">労働安全衛生法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_safety_health_equip_ntfc" value="1"></font>
+                <font size="4">
+                    <input type="hidden" id="safety_health_equip_ntfc_category" value="{{ safety_health_equip_ntfc_category }}">
+                    <select id="sel_safety_health_equip_ntfc_category" name="sel_safety_health_equip_ntfc_category" onchange="safety_health_equip_ntfc_category_change(value);">
+                    <option hidden value="">設置物種類</option>
+                        {% for safety_health_equip_ntfc_category_list in safety_health_equip_ntfc_category_list %}
+                            <option value="{{ safety_health_equip_ntfc_category_list.category }}">{{ safety_health_equip_ntfc_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="4">
+                <input type="hidden" id="safety_health_equip_ntfc_motive" value="{{ safety_health_equip_ntfc_motive }}">
+                <select id="sel_safety_health_equip_ntfc_motive" name="sel_safety_health_equip_ntfc_motive" onchange="safety_health_equip_ntfc_motive_change(value);">
+                <option hidden value="">設置/変更</option>
+                    {% for safety_health_equip_ntfc_motive_list in safety_health_equip_ntfc_motive_list %}
+                        <option value="{{ safety_health_equip_ntfc_motive_list.motive }}">{{ safety_health_equip_ntfc_motive_list.motive }}</option>
+                    {% endfor %}
+                </select>
+                </font>
+                    <font size="5"><label for="sel_safety_health_equip_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_safety_health_deleterious_ntfc" value="1"></font>
+                <font size="4">
+                    <input type="hidden" id="safety_health_deleterious_ntfc_category" value="{{ safety_health_deleterious_ntfc_category }}">
+                    <select id="sel_safety_health_deleterious_ntfc_category" name="sel_safety_health_deleterious_ntfc_category" onchange="safety_health_deleterious_ntfc_category_change(value);">
+                    <option hidden value="">有害物質種類</option>
+                        {% for safety_health_deleterious_ntfc_category_list in safety_health_deleterious_ntfc_category_list %}
+                            <option value="{{ safety_health_deleterious_ntfc_category_list.category }}">{{ safety_health_deleterious_ntfc_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="4">
+                <input type="hidden" id="safety_health_deleterious_ntfc_motive" value="{{ safety_health_deleterious_ntfc_motive }}">
+                <select id="sel_safety_health_deleterious_ntfc_motive" name="sel_safety_health_deleterious_ntfc_motive" onchange="safety_health_deleterious_ntfc_motive_change(value);">
+                <option hidden value="">設置/変更</option>
+                    {% for safety_health_deleterious_ntfc_motive_list in safety_health_deleterious_ntfc_motive_list %}
+                        <option value="{{ safety_health_deleterious_ntfc_motive_list.motive }}">{{ safety_health_deleterious_ntfc_motive_list.motive }}</option>
+                    {% endfor %}
+                </select>
+                </font>
+                    <font size="5"><label for="sel_safety_health_deleterious_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_safety_health_asbestos" value="1">石綿障害予防規則</label></font></div></td>
+                <td><div><font size="5">・・・14日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_safety_health_specified_equip_ntfc" value="1"></font>
+                <font size="4">
+                    <input type="hidden" id="safety_health_specified_equip_ntfc_category" value="{{ safety_health_specified_equip_ntfc_category }}">
+                    <select id="sel_safety_health_specified_equip_ntfc_category" name="sel_safety_health_specified_equip_ntfc_category" onchange="safety_health_specified_equip_ntfc_category_change(value);">
+                    <option hidden value="">設備種類</option>
+                        {% for safety_health_specified_equip_ntfc_category_list in safety_health_specified_equip_ntfc_category_list %}
+                            <option value="{{ safety_health_specified_equip_ntfc_category_list.category }}">{{ safety_health_specified_equip_ntfc_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="4">
+                <input type="hidden" id="safety_health_specified_equip_ntfc_motive" value="{{ safety_health_specified_equip_ntfc_motive }}">
+                <select id="sel_safety_health_specified_equip_ntfc_motive" name="sel_safety_health_specified_equip_ntfc_motive" onchange="safety_health_specified_equip_ntfc_motive_change(value);">
+                <option hidden value="">設置/変更</option>
+                    {% for safety_health_specified_equip_ntfc_motive_list in safety_health_specified_equip_ntfc_motive_list %}
+                        <option value="{{ safety_health_specified_equip_ntfc_motive_list.motive }}">{{ safety_health_specified_equip_ntfc_motive_list.motive }}</option>
+                    {% endfor %}
+                </select>
+                </font>
+                    <font size="5"><label for="sel_safety_health_specified_equip_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_safety_health_installation_report" value="1"></font>
+                <font size="4">
+                    <input type="hidden" id="safety_health_installation_report_category" value="{{ safety_health_installation_report_category }}">
+                    <select id="sel_safety_health_installation_report_category" name="sel_safety_health_installation_report_category" onchange="safety_health_installation_report_category_change(value);">
+                    <option hidden value="">設備種類</option>
+                        {% for safety_health_installation_report_category_list in safety_health_installation_report_category_list %}
+                            <option value="{{ safety_health_installation_report_category_list.category }}">{{ safety_health_installation_report_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_safety_health_installation_report">設置報告</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">放射線障害防止法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_radiation_hazards_app" value="1">放射性同位元素</label></font>
+                <font size="4">
+                    <input type="hidden" id="radiation_hazards_app_motive" value="{{ radiation_hazards_app_motive }}">
+                    <select id="sel_radiation_hazards_app_motive" name="sel_radiation_hazards_app_motive" onchange="radiation_hazards_app_motive_change(value);">
+                    <option hidden value="">使用/変更</option>
+                        {% for radiation_hazards_app_motive_list in radiation_hazards_app_motive_list %}
+                            <option value="{{ radiation_hazards_app_motive_list.motive }}">{{ radiation_hazards_app_motive_list.motive }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_radiation_hazards_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">石災法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_petroleum_complexes_act" value="1"></font>
+                    <font size="5"><label for="sel_petroleum_complexes_act">特定防災施設等設置計画書・</label></font><br/>
+                    <font size="5"><label for="sel_petroleum_complexes_act">　消防車用屋外給水施設設置届出書</label></font></div>
+                </td>
+                <td><div><font size="5">・・・あらかじめ・事後</font></div></td>
+            </tr>
+
+        </table>
+    </div>
+
+    </div><!--ng_character_checkここまで-->
+
+    <div style="clear: both;"></div>

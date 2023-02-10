@@ -1,0 +1,393 @@
+<script>
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+</script>
+<style type="text/css">
+div.scroll_work_info_div {
+  width: 1880px;
+  height: 780px;
+  overflow: scroll;
+}
+</style>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">{{ work_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+        <input type="hidden" id="budget_id" value="{{ work_common_data.budget_id }}" >
+        <input type="hidden" id="rev_no" value="{{ work_common_data.rev_no }}" >
+        <input type="hidden" id="budget_no" value="{{ work_common_data.budget_no }}" >
+        <input type="hidden" id="budget_name" value="{{ work_common_data.budget_name }}" >
+        <input type="hidden" id="construction_id" value="{{ work_common_data.construction_id }}" >
+        <input type="hidden" id="sub_id" value="{{ work_common_data.sub_id }}" >
+        <input type="hidden" id="goods_construct_kbn" value="{{ work_common_data.prospecificationunit_data.goods_construct_kbn  }}" >
+    </div>
+
+    <div style="float:left;width:auto;">
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算ＩＤ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ work_common_data.budget_id }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">RevNO</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ work_common_data.rev_no }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算ＮＯ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ work_common_data.budget_no }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ work_common_data.budget_name }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事ＩＤ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ work_common_data.construction_id }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ work_common_data.work_name }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">サブNO</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ work_common_data.sub_id }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">部門</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.division_name }}</font>
+                    {% elif work_common_data.prospecificationunit_data.division == work_common_data.old_prospecificationunit_data.division %}
+                        <font size="5" color="black">{{ work_common_data.division_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.division_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">部署</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.department_name }}</font>
+                    {% elif work_common_data.prospecificationunit_data.department == work_common_data.old_prospecificationunit_data.department %}
+                        <font size="5" color="black">{{ work_common_data.department_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.department_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">定型/非定型</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.format_kbn }}</font>
+                    {% elif work_common_data.prospecificationunit_data.format_kbn == work_common_data.old_prospecificationunit_data.format_kbn %}
+                        <font size="5" color="black">{{work_common_data.format_kbn }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.format_kbn }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">物品/工事区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.goods_construct_kbn_name }}</font>
+                    {% elif work_common_data.prospecificationunit_data.goods_construct_kbn == work_common_data.old_prospecificationunit_data.goods_construct_kbn %}
+                        <font size="5" color="black">{{ work_common_data.goods_construct_kbn_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.goods_construct_kbn_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">設備工程</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.work_charge_process }}:{{ work_common_data.work_charge_process_name }}</font>
+                    {% elif work_common_data.prospecificationunit_data.goods_construct_kbn == work_common_data.old_prospecificationunit_data.goods_construct_kbn %}
+                        <font size="5" color="black">{{ work_common_data.work_charge_process }}:{{ work_common_data.work_charge_process_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.work_charge_process }}:{{ work_common_data.work_charge_process_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">計画担当者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                <font size="5" color="black">{{ work_common_data.planning_charge_person_name }}</font>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">仕様書担当者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.specification_person_in_charge_name }}</font>
+                    {% elif work_common_data.prospecificationunit_data.specification_person_in_charge == work_common_data.old_prospecificationunit_data.specification_person_in_charge %}
+                        <font size="5" color="black">{{ work_common_data.specification_person_in_charge_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.specification_person_in_charge_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">調達担当者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.procurement_person_in_charge_name }}</font>
+                    {% elif work_common_data.prospecificationunit_data.procurement_person_in_charge == work_common_data.old_prospecificationunit_data.procurement_person_in_charge %}
+                        <font size="5" color="black">{{ work_common_data.procurement_person_in_charge_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.procurement_person_in_charge_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.management_class_name }}</font>
+                    {% elif work_common_data.prospecificationunit_data.management_class_cd == work_common_data.old_prospecificationunit_data.management_class_cd %}
+                        <font size="5" color="black">{{ work_common_data.management_class_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.management_class_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">納入場所</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.delivery_location }}</font>
+                    {% elif work_common_data.prospecificationunit_data.delivery_location == work_common_data.old_prospecificationunit_data.delivery_location %}
+                        <font size="5" color="black">{{ work_common_data.delivery_location }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.delivery_location }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">希望工期</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.desired_construct_period_from }} ～ {{ work_common_data.desired_construct_period_to }}</font>
+                    {% elif work_common_data.prospecificationunit_data.desired_construct_period_from == work_common_data.old_prospecificationunit_data.desired_construct_period_from and work_common_data.prospecificationunit_data.desired_construct_period_to == work_common_data.old_prospecificationunit_data.desired_construct_period_to %}
+                        <font size="5" color="black">{{ work_common_data.desired_construct_period_from }} ～ {{ work_common_data.desired_construct_period_to }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.desired_construct_period_from }} ～ {{ work_common_data.desired_construct_period_to }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">希望納期日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.desired_delivery_date }}</font>
+                    {% elif work_common_data.prospecificationunit_data.desired_delivery_date == work_common_data.old_prospecificationunit_data.desired_delivery_date %}
+                        <font size="5" color="black">{{ work_common_data.desired_delivery_date }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.desired_delivery_date }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">見積提出希望日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.estimate_submission_date }}</font>
+                    {% elif work_common_data.prospecificationunit_data.estimate_submission_date == work_common_data.old_prospecificationunit_data.estimate_submission_date %}
+                        <font size="5" color="black">{{ work_common_data.estimate_submission_date }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.estimate_submission_date }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">決定見積提出期日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_proestimate_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.estimated_deadline_date }}</font>
+                    {% elif work_common_data.estimated_deadline_date == work_common_data.old_proestimate_data.estimated_deadline_date %}
+                        <font size="5" color="black">{{ work_common_data.estimated_deadline_date }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.estimated_deadline_date }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">発注期日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_proestimate_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.order_limited_date }}</font>
+                    {% elif work_common_data.order_limited_date == work_common_data.old_proestimate_data.order_limited_date %}
+                        <font size="5" color="black">{{ work_common_data.order_limited_date }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.order_limited_date }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">決定納入場所</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_proestimate_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.fixed_delivery_location }}</font>
+                    {% elif work_common_data.fixed_delivery_location == work_common_data.old_proestimate_data.fixed_delivery_location %}
+                        <font size="5" color="black">{{ work_common_data.fixed_delivery_location }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.fixed_delivery_location }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">決定工期</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_proestimate_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.fixed_delivery_date_from }}</font>
+                    {% elif work_common_data.fixed_delivery_date_from == work_common_data.old_proestimate_data.fixed_delivery_date_from %}
+                        <font size="5" color="black">{{ work_common_data.fixed_delivery_date_from }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.fixed_delivery_date_from }}</font>
+                    {% endif %}
+                    <font size="5" color="black"> ～ </font>
+                    {% if work_common_data.old_proestimate_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.fixed_delivery_date_to }}</font>
+                    {% elif work_common_data.fixed_delivery_date_to == work_common_data.old_proestimate_data.fixed_delivery_date_to %}
+                        <font size="5" color="black">{{ work_common_data.fixed_delivery_date_to }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.fixed_delivery_date_to }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">決定納期</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_proestimate_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.fixed_delivery_date }}</font>
+                    {% elif work_common_data.fixed_delivery_date == work_common_data.old_proestimate_data.fixed_delivery_date %}
+                        <font size="5" color="black">{{ work_common_data.fixed_delivery_date }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.fixed_delivery_date }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">品質/立会検査予定日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.scheduled_inspection_date_from }} ～ {{ work_common_data.scheduled_inspection_date_to }}</font>
+                    {% elif work_common_data.prospecificationunit_data.scheduled_inspection_date_from == work_common_data.old_prospecificationunit_data.scheduled_inspection_date_from and work_common_data.prospecificationunit_data.scheduled_inspection_date_to == work_common_data.old_prospecificationunit_data.scheduled_inspection_date_to %}
+                        <font size="5" color="black">{{ work_common_data.scheduled_inspection_date_from }} ～ {{ work_common_data.scheduled_inspection_date_to }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.scheduled_inspection_date_from }} ～ {{ work_common_data.scheduled_inspection_date_to }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">品質/受入検査予定日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.scheduled_acceptance_date_from }} ～ {{ work_common_data.scheduled_acceptance_date_to }}</font>
+                    {% elif work_common_data.prospecificationunit_data.scheduled_acceptance_date_from == work_common_data.old_prospecificationunit_data.scheduled_acceptance_date_from and work_common_data.prospecificationunit_data.scheduled_acceptance_date_to == work_common_data.old_prospecificationunit_data.scheduled_acceptance_date_to %}
+                        <font size="5" color="black">{{ work_common_data.scheduled_acceptance_date_from }} ～ {{ work_common_data.scheduled_acceptance_date_to }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.scheduled_acceptance_date_from }} ～ {{ work_common_data.scheduled_acceptance_date_to }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">引渡準備完了日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.preparation_delivery_date }}</font>
+                    {% elif work_common_data.prospecificationunit_data.preparation_delivery_date == work_common_data.old_prospecificationunit_data.preparation_delivery_date %}
+                        <font size="5" color="black">{{ work_common_data.preparation_delivery_date }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.preparation_delivery_date }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+{% comment %}削除予定
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">仕様書データ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.specification_data }}</font>
+                    {% elif work_common_data.prospecificationunit_data.specification_data == work_common_data.old_prospecificationunit_data.specification_data %}
+                        <font size="5" color="black">{{ work_common_data.specification_data }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.specification_data }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+{% endcomment %}
+        </table>
+
+        {% block under_sub_contents %}
+        {% endblock %}
+
+    </div>
+
+
+    <div style="float:left;width:10px;" >　</div>
+
+    <div style="float:left;" >
+        {% block execution_sub_contents %}
+        {% endblock %}
+    </div>
+

@@ -1,0 +1,97 @@
+<div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+    <h2 class="page-header">工事依頼</h2>
+</div>
+<div id="maintenance_order_maintenance_order_action_button" style="width: auto;"></div>
+<div class="scroll_maintenance_order_div">
+    <div style="float:left;">
+        <table>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">保全名称</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ order_data.order_name }}{{ order_data.order_name_extension_name }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">依頼先</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ contact_request_name }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">概算(予想)金額</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ expected_price }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">希望納期</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ order_data.desired_start_date }} ～ {{ order_data.desired_end_date }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">部署</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ department }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工場</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ plant_name }} </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">原課担当者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ order_permit_person | default_if_none:'' }} </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">原価センター</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ cost_center_data.原価センタ }}：{{ cost_center_data.原価センタテキスト }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">指図書ＮＯ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ instruction_no_data.指図書コード }}：{{ instruction_no_data.テキスト短 }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">勘定コード</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ account_cd_data.勘定コード }}：{{ account_cd_data.テキスト短 }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">注文番号</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ order_no  | default_if_none:'' }} </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">依頼業者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ order_vendor  | default_if_none:'' }} </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">依頼受付者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ orders_received_person  | default_if_none:'' }} </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">PLANTIA入力要否</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ is_need_input_plantia }}</font></div></td>
+            </tr>
+        </table>
+    </div>
+    <div style="float:left;">　</div>
+    <div style="float:left;">
+        <table>
+
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事/依頼内容</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4"><textarea rows="9" cols="45" readonly>{{ order_data.order_detail | default_if_none:''  }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">備考</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4"><textarea rows="9" cols="45" readonly>{{ order_data.rem | default_if_none:'' }}</textarea></font></div></td>
+            </tr>
+        </table>
+    </div>
+    <div style="clear: both;"></div>
+</div>

@@ -1,0 +1,661 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+
+function budget_detail_info() {
+        var id = $('#target_unique_id').val();;
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/budget_detail/budget_data_info/",
+                type: "POST",
+                data : {
+                    'id': id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_detail').empty();
+                    $('#budget_detail').html(data);
+                    action_button_display();
+                    planning_charge_person_info();
+                    business_year_selected_judgment();
+                    application_class_selected_judgment();
+                    budget_class_selected_judgment();
+                    period_class_selected_judgment();
+                    budget_department_selected_judgment();
+                    process_selected_judgment();
+                    budget_condition_selected_judgment();
+                    purpose_class_selected_judgment();
+                    budget_department_charge_person_selected_judgment();
+
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function action_button_display() {
+        var target_id = $('#target_budget_id').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var next_department = $('#next_department').val();
+        var next_division = $('#next_division').val();
+        var target_table = "budget";
+        var level5_step_id = $('#level5_step_id').val();
+        var permit_user = $('#permit_user').val();
+        var target_step_id = $('#target_step_id').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var last_operation_step = $('#last_operation_step').val();
+        var target = "budget";
+        //alert(target_id);
+        var target_div_id = "#" + target + "_action_button";
+        $.ajax({
+                url: "/isk_tools/fms/parts/common/action_button_display/",
+                type: "POST",
+                data : {
+                    'next_department' : next_department,
+                    'next_division' : next_division,
+                    'target_budget_id' : target_budget_id,
+                    'target_table' : target_table,
+                    'target_id' : target_id,
+                    'level5_step_id' : level5_step_id,
+                    'permit_user' : permit_user,
+                    'target_step_id' : target_step_id,
+                    'user_department_cd' : user_department_cd,
+                    'last_operation_step' : last_operation_step,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(target_div_id).empty();
+                    $(target_div_id).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(target_div_id).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function log_list() {
+        var target_id = $('#target_budget_id').val();
+        var target = "budget";
+        $.ajax({
+                url: "/isk_tools/fms/parts/common/log_list/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#log_lists').empty();
+                    $('#log_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#log_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function budget_spec_handling_material_info(a,b) {
+        var budget_material_id = a;
+        var data_source = b;
+        var target_budget_unique_id = $('#target_unique_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/handling_material_data_info/",
+                type: "POST",
+                data : {
+                    'target_budget_unique_id': target_budget_unique_id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'budget_material_id' : budget_material_id,
+                    'data_source' : data_source,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_spec_handling_material_detail').empty();
+                    $('#budget_spec_handling_material_detail').html(data);
+                    material_state_change();
+                    concentration_unit_change();
+                    pressure_unit_change();
+                    //action_button_display();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_spec_handling_material_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function handling_material_list() {
+        var target_id = $('#target_budget_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/handling_material_list/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#handling_material_lists').empty();
+                    $('#handling_material_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#handling_material_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function handling_material_my_master_list() {
+        //var target_id = $('#target_budget_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/handling_material_my_master_list/",
+                type: "POST",
+                data : {
+                    //'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#handling_material_lists').empty();
+                    $('#handling_material_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#handling_material_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function level4_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '../../level4_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level4_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+function level5_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '../../../level5_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+var tab = {
+	init: function(a){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		for(i=0; i<pages.length; i++) {
+			if(i == a) {
+                            pages[a].style.display = 'block';
+                            tabs[a].className = 'present';
+                            tabs[a].onclick = function(){ tab.showpage(this); return false; };
+                        }
+                        else{
+                            pages[i].style.display = 'none';
+                            tabs[i].className = null;
+                            tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                        }
+		}
+	},
+	showpage: function(obj){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var num;
+		for(num=0; num<tabs.length; num++) {
+			if(tabs[num] === obj) break;
+		}
+		for(var i=0; i<pages.length; i++) {
+			if(i == num) {
+				pages[num].style.display = 'block';
+				tabs[num].className = 'present';
+			}
+			else{
+				pages[i].style.display = 'none';
+				tabs[i].className = null;
+			}
+		}
+	}
+}
+function function_select(a) {
+        var function_cd = a;
+        var function_name = $('#sel_function option:selected').text();
+        //$.ajax({
+                //url: "/fms/parts/selected_function/",
+                //type: "POST",
+                //data : {
+                    //'function_cd' : function_cd,
+                    //'csrfmiddlewaretoken': "{{ csrf_token }}"
+                //},
+                //timeout: 10000,
+                //dataType: 'html',
+                //cache : false,
+                //})
+                //.done(function(data){
+                    //$('#function_edit').empty();
+                    //$('#function_edit').html(data);
+                    budget_required_function_info(0,function_name);
+                    //function_list_select(function_cd);
+                //})
+               //.fail(function(jqXHR,textStatus,errorThrown){
+                    //$('#function_edit').empty();
+                    //alert('Error!' +textStatus+' ' +errorThrown);
+                //});
+}
+function budget_required_function_info(a,b) {
+        var budget_required_function_id = a;
+        var select_function = b;
+        var budget_id = $('#target_budget_id').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+            $.ajax({
+                url: "/isk_tools/fms/parts/budget/required_function_detail/",
+                type: "POST",
+                data : {
+                    'budget_required_function_id' : budget_required_function_id,
+                    'budget_id' : budget_id,
+                    'new_step' : new_step,
+                    'select_function' : select_function,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#function_edit').empty();
+                    $('#function_edit').html(data);
+                    //rf_pressure_unit_change();
+                    rf_material_capacity_unit_value_change();
+                    rf_concentration_unit_change();
+                    rf_pressure_unit_change();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#function_edit').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function required_function_list() {
+        var target_id = $('#target_budget_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_required_function_list/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_function1_lists').empty();
+                    $('#budget_function1_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_function1_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+}
+function planning_charge_person_info() {
+        var target_id = $('#target_budget_id').val();
+        var this_step = $('#this_step').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/planning_charge_person_data_info/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#planning_charge_person').empty();
+                    $('#planning_charge_person').html(data);
+                    get_charge_person_list(target_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#planning_charge_person').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+}
+// この下の関数は未使用
+function function_list_select(a) {
+        var function_cd = a;
+        $.ajax({
+                url: "/fms/parts/selected_function_list/",
+                type: "POST",
+                data : {
+                    'function_cd' : function_cd,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_function1_lists').empty();
+                    $('#budget_function1_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_function1_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function handling_material_list_source_select(a) {
+    var select_type = a;
+    if (select_type == "d" ) {
+        handling_material_list();
+    } else if (select_type == "m" ) {
+        handling_material_my_master_list();
+    }
+}
+window.onload = function() {
+        budget_detail_info();
+        budget_spec_handling_material_info(0,'d');
+        handling_material_list();
+        budget_required_function_info(0,'すべて');
+        required_function_list();
+        log_list();
+        //action_button_display();
+};
+
+</script>
+<style type="text/css">
+textarea {
+    font-size: 100%;
+}
+</style>
+    <div style="width: auto;">
+        <div style="float:left">
+            <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+                <h2 class="page-header">{{ budget_step_name }}</h2>
+            </div>
+        </div>
+        <div style="float:right;">
+            <input TYPE=button VALUE=前の画面に戻る NAME=disp_return size=3 style="width:120px" onclick="level5_toppage({{ level5_step_id }});"/>
+        </div>
+    </div>
+    <div style="clear: both;" ></div>
+    <div style="width: auto;">
+        <input type="hidden" id="target_unique_id" value="{{ target_id }}" >
+        <input type="hidden" id="target_budget_id" value="{{ target_budget_id }}" >
+        <input type="hidden" id="budget_rev_no" value="{{ budget_rev_no }}" >
+        <input type="hidden" id="target_step_id" value="{{ target_step_id }}" >
+        <input TYPE="hidden" id="user_division_cd" VALUE="{{user_division_cd}}" NAME=user_division_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="user_department_cd" VALUE="{{user_department_cd}}" NAME=user_department_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="user_authority" VALUE="{{user_authority}}" NAME=user_authority size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="confirm_user" VALUE="{{confirm_user}}" NAME=confirm_user size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="permit_user" VALUE="{{permit_user}}" NAME=permit_user size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="level5_step_id" VALUE="{{level5_step_id}}" NAME=level5_step_id size=3 style="width:150px; height:20px"/>
+        <input type="hidden" id="next_division" value="{{ next_division }}">
+        <input type="hidden" id="next_department" value="{{ next_department }}">
+        <input type="hidden" id="this_step" value="{{ this_step }}">
+        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+        <input type="hidden" id="last_operator" value="{{ last_operator }}">
+        <input type="hidden" id="this_department" value="{{ this_department }}">
+        <input type="hidden" id="this_division" value="{{ this_division }}">
+        <input type="hidden" id="last_operator_department" value="{{ last_operator_department }}">
+        <input type="hidden" id="last_operator_division" value="{{ last_operator_division }}">
+        <input type="hidden" id="target" value="budget">
+        <input type="hidden" id="target_id" value="{{ target_budget_id }}" >
+        <input type="hidden" id="function_amount" value="{{ function_amount }}">
+
+    </div>
+    <div class='clear'></div>
+    <ul id="tab" style="width: auto;">
+        <li class="present"><a href="#page1">予算基本情報</a></li>
+        <li><a href="#page2">物質情報</a></li>
+        <li><a href="#page3">要求機能</a></li>
+        <li><a href="#page4">計画担当者</a></li>
+        <li><a href="#page10">処理履歴</a></li>
+    </ul>
+    <div id="page1" class="pagetitle">
+
+        <div id="budget_detail" style="width: auto"></div>
+    </div>
+    <div id="page2" class="pagetitle">
+        <div style="float: left;">
+            <div id="budget_spec_handling_material_detail" style="width: auto;"></div>
+        </div>
+        <div style="float: left;">
+            <select id="sel_handling_material_list_source" name="sel_handling_material_list_source" onChange="handling_material_list_source_select(value);">
+                <option value="d">予算への登録データ</option>
+                <option value="m">マイマスター</option>
+            </select>
+            <div id="handling_material_lists" style="width: auto;">
+                    取扱物質リスト
+            </div>
+        </div>
+    </div>
+    <div id="page3" class="pagetitle">
+        <div id="budget_function1_detail" style="width: auto;">
+            <div><h2 class="page-header">要求機能</h2></div>
+            <div><font size="3">機能選択：
+                    <input type="hidden" id="function" value="">
+                    <select id="sel_function" name="sel_function" onChange="function_select(value);">
+                        <option value=""></option>
+                            {% for function_list in function_list %}
+                                <option value="{{ function_list.function_cd }}">{{ function_list.function_name }}</option>
+                            {% endfor %}
+                    </select>
+                </font>
+            </div>
+            <div style="float: left;">
+                <div id="function_edit" style="width: 460px;">機能登録内容</div>
+            </div>
+            <div style="float: left;">
+                <div id="budget_function1_lists" style="width: auto;">
+                    要求機能リスト
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div id="page4" class="pagetitle">
+        <div id="planning_charge_person" style="width: auto;">
+        </div>
+    </div>
+    <div id="page10" class="pagetitle">
+        <div id="log_lists" style="width: auto;">
+        </div>
+    </div>
+<script type="text/javascript">
+//var function_amount = $('#function_amount').val();
+//alert(function_amount);
+    //if ( function_amount == 0 ){
+        // <![CDATA[
+        tab.setup = {
+            tabs: document.getElementById('tab').getElementsByTagName('li'),
+                pages: [
+                    document.getElementById('page1'),
+                    document.getElementById('page2'),
+                    document.getElementById('page3'),
+                    document.getElementById('page4'),
+                    document.getElementById('page10')
+                ]
+        }
+        tab.init(0);
+        // ]]>
+    //}else if ( function_amount == 1 ){
+        // <![CDATA[ ・・・元からコメント
+        //tab.setup = {
+            //tabs: document.getElementById('tab').getElementsByTagName('li'),
+                //pages: [
+                    //document.getElementById('page1'),
+                    //document.getElementById('page2'),
+                    //document.getElementById('page3'),
+                    //document.getElementById('page10')
+                //]
+        //}
+        tab.init(0);
+        // ]]> ・・・元からコメント
+    //}else if ( function_amount == 2 ){
+        // <![CDATA[ ・・・元からコメント
+        //tab.setup = {
+            //tabs: document.getElementById('tab').getElementsByTagName('li'),
+                //pages: [
+                    //document.getElementById('page1'),
+                    //document.getElementById('page2'),
+                    //document.getElementById('page3'),
+                    //document.getElementById('page4'),
+                    //document.getElementById('page10')
+                //]
+        //}
+        //tab.init(0);
+        // ]]> ・・・元からコメント
+    //}else if ( function_amount == 3 ){
+        // <![CDATA[ ・・・元からコメント
+        //tab.setup = {
+            //tabs: document.getElementById('tab').getElementsByTagName('li'),
+                //pages: [
+                    //document.getElementById('page1'),
+                    //document.getElementById('page2'),
+                    //document.getElementById('page3'),
+                    //document.getElementById('page4'),
+                    //document.getElementById('page5'),
+                    //document.getElementById('page10')
+                //]
+        //}
+        //tab.init(0);
+        // ]]> ・・・元からコメント
+    //}else if ( function_amount == 4 ){
+        // <![CDATA[ ・・・元からコメント
+        //tab.setup = {
+            //tabs: document.getElementById('tab').getElementsByTagName('li'),
+                //pages: [
+                    //document.getElementById('page1'),
+                    //document.getElementById('page2'),
+                    //document.getElementById('page3'),
+                    //document.getElementById('page4'),
+                    //document.getElementById('page5'),
+                    //document.getElementById('page6'),
+                    //document.getElementById('page10')
+                //]
+        //}
+        //tab.init(0);
+        // ]]> ・・・元からコメント
+    //}else if ( function_amount == 5 ){
+        // <![CDATA[ ・・・元からコメント
+        //tab.setup = {
+            //tabs: document.getElementById('tab').getElementsByTagName('li'),
+                //pages: [
+                    //document.getElementById('page1'),
+                    //document.getElementById('page2'),
+                    //document.getElementById('page3'),
+                    //document.getElementById('page4'),
+                    //document.getElementById('page5'),
+                    //document.getElementById('page6'),
+                    //document.getElementById('page7'),
+                    //document.getElementById('page10')
+                //]
+        //}
+        //tab.init(0);
+        // ]]> ・・・元からコメント
+    //}else if ( function_amount == 6 ){
+        // <![CDATA[ ・・・元からコメント
+        //tab.setup = {
+            //tabs: document.getElementById('tab').getElementsByTagName('li'),
+                //pages: [
+                    //document.getElementById('page1'),
+                    //document.getElementById('page2'),
+                    //document.getElementById('page3'),
+                    //document.getElementById('page4'),
+                    //document.getElementById('page5'),
+                    //document.getElementById('page6'),
+                    //document.getElementById('page7'),
+                    //document.getElementById('page8'),
+                    //document.getElementById('page10')
+                //]
+        //}
+        //tab.init(0);
+        // ]]> ・・・元からコメント
+    //}else if ( function_amount == 7 ){
+        // <![CDATA[ ・・・元からコメント
+        //tab.setup = {
+            //tabs: document.getElementById('tab').getElementsByTagName('li'),
+                //pages: [
+                    //document.getElementById('page1'),
+                    //document.getElementById('page2'),
+                    //document.getElementById('page3'),
+                    //document.getElementById('page4'),
+                    //document.getElementById('page5'),
+                    //document.getElementById('page6'),
+                    //document.getElementById('page7'),
+                    //document.getElementById('page8'),
+                    //document.getElementById('page9'),
+                    //document.getElementById('page10')
+                //]
+        //}
+        //tab.init(0);
+        // ]]> ・・・元からコメント
+    //}
+</script>
+
+{% endblock %}

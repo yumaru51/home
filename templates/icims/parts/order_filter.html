@@ -1,0 +1,193 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+function getorderdata(a) {
+        var from_page = a;
+        var select_start_shipment_date = "";
+        var select_end_shipment_date = "";
+        var start_delivery_date_before = $('#datepicker1').val();
+        var start_delivery_date_before = start_delivery_date_before.replace( '年', '-' );
+        var start_delivery_date_before = start_delivery_date_before.replace( '月', '-' );
+        var start_delivery_date = start_delivery_date_before.replace( '日', '' );
+        var end_delivery_date_before = $('#datepicker2').val();
+        var end_delivery_date_before = end_delivery_date_before.replace( '年', '-' );
+        var end_delivery_date_before = end_delivery_date_before.replace( '月', '-' );
+        var end_delivery_date = end_delivery_date_before.replace( '日', '' );
+        var select_company = $('#selectcompany').val();
+        var select_item_code = $('#selectitemcode').val();
+        var select_item_group = $('#selectitemgroup').val();
+        var select_item_name = $('#selectitemname').val();
+        var select_status1 = $('#selectstatus1').val();
+        var select_status2 = $('#selectstatus2').val();
+        var select_status3 = $('#selectstatus3').val();
+        var incoterm = "";
+        var target = 0;
+        $("#loading").show();
+        $.ajax({
+                url: "/imsds/parts/order_list/",
+                type: "POST",
+                data : {
+                    'from_page': from_page,
+                    'select_start_shipment_date': select_start_shipment_date,
+                    'select_end_shipment_date': select_end_shipment_date,
+                    'start_delivery_date': start_delivery_date,
+                    'end_delivery_date': end_delivery_date,
+                    'select_company': select_company,
+                    'select_item_code': select_item_code,
+                    'select_item_group': select_item_group,
+                    'select_item_name': select_item_name,
+                    'select_status1': select_status1,
+                    'select_status2': select_status2,
+                    'select_status3': select_status3,
+                    'incoterm': incoterm,
+                    'target': target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#order_list').empty();
+                    $('#order_list').html(data);
+                    $("#loading").fadeOut();
+                    $("#order_list").fadeIn();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function filtercompany() {
+        var filter_company = $('#filtercompany').val();
+        $.ajax({
+                url: "/imsds/parts/select_company/",
+                type: "POST",
+                data : {
+                    'filter_company': filter_company,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#select_company').empty();
+                    $('#select_company').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#select_company').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+    <div style="width: 1680px;height:100px;background:#ffcccc; border-style:double none;">
+        絞込条件<br>
+        <div class="filter_item" style="float:left;">
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">
+                    指定納入期日：<INPUT id="datepicker1" class="datepicker" TYPE=text VALUE="" NAME="start_packed_date" size=3 style="width:100px; height:20px"/><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('datepicker1');">
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    ～ <INPUT id="datepicker2" class="datepicker" TYPE=text VALUE="" NAME="end_packed_date" size=3 style="width:100px; height:20px"/><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('datepicker2');">
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    型：<select id="selectgradetype"　name="grade_type" style="width:55px; height:30px">
+                        <option value=""></option>
+                        {% for grade_type_list in grade_type_list %}
+                            <option value="{{ grade_type_list.grade_type_code }}">{{ grade_type_list.grade_type_code_name }}</option>
+                        {% endfor %}
+                        </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    品目グループ：<INPUT id="selectitemgroup" TYPE=text VALUE="{{ target_item_group }}" NAME="item_group" size=3 style="width:160px; height:20px; background-color: #FFFFBB;"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    品目コード：<INPUT id="selectitemcode" TYPE=text VALUE="{{ target_item_code }}" NAME="item_code" size=3 style="width:160px; height:20px; background-color: #FFFFBB;"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    品目名：<INPUT id="selectitemname" TYPE=text VALUE="{{ target_item_name }}" NAME="item_name" size=3 style="width:160px; height:20px; background-color: #FFFFBB;"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    袋数：<INPUT id="selectstartpackedamount" TYPE=text VALUE="" NAME="start_packing_amount" size=3 style="width:40px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    ～ <INPUT id="selectendpackedamount" TYPE=text VALUE="" NAME="end_packing_amount" size=3 style="width:40px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    数量：<INPUT id="selectstartamount" TYPE=text VALUE="" NAME="start_amount" size=3 style="width:50px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    ～ <INPUT id="selectendamount" TYPE=text VALUE="" NAME="end_amount" size=3 style="width:50px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    荷受先絞込　：<INPUT id="filtercompany" TYPE=text VALUE="" NAME="filter_company" size=3 style="width:100px; height:20px; background-color: #FFFFBB;" onchange="filtercompany();"/>　→　
+                </div>
+                <div id="select_company" class="item" style="float:left;margin-left:0px;">
+                    荷受先：<select id="selectcompany"　name="company" style="width:360px; height:30px">
+                        <option value=""></option>
+                        {% for company_list in company_list %}
+                            <option value="{{ company_list.company_code }}">{{ company_list.company_name }}</option>
+                        {% endfor %}
+                        </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    状態：<select id="selectstatus1"　name="status1" style="width:135px; height:30px">
+                        <option value=""></option>
+                        {% for order_status_list in order_status_list %}
+                            {% if order_status_list.stock_allocation_status_cd == status1 %}
+                                <option value="{{ order_status_list.stock_allocation_status_cd }}" selected>{{ order_status_list.stock_allocation_status_name }}</option>
+                            {% else %}
+                                <option value="{{ order_status_list.stock_allocation_status_cd }}">{{ order_status_list.stock_allocation_status_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                        </select>
+
+                    or<select id="selectstatus2"　name="status2" style="width:135px; height:30px">
+                        <option value=""></option>
+                        {% for order_status_list in order_status_list %}
+                            {% if order_status_list.stock_allocation_status_cd == status2 %}
+                                <option value="{{ order_status_list.stock_allocation_status_cd }}" selected>{{ order_status_list.stock_allocation_status_name }}</option>
+                            {% else %}
+                                <option value="{{ order_status_list.stock_allocation_status_cd }}">{{ order_status_list.stock_allocation_status_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                        </select>
+
+                    or<select id="selectstatus3"　name="status2" style="width:135px; height:30px">
+                        <option value=""></option>
+                        {% for order_status_list in order_status_list %}
+                            {% if order_status_list.stock_allocation_status_cd == status3 %}
+                                <option value="{{ order_status_list.stock_allocation_status_cd }}" selected>{{ order_status_list.stock_allocation_status_name }}</option>
+                            {% else %}
+                                <option value="{{ order_status_list.stock_allocation_status_cd }}">{{ order_status_list.stock_allocation_status_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                        </select>
+                </div>
+            </div>
+        </div>
+    </div>

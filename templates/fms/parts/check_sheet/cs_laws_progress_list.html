@@ -1,0 +1,64 @@
+    {% if cs_laws_list_num > 0 %}
+    <div id="cs_laws_list_parts">
+        表示件数：{{ cs_laws_list_num }}件
+        <table class="table table-strriped" id="cs_laws_list_table" border="1" cellspacing="0" cellpadding="5" style="border-collapse: collapse">
+            <thead class="scrollHead">
+                <tr>
+                    <th class="selected_item"> 対象</th>
+                    <th class="laws_no">届出No</th>
+                    <th class="business_year_id">年度</th>
+                    <th class="budget_main_department_id">部署名</th>
+                    <th class="budget_id">予算ID</th>
+                    <th class="budget_no">予算No</th>
+                    <th class="budget_name">予算名</th>
+                    <th class="budget_stop">中止</th>
+                    <th class="laws_name">法令名称</th>
+                    <th class="laws_detail_name">法令詳細分類名称</th>
+                    <th class="department_name">所管部署</th>
+                    <th class="limit_date">提出期限</th>
+                    <th class="witness_inspection">立会検査</th>
+                    <th class="submission_date">提出日</th>
+                    <th class="notification_date">届出日</th>
+                    <th class="permit_date">許可日</th>
+                    <th class="permit_no">許可番号</th>
+                    <th class="scroll_bar_head">#</th>
+                </tr>
+            </thead>
+            <tbody class="scrollBody">
+            {% for cs_law_item in cs_laws_list %}
+                <tr onclick="select_radio({{ cs_law_item.id }})">
+                    <td class="selected_item">
+                        <input type="radio" id="{{ cs_law_item.id }}" name="sel_selected_item" value="{{ cs_law_item.id }}">
+                    </td>
+                    <td class="laws_no">{{ cs_law_item.id }}</td>
+                    <td class="business_year_id">{{ cs_law_item.business_year_id }}</td>
+                    <td class="budget_main_department_id">{{ cs_law_item.budget_department_name }}</td>
+                    <td class="budget_id">{{ cs_law_item.budget_id }}</td>
+                    <td class="budget_no">{{ cs_law_item.budget_no  | default_if_none:'' }}</td>
+                    <td class="budget_name">{{ cs_law_item.budget_name  | default_if_none:'' }}</td>
+                    {% if cs_law_item.cancel_flag == 0 %}
+                        <td class="budget_stop"></td>
+                    {% else %}
+                        <td class="budget_stop">中止</td>
+                    {% endif %}
+                    <td class="laws_name">{{ cs_law_item.laws_name  | default_if_none:'' }}</td>
+                    <td class="laws_detail_name">{{ cs_law_item.laws_detail_name  | default_if_none:'' }}</td>
+                    <td class="department_name">{{ cs_law_item.department_name  | default_if_none:'' }}</td>
+                    <td class="limit_date">{{ cs_law_item.limit_date  | default_if_none:'' }}</td>
+                    {% if cs_law_item.witness_inspection == 1 %}
+                        <td class="witness_inspection" style="vertical-align:middle; text-align:center">有</td>
+                    {% else %}
+                        <td class="witness_inspection" style="vertical-align:middle; text-align:center">無</td>
+                    {% endif %}
+                    <td class="submission_date">{{ cs_law_item.submission_date | default_if_none:'' }}</td>
+                    <td class="notification_date">{{ cs_law_item.notification_date | default_if_none:'' }}</td>
+                    <td class="permit_date">{{ cs_law_item.permit_date | default_if_none:'' }}</td>
+                    <td class="permit_no">{{ cs_law_item.permit_no | default_if_none:'' }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div id="cs_laws_list_parts">対象データなし</div>
+    {% endif %}

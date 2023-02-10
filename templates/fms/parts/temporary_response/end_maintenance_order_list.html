@@ -1,0 +1,162 @@
+<script>
+//異常報告一覧から選択された異常報告データの詳細の表示処理
+function phenomenon_detail(phenomenon_id) {
+    window.open('', 'phenomenon_data_detail');
+    var budget_id = 0;
+    var budget_unique_id = 0;
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var level5_step_id = 232009900;
+    var new_step = Number(level5_step_id) + 1;
+    var id = $("#phenomenon_lists_id_" + String(phenomenon_id)).val();
+
+    $('<form/>', {action: '/isk_tools/fms/parts/common/detail_template/', target: 'phenomenon_data_detail', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: budget_unique_id}))
+    .append($('<input/>', {type: 'hidden', name: 'phenomenon_unique_id', value: id}))
+    .append($('<input/>', {type: 'hidden', name: 'phenomenon_id', value: phenomenon_id}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: 'phenomenon'}))
+    .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+    .append($('<input/>', {type: 'hidden', name: 'step_id', value: 232009901}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+</script>
+
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:550px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.return_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.sel_make_plantia_import_excel{
+    width:40px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.export_complete_flag{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.phenomenon_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.project_title{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.facility{
+    width:170px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.completion_date{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.eqpt_no{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.mng_charge_person{
+    width:120px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if end_maintenance_order_list_num > 0 %}
+            表示件数：{{ end_maintenance_order_list_num }}件
+            <table class="table table-strriped" id="end_maintenance_order_lists" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse;">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="sel_make_plantia_import_excel">選択</th>
+                        <th class="export_complete_flag">状態</th>
+                        <th class="detail_pb"></th>
+                        <th class="phenomenon_id">案件ID</th>
+                        <th class="project_title">案件名</th>
+                        <th class="facility">工場</th>
+                        <th class="completion_date">工事完了日</th>
+                        <th class="mng_charge_person">保全G担当者</th>
+                        <th class="eqpt_no">機器番号</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for end_maintenance_order_list_item in end_maintenance_order_lists %}
+                    <tr>
+                        <td class="sel_make_plantia_import_excel" >
+                            {% if end_maintenance_order_list_item.export_complete_flag == 1%}
+                                <input type="checkbox" value="{{ end_maintenance_order_list_item.id }}" name="sel_output_cb" style="float:left;margin-left:15px;" checked>
+                            {% else %}
+                                <input type="checkbox" value="{{ end_maintenance_order_list_item.id }}" name="sel_output_cb" style="float:left;margin-left:15px;">
+                            {% endif %}
+                        </td>
+                        <td class="export_complete_flag">
+                            <input TYPE="hidden" value="{{ end_maintenance_order_list_item.export_complete_flag }}"/>
+                            {% if end_maintenance_order_list_item.export_complete_flag == 1%}未出力
+                            {% elif end_maintenance_order_list_item.export_complete_flag == 2 %}出力済
+                            {% elif end_maintenance_order_list_item.export_complete_flag == 3 %}変更有
+                            {% endif %}
+                        </td>
+                        <td class="detail_pb">
+                            <a href="#" id="{{ end_maintenance_order_list_item.id }}" class="detailpb" onclick="phenomenon_detail({{ end_maintenance_order_list_item.phenomenon_id2 }});">詳細</a>
+                        </td>
+                        <td class="phenomenon_id">{{ end_maintenance_order_list_item.phenomenon_id2 | default_if_none:'' }}</td>
+                        <td class="project_title">{{ end_maintenance_order_list_item.maintenance_name | default_if_none:'' }}</td>
+                        <td class="facility">{{ end_maintenance_order_list_item.m_location_skey | default_if_none:'' }}</td>
+                        <td class="completion_date">{{ end_maintenance_order_list_item.completion_date | default_if_none:'' }}</td>
+                        <td class="mng_charge_person">{{ end_maintenance_order_list_item.maintenance_personnel | default_if_none:'' }}</td>
+                        <td class="eqpt_no">{{ end_maintenance_order_list_item.t_fclty_ldgr_skey | default_if_none:'' }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+            {% if phenomenon_lists_num > 0 %}
+                {% for phenomenon_item in phenomenon_lists %}
+                    <input type="hidden" id="phenomenon_lists_id_{{ phenomenon_item.phenomenon_id }}" value="{{ phenomenon_item.id }}">
+                {% endfor %}
+            {% endif %}
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

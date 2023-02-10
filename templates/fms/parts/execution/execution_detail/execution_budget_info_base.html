@@ -1,0 +1,148 @@
+<script>
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    if ( this_step != next_step ){
+        $('#probudgetunit_action_button').empty();
+        $('#{{ action_button_id }}').empty();
+    }
+}
+</script>
+<style type="text/css">
+div.scroll_budget_info_div {
+  width: 1880px;
+  height: 780px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+<!--        <input type="hidden" id="budget_detail_id" value="{{ budget_lists.id }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_budget_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="budget_rev_no" value="{{ budget_rev_no }}">
+        <input type="hidden" id="budget_id" value="{{ budget_id }}">
+        <input type="hidden" id="edit_page" value="false">
+    </div>
+    <div style="float:left;">
+        <table>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算ＩＤ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ budget_id }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">RevNO</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ rev_no }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算ＮＯ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ budget_no }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_probudgetunit_data_num == 0 %}
+                        <font size="5" color="black">{{ probudgetunit_data.budget_name }}</font>
+                    {% elif probudgetunit_data.budget_name == old_probudgetunit_data.budget_name %}
+                        <font size="5" color="black">{{ probudgetunit_data.budget_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ probudgetunit_data.budget_name }}</font>
+                    {% endif %}
+                    </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">部門</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_probudgetunit_data_num == 0 %}
+                        <font size="5" color="black">{{ division_name }}</font>
+                    {% elif probudgetunit_data.division == old_probudgetunit_data.division %}
+                        <font size="5" color="black">{{ division_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ division_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">部署</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_probudgetunit_data_num == 0 %}
+                        <font size="5" color="black">{{ department_name }}</font>
+                    {% elif probudgetunit_data.department == old_probudgetunit_data.department %}
+                        <font size="5" color="black">{{ department_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ department_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">所管エリア</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_probudgetunit_data_num == 0 %}
+                        <font size="5" color="black">{{ jurisdiction_area }}</font>
+                    {% elif probudgetunit_data.jurisdiction_area == old_probudgetunit_data.jurisdiction_area %}
+                        <font size="5" color="black">{{ jurisdiction_area }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ jurisdiction_area }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">エリア管理者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_probudgetunit_data_num == 0 %}
+                        <font size="5" color="black">{{ area_person_in_charge_name }}</font>
+                    {% elif probudgetunit_data.area_person_in_charge == old_probudgetunit_data.area_person_in_charge %}
+                        <font size="5" color="black">{{ area_person_in_charge_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ area_person_in_charge_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">原課担当者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_probudgetunit_data_num == 0 %}
+                        <font size="5" color="black">{{ original_sec_person_in_charge_name }}</font>
+                    {% elif probudgetunit_data.original_sec_person_in_charge == old_probudgetunit_data.original_sec_person_in_charge %}
+                        <font size="5" color="black">{{ original_sec_person_in_charge_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ original_sec_person_in_charge_name }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">官庁検査予定日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_probudgetunit_data_num == 0 %}
+                        <font size="5" color="black">{{ sche_gov_inspection_date }}</font>
+                    {% elif probudgetunit_data.sche_gov_inspection_date == old_probudgetunit_data.sche_gov_inspection_date %}
+                        <font size="5" color="black">{{ sche_gov_inspection_date }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ sche_gov_inspection_date }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+        </table>
+    </div>
+<!--        <div style="clear: both;"></div>-->
+    <div style="float:left;width:10px;" >　</div>
+
+    <div style="float:left;" >
+        {% block execution_sub_contents %}
+        {% endblock %}
+    </div>

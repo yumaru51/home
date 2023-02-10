@@ -1,0 +1,193 @@
+<script language="javascript" type="text/javascript" charset="UTF-8" xmlns="http://www.w3.org/1999/html">
+
+function incidental_work_check() {
+            if (document.getElementById("supplemental_task1_flag").value > 0) {
+                document.getElementById("supplemental_task1_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task2_flag").value > 0) {
+                document.getElementById("supplemental_task2_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task3_flag").value > 0) {
+                document.getElementById("supplemental_task3_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task4_flag").value > 0) {
+                document.getElementById("supplemental_task4_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task5_flag").value > 0) {
+                document.getElementById("supplemental_task5_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task6_flag").value > 0) {
+                document.getElementById("supplemental_task6_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task7_flag").value > 0) {
+                document.getElementById("supplemental_task7_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task8_flag").value > 0) {
+                document.getElementById("supplemental_task8_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task9_flag").value > 0) {
+                document.getElementById("supplemental_task9_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task10_flag").value > 0) {
+                document.getElementById("supplemental_task10_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task11_flag").value > 0) {
+                document.getElementById("supplemental_task11_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task12_flag").value > 0) {
+                document.getElementById("supplemental_task12_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task13_flag").value > 0) {
+                document.getElementById("supplemental_task13_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task14_flag").value > 0) {
+                document.getElementById("supplemental_task14_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task15_flag").value > 0) {
+                document.getElementById("supplemental_task15_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task16_flag").value > 0) {
+                document.getElementById("supplemental_task16_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task17_flag").value > 0) {
+                document.getElementById("supplemental_task17_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task18_flag").value > 0) {
+                document.getElementById("supplemental_task18_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task19_flag").value > 0) {
+                document.getElementById("supplemental_task19_flag").checked = true;
+            }
+            if (document.getElementById("supplemental_task20_flag").value > 0) {
+                document.getElementById("supplemental_task20_flag").checked = true;
+            }
+}
+
+</script>
+
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">受注詳細情報</h2>
+    </div>
+    <input type="hidden" id="order_detail_id" value="{{ order_lists.id }}">
+    <input type="hidden" id="order_detail_item_code" value="{{ order_lists.item_code }}">
+    <div style="float:left;width:500px;">
+        <div>受注日　　　　:　{{ order_date }}</div>
+        <div>受注管理ＮＯ　:　{{ order_lists.order_no }}</div>
+        <div>出荷管理ＮＯ　:　{{ order_lists.delivery_no }}</div>
+        <div>製品部門　　　:　{{ item_data.item_category }}:{{ item_category_name }}</div>
+        <div>伝票タイプ　　:　{{ order_lists.voucher_type }}:{{ voucher_type_name }}</div>
+        <div>訂正区分　　　:　{{ order_lists.registration_division }}:{{ registration_division_name }}</div>
+        <div>指定納入期日　:　{{ order_lists.delivery_date }}</div>
+        <div>運送会社　　　:　{{ order_lists.carrier }}</div>
+        <div>出荷ポイント　:　{{ delivery_point }}:{{ delivery_point_name }}</div>
+        <div>担当営業　　　:　{{ company_sub_data.handling_office }}</div>
+        <div>インコターム　:　{{ company_sub_data.incoterm }}</div>
+        <div>備考１　　　　:　<textarea name="rem1" rows="3" cols="42">{{ order_lists.rem1 }}</textarea></div>
+    </div>
+    <div style="float:left;width:500px;" >
+        <div>受注経路　　　:　{{ order_lists.order_route }}</div>
+        <div>荷受先　　　　:　{{ order_lists.place_for_receipt_of_goods }}</div>
+        <div>荷受先名　　　:　{{ company_data.company_name }}</div>
+        <div>都道府県　　　:　{{ company_data.company_prefecture }}</div>
+        <div>住所　　　　　:　{{ company_data.company_address }}</div>
+        <div>郵便番号　　　:　{{ company_data.company_post_no }}</div>
+        <div>電話番号　　　:　{{ company_data.company_phone_no }}</div>
+        <div>得意先発注ＮＯ:　{{ order_lists.customer_order_no }}</div>
+        <div>　</div>
+        <div>　</div>
+        <div>　</div>
+        <div>　</div>
+        <div>備考２　　　　:　<textarea name="rem2" rows="3" cols="42">{{ order_lists.rem2 }}</textarea></div>
+    </div>
+    <div style="float:left;width:560px;" >
+        <div>品目グループ　:　{{ item_data.item_group }}</div>
+        <div id="detail_item_code">品目コード　　:　{{ order_lists.item_code }}</div>
+        <div>品目名　　　　:　{{ item_data.item_name }}</div>
+        <div>受注数量　　　:　{{ order_lists.order_packed_amount }}{{ item_data.packing_unit }}</div>
+        <div>受払数量　　　:　{{ order_lists.order_amount }}{{ item_data.basic_unit }}</div>
+        <div style="float:left;width:180px;">
+            <div>
+                <input type="checkbox" id="supplemental_task1_flag" value="{{ supplemental_task1_flag }}"  onclick="return false;" >{{ supplemental_task1_flag_name }}
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task2_flag" value="{{ supplemental_task2_flag }}"  onclick="return false;" >{{ supplemental_task2_flag_name }}　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task3_flag" value="{{ supplemental_task3_flag }}" onclick="return false;" >{{ supplemental_task3_flag_name }}　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task4_flag" value="{{ supplemental_task4_flag }}" onclick="return false;" >{{ supplemental_task4_flag_name }}　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task5_flag" value="{{ supplemental_task5_flag }}" onclick="return false;" >{{ supplemental_task5_flag_name }}　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task6_flag" value="{{ supplemental_task6_flag }}" onclick="return false;" >{{ supplemental_task6_flag_name }}　　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task7_flag" value="{{ supplemental_task7_flag }}" onclick="return false;" >{{ supplemental_task7_flag_name }}　　
+            </div>
+        </div>
+        <div style="float:left;width:180px;">
+            <div>
+                <input type="checkbox" id="supplemental_task8_flag" value="{{ supplemental_task8_flag }}" onclick="return false;" >{{ supplemental_task8_flag_name }}　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task9_flag" value="{{ supplemental_task9_flag }}" onclick="return false;" >{{ supplemental_task9_flag_name }}　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task10_flag" value="{{ supplemental_task10_flag }}" onclick="return false;" >{{ supplemental_task10_flag_name }}　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task11_flag" value="{{ supplemental_task11_flag }}" onclick="return false;" >{{ supplemental_task11_flag_name }}　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task12_flag" value="{{ supplemental_task12_flag }}" onclick="return false;" >{{ supplemental_task12_flag_name }}　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task13_flag" value="{{ supplemental_task13_flag }}" onclick="return false;" >{{ supplemental_task13_flag_name }}　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task14_flag" value="{{ supplemental_task14_flag }}" onclick="return false;" >{{ supplemental_task14_flag_name }}　
+            </div>
+        </div>
+        <div style="float:left;width:180px;">
+            <div>
+                <input type="checkbox" id="supplemental_task15_flag" value="{{ supplemental_task15_flag }}" onclick="return false;" >{{ supplemental_task15_flag_name }}　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task16_flag" value="{{ supplemental_task16_flag }}" onclick="return false;" >{{ supplemental_task16_flag_name }}　　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task17_flag" value="{{ supplemental_task17_flag }}" onclick="return false;" >{{ supplemental_task17_flag_name }}　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task18_flag" value="{{ supplemental_task18_flag }}" onclick="return false;" >{{ supplemental_task18_flag_name }}　　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task19_flag" value="{{ supplemental_task19_flag }}" onclick="return false;" >{{ supplemental_task19_flag_name }}　
+            </div>
+            <div>
+                <input type="checkbox" id="supplemental_task20_flag" value="{{ supplemental_task20_flag }}" onclick="return false;" >{{ supplemental_task20_flag_name }}　
+            </div>
+            <div>
+                <input type="checkbox" value="21" onclick="return false;" >倉庫移動　　　
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+        <div>備考３　　　　:　<textarea name="rem3" rows="3" cols="42">{{ order_lists.rem3 }}</textarea></div>
+    </div>
+    <div style="clear:both "></div>
+    {% if from_page == 10001 %}
+        <br>
+        <div>
+            <input type="button" value="  受注複写  " onclick="copy_entry({{ order_lists.id }},0);" >
+            {% if order_lists.stock_allocation_status == 100201 or order_lists.stock_allocation_status == 100211 %}
+                <input type="button" value="{{ link_label }}" onclick="copy_entry({{ order_lists.id }},1);" >
+            {% endif %}
+        </div>
+    {% endif %}
+
+
+

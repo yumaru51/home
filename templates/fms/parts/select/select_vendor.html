@@ -1,0 +1,6 @@
+                    <select id="sel_vendor_code" name="sel_vendor_code" onchange="vendor_code_change(value);">
+                        <option value=""></option>
+                        {% for vendor_lists in vendor_lists %}
+                            <option value="{{ vendor_lists.supplier_cd }}">{{ vendor_lists.supplier_cd }}：{{ vendor_lists.supplier_name }}</option>
+                        {% endfor %}
+                    </select>

@@ -1,0 +1,225 @@
+<script>
+
+//異常報告一覧から選択された異常報告データの詳細の表示処理
+function notification_check_detail(a,b,present_step,progress_id) {
+    var step_id = present_step;
+    var budget_id = 0;
+    var budget_unique_id = 0;
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var target_tab= '';
+    var level5_step_id = $('#level5_step_id').val();
+    var new_step = Number(level5_step_id) + 1;
+    $('<form/>', {action: '/isk_tools/fms/parts/common/detail_template/', target: target_tab, method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'progress_id', value: progress_id}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: budget_unique_id}))
+    .append($('<input/>', {type: 'hidden', name: 'phenomenon_unique_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'phenomenon_id', value: b}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: 'phenomenon'}))
+    .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+    .append($('<input/>', {type: 'hidden', name: 'step_id', value: step_id}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:57px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.return_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.phenomenon_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.sub_no{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.condition{
+    width:140px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.equip_no {
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.step{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.next_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.discovery_user{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.discovery_date{
+    width:150px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.business_year{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.project_title{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.department{
+    width:200px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.next_department{
+    width:200px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.construction_name{
+    width:280px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.order_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.desired_date{
+    width:220px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.plan_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.PM_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.process{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.cost_center{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.rem{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+    overflow: hidden;
+}
+.supplemental_task_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.days_stay{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+tr:nth-child(2n+1) {
+    background: #EEFFFF;
+}
+</style>
+
+        {% if notification_check_lists_num > 0 %}
+            表示件数：{{ notification_check_lists_num }}件
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="return_flag">差戻</th>
+                        <th class="phenomenon_id">案件ID</th>
+                        <th class="project_title">案件名</th>
+                        <th class="department">担当部署</th>
+                        <th class="discovery_user">発見者</th>
+                        <th class="discovery_date">発見日</th>
+                        <th class="step">進捗状況</th>
+                        <th class="next_department">次作業部署</th>
+                        <th class="next_person">次作業者</th>
+                        <th class="equip_no">機器番号</th>
+                        <th class="days_stay">滞留日数</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for notification_check_item in notification_check_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" id="{{ notification_check_lists.id }}" class="detailpb" onclick="notification_check_detail({{ notification_check_item.phenomenon_unique_id }},{{ notification_check_item.phenomenon_id }},{{ notification_check_item.present_step }},{{ notification_check_item.progress_id }});">詳細</a>
+                        </td>
+                        <td class="return_flag">
+                        {% if notification_check_item.return_flag == 1  %}
+                        <font color="yellow" style="background-color:red; font-weight:bold">差戻</font>
+                        {% endif %}
+                        </td>
+                        <td class="phenomenon_id">{{ notification_check_item.phenomenon_id }}</td>
+                        <td class="project_title">{{ notification_check_item.project_title }}</td>
+                        <td class="department">{{ notification_check_item.phenomenon_department_name | default_if_none:''  }}</td>
+                        <td class="discovery_user">{{ notification_check_item.discovery_user_last_name | default_if_none:''  }}{{ notification_check_item.discovery_user_first_name | default_if_none:''  }}</td>
+                        <td class="discovery_date">{{ notification_check_item.discovery_date | default_if_none:''  }}</td>
+                        <td class="step">{{ notification_check_item.step_name }}</td>
+                        <td class="next_department">{{ notification_check_item.progress_department_name | default_if_none:''  }}</td>
+                        <td class="next_person">{{ notification_check_item.last_name | default_if_none:''  }}{{ notification_check_item.first_name | default_if_none:''  }}</td>
+                        <td class="equip_no">{{ notification_check_item.equipment_no | default_if_none:'' }}</td>
+                        <td class="days_stay">{{ notification_check_item.days_stay | default_if_none:''}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

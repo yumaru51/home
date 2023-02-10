@@ -1,0 +1,51 @@
+<script>
+
+function list_refresh(a) {
+        var entry_person = $('#entry_person').val();
+        var program_name_text = $('#program_name_text').val();
+        var description_text = $('#description_text').val();
+        var from_page = a;
+        $("#loading").show();
+        $.ajax({
+                url: "/isk_tools/cpexcel/parts/program_lists/",
+                type: "POST",
+                data : {
+                    'entry_person': entry_person,
+                    'program_name_text': program_name_text,
+                    'description_text': description_text,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#program_list').empty();
+                    $('#program_list').html(data);
+                    $("#loading").fadeOut();
+                    $("#program_list").fadeIn();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    $('#program_list').empty();
+                });
+}
+
+</script>
+    <div style="width: 1680px;height:65px;background:#ffcccc; border-style:double none;">
+         絞込条件<br>
+        <div class="filter_item" style="float:left;">
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">
+                    登録者：<input id="entry_person" TYPE=text VALUE="" NAME="entry_person" size=3 style="width:100px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    プログラム名：<input id="program_name_text" TYPE=text VALUE="" NAME="program_name_text" size=6 style="width:250px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    説明文字：<input id="description_text" TYPE=text VALUE="" NAME="description_text" size=9 style="width:500px; height:20px"/>
+                </div>
+            </div>
+        </div>
+    </div>

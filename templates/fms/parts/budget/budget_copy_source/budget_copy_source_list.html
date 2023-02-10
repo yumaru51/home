@@ -1,0 +1,505 @@
+<script>
+//予算一覧から選択されたコピー元予算データの詳細を別タブでの表示処理
+function budget_detail(id, budget_id, budget_step_present_user, step_id) {
+    window.open('', 'budget_copy_source');
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var level5_step_id = String(133009902);
+    var new_step = Number(level5_step_id) + 1;
+    $('<form/>', {action: '/isk_tools/fms/parts/common/detail_template/', target: 'budget_copy_source', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: id}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: 'budget'}))
+    .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+    .append($('<input/>', {type: 'hidden', name: 'present_operator', value: budget_step_present_user}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+    .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 1}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+//予算内容コピー選択時の処理
+function budget_copy(target_budget_unique_id, copy_budget_id, present_step){
+    var budget_id = $('#budget_id').val();
+    if (budget_id == 0){
+        alert("予算データを先に登録(一時保存)してください！！");
+        return;
+    }
+    var target = $('#target').val();
+    var target_budget_unique_id = target_budget_unique_id;
+    var work_id = $('#target_work_id').val();
+    var level5_step_id = Number($('#level5_step_id').val());
+            $.ajax({
+                url: "/isk_tools/fms/action/budget_copy/",
+                type: "POST",
+                data : {
+                    'target': target,
+                    'target_budget_unique_id': target_budget_unique_id,
+                    'copy_budget_id': copy_budget_id,
+                    'work_id': work_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#sel_application_class').val(data.application_class);
+                    $('#sel_budget_class').val(data.budget_class);
+                    $('#sel_period_class').val(data.period_class);
+                    $('#sel_budget_person').val(data.budget_person_username);
+                    $('#sel_management_class_cd').val(data.management_class_cd);
+                    if (132000000 <= level5_step_id && level5_step_id < 133000000){
+                        if (data.plan_class == 'M'){
+                            //$('#request_name').val(data.request_name);
+                            $('#request_detail').val(data.request_detail);
+                            $('#mplan_concerns').val(data.mplan_concerns);
+                        }else{
+                            //$('#request_name').val(data.budget_name);
+                            $('#request_detail').val(data.detail);
+                        }
+                    }else{
+                        $('#budget_name').val(data.budget_name);
+                        $('#request_detail').val(data.request_detail);
+                        $('#detail').val(data.detail);
+                    }
+                    $('#sel_asdm_flag').val(data.asdm_flag);
+                    $('#sel_purpose_class').val(data.purpose_class);
+                    $('#purpose').val(data.purpose);
+                    $('#effect').val(data.effect);
+                    $('#influence_for_operation').val(data.influence_for_operation);
+                    $('#influence_for_quality').val(data.influence_for_quality);
+                    $('#rem').val(data.rem);
+                    $('#remove_assets').val(data.remove_assets);
+                    $('#sel_budget_department').val(data.budget_main_department_department_cd);
+
+                    //以下budget_edit.html側のリスト更新完了待ちが必要
+                    var deferred_department = change_department(data.budget_main_department_department_cd);
+                    deferred_department.done(function(){
+                        //原課担当者、設備工程を設定
+                        $('#sel_budget_department_charge_person').val(data.budget_department_charge_person_username);
+                        $('#sel_process').val(data.facility_process_process_cd);
+
+                        alert(data.msg);
+
+                        if(data.law_list_num > 0 || data.budget_equipment_list_num > 0){
+                            if(window.confirm('法令/機器をコピーしますか？')){
+                                copy_budget_law_list_entry(copy_budget_id, present_step);
+                                copy_budget_equipment_list_entry(copy_budget_id, present_step);
+                            }
+                        }
+
+                        if(data.handling_material_list_num > 0){
+                            if(window.confirm('物質情報をコピーしますか？')){
+                                copy_budget_material_list_entry(copy_budget_id, present_step);
+                            }
+                        }
+
+                        if(data.required_specification_list_num > 0){
+                            if(window.confirm('要求仕様をコピーしますか？')){
+                                copy_required_spec_list_entry(copy_budget_id, present_step);
+                            }
+                        }
+
+                        if(data.uploadfile_list_num > 0){
+                            if(window.confirm('添付ファイルをコピーしますか？')){
+                                copy_budget_uploadfile_list_entry(copy_budget_id, present_step);
+                            }
+                        }
+                    })
+                    .fail(function(){
+                        alert('Error!');
+                    });
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+// 関係法令コピー処理
+function copy_budget_law_list_entry(copy_budget_id, present_step){
+    var budget_id = $('#budget_id').val();
+    var this_step = $('#this_step').val();
+    var copy_step_no = present_step;
+    var rev_no = $('#target_work_rev_no').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_budget_law_list_entry/",
+            type: "POST",
+            data : {
+                'budget_id': budget_id,
+                'copy_step_no': copy_step_no,
+                'copy_budget_id': copy_budget_id,
+                'this_step': this_step,
+                'rev_no': rev_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                get_budget_law_list(budget_id);
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#budget_law_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+// 関係機器情報コピー処理
+function copy_budget_equipment_list_entry(copy_budget_id, present_step){
+    var budget_id = $('#budget_id').val();
+    var this_step = $('#this_step').val();
+    var copy_budget_id = copy_budget_id;
+    var copy_step_no = present_step;
+    var rev_no = $('#target_work_rev_no').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_budget_equipment_list_entry/",
+            type: "POST",
+            data : {
+                'budget_id': budget_id,
+                'copy_step_no': copy_step_no,
+                'copy_budget_id': copy_budget_id,
+                'this_step': this_step,
+                'rev_no': rev_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                get_budget_equipment_list(budget_id);
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#budget_equipment_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+// 物質情報コピー処理
+function copy_budget_material_list_entry(copy_budget_id, present_step){
+    var budget_id = $('#budget_id').val();
+    var this_step = $('#this_step').val();
+    var target = $('#target').val();
+    var copy_budget_id = copy_budget_id;
+    var copy_step_no = present_step;
+    var rev_no = $('#target_work_rev_no').val();
+    var work_id = '';
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_budget_material_list_entry/",
+            type: "POST",
+            data : {
+                'budget_id': budget_id,
+                'copy_step_no': copy_step_no,
+                'copy_budget_id': copy_budget_id,
+                'this_step': this_step,
+                'rev_no': rev_no,
+                'work_id': work_id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                handling_material_list(target, work_id);
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#handling_material_lists').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+// 要求仕様コピー処理
+function copy_required_spec_list_entry(copy_budget_id, present_step){
+    var budget_id = $('#budget_id').val();
+    if (budget_id == 0){
+        alert("予算データを先に登録(一時保存)してください！！");
+    }else{
+        var budget_rev_no = $('#budget_rev_no').val();
+        var this_step = $('#this_step').val();
+        var copy_budget_id = copy_budget_id;
+        var copy_step_no = present_step;
+        var work_id = '';
+            $.ajax({
+                url: "/isk_tools/fms/action/copy_required_spec_list_entry/",
+                type: "POST",
+                data : {
+                    'budget_id': budget_id,
+                    'budget_rev_no': budget_rev_no,
+                    'copy_budget_id': copy_budget_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    required_spec_list();//要求仕様一覧表示のためのJS起動
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#handling_material_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+    }
+}
+
+// 添付ファイルコピー処理
+function copy_budget_uploadfile_list_entry(copy_budget_id, present_step){
+    if(present_step > 200000000){
+        var budget_id = $('#budget_id').val();
+    }else{
+        var budget_id = $('#target_budget_id').val();
+    }
+    var work_id = 0
+    var this_step = $('#this_step').val();
+    var target = $('#target').val();
+    var copy_work_id = 0;
+    var copy_step_no = present_step;
+        $.ajax({
+            url: "/isk_tools/fms/action/copy_uploadfile_list_entry/",
+            type: "POST",
+            data : {
+                'budget_id': budget_id,
+                'work_id': work_id,
+                'this_step': this_step,
+                'target': target,
+                'copy_budget_id': copy_budget_id,
+                'copy_work_id': copy_work_id,
+                'copy_step_no': copy_step_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                console.log('copy_budget_uploadfile_list_entry')
+                upload_file_list(target);
+           })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#upload_file_list_' + target).empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+           });
+}
+
+//関連予算ID入力時の処理
+function copy_relation_budget_id(budget_id,business_year_id,period_class_id,budget_class_id){
+
+    //関連予算ID、年度、期区分、工事区分を転記
+    $('#relation_budget_id').val(budget_id);
+    $('#sel_business_year').val(business_year_id);
+    $('#sel_period_class').val(period_class_id);
+    $('#sel_budget_class').val(budget_class_id);
+
+    //メッセージを表示
+    alert('予算基本情報に設定しました。\n申請区分で予算額追加を選択して、一時保存してください。');
+}
+
+</script>
+<style type="text/css">
+thead.copy_scrollHead,tbody.copy_scrollBody{
+    display:block;
+}
+tbody.copy_scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.copy_detail_pb{
+    width:57px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.copy_budget_copy_pb{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.copy_relation_budget_id_pb{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.copy_budget_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_budget_no{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_condition{
+    width:140px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_step{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_next_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_business_year{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_budget_name{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_department{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_construction_name{
+    width:280px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_order_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_desired_date{
+    width:220px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_plan_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_PM_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_process{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_cost_center{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_rem{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+    overflow: hidden;
+}
+.copy_supplemental_task_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_days_stay{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if budget_lists_num > 0 %}
+            表示件数：{{ budget_lists_num }}件
+
+            <table class="copy_table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="copy_scrollHead">
+                    <tr>
+                        <th class="copy_detail_pb"></th>
+                        <th class="copy_budget_copy_pb"></th>
+                        {% if copy_relation_budget_id_flag == 1 %}
+                        <th class="copy_relation_budget_id_pb">関連予算</th>
+                        {% endif %}
+                        <th class="copy_budget_id">予算ID</th>
+                        <th class="copy_budget_no">予算NO</th>
+                        <th class="copy_condition">予算状態</th>
+                        <th class="copy_step">工程</th>
+                        <th class="copy_next_person">次作業者</th>
+                        <th class="copy_business_year">年度</th>
+                        <th class="copy_budget_name">{{ budget_name_text }}</th>
+                        <th class="copy_department">部署</th>
+                        <th class="copy_days_stay">滞留日数</th>
+                    </tr>
+                </thead>
+                <tbody class="copy_scrollBody">
+                {% for budget_item in budget_lists %}
+                    <tr>
+                        <td class="copy_detail_pb">
+                            <a href="#" id="{{ budget_item.id }}" class="detailpb"
+                               onclick="budget_detail({{ budget_item.id }},{{ budget_item.budget_id }},'{{ budget_item.username }}',{{ budget_item.step_id }});">詳細</a>
+                        </td>
+                       <td class="copy_budget_copy_pb">
+                            <a href="#" class="detailpb"
+                               onclick="budget_copy({{ budget_item.id }}, {{ budget_item.budget_id }}, {{ budget_item.step_id }});">コピー</a>
+                        </td>
+                        {% if copy_relation_budget_id_flag == 1 %}
+                        <td class="copy_relation_budget_id_pb">
+                            <a href="#" class="detailpb"
+                               onclick="copy_relation_budget_id({{ budget_item.budget_id }},{{ budget_item.business_year_id }},{{ budget_item.period_class_id }},{{ budget_item.budget_class_id }});">ID転記</a>
+                        </td>
+                        {% endif %}                        <td class="copy_budget_id">{{ budget_item.budget_id }}</td>
+                        <td class="copy_budget_no">{{ budget_item.bd_no }}</td>
+                        <td class="copy_condition">{{ budget_item.condition_name }}</td>
+                        <td class="copy_step">{{ budget_item.step_name }}</td>
+                        <td class="copy_next_person">{{ budget_item.last_name }}{{ budget_item.first_name }}</td>
+                        <td class="copy_business_year">{{ budget_item.business_year }}</td>
+                        {% if is_mplan_flag %}
+                            <td class="copy_budget_name">{{ budget_item.request_name }}</td>
+                        {% else %}
+                            <td class="copy_budget_name">{{ budget_item.budget_name }}</td>
+                        {% endif %}
+                        <td class="copy_department">{{ budget_item.department_name }}</td>
+                        {% if budget_item.days_stay == None %}
+                            <td class="copy_days_stay"></td>
+                        {% else %}
+                            <td class="copy_days_stay">{{ budget_item.days_stay }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

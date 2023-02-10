@@ -1,0 +1,692 @@
+{% load humanize %}
+
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="budget_detail_id" value="{{ budget_lists.id }}">
+    <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+    <input type="hidden" id="last_operator" value="{{ last_operator }}">
+    <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">
+    <input type="hidden" id="action" value="{{ action }}">
+    <input type="hidden" id="action_sub" value="{{ action_sub }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="budget_rev_no" value="{{ budget_rev_no }}">
+
+    <!--単年度計画用項目-->
+    <input type="hidden" id="relation_budget_id" value="">
+    <input type="hidden" id="decision_no" value="">
+    <input type="hidden" id="sel_application_class" value="">
+    <input type="hidden" id="sel_period_class" value="">
+    <input type="hidden" id="budget_name" value="">
+    <input type="hidden" id="order_date" value="">
+    <input type="hidden" id="sel_pre_order_flag" value="">
+    <input type="hidden" id="sel_make_cs_flag" value="">
+    <input type="hidden" id="detail" value="">
+    <input type="hidden" id="sel_budget_importance_eval" value="">
+    <input type="hidden" id="sel_budget_urgency_eval" value="">
+    <input type="hidden" id="budget_quantitative_evaluation" value="">
+    </div>
+    <div id="budget_budget_detail_action_button" style="width: auto;"></div>
+
+<!--scroll_budget_div-->
+    <div class="scroll_budget_div">
+
+    <div id="{{ div_id_name }}_input_check" ><!--input_check ここから-->
+
+<!--FileUploadForm        -->
+    <form id="file_upload_form_{{ div_id_name }}" name="file_upload_form_{{ div_id_name }}" action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">
+        <div style="float:left;">
+        <table>
+            <tr>
+                <td><div><font size="4">予算ＩＤ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="budget_id" value="{{ budget_data.budget_id }}" readonly="readonly">
+                </font>※自動取得</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算状態</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_condition" name="sel_budget_condition" input_check="must1">
+                            <option value=""></option>
+                    {% for budget_condition_list in budget_condition_list %}
+                        {% if budget_condition_list.condition_id == budget_condition %}
+                            <option value="{{ budget_condition_list.condition_id }}" selected>{{ budget_condition_list.condition_name }}</option>
+                        {% else %}
+                            <option value="{{ budget_condition_list.condition_id }}">{{ budget_condition_list.condition_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">年度</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_business_year" name="sel_business_year" input_check="must1">
+                    {% for business_year_item in business_year_list %}
+                        {% if business_year_item.business_year == business_year %}
+                            <option value="{{ business_year_item.business_year }}" selected>{{ business_year_item.business_year }}</option>
+                        {% else %}
+                            <option value="{{ business_year_item.business_year }}">{{ business_year_item.business_year }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工事区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_class" name="sel_budget_class" input_check="must1">
+                        <option value=""></option>
+                    {% for budget_class_item in budget_class_list %}
+                        {% if budget_class_item.budget_class_cd == budget_data.budget_class_id %}
+                            <option value="{{ budget_class_item.budget_class_cd }}" selected>{{ budget_class_item.budget_class_name }}</option>
+                        {% else %}
+                            <option value="{{ budget_class_item.budget_class_cd }}">{{ budget_class_item.budget_class_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">申請希望額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="mplan_desired_amount" data-type="number" input_check="must2" basis_popup_display='on' inputmode="numeric" value="{{ budget_data.mplan_desired_amount | default_if_none:''| intcomma }}" onfocus="this.select();" onblur="add_comma_value(this)">
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">申請希望額根拠</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_mplan_basis" name="sel_mplan_basis" input_check="must2" basis_popup_display='on' style="width:400px;">
+                        <option hidden value=""></option>
+                        {% for mplan_basis in mplan_basis_list %}
+                            {% if mplan_basis.basis_cd == budget_data.mplan_basis_id %}
+                                <option value='{{mplan_basis.basis_cd}}' selected>{{ mplan_basis.name }}</option>
+                            {% else %}
+                                <option value='{{mplan_basis.basis_cd}}'>{{ mplan_basis.name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">申請額根拠コメント</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="mplan_basis_comment" input_check="must2 length" data-max_length="200" size="38" basis_popup_display='on' value="{{ budget_data.mplan_basis_comment | default_if_none:''}}"></font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">申請額根拠説明</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    <div id="mplan_basis_popup_table">
+                        <table border="1" style="border-collapse: collapse; border-color: black">
+                            <tr><td></td><td></td></tr>
+                                <tr>
+                                    <td><div style="padding: 5px 0px;"><font size="2"color="red">
+                                    申請額根拠
+                                    </font></div></td>
+                                    <td><div style="padding: 5px 0px;"><font size="2"color="red">
+                                    入力例
+                                    </font></div></td>
+                                </tr>
+                            {% for mplan_basis in mplan_basis_list %}
+                                <tr>
+                                    <td><div style="padding: 5px 0px;"><font size="2">
+                                    {{ mplan_basis.name }}
+                                    </font></div></td>
+                                    <td><div style="padding: 5px 0px;"><font size="2">
+                                    {{ mplan_basis.detail }}
+                                    </font></div></td>
+                                </tr>
+                            {% endfor %}
+                            <tr><td></td><td></td></tr>
+                        </table>
+                    </div>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">申請後調整額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="mplan_adjustment_amount" data-type="number" inputmode="numeric" value="{{ budget_data.mplan_adjustment_amount | default_if_none:'' | intcomma }}" onfocus="this.select();" disabled>
+                </font>※入力不可</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">仕様単位の積み上げ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="application_price" data-type="number" inputmode="numeric" value="{{ budget_data.application_price | default_if_none:''|intcomma  }}" onfocus="this.select();" disabled>
+                </font>※入力不可</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算見積額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_price" data-type="number" inputmode="numeric" value="{{ budget_data.budget_price | default_if_none:''|intcomma  }}" onfocus="this.select();" disabled>
+                </font>※入力不可</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">部署</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_department" name="sel_budget_department" input_check="must1" list="departmentList" onchange="change_department(value);">
+                        <option hidden></option>
+                    <datalist id="departmentList">
+                        {{ departments_list | safe }}
+                    </datalist>
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">原課担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_department_charge_person" input_check="must1" name="sel_budget_department_charge_person" list="userList">
+                        <option hidden></option>
+                    <datalist id="userList">
+                        {{ user_list | safe }}
+                    </datalist>
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_person" name="sel_budget_person" disabled>
+                        <option hidden value="" ></option>
+                        {% for budget_department_charge_person_item in budget_department_charge_person_list %}
+                            {% if budget_department_charge_person_item.username == budget_data.budget_person_id %}
+                                <option value="{{ budget_department_charge_person_item.username }}" selected>{{ budget_department_charge_person_item.last_name }}　{{ budget_department_charge_person_item.first_name }}</option>
+                            {% else %}
+                                <option value="{{ budget_department_charge_person_item.username }}">{{ budget_department_charge_person_item.last_name }}　{{ budget_department_charge_person_item.first_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </font>※選択不可</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">設備工程</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_process" name="sel_process" input_check="must1" list="processList">
+                    <datalist id="processList">
+                        {{ processmaster_list | safe }}
+                    </datalist>
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">依頼名</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="request_name" input_check="must1 length" data-max_length="70" size="38" value="{{ budget_data.request_name | default_if_none:''}}"></font>※必須、原課入力</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望工期</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="start_date" input_check="must1" class="datepicker" value="{{ budget_data.start_date | default_if_none:''}}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('start_date');"> ～ <input type="text" id="end_date" input_check="must1" class="datepicker" value="{{ budget_data.end_date | default_if_none:''}}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('end_date');">
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望納期日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="delivery_date" class="datepicker" value="{{ budget_data.delivery_date | default_if_none:''}}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('delivery_date');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">定修区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_asdm_flag" name="sel_asdm_flag" input_check="must2">
+                        <option hidden value=""></option>
+                        {% if budget_data.asdm_flag == "定修" %}
+                            <option value="定修" selected>定修</option>
+                            <option value="定修外">定修外</option>
+                        {% elif budget_data.asdm_flag == "定修外" %}
+                            <option value="定修">定修</option>
+                            <option value="定修外" selected>定修外</option>
+                        {% else %}
+                            <option value="定修">定修</option>
+                            <option value="定修外">定修外</option>
+                        {% endif %}
+                    </select>
+                </font>　※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">中計評価</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_mpaln_evaluation" name="sel_mpaln_evaluation" input_check="must2" style="width:500px;">
+                        <option hidden value=""></option>
+                        {% for mpaln_evaluation in mpaln_evaluation_list %}
+                            {% if mpaln_evaluation.id == budget_data.mpaln_evaluation_id %}
+                                <option value='{{mpaln_evaluation.id}}' selected>{{mpaln_evaluation.criteria_detail}}</option>
+                            {% else %}
+                                <option value='{{mpaln_evaluation.id}}'>{{mpaln_evaluation.criteria_detail}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">物質情報入力の該当</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_check_material" name="sel_check_material">
+                        <option
+                            {% if "有り" == budget_data.check_material_flag %}
+                            selected
+                            {% endif %}
+                            value="有り" >有り</option>
+                        <option
+                            {% if "無し" == budget_data.check_material_flag %}
+                            selected
+                            {% endif %}
+                                value="無し" >無し</option>
+                    </select>
+                </font></div></td>
+            </tr>
+        </table>
+        <div><font size="4">※基本的に機器更新/配管工事等に係る工事の場合は必要です。<br>
+                            　有りとした場合、「物質情報」タブでの情報入力は必須となります。
+        </font></div>
+    </div>
+    <div style="float:left;width:10px;" >　</div>
+    <div style="float:left;" >
+        <table>
+            <tr>
+                <td><div><font size="4">目的区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_purpose_class" name="sel_purpose_class" input_check="must2">
+                        <option hidden value="" ></option>
+                        {% for purpose_class_list in purpose_class_list %}
+                            {% if purpose_class_list.purpose_class_cd == budget_data.purpose_class_id %}
+                                <option value="{{ purpose_class_list.purpose_class_cd }}" selected>{{ purpose_class_list.purpose_class_cd }} : {{ purpose_class_list.purpose_class_name }}</option>
+                            {% else %}
+                                <option value="{{ purpose_class_list.purpose_class_cd }}">{{ purpose_class_list.purpose_class_cd }} : {{ purpose_class_list.purpose_class_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">目的詳細</font>
+                <font size="3"><p style="margin: 0;">※必須</p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="purpose" name="purpose" input_check="must2 length" data-max_length="400" rows="9" cols="45">{{ budget_data.purpose | default_if_none:''}}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div>
+                    <font size="4">依頼内容</font>
+                    <font size="3">
+                        <p style="margin: 0;">※必須、原課入力</p>
+                        <strong>
+                        <font color="red">
+                            <p style="margin: 0;">詳細は、要求仕様</p>
+                            <p style="margin: 0;">タブに記載のこと</p>
+                        </font>
+                        </strong>
+                        <input id="get_detail_help_file_button" type="button" name="get_detail_help_file_button" value="記載例 取得" onclick='download_server_file("\\\\Ydomnserv\\COMMON\\部門間フォルダ\\FacilityData\\template_files\\manuals\\要求仕様入力方法","中計要求仕様検討入力方法-予算見積依頼(原課操作)r0.pptx")'>
+                    </font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td>
+                    <div>
+                        <font size="3"><textarea id="request_detail" name="detail" input_check="must2 length" data-max_length="400" rows="9" cols="45">{{ budget_data.request_detail | default_if_none:''}}</textarea></font>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">懸念事項(申請背景)</font>
+                <font size="3"><p style="margin: 0;">※必須</p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="mplan_concerns" name="mplan_concerns" input_check="must2 length" data-max_length="400"  rows="6" cols="45">{{ budget_data.mplan_concerns | default_if_none:''}}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">効果</font>
+                <font size="3"><p style="margin: 0;">※必須</p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="effect" name="effect" input_check="must2 length" data-max_length="400" rows="6" cols="45">{{ budget_data.effect | default_if_none:''}}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">操業への影響</font>
+                <font size="3"><p style="margin: 0;"></p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="influence_for_operation" name="influence_for_operation" input_check="length" data-max_length="400" rows="6" cols="45">{{ budget_data.influence_for_operation | default_if_none:''}}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">品質への影響</font>
+                <font size="3"><p style="margin: 0;"></p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="influence_for_quality" name="influence_for_quality" input_check="length" data-max_length="400" rows="6" cols="45">{{ budget_data.influence_for_quality | default_if_none:''}}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">除去資産</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="remove_assets" name="remove_assets" input_check="length" data-max_length="400" rows="6" cols="45">{{ budget_data.remove_assets | default_if_none:''}}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">備考</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="rem" name="rem" input_check="length" data-max_length="400" rows="6" cols="45">{{ budget_data.budget_rem | default_if_none:''}}</textarea></font></div></td>
+            </tr>
+        </table>
+    </div>
+
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            資料データ選択：<input type="file" id="required_specifications" name="required_specifications">
+            {% csrf_token %}
+            <input type="button" value=" 格納 " onclick="file_upload('{{ div_id_name }}');">
+    </form><br>
+<!--FileUploadForm        -->
+<!--UploadFileList        -->
+    <div id="upload_file_list_{{ div_id_name }}"></div>
+<!--UploadFileList        -->
+
+    </div><!--input_check ここまで-->
+
+    <div style="clear: both;"></div>
+
+    </div>
+<!--scroll_budget_div-->
+
+<script>
+/* HTML描画完了後処理 */
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//申請額根拠説明表示処理
+const basis_popup_elements = document.querySelectorAll('[basis_popup_display]');
+basis_popup_elements.forEach(function(element,num){
+    element.addEventListener('focusin', (e) => {
+        $("#mplan_basis_popup_table").css("display", "block");
+    });
+    element.addEventListener('focusout', (e) => {
+        $("#mplan_basis_popup_table").css("display", "none");
+    });
+});
+
+//初期状態設定
+$("#mplan_basis_popup_table").css("display", "none");
+
+//部署を選択したときにユーザー・工程選択の一覧を絞込
+function change_department(department) {
+    //完了を通知するためのDeferredオブジェクトを作成
+    var deferred = new $.Deferred();
+    $.ajax({
+            url: "/isk_tools/fms/action/budget/budget/budget_change_department/",
+            type: "POST",
+            data : {
+                'department': department,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                $('[list=userList]').empty();
+                $('[list=userList]').html(data.user_list);
+                $('[list=processList]').empty();
+                $('[list=processList]').html(data.processmaster_list);
+                $('[list=charge_person_list]').empty();
+                $('[list=charge_person_list]').html(data.charge_person_list);
+
+                //完了を通知
+                deferred.resolve();
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                //失敗を通知
+                deferred.reject();
+
+                $('#select_process').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+
+</script>
+<script>
+
+// 入力項目チェック処理
+function common_input_check( target_id , check_type_list) {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    // チェック範囲のelementを取得
+    let target = document.querySelector('#' + target_id)
+
+    // 入力チェック対象の背景を初期化
+    let elements = target.querySelectorAll('[input_check]');
+    elements.forEach(function(element,num){
+        element.style.backgroundColor = 'white';
+    });
+
+    check_type_list.forEach(function(check_type){
+        if(check_type == 'length'){
+            //文字数上限チェック
+            elements = target.querySelectorAll('[input_check~="length"]');
+            elements.forEach(function(element,num){
+                let max_length = Number(element.dataset.max_length);
+                let check_val_length = count_char(element.value);
+                if ( check_val_length > max_length ){
+                    element.style.backgroundColor = 'silver';
+                    ng_str_count_flag = ng_str_count_flag + 1 ;
+                }
+            });
+        }else if (check_type == 'must1'){
+            //必須入力チェック
+            elements = target.querySelectorAll('[input_check~="must1"]');
+            elements.forEach(function(element,num){
+                let check_val_length = count_char(element.value);
+                if ( check_val_length == 0 ){
+                    element.style.backgroundColor = 'orange';
+                    ng_flag = ng_flag + 1 ;
+                }
+            });
+        }else if (check_type == 'must2'){
+            //必須入力チェック
+            elements = target.querySelectorAll('[input_check~="must2"]');
+            elements.forEach(function(element,num){
+                let check_val_length = count_char(element.value);
+                if ( check_val_length == 0 ){
+                    element.style.backgroundColor = 'orange';
+                    ng_flag = ng_flag + 1 ;
+                }
+            });
+        }
+    });
+
+    return { 1:ng_flag , 2:ng_str_count_flag };
+}
+
+// 画面上の指定id要素以下の入力項目を全て取得する
+function common_get_all_input(target_id) {
+    var text_inputs;
+    let target = document.querySelector("#" + target_id)
+    text_inputs = target.querySelectorAll('input[type=text],textarea,select');
+    return text_inputs;
+}
+
+//入力項目チェック
+function input_check(this_step, next_step, action_cd) {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+
+    // 次工程に進む場合のみmust2必須チェック、一時保存時はmust1チェック、文字列長チェックのみ
+    if( this_step != next_step  ) {
+        var check_type_list = ['length','must1','must2'];
+    }else{
+        var check_type_list = ['length','must1'];
+    }
+
+    var { 1:ng_flag_common , 2:ng_str_count_flag_common } = common_input_check("{{ div_id_name }}_input_check" , check_type_list);
+    ng_flag = ng_flag + ng_flag_common;
+    ng_str_count_flag = ng_str_count_flag + ng_str_count_flag_common;
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_input_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    if( ng_all_flag == 0){
+        //正常時処理
+        budget_mplan_edit(this_step, next_step);
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+//データ登録･更新処理
+function budget_mplan_edit(this_step,next_step) {
+    if ( this_step == next_step ){
+        var next_person = $('#this_user').val();
+        var user_attribute_id = 0;
+    }else{
+        var next_person = "";
+        var user_attribute_id = $('#sel_next_person').val();
+    }
+
+    // 画面上の指定id要素以下のinputを全て取得し、JSON形式でPOSTする
+    let text_inputs = common_get_all_input("{{ div_id_name }}_input_check");
+    var input_value_array = {};
+    text_inputs.forEach(function(element,num){
+        input_value_array[element.id] = element.value;
+    });
+    var input_value_array_json = JSON.stringify(input_value_array);
+
+    $.ajax({
+            url: "/isk_tools/fms/action/budget_mplan_entry/",
+            type: "POST",
+            data : {
+                'this_step' : this_step,
+                'next_step' : next_step,
+                'next_person' : next_person,
+                'user_attribute_id' : user_attribute_id,
+                'next_division' : $('#next_division').val(),
+                'next_department' : $('#next_department').val(),
+                'comment' : $('#comment').val(),
+                'this_division' : $('#user_division_cd').val(),
+                'this_department' : $('#user_department_cd').val(),
+                'input_value_array' : input_value_array_json,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                if (data.entry_success_flag == 1){
+                    var this_budget_id = data.budget_id;
+                    $('#budget_id').val(this_budget_id);
+                    $('#target_budget_id').val(this_budget_id);
+                    $('#target_id').val(this_budget_id);
+                    $('#target_budget_unique_id').val( data.target_unique_budget_id);
+
+                    $('#file_budget_id').val(this_budget_id);
+                    var this_budget_rev_no = data.budget_rev_no
+                    $('#budget_rev_no').val(this_budget_rev_no);
+
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#budget_budget_detail_action_button').empty();//別の場合は、「操作」ボタンを非表示に
+                    }else{
+                        //一時保存した時、物質情報画面を再描画する
+                        budget_spec_handling_material_info(0,'d','');//予算取扱物質詳細情報を表示するJSを起動
+                    }
+
+                    log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                }
+                if($("#action_pb_loading") != null){
+                    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                }
+                // アクションボタン有効化
+                $(".button").prop("disabled", false);
+
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+
+</script>

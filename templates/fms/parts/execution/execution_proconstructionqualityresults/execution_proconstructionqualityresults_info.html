@@ -1,0 +1,251 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+</script>
+<style type="text/css">
+
+/*20201205y-kawauchi フォームレイアウト*/
+dl {
+    height: auto;
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+dt{
+    width: 200px;
+    height: auto;
+    float:left;
+    clear:both;
+    font-weight: normal;
+    font-size: 24px;
+}
+dd{
+    height: 30px;
+    padding: 5px 0px;
+    font-size: 24px;
+}
+dd:nth-child(4n+2) {
+background-color:#dddddd
+}
+
+</style>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+<!--        <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">-->
+<!--        <input type="hidden" id="this_work_id" value="{{ work_lists.work_id }}">-->
+<!--        <input type="hidden" id="this_work_rev_no" value="{{ work_lists.work_rev_no }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_proconstructionqualityresults_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+
+<!--        <div id="{{ action_button_id }}" style="width: auto;"></div>-->
+
+        <div class="scroll_div" style="float: left;">
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">工事完了日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ construction_completion_date }}</font>
+                        {% elif proconstructionqualityresults_data.construction_completion_date == old_proconstructionqualityresults_data.construction_completion_date %}
+                            <font size="5" color="black">{{ construction_completion_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ construction_completion_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">品質検査結果</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ quality_inspection_result }}</font>
+                        {% elif proconstructionqualityresults_data.quality_inspection_result == old_proconstructionqualityresults_data.quality_inspection_result %}
+                            <font size="5" color="black">{{ quality_inspection_result }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ quality_inspection_result }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">生産許可日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ production_permit_date }}</font>
+                        {% elif proconstructionqualityresults_data.production_permit_date == old_proconstructionqualityresults_data.production_permit_date %}
+                            <font size="5" color="black">{{ production_permit_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ production_permit_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">備考</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ memo }}</textarea></font>
+                        {% elif proconstructionqualityresults_data.memo == old_proconstructionqualityresults_data.memo %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ memo }}</textarea></font>
+                        {% else %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:red;" readonly>{{ memo }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% comment %}削除予定
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">提出資料データ</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ submitted_doc }}</font>
+                        {% elif proconstructionqualityresults_data.submitted_doc == old_proconstructionqualityresults_data.submitted_doc %}
+                            <font size="5" color="black">{{ submitted_doc }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ submitted_doc }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% endcomment %}
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">提出資料受領日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ date_of_receipt_of_submitted_materials }}</font>
+                        {% elif proconstructionqualityresults_data.date_of_receipt_of_submitted_materials == old_proconstructionqualityresults_data.date_of_receipt_of_submitted_materials %}
+                            <font size="5" color="black">{{ date_of_receipt_of_submitted_materials }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ date_of_receipt_of_submitted_materials }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">提出書類の備考欄</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ submitted_doc_memo }}</textarea></font>
+                        {% elif proconstructionqualityresults_data.submitted_doc_memo == old_proconstructionqualityresults_data.submitted_doc_memo %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ submitted_doc_memo }}</textarea></font>
+                        {% else %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:red;" readonly>{{ submitted_doc_memo }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">提出書類の内容確認結果</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ check_result }}</font>
+                        {% elif proconstructionqualityresults_data.check_result == old_proconstructionqualityresults_data.check_result %}
+                            <font size="5" color="black">{{ check_result }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ check_result }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% comment %}削除予定
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">竣工届データ</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ completion_notification }}</font>
+                        {% elif proconstructionqualityresults_data.completion_notification == old_proconstructionqualityresults_data.completion_notification %}
+                            <font size="5" color="black">{{ completion_notification }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ completion_notification }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% endcomment %}
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">検収実施日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ acceptance_date }}</font>
+                        {% elif proconstructionqualityresults_data.acceptance_date == old_proconstructionqualityresults_data.acceptance_date %}
+                            <font size="5" color="black">{{ acceptance_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ acceptance_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% comment %}削除予定
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">検収書電子データ</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ receipt }}</font>
+                        {% elif proconstructionqualityresults_data.receipt == old_proconstructionqualityresults_data.receipt %}
+                            <font size="5" color="black">{{ receipt }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ receipt }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% endcomment %}
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">検収書送付日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ receipt_sending_date }}</font>
+                        {% elif proconstructionqualityresults_data.receipt_sending_date == old_proconstructionqualityresults_data.receipt_sending_date %}
+                            <font size="5" color="black">{{ receipt_sending_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ receipt_sending_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% comment %}削除予定
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">請求書電子データ</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionqualityresults_data_num == 0 %}
+                            <font size="5" color="black">{{ invoice }}</font>
+                        {% elif proconstructionqualityresults_data.invoice == old_proconstructionqualityresults_data.invoice %}
+                            <font size="5" color="black">{{ invoice }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ invoice }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+{% endcomment %}
+            </table>
+        <!--UploadFileList        -->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+{% endblock %}

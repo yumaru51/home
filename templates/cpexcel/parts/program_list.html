@@ -1,0 +1,65 @@
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:650px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.id{
+    width:100px;
+}
+.program_name{
+    width:300px;
+}
+.description{
+    width:700px;
+}
+.entry_person{
+    width:100px;
+}
+.entry_date{
+    width:160px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="id">id</th>
+                        <th class="program_name">プログラム名</th>
+                        <th class="description">説明</th>
+                        <th class="entry_person">作成者</th>
+                        <th class="entry_date">作成日時</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for program_lists in program_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            {% if from_page == 1 %}
+                                <a href="#" class="detailpb" onclick="entry_page_open({{ program_lists.id }});">変更</a>
+                            {% elif from_page == 2 %}
+                                <a href="#" class="detailpb" onclick="program_select({{ program_lists.id }});">選択</a>
+                            {% endif %}
+                        </td>
+                        <td class="id">{{ program_lists.id }}</td>
+                        <td class="program_name">{{ program_lists.program_name }}</td>
+                        <td class="description">{{ program_lists.description }}</td>
+                        <td class="entry_person">{{ program_lists.entry_operator }}</td>
+                        <td class="entry_date">{{ program_lists.entry_date }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>

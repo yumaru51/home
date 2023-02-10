@@ -1,0 +1,277 @@
+<script>
+
+//機器リストソース取得
+function equipment_list_change() {
+    $.ajax({
+        url: "/isk_tools/fms/parts/input_select_equipment_list/",
+        type: "POST",
+        data : {
+            'mgt_cls': {{ mgt_class.m_mgt_cls_skey }},
+            'facility' : {{ facility.m_location_skey }},
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#equipment_no').empty();
+            $('#equipment_no').html(data);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('#equipment_no').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+
+}
+
+//入力チェックの実施、対応処理
+function input_check(a,b,d) {
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = 0;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常処理を先に判定
+    if ( ng_all_flag == 0) {
+        equipment_history_report_entry(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+//機器履歴登録処理
+function equipment_history_report_entry(a,b) {
+    var phenomenon_id = $('#target_phenomenon_id').val();
+    if (phenomenon_id == 0){
+        alert("案件データを先に登録(一時保存)してください！！");
+    }else{
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var equipment_history_report_id = $('#equipment_history_report_id').val();
+        var phenomenon_id = $('#target_phenomenon_id').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/report_origin_g_entry/",
+            type: "POST",
+            data: {
+                'this_step': this_step,
+                'next_step': next_step,
+                'next_division': next_division,
+                'next_department': next_department,
+                'next_person': next_person,
+                'this_division': this_division,
+                'this_department': this_department,
+                'user_attribute_id': user_attribute_id,
+                'equipment_history_report_id': equipment_history_report_id,
+                'phenomenon_id': phenomenon_id,
+                'special_note_production': $('#special_note_production').val(),
+                'items_to_be_sent_production': $('#items_to_be_sent_production').val(),
+                'stop_time': $('#stop_time').val(),
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache: false,
+        })
+        .done(function(data){
+            $('#equipment_history_report_id').val(data.equipment_history_report_unique_id);
+            if ( this_step != next_step ){
+                $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+            }
+            if($("#action_pb_loading") != null){
+                $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            }
+            alert(data.msg);
+            $('#report_equipment_list').html(data.equipment_list);
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            if($("#action_pb_loading") != null){
+                $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            }
+            alert('Error!' +textStatus+' ' +errorThrown);
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+        });
+    }
+}
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+}
+
+//画面表示時チェックボックス同期処理
+function report_origin_g_display_open() {
+    var file_folder = $('#report_origin_g_file_folder').val();
+    var div_id_name = $('#report_origin_g_div_id_name').val();
+    var delete_pb_disp_flag = $('#report_origin_g_delete_pb_disp_flag').val();
+    var file_class = $('#report_origin_g_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+    equipment_list_change();
+}
+
+//停止/修理時間説明表示
+const stop_time_input = document.getElementById('stop_time');
+stop_time_input.addEventListener('focusin', (e) => {
+    $("#stop_time_popup_table").css("display", "block");
+});
+stop_time_input.addEventListener('focusout', (e) => {
+    $("#stop_time_popup_table").css("display", "none");
+});
+
+//初期状態設定
+$("#stop_time_popup_table").css("display", "none");
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_maintenance_order_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+
+<body>
+
+<div>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">原課入力</h2>
+    </div>
+    <div>
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="equipment_history_report_id" value="{{ equipment_history_report_data.id }}">
+    </div>
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div class="scroll_equipment_history_report_div" style="float: left;">
+        <div style="float: left;">
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ mgt_class.mgt_cls_nm_1 }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">工場名</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ facility.location_nm_1 }}</font></div></td>
+                </tr>
+            </table>
+            <font size="4">機器一覧：</font>
+            <div id="report_equipment_list" name="equipment_list">
+                {{ equipment_list | safe }}
+            </div>
+            <br>
+        </div>
+
+        <div style="float: left;" size="5px">　</div>
+        <div style="float: left;"><br>
+            <div><font size="4">特記：　</font></div>
+            <div><font size="3"><textarea id="special_note_production" name="special_note_production" rows="8" cols="45">{{ equipment_history_report_data.special_note_production | default_if_none:"" }}</textarea></font></div>
+
+            <div><font size="4">申送事項：　</font></div>
+            <div><font size="3"><textarea id="items_to_be_sent_production" name="items_to_be_sent_production" rows="8" cols="45">{{ equipment_history_report_data.items_to_be_sent_production | default_if_none:"" }}</textarea></font></div>
+            <div>
+                <table>
+                    <tr>
+                        <td><div><font size="4">停止時間(h)</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <input type="text" id="stop_time" name="stop_time" value="{{ equipment_history_report_data.stop_time | default_if_none:'' }}">
+                        </font></div></td>
+                    </tr>
+                </table>
+            </div>
+            <div id="stop_time_popup_table" >
+                <font size="5">停止/修理時間説明：</font>
+                <table border="1" style="border-collapse: collapse; border-color: black">
+                    <tr><td></td><td></td></tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4" color="red">
+                            停止時間
+                        </font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4" color="red">
+                            重故障時に記載、減損時間のこと。
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">
+                            修理時間
+                        </font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">
+                            ライン内作業時間のこと。
+                        </font></div></td>
+                    </tr>
+                    <tr><td></td><td></td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    </div><!--ng_character_checkここまで-->
+
+    <div style="float: left;" size="5px">　</div>
+    <div style="float: left;">
+        <form id="report_origin_g_file_upload_form" name="file_upload_form" action="/isk_tools/fms/action/file_upload_other_type/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group"><font size="4">
+                    資料データ選択　　　　　　　：　<input type="file" id="report_origin_g_attachment_file" name="file"/>
+                <input type="hidden" id="report_origin_g_file_target" name="file_target" value="FailureCorrespondence">
+                <input type="hidden" id="report_origin_g_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_data.phenomenon_id }}\">
+                <input type="hidden" id="report_origin_g_div_id_name" name="div_id_name" value="report_origin_g">
+                <input type="hidden" id="report_origin_g_delete_pb_disp_flag" name="delete_pb_disp_flag" value="1">
+                <input type="hidden" id="report_origin_g_check_item" name="check_item" value="{{ phenomenon_data.phenomenon_id }}">
+                <input type="hidden" id="report_origin_g_file_first_layer_id" name="file_first_layer_id" value="{{ phenomenon_data.phenomenon_id }}">
+                <input type="hidden" id="report_origin_g_file_second_layer_id" name="file_second_layer_id" value="">
+                <input type="hidden" id="report_origin_g_file_class" name="file_class" value="Evaluation_Origin">
+                <input type="button" class="button" value="送信" onclick="file_upload_other_type('report_origin_g');">
+            </font></div>
+        </form>
+        <div id="upload_file_list_report_origin_g">添付ファイル無し</div>
+    </div>
+</div>
+
+
+</body>

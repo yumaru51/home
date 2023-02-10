@@ -1,0 +1,518 @@
+<script>
+function cs_action_button_empty() {
+$('#cs_action_button').empty();
+}
+
+// チェックボックスの状態同期
+function cs_sh_check_box_change(){
+    if($('#fire_service_app').val() == "True")
+    {
+        document.getElementById("sel_fire_service_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_app").checked = 0;
+    }
+    if($('#fire_service_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_service_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_ntfc").checked = 0;
+    }
+    if($('#fire_service_quantity_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_service_quantity_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_quantity_ntfc").checked = 0;
+    }
+    if($('#fire_service_acetylene_gas_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_service_acetylene_gas_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_acetylene_gas_ntfc").checked = 0;
+    }
+    if($('#fire_service_tentative_app').val() == "True")
+    {
+        document.getElementById("sel_fire_service_tentative_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_service_tentative_app").checked = 0;
+    }
+    if($('#fire_prevent_storage_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_storage_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_storage_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_equip_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_commencement_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_commencement_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_commencement_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_construction_plan').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_construction_plan").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_construction_plan").checked = 0;
+    }
+    if($('#fire_prevent_installation_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_installation_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_installation_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_hazardous_work_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_hazardous_work_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_hazardous_work_ntfc").checked = 0;
+    }
+    if($('#fire_prevent_fires_smoke_ntfc').val() == "True")
+    {
+        document.getElementById("sel_fire_prevent_fires_smoke_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_fire_prevent_fires_smoke_ntfc").checked = 0;
+    }
+    if($('#deleterious_substances_list_app').val() == "True")
+    {
+        document.getElementById("sel_deleterious_substances_list_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_deleterious_substances_list_app").checked = 0;
+    }
+    if($('#deleterious_substances_ntfc').val() == "True")
+    {
+        document.getElementById("sel_deleterious_substances_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_deleterious_substances_ntfc").checked = 0;
+    }
+    if($('#press_gas_app').val() == "True")
+    {
+        document.getElementById("sel_press_gas_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_app").checked = 0;
+    }
+    if($('#press_gas_lpg_app').val() == "True")
+    {
+        document.getElementById("sel_press_gas_lpg_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_lpg_app").checked = 0;
+    }
+    if($('#press_gas_frozen_gas_app').val() == "True")
+    {
+        document.getElementById("sel_press_gas_frozen_gas_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_frozen_gas_app").checked = 0;
+    }
+    if($('#press_gas_ntfc').val() == "True")
+    {
+        document.getElementById("sel_press_gas_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_ntfc").checked = 0;
+    }
+    if($('#press_gas_lpg_ntfc').val() == "True")
+    {
+        document.getElementById("sel_press_gas_lpg_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_lpg_ntfc").checked = 0;
+    }
+    if($('#press_gas_frozen_gas_ntfc').val() == "True")
+    {
+        document.getElementById("sel_press_gas_frozen_gas_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_frozen_gas_ntfc").checked = 0;
+    }
+    if($('#press_gas_consumption_ntfc').val() == "True")
+    {
+        document.getElementById("sel_press_gas_consumption_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_press_gas_consumption_ntfc").checked = 0;
+    }
+    if($('#safety_health_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_safety_health_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_equip_ntfc").checked = 0;
+    }
+    if($('#safety_health_deleterious_ntfc').val() == "True")
+    {
+        document.getElementById("sel_safety_health_deleterious_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_deleterious_ntfc").checked = 0;
+    }
+    if($('#safety_health_asbestos').val() == "True")
+    {
+        document.getElementById("sel_safety_health_asbestos").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_asbestos").checked = 0;
+    }
+    if($('#safety_health_specified_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_safety_health_specified_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_specified_equip_ntfc").checked = 0;
+    }
+    if($('#safety_health_installation_report').val() == "True")
+    {
+        document.getElementById("sel_safety_health_installation_report").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_safety_health_installation_report").checked = 0;
+    }
+    if($('#radiation_hazards_app').val() == "True")
+    {
+        document.getElementById("sel_radiation_hazards_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_radiation_hazards_app").checked = 0;
+    }
+    if($('#petroleum_complexes_act').val() == "True")
+    {
+        document.getElementById("sel_petroleum_complexes_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_petroleum_complexes_act").checked = 0;
+    }
+
+}
+//データ登録･更新処理（edit側と同じ関数を用意するためのダミーで即完了する）
+function cs_sh_edit(a,b) {  // a:自工程id, b:次工程id
+    var deferred = new $.Deferred();
+    deferred.resolve();
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+</script>
+
+<style type="text/css">
+    input[type=checkbox] {
+        width: 20px;
+        height: 20px;
+    }
+</style>
+
+    <div class="fms_col" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="cs_no" value="{{ cs_no }}">
+<!--    <input type="hidden" id="target_budget_id" value="{{ budget_id }}">-->
+<!--    <input type="hidden" id="work_id" value="{{ work_id }}">-->
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="cs_rev_no" value="{{cs_rev_no}}">
+    <input type="hidden" id="fire_service_app" value="{{ fire_service_app }}">
+    <input type="hidden" id="fire_service_ntfc" value="{{ fire_service_ntfc }}">
+    <input type="hidden" id="fire_service_quantity_ntfc" value="{{ fire_service_quantity_ntfc }}">
+    <input type="hidden" id="fire_service_acetylene_gas_ntfc" value="{{ fire_service_acetylene_gas_ntfc }}">
+    <input type="hidden" id="fire_service_tentative_app" value="{{ fire_service_tentative_app }}">
+    <input type="hidden" id="fire_prevent_storage_ntfc" value="{{ fire_prevent_storage_ntfc }}">
+    <input type="hidden" id="fire_prevent_equip_ntfc" value="{{ fire_prevent_equip_ntfc }}">
+    <input type="hidden" id="fire_prevent_commencement_ntfc" value="{{ fire_prevent_commencement_ntfc }}">
+    <input type="hidden" id="fire_prevent_construction_plan" value="{{ fire_prevent_construction_plan }}">
+    <input type="hidden" id="fire_prevent_installation_ntfc" value="{{ fire_prevent_installation_ntfc }}">
+    <input type="hidden" id="fire_prevent_hazardous_work_ntfc" value="{{ fire_prevent_hazardous_work_ntfc }}">
+    <input type="hidden" id="fire_prevent_fires_smoke_ntfc" value="{{ fire_prevent_fires_smoke_ntfc }}">
+    <input type="hidden" id="deleterious_substances_list_app" value="{{ deleterious_substances_list_app }}">
+    <input type="hidden" id="deleterious_substances_ntfc" value="{{ deleterious_substances_ntfc }}">
+    <input type="hidden" id="press_gas_app" value="{{ press_gas_app }}">
+    <input type="hidden" id="press_gas_lpg_app" value="{{ press_gas_lpg_app }}">
+    <input type="hidden" id="press_gas_frozen_gas_app" value="{{ press_gas_frozen_gas_app }}">
+    <input type="hidden" id="press_gas_ntfc" value="{{ press_gas_ntfc }}">
+    <input type="hidden" id="press_gas_lpg_ntfc" value="{{ press_gas_lpg_ntfc }}">
+    <input type="hidden" id="press_gas_frozen_gas_ntfc" value="{{ press_gas_frozen_gas_ntfc }}">
+    <input type="hidden" id="press_gas_consumption_ntfc" value="{{ press_gas_consumption_ntfc }}">
+    <input type="hidden" id="safety_health_equip_ntfc" value="{{ safety_health_equip_ntfc }}">
+    <input type="hidden" id="safety_health_deleterious_ntfc" value="{{ safety_health_deleterious_ntfc }}">
+    <input type="hidden" id="safety_health_asbestos" value="{{ safety_health_asbestos }}">
+    <input type="hidden" id="safety_health_specified_equip_ntfc" value="{{ safety_health_specified_equip_ntfc }}">
+    <input type="hidden" id="safety_health_installation_report" value="{{ safety_health_installation_report }}">
+    <input type="hidden" id="radiation_hazards_app" value="{{ radiation_hazards_app }}">
+    <input type="hidden" id="petroleum_complexes_act" value="{{ petroleum_complexes_act }}">
+    <input type="hidden" id="sh_edit_flag" value="{{sh_edit_flag}}">
+    </div>
+    <div style="float:left;">
+        <table class=cs_safety_health_edit_table">
+            <tr>
+                <th><div><font size="6" style="line-height:130%">消防法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_app" value="1" onclick='return false;'>危険物</label></font>
+                    <font size="5"><label for="sel_fire_service_app" id="sel_fire_service_app_1">{{ fire_service_app_place }}</label></font>
+                    <font size="5"><label for="sel_fire_service_app" id="sel_fire_service_app_2">{{ fire_service_app_action }}</label></font>
+                <font size="5"><label for="sel_fire_service_app" id="sel_fire_service_app_3">承認申請</label></font></div></td>
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_ntfc" value="1" onclick='return false;'>危険物</label></font>
+                    <font size="5"><label for="sel_fire_service_ntfc">{{ fire_service_ntfc_place }}</label></font>
+                    <font size="5"><label for="sel_fire_service_ntfc">{{ fire_service_ntfc_amendment }}</label></font>
+                    <font size="5"><label for="sel_fire_service_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_quantity_ntfc" value="1" onclick='return false;'>危険物</label></font>
+                    <font size="5"><label for="sel_fire_service_quantity_ntfc">{{ fire_service_quantity_ntfc_place }}</label></font>
+                    <font size="5"><label for="sel_fire_service_quantity_ntfc">品名数量倍数変更届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_acetylene_gas_ntfc" value="1" onclick='return false;'>圧縮アセチレンガス等貯蔵取扱</label></font>
+                    <font size="5"><label for="sel_fire_service_acetylene_gas_ntfc">{{ fire_service_acetylene_gas_ntfc_amendment }}</label></font>
+                    <font size="5"><label for="sel_fire_service_acetylene_gas_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_service_tentative_app" value="1" onclick='return false;'>危険物仮</label></font>
+                    <font size="5"><label for="sel_fire_service_tentative_app">{{ fire_service_tentative_app_action }}</label></font>
+                    <font size="5"><label for="sel_fire_service_tentative_app">承認申請</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">市火災予防条例</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_fire_prevent_storage_ntfc" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_fire_prevent_storage_ntfc">{{ fire_prevent_storage_ntfc_category }}</label></font>
+                    <font size="5"><label for="sel_fire_prevent_storage_ntfc">貯蔵取扱</label></font>
+                    <font size="5"><label for="sel_fire_prevent_storage_ntfc">{{ fire_prevent_storage_ntfc_amendment }}</label></font>
+                    <font size="5"><label for="sel_fire_prevent_storage_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_fire_prevent_equip_ntfc" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_fire_prevent_equip_ntfc">{{ fire_prevent_equip_ntfc_category }}</label></font>
+                    <font size="5"><label for="sel_fire_prevent_equip_ntfc">設置届</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_prevent_commencement_ntfc" value="1" onclick='return false;'>防火対象物　使用開始届</label></font></div></td>
+                <td><div><font size="5">・・・7日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_prevent_construction_plan" value="1" onclick='return false;'>消防用設備等　工事計画書</label></font></div></td>
+                <td><div><font size="5">・・・建築申請と同時</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_prevent_installation_ntfc" value="1" onclick='return false;'>消防用設備等　設置届</label></font></div></td>
+                <td><div><font size="5">・・・7日以内(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_fire_prevent_hazardous_work_ntfc" value="1" onclick='return false;'>危険作業　開始届</label></font></div></td>
+                <td><div><font size="5">・・・3日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_fire_prevent_fires_smoke_ntfc" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_fire_prevent_fires_smoke_ntfc">火災と紛らわしい煙</label></font><br/>
+                    <font size="5"><label for="sel_fire_prevent_fires_smoke_ntfc">　又は火災を発するおそれのある行為</label></font>
+                    <font size="5"><label for="sel_fire_prevent_fires_smoke_ntfc">届出書</label></font></div>
+                </td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">劇毒物取締法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_deleterious_substances_list_app" value="1" onclick='return false;'>劇毒物製造業品目登録 申請</label></font></div></td>
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_deleterious_substances_ntfc" value="1" onclick='return false;'>劇毒物</label></font>
+                    <font size="5"><label for="sel_deleterious_substances_ntfc">{{ deleterious_substances_ntfc_purpose }}</label></font>
+                    <font size="5"><label for="sel_deleterious_substances_ntfc">変更届</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">高圧ガス保安法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_app" value="1" onclick='return false;'>特定高圧ガス設備</label></font>
+                    <font size="5"><label for="sel_deleterious_substances_ntfc">{{ press_gas_app_motive }}</label></font>
+                    <font size="5"><label for="sel_press_gas_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_lpg_app" value="1" onclick='return false;'>液化石油高圧ガス設備</label></font>
+                    <font size="5"><label for="sel_press_gas_lpg_app">{{ press_gas_lpg_app_motive }}</label></font>
+                    <font size="5"><label for="sel_press_gas_lpg_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_frozen_gas_app" value="1" onclick='return false;'>冷凍高圧ガス設備</label></font>
+                    <font size="5"><label for="sel_press_gas_frozen_gas_app">{{ press_gas_frozen_gas_app_motive }}</label></font>
+                    <font size="5"><label for="sel_press_gas_frozen_gas_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_ntfc" value="1" onclick='return false;'>特定高圧ガス設備</label></font>
+                    <font size="5"><label for="sel_press_gas_ntfc">{{ press_gas_ntfc_amendment }}</label></font>
+                    <font size="5"><label for="sel_press_gas_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・遅滞なく</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_lpg_ntfc" value="1" onclick='return false;'>液化石油高圧ガス設備</label></font>
+                    <font size="5"><label for="sel_press_gas_lpg_ntfc">{{ press_gas_lpg_ntfc_amendment }}</label></font>
+                    <font size="5"><label for="sel_press_gas_lpg_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・遅滞なく</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_frozen_gas_ntfc" value="1" onclick='return false;'>冷凍高圧ガス設備</label></font>
+                    <font size="5"><label for="sel_press_gas_frozen_gas_ntfc">{{ press_gas_frozen_gas_ntfc_amendment }}</label></font>
+                    <font size="5"><label for="sel_press_gas_frozen_gas_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・遅滞なく</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_press_gas_consumption_ntfc" value="1" onclick='return false;'>特定高圧ガス消費設備</label></font>
+                    <font size="5"><label for="sel_press_gas_consumption_ntfc">{{ press_gas_consumption_ntfc_amendment }}</label></font>
+                    <font size="5"><label for="sel_press_gas_consumption_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・20日前</font></div></td>
+            </tr>
+        </table>
+    </div>
+    <div style="float:left;width:30px;" >　　</div>
+    <div style="float:left;" >
+        <table>
+            <tr>
+                <th><div><font size="6" style="line-height:130%">労働安全衛生法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_safety_health_equip_ntfc" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_safety_health_equip_ntfc">{{ safety_health_equip_ntfc_category }}</label></font>
+                    <font size="5"><label for="sel_safety_health_equip_ntfc">{{ safety_health_equip_ntfc_motive }}</label></font>
+                    <font size="5"><label for="sel_safety_health_equip_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_safety_health_deleterious_ntfc" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_safety_health_deleterious_ntfc">{{ safety_health_deleterious_ntfc_category }}</label></font>
+                    <font size="5"><label for="sel_safety_health_deleterious_ntfc">{{ safety_health_deleterious_ntfc_motive }}</label></font>
+                    <font size="5"><label for="sel_safety_health_deleterious_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_safety_health_asbestos" value="1" onclick='return false;'>石綿障害予防規則</label></font></div></td>
+                <td><div><font size="5">・・・14日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_safety_health_specified_equip_ntfc" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_safety_health_specified_equip_ntfc">{{ safety_health_specified_equip_ntfc_category }}</label></font>
+                    <font size="5"><label for="sel_safety_health_specified_equip_ntfc">{{ safety_health_specified_equip_ntfc_motive }}</label></font>
+                    <font size="5"><label for="sel_safety_health_specified_equip_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_safety_health_installation_report" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_safety_health_installation_report">{{ safety_health_installation_report_category }}</label></font>
+                    <font size="5"><label for="sel_safety_health_installation_report">設置報告</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">放射線障害防止法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_radiation_hazards_app" value="1" onclick='return false;'>放射性同位元素</label></font>
+                    <font size="5"><label for="sel_radiation_hazards_app">{{ radiation_hazards_app_motive }}</label></font>
+                    <font size="5"><label for="sel_radiation_hazards_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">石災法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_petroleum_complexes_act" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_petroleum_complexes_act">特定防災施設等設置計画書・</label></font><br/>
+                    <font size="5"><label for="sel_petroleum_complexes_act">　消防車用屋外給水施設設置届出書</label></font></div>
+                </td>
+                <td><div><font size="5">・・・あらかじめ・事後</font></div></td>
+            </tr>
+
+        </table>
+    </div>
+    <div style="clear: both;"></div>

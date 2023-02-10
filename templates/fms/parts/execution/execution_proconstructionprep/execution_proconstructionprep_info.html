@@ -1,0 +1,170 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+</script>
+<style type="text/css">
+
+/*20201205y-kawauchi フォームレイアウト*/
+dl {
+    height: auto;
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+dt{
+    width: 200px;
+    height: auto;
+    float:left;
+    clear:both;
+    font-weight: normal;
+    font-size: 24px;
+}
+dd{
+    height: 30px;
+    padding: 5px 0px;
+    font-size: 24px;
+}
+dd:nth-child(4n+2) {
+background-color:#dddddd
+}
+
+</style>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+<!--        <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">-->
+<!--        <input type="hidden" id="this_work_id" value="{{ work_lists.work_id }}">-->
+<!--        <input type="hidden" id="this_work_rev_no" value="{{ work_lists.work_rev_no }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_proconstructionprep_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+
+<!--        <div id="{{ action_button_id }}" style="width: auto;"></div>-->
+
+        <div class="scroll_div" style="float: left;">
+
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">引渡準備期間</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionprep_data_num == 0 %}
+                            <font size="5" color="black">{{ delivery_prep_period_from }}　～　{{ delivery_prep_period_to }}</font>
+                        {% elif proconstructionprep_data.delivery_prep_period_from == old_proconstructionprep_data.delivery_prep_period_from and proconstructionprep_data.delivery_prep_period_to == old_proconstructionprep_data.delivery_prep_period_to %}
+                            <font size="5" color="black">{{ delivery_prep_period_from }}　～　{{ delivery_prep_period_to }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ delivery_prep_period_from }}　～　{{ delivery_prep_period_to }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">準備内容</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionprep_data_num == 0 %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ prep_contents }}</textarea></font>
+                        {% elif proconstructionprep_data.prep_contents == old_proconstructionprep_data.prep_contents %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ prep_contents }}</textarea></font>
+                        {% else %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:red;" readonly>{{ prep_contents }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">準備結果</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionprep_data_num == 0 %}
+                            <font size="5" color="black">{{ prep_result }}</font>
+                        {% elif proconstructionprep_data.prep_result == old_proconstructionprep_data.prep_result %}
+                            <font size="5" color="black">{{ prep_result }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ prep_result }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">実施部署</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionprep_data_num == 0 %}
+                            <font size="5" color="black">{{ implementation_department_name }}</font>
+                        {% elif proconstructionprep_data.implementation_department == old_proconstructionprep_data.implementation_department %}
+                            <font size="5" color="black">{{ implementation_department_name }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ implementation_department_name }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">実施部署責任者</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionprep_data_num == 0 %}
+                            <font size="5" color="black">{{ execution_department_manager_name }}</font>
+                        {% elif proconstructionprep_data.execution_department_manager == old_proconstructionprep_data.execution_department_manager %}
+                            <font size="5" color="black">{{ execution_department_manager_name }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ execution_department_manager_name }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">備考</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionprep_data_num == 0 %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ memo }}</textarea></font>
+                        {% elif proconstructionprep_data.memo == old_proconstructionprep_data.memo %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ memo }}</textarea></font>
+                        {% else %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:red;" readonly>{{ memo }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">引渡準備完了日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionprep_data_num == 0 %}
+                            <font size="5" color="black">{{ delivery_prep_completion_date }}</font>
+                        {% elif proconstructionprep_data.delivery_prep_completion_date == old_proconstructionprep_data.delivery_prep_completion_date %}
+                            <font size="5" color="black">{{ delivery_prep_completion_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ delivery_prep_completion_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">必要手続き</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proconstructionprep_data_num == 0 %}
+                            <font size="5" color="black">{{ required_procedure }}</font>
+                        {% elif proconstructionprep_data.required_procedure == old_proconstructionprep_data.required_procedure %}
+                            <font size="5" color="black">{{ required_procedure }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ required_procedure }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+{% endblock %}

@@ -1,0 +1,775 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+{% load humanize %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+
+//画面表示時に値引き率計算
+function calc_discount_rate_at_open() {
+    for (let i = 1; i < 6; i++) {
+        calc_discount_rate(String(i));
+    }
+}
+
+// 値引き率計算処理
+function calc_discount_rate(vendor_no_str){
+    // ベンダーごとのIDに変換
+    var price_id = '#last_estimated_amount' + vendor_no_str;
+    var discount_id = '#last_estimated_discount' + vendor_no_str;
+    var discount_rate_id = '#discount_rate_' + vendor_no_str;
+    var nego_id = '#estimated_amount_af_nego' + vendor_no_str;
+    var nego_rate_id = '#nego_discount_rate_' + vendor_no_str;
+
+    // 入力値取得
+    var price_str = $(price_id).val();
+    var discount_str = $(discount_id).val();
+    var nego_str = $(nego_id).val();
+
+    // いったん値引き率をクリア
+    $(discount_rate_id).val("");
+    $(nego_rate_id).val("");
+
+    // 値引き率計算
+    if(price_str != ""){
+        let price = Number(price_str.replace(/,/g, ""))
+
+        if(discount_str != ""){
+            let discount = Number(discount_str.replace(/,/g, ""))
+            if( price != 0 ){
+                let discount_rate = (discount / (price + discount)) * 100;
+                let discount_rate_str =  discount_rate.toFixed(1) + '%';
+                $(discount_rate_id).val(discount_rate_str);
+            }
+        }
+
+        if(nego_str != ""){
+            let nego = Number(nego_str.replace(/,/g, ""))
+            if( price != 0 && nego != 0 && price >= nego ){
+                let nego_rate = ((price - nego) / price) * 100;
+                let nego_rate_str =  nego_rate.toFixed(1) + '%';
+                $(nego_rate_id).val(nego_rate_str);
+            }
+        }
+    }
+}
+
+</script>
+<style type="text/css">
+.proestimate_data_div{
+    overflow-x: scroll;
+    width: 1000px;
+    padding: 0px 0px;
+    margin: 0;
+}
+.proestimate_data_div table{
+    width: 150%;
+    margin: 0;
+    border: 1px solid #999;
+    border-spacing: 1;
+    padding: 0px 0px;
+}
+.proestimate_data_div td{
+    width: 100px;
+    white-space: nowrap;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-spacing: 1;
+    background: #FFF;
+    padding: auto;
+    vertical-align: middle;
+}
+.proestimate_data_div th{
+    width: 100px;
+    white-space: nowrap;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-spacing: 1;
+    color: #000;
+    background: #f2f2f2;
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: auto;
+    vertical-align: middle;
+}
+.proestimate_data_div tr:first-child{
+    border-top: 1px solid #999;
+    top: 0;
+    left: 0;
+}
+.proestimate_data_div th:first-child{
+    border-left: 1px solid #999;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+.proestimate_data_div input[type=checkbox] {
+	transform: scale(2);
+	z-index: -10;
+    margin: 10px;
+}
+</style>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main"></div>
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_proestimates_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+    </div>
+
+    <div style="width: auto;">
+        <table>
+            <tr>
+                <td><div><font size="4">最終金額評価：</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4"><textarea id="eva_final_price_e" name="eva_final_price" rows="5" cols="30" readonly
+                {% if old_provendorevaluation_data_num != 0 and provendorevaluation_data.eva_final_price != old_provendorevaluation_data.eva_final_price %}
+                    style="color:red;"
+                {% endif %}
+                >{{ provendorevaluation_data.eva_final_price|default_if_none:'' }}</textarea></font></div></td>
+            </tr>
+        </table>
+    </div>
+
+<div class="proestimate_data_div">
+    <font size="4">
+    <table>
+        <tr>
+            <th><font size="4">候補業者一覧</font></th>
+            <th><font size="4">候補業者１</font></th>
+            <th><font size="4">候補業者２</font></th>
+            <th><font size="4">候補業者３</font></th>
+            <th><font size="4">候補業者４</font></th>
+            <th><font size="4">候補業者５</font></th>
+        </tr>
+        <tr>
+            <th><font size="4">決定</font></th>
+            <td>
+                <div><font size="5"><input type="checkbox" name="decision" {% if decision_flag == 1 %} checked="checked" {% endif %} onclick='return false;'></font></div>
+            </td>
+            <td>
+                <div><font size="5"><input type="checkbox" name="decision" {% if decision_flag == 2 %} checked="checked" {% endif %} onclick='return false;'></font></div>
+            </td>
+            <td>
+                <div><font size="5"><input type="checkbox" name="decision" {% if decision_flag == 3 %} checked="checked" {% endif %} onclick='return false;'></font></div>
+            </td>
+            <td>
+                <div><font size="5"><input type="checkbox" name="decision" {% if decision_flag == 4 %} checked="checked" {% endif %} onclick='return false;'></font></div>
+            </td>
+            <td>
+                <div><font size="5"><input type="checkbox" name="decision" {% if decision_flag == 5 %} checked="checked" {% endif %} onclick='return false;'></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">候補業者名</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.candidate_vendor1 != old_proestimates_data.candidate_vendor1 %} color="red" {% endif %}>
+                {{ proestimates_data.candidate_vendor1|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.candidate_vendor2 != old_proestimates_data.candidate_vendor2 %} color="red" {% endif %}>
+                {{ proestimates_data.candidate_vendor2|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.candidate_vendor3 != old_proestimates_data.candidate_vendor3 %} color="red" {% endif %}>
+                {{ proestimates_data.candidate_vendor3|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.candidate_vendor4 != old_proestimates_data.candidate_vendor4 %} color="red" {% endif %}>
+                {{ proestimates_data.candidate_vendor4|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.candidate_vendor5 != old_proestimates_data.candidate_vendor5 %} color="red" {% endif %}>
+                {{ proestimates_data.candidate_vendor5|default_if_none:'' }}</font>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">メーカー名</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.maker_name1 != old_proestimates_data.maker_name1 %} color="red" {% endif %}>
+                {{ proestimates_data.maker_name1|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.maker_name2 != old_proestimates_data.maker_name2 %} color="red" {% endif %}>
+                {{ proestimates_data.maker_name2|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.maker_name3 != old_proestimates_data.maker_name3 %} color="red" {% endif %}>
+                {{ proestimates_data.maker_name3|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.maker_name4 != old_proestimates_data.maker_name4 %} color="red" {% endif %}>
+                {{ proestimates_data.maker_name4|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.maker_name5 != old_proestimates_data.maker_name5 %} color="red" {% endif %}>
+                {{ proestimates_data.maker_name5|default_if_none:'' }}</font>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">見積依頼日</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.quotation_req_date1 != old_proestimates_data.quotation_req_date1 %} color="red" {% endif %}>
+                {{ proestimates_data.quotation_req_date1|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.quotation_req_date2 != old_proestimates_data.quotation_req_date2 %} color="red" {% endif %}>
+                {{ proestimates_data.quotation_req_date2|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.quotation_req_date3 != old_proestimates_data.quotation_req_date3 %} color="red" {% endif %}>
+                {{ proestimates_data.quotation_req_date3|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.quotation_req_date4 != old_proestimates_data.quotation_req_date4 %} color="red" {% endif %}>
+                {{ proestimates_data.quotation_req_date4|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.quotation_req_date5 != old_proestimates_data.quotation_req_date5 %} color="red" {% endif %}>
+                {{ proestimates_data.quotation_req_date5|default_if_none:'' }}</font>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">見積回答期日</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.estimated_reply_date1 != old_proestimates_data.estimated_reply_date1 %} color="red" {% endif %}>
+                {{ proestimates_data.estimated_reply_date1|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.estimated_reply_date2 != old_proestimates_data.estimated_reply_date2 %} color="red" {% endif %}>
+                {{ proestimates_data.estimated_reply_date2|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.estimated_reply_date3 != old_proestimates_data.estimated_reply_date3 %} color="red" {% endif %}>
+                {{ proestimates_data.estimated_reply_date3|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.estimated_reply_date4 != old_proestimates_data.estimated_reply_date4 %} color="red" {% endif %}>
+                {{ proestimates_data.estimated_reply_date4|default_if_none:'' }}</font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                <font size="5" {% if old_proestimates_data_num != 0 and proestimates_data.estimated_reply_date5 != old_proestimates_data.estimated_reply_date5 %} color="red" {% endif %}>
+                {{ proestimates_data.estimated_reply_date5|default_if_none:'' }}</font>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">本見積額</font></th>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount1" size="14"
+                           value="{{ proestimates_data.last_estimated_amount1|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_amount1 != old_proestimates_data.last_estimated_amount1 %} color="red" {% endif %}>
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount2" size="14"
+                           value="{{ proestimates_data.last_estimated_amount2|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_amount2 != old_proestimates_data.last_estimated_amount2 %} color="red" {% endif %}>
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount3" size="14"
+                           value="{{ proestimates_data.last_estimated_amount3|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_amount3 != old_proestimates_data.last_estimated_amount3 %} color="red" {% endif %}>
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount4" size="14"
+                           value="{{ proestimates_data.last_estimated_amount4|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_amount4 != old_proestimates_data.last_estimated_amount4 %} color="red" {% endif %}>
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount5" size="14"
+                           value="{{ proestimates_data.last_estimated_amount5|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_amount5 != old_proestimates_data.last_estimated_amount5 %} color="red" {% endif %}>
+                </font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">出精値引額</font></th>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount1" size="14"
+                           value="{{ proestimates_data.last_estimated_discount1|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_discount1 != old_proestimates_data.last_estimated_discount1 %} color="red" {% endif %}>
+                <input type="text" id="discount_rate_1" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount2" size="14"
+                           value="{{ proestimates_data.last_estimated_discount2|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_discount2 != old_proestimates_data.last_estimated_discount2 %} color="red" {% endif %}>
+                <input type="text" id="discount_rate_2" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount3" size="14"
+                           value="{{ proestimates_data.last_estimated_discount3|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_discount3 != old_proestimates_data.last_estimated_discount3 %} color="red" {% endif %}>
+                <input type="text" id="discount_rate_3" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount4" size="14"
+                           value="{{ proestimates_data.last_estimated_discount4|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_discount4 != old_proestimates_data.last_estimated_discount4 %} color="red" {% endif %}>
+                <input type="text" id="discount_rate_4" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount5" size="14"
+                           value="{{ proestimates_data.last_estimated_discount5|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.last_estimated_discount5 != old_proestimates_data.last_estimated_discount5 %} color="red" {% endif %}>
+                <input type="text" id="discount_rate_5" size="4" value="" readonly></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">交渉後見積額</font></th>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego1" size="14"
+                           value="{{ proestimates_data.estimated_amount_af_nego1|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.estimated_amount_af_nego1 != old_proestimates_data.estimated_amount_af_nego1 %} color="red" {% endif %}>
+                <input type="text" id="nego_discount_rate_1" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego2" size="14"
+                           value="{{ proestimates_data.estimated_amount_af_nego2|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.estimated_amount_af_nego2 != old_proestimates_data.estimated_amount_af_nego2 %} color="red" {% endif %}>
+                <input type="text" id="nego_discount_rate_2" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego3" size="14"
+                           value="{{ proestimates_data.estimated_amount_af_nego3|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.estimated_amount_af_nego3 != old_proestimates_data.estimated_amount_af_nego3 %} color="red" {% endif %}>
+                <input type="text" id="nego_discount_rate_3" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego4" size="14"
+                           value="{{ proestimates_data.estimated_amount_af_nego4|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.estimated_amount_af_nego4 != old_proestimates_data.estimated_amount_af_nego4 %} color="red" {% endif %}>
+                <input type="text" id="nego_discount_rate_4" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4">
+                    <input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego5" size="14"
+                           value="{{ proestimates_data.estimated_amount_af_nego5|default_if_none:''|intcomma  }}" readonly
+                           {% if old_proestimates_data_num != 0 and proestimates_data.estimated_amount_af_nego5 != old_proestimates_data.estimated_amount_af_nego5 %} color="red" {% endif %}>
+                <input type="text" id="nego_discount_rate_5" size="4" value="" readonly></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th style="height: 35px;"><font size="5" >評価</font></th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th><font size="4">工期/納期</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_delivery_date1 != old_proestimates_data.eva_delivery_date1 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_delivery_date1|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_delivery_date2 != old_proestimates_data.eva_delivery_date2 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_delivery_date2|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_delivery_date3 != old_proestimates_data.eva_delivery_date3 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_delivery_date3|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and  eva_delivery_date4.eva_delivery_date1 != old_proestimates_data.eva_delivery_date1 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_delivery_date4|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_delivery_date5 != old_proestimates_data.eva_delivery_date5 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_delivery_date5|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">見積査定額</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_assessment_price1 != old_proestimates_data.eva_estimated_assessment_price1 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_assessment_price1|default_if_none:''|intcomma }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_assessment_price2 != old_proestimates_data.eva_estimated_assessment_price2 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_assessment_price2|default_if_none:''|intcomma }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_assessment_price3 != old_proestimates_data.eva_estimated_assessment_price3 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_assessment_price3|default_if_none:''|intcomma }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_assessment_price4 != old_proestimates_data.eva_estimated_assessment_price4 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_assessment_price4|default_if_none:''|intcomma }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_assessment_price5 != old_proestimates_data.eva_estimated_assessment_price5 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_assessment_price5|default_if_none:''|intcomma }}</textarea></font>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">見積査定</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="10" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_valuation_amount1 != old_proestimates_data.eva_estimated_valuation_amount1 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_valuation_amount1|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="10" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_valuation_amount2 != old_proestimates_data.eva_estimated_valuation_amount2 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_valuation_amount2|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="10" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_valuation_amount3 != old_proestimates_data.eva_estimated_valuation_amount3 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_valuation_amount3|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="10" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_valuation_amount4 != old_proestimates_data.eva_estimated_valuation_amount4 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_valuation_amount4|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="10" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_estimated_valuation_amount5 != old_proestimates_data.eva_estimated_valuation_amount5 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_estimated_valuation_amount5|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">最終金額評価</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_final_price1 != old_proestimates_data.eva_final_price1 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_final_price1|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_final_price2 != old_proestimates_data.eva_final_price2 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_final_price2|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_final_price3 != old_proestimates_data.eva_final_price3 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_final_price3|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_final_price4 != old_proestimates_data.eva_final_price4 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_final_price4|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_final_price5 != old_proestimates_data.eva_final_price5 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_final_price5|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">その他</font></th>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_other1 != old_proestimates_data.eva_other1 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_other1|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_other2 != old_proestimates_data.eva_other2 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_other2|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_other3 != old_proestimates_data.eva_other3 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_other3|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_other4 != old_proestimates_data.eva_other4 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_other4|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+            <td>
+                <div style="padding: 5px 0px;">
+                    <font size="4"><textarea name="work_rem" rows="1" cols="18"
+                    {% if old_proestimates_data_num != 0 and proestimates_data.eva_other5 != old_proestimates_data.eva_other5 %} style="color:red;" {% endif %}
+                    readonly>{{ proestimates_data.eva_other5|default_if_none:'' }}</textarea></font>
+                </div>
+            </td>
+        </tr>
+    </table>
+    </font>
+</div>
+
+
+<br><br>
+        <!--UploadFileList        -->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+    <div style="clear: both;"></div>
+
+{% endblock %}
+
+{% block under_sub_contents %}
+        <br>
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予想額</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.probable_price | default_if_none:'' }}</font>
+                    {% elif work_common_data.prospecificationunit_data.probable_price == work_common_data.old_prospecificationunit_data.probable_price %}
+                        <font size="5" color="black">{{ work_common_data.probable_price | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.probable_price | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者1</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:'' }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor1 == work_common_data.old_prospecificationunit_data.candidate_vendor1 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:''  }}</font>
+                    {% endif %}
+
+                        <div style="float:right;" >
+                    {% if work_common_data.prospecificationunit_data.special_vendor_check %}
+                        <font size="4"><input type="checkbox" checked="checked" disabled='disabled'> 特命</font>
+                    {% else %}
+                        <font size="4"><input type="checkbox" disabled='disabled'> 特命</font>
+                    {% endif %}
+                        </div>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者2</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor2 == work_common_data.old_prospecificationunit_data.candidate_vendor2 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者3</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor3 == work_common_data.old_prospecificationunit_data.candidate_vendor3 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者4</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor4 == work_common_data.old_prospecificationunit_data.candidate_vendor4 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者5</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor5 == work_common_data.old_prospecificationunit_data.candidate_vendor5 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">備考</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.memo == work_common_data.old_prospecificationunit_data.memo %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">特命コメント</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.special_vendor_comment == work_common_data.old_prospecificationunit_data.special_vendor_comment %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">調達G特命コメント</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="special_vendor_si_comment" rows="5" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_si_comment | default_if_none:'' }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.special_vendor_si_comment == work_common_data.old_prospecificationunit_data.special_vendor_si_comment %}
+                        <font size="4"><textarea name="special_vendor_si_comment" rows="5" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_si_comment | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="special_vendor_si_comment" rows="5" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_si_comment | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事概要</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.construction_outline == work_common_data.old_prospecificationunit_data.construction_outline %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+        </table>
+{% endblock %}

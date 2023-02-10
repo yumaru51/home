@@ -1,0 +1,291 @@
+{% extends 'fms/parts/common/level5_step_top_page.html' %}
+
+{% block sub_contents %}
+
+<script>
+
+// 絞込条件リセット
+function reset_phenomenon_filter() {
+    //セッション情報の削除
+    session_value_phenomenon_clear();
+    //フィルター再表示
+    phenomenon_filter_call();
+}
+
+//異常報告一覧絞込パーツ表示処理
+function phenomenon_filter_call() {
+    var level5_step_id = $('#level5_step_id').val();
+    var user = $('#user').val();
+    var user_department_cd = $('#user_department_cd').val();
+
+    if (sessionStorage.getItem('sel_phenomenon_next_division') == null) {
+        var next_division = "no_data";
+    }else{
+        var next_division = sessionStorage.getItem('sel_phenomenon_next_division');
+    }
+
+    if (sessionStorage.getItem('sel_phenomenon_next_department') == null) {
+        var next_department = "no_data";
+    }else{
+        var next_department = sessionStorage.getItem('sel_phenomenon_next_department');
+    }
+
+    if (sessionStorage.getItem('sel_phenomenon_next_parson') == null) {
+        var next_parson = "no_data";
+    }else{
+        var next_parson = sessionStorage.getItem('sel_phenomenon_next_parson');
+    }
+    var list_type = 'normal'
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/maintenance/phenomenon_filter/",
+        type: "POST",
+        data : {
+                'level5_step_id' : level5_step_id,
+                'user' : user,
+                'user_department_cd' : user_department_cd,
+                'next_division' : next_division,
+                'next_department' : next_department,
+                'next_parson' : next_parson,
+                'list_type' : list_type,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#phenomenon_filter').empty();
+            $('#phenomenon_filter').html(data);
+            get_phenomenon_lists();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#phenomenon_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+// 届出チェック絞込条件リセット
+function reset_notification_filter() {
+    //セッション情報の削除
+    session_value_notification_check_clear();
+    //小口届出チェックフィルター再表示
+    notification_check_filter_call();
+}
+
+//小口届出チェック一覧絞込パーツ表示処理
+function notification_check_filter_call() {
+    var level5_step_id = $('#level5_step_id').val();
+    var user = $('#user').val();
+    var user_department_cd = $('#user_department_cd').val();
+
+    if (sessionStorage.getItem('sel_ph_nc_next_division') == null) {
+        var next_division = "no_data";
+    }else{
+        var next_division = sessionStorage.getItem('sel_ph_nc_next_division');
+    }
+
+    if (sessionStorage.getItem('sel_ph_nc_next_department') == null) {
+        var next_department = "no_data";
+    }else{
+        var next_department = sessionStorage.getItem('sel_ph_nc_next_department');
+    }
+
+    if (sessionStorage.getItem('sel_ph_nc_next_parson') == null) {
+        var next_parson = "no_data";
+    }else{
+        var next_parson = sessionStorage.getItem('sel_ph_nc_next_parson');
+    }
+    $.ajax({
+        url: "/isk_tools/fms/parts/maintenance/maintenance_notification_check_filter/",
+        type: "POST",
+        data : {
+                'level5_step_id' : level5_step_id,
+                'user' : user,
+                'user_department_cd' : user_department_cd,
+                'next_division' : next_division,
+                'next_department' : next_department,
+                'next_parson' : next_parson,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+
+            $('#maintenance_notification_check_filter').empty();
+            $('#maintenance_notification_check_filter').html(data);
+            get_notification_check_lists();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#maintenance_notification_check_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+//異常報告新規登録ページ表示処理
+function maintenance_new_entry(a) {
+    var step_id = a;
+    //コメント mainte_list.htmlに記述
+    phenomenon_detail(0,0,step_id);//異常報告データの詳細の表示処理を表示するJSを起動(maintenance_lists.html内にプログラム有)
+}
+//タブ表示のためのJS
+var tab = {
+	init: function(a){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var show_page_id = 'page' + a;
+		for(i=0; i<pages.length; i++){
+			if(pages[i] != null){
+			    if( pages[i].id == show_page_id ) {
+                    pages[i].style.display = 'block';
+                    tabs[i].className = 'present';
+                    tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                }else{
+                    pages[i].style.display = 'none';
+                    tabs[i].className = null;
+                    tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                }
+            }
+		}
+	},
+	showpage: function(obj){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var num;
+		for(num=0; num<tabs.length; num++) {
+			if(tabs[num] === obj) break;
+		}
+		for(var i=0; i<pages.length; i++) {
+			if(i == num) {
+				pages[num].style.display = 'block';
+				tabs[num].className = 'present';
+                $('#select_tab').val(num);
+			}
+			else{
+				pages[i].style.display = 'none';
+				tabs[i].className = null;
+			}
+		}
+	}
+}
+window.onload = function() {
+        phenomenon_filter_call();//異常報告一覧絞込パーツを表示するJSを起動(このhtml内にプログラム有)
+        notification_check_filter_call();//小口届出チェック一覧絞込パーツを表示するJSを起動(このhtml内にプログラム有)
+};
+</script>
+<style type="text/css">
+
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 490px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+.square_small {
+   width: 160px;
+   height: 140px;
+   background: khaki;
+}
+.triangle_right_small {
+  width: 0;
+  height: 0;
+  border-left: 25px solid khaki;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+#budget_lists{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+#work_lists{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+.button{
+    width:100px;
+}
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+
+</style>
+
+        <input TYPE="hidden" id="level5_step_id" VALUE="{{level5_step_id}}" NAME=level5_step_id size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="select_tab" VALUE="{{select_tab}}" NAME=select_tab size=3 style="width:50px; height:20px"/>
+        <input type="hidden" id="default_tab" value="{{ default_tab }}">
+
+    <ul id="tab" style="width:auto;">
+        <li class="present"><a href="#page1">異常報告</a></li>
+        <li><a href="#page2">小口届出チェック</a></li>
+    </ul>
+    <div id="page1" class="pagetitle" >
+        <div>
+            <input type="button" name="get_phenomenon_list" value=" 　リスト更新　 " onclick="get_phenomenon_lists_search();">
+            <input type="button" name="reset_phenomenon_filter_button" value=" 　条件リセット　 " onclick="reset_phenomenon_filter();">
+            {% if new_entry_flag == 1 %}
+                <input type="button" name="new_entry" value="　　新規作成　　" onclick="maintenance_new_entry({{ level5_step_id }});">
+            <input type="hidden" value="{{ level5_step_id }}">
+            {% endif %}
+        </div>
+
+        <div id="phenomenon_filter"></div>
+        <div>
+                異常報告リスト
+        </div>
+        <div id="loading">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="maintenance_lists" style="width: 1800px;">
+        </div>
+    </div>
+    <div id="page2" class="pagetitle">
+        <div>
+            <input type="button" name="get_work_list" value=" 　リスト更新　 " onclick="get_notification_check_search();">
+            <input type="button" name="reset_budget_filter_button" value=" 　条件リセット　 " onclick="reset_notification_filter();">
+        </div>
+        <div id="maintenance_notification_check_filter"></div>
+        <div>
+            小口届出チェックリスト
+        </div>
+        <div id="loading2">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="maintenance_notification_check_lists" style="width: 1800px;">
+        </div>
+    </div>
+
+<script type="text/javascript">
+var default_tab = $('#default_tab').val();
+tab.setup = {
+	tabs: document.getElementById('tab').getElementsByTagName('li'),
+
+	pages: [
+		document.getElementById('page1'),
+		document.getElementById('page2')
+	]
+}
+tab.init(default_tab);
+</script>
+
+{% endblock %}

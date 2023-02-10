@@ -1,0 +1,478 @@
+<script>
+//工事関連機器登録･更新処理
+function work_equipment_edit(a) {
+    var action_type = a;
+    var work_equipment_id = $('#work_equipment_id').val();
+    var budget_id = $('#target_budget_id').val();
+    var work_id = $('#work_id').val();
+    var equipment_no = $('#equipment_no').val();
+    if (work_id == 0){
+        alert("工事データを先に登録(一時保存)してください！！");
+    }else if (equipment_no =='') {
+        alert("機器を選択してください！！");
+    }else{
+        var rev_no = $('#budget_rev_no').val();
+        var this_step = $('#this_step').val();
+        var this_budget_id = $('#target_budget_id').val();
+        var this_department = $('#this_department').val();
+        var this_division = $('#this_division').val();
+
+        var equipment_name = $('#equipment_name').val();
+        var management_class = $('#management_class').val();
+        var equip_family = $('#equip_family').val();
+        var equip_type = $('#equip_type').val();
+        var equipment_purchase = $('#sel_equipment_purchase').prop('checked');
+        var construction = $('#sel_on_work').prop('checked');
+        var facility = $('#facility').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/work_equipment_entry/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'budget_id' : budget_id,
+                    'work_id' : work_id,
+                    'rev_no' : rev_no,
+                    'work_equipment_id' : work_equipment_id,
+                    'equipment_no' : equipment_no,
+                    'equipment_name' : equipment_name,
+                    'management_class' : management_class,
+                    'equip_family' : equip_family,
+                    'equipment_type' : equip_type,
+                    'equipment_purchase' : equipment_purchase,
+                    'construction' : construction,
+                    'facility' : facility,
+                    'this_step' : this_step,
+                    'this_budget_id' : this_budget_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    get_work_equipment_list(budget_id, work_id);//工事関連機器一覧表示のためのJS起動(detail_template.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事関連機器削除処理
+function work_equipment_delete(a) {
+    var action_type = a;
+    var work_equipment_id = $('#work_equipment_id').val();
+    var budget_id = $('#target_budget_id').val();
+    var work_id = $('#work_id').val();
+    var rev_no = $('#budget_rev_no').val();
+    var this_step = $('#this_step').val();
+    var this_budget_id = $('#target_budget_id').val();
+    var this_department = $('#this_department').val();
+    var this_division = $('#this_division').val();
+    var budget_equipment_no = $('#equipment_no').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/work_equipment_delete/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'budget_id' : budget_id,
+                    'work_id' : work_id,
+                    'rev_no' : rev_no,
+                    'work_equipment_id' : work_equipment_id,
+                    'budget_equipment_no' : budget_equipment_no,
+                    'this_step' : this_step,
+                    'this_budget_id' : this_budget_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    get_work_equipment_list(budget_id, work_id);//工事関連機器一覧表示のためのJS起動(detail_template.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//マスターから予算関連機器を選択したときの処理
+function select_master_budget_equipment(a, b) {
+    var equipment_id = a;
+    var equip_type = b;
+        $.ajax({
+                url: "/isk_tools/fms/action/select_budget_equipment/",
+                type: "POST",
+                data : {
+                    'equipment_id' : equipment_id,
+                    'equipment_type' : equip_type,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#equipment_no').val(data.equipment_no);
+                    $('#equipment_name').val(data.equipment_name);
+                    $('#management_class').val(data.management_class);
+                    $('#equip_family').val(data.equip_family);
+                    $('#equip_family_nm').val(data.equip_family_nm);
+                    $('#equip_type').val(b);
+                    $('#equip_type_nm').val(data.equip_type_nm);
+                    $('#facility').val(data.facility);
+                    $('#work_equipment_id').val(data.equipment_id);
+
+                    $('#sel_equipment_purchase').prop('readonly', false);
+                    $('#sel_on_work').prop('readonly', false);
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("work_equipment_add_button_div") != null){
+                        const p3 = document.getElementById("work_equipment_add_button_div");
+                        p3.style.display ="block";
+                    }
+                    if(document.getElementById("work_equipment_edit_button_div") != null){
+                        const p4 = document.getElementById("work_equipment_edit_button_div");
+                        p4.style.display ="none";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function select_equipment(equipment){
+    //確認
+    console.log(equipment.getAttribute("data-management_class"));
+    console.log(equipment.getAttribute("data-facility_code"));
+    console.log(equipment.getAttribute("data-equip_no"));
+    console.log(equipment.getAttribute("data-equip_name"));
+    console.log(equipment.getAttribute("data-equip_family"));
+    console.log(equipment.getAttribute("data-equip_family_nm"));
+    console.log(equipment.getAttribute("data-equip_type"));
+    console.log(equipment.getAttribute("data-equip_type_nm"));
+
+    //dataをフォームに格納
+    $('#management_class').val(equipment.getAttribute("data-management_class"));
+    $('#facility').val(equipment.getAttribute("data-facility_code"));
+    $('#equipment_no').val(equipment.getAttribute("data-equip_no"));
+    $('#equipment_name').val(equipment.getAttribute("data-equip_name"));
+    $('#equip_family').val(equipment.getAttribute("data-equip_family"));
+    $('#equip_family_nm').val(equipment.getAttribute("data-equip_family_nm"));
+    $('#equip_type').val(equipment.getAttribute("data-equip_type"));
+    $('#equip_type_nm').val(equipment.getAttribute("data-equip_type_nm"));
+
+    //ボタン表示/非表示処理
+    if(document.getElementById("work_equipment_add_button_div") != null){
+        const p3 = document.getElementById("work_equipment_add_button_div");
+        p3.style.display ="block";
+    }
+    if(document.getElementById("work_equipment_edit_button_div") != null){
+        const p4 = document.getElementById("work_equipment_edit_button_div");
+        p4.style.display ="none";
+    }
+}
+//機器マスタ絞込処理
+function equipment_filter() {
+    $("#loading_equipment").show();//呼び出し中に表示するgifを表示
+    var management_class = $('#sel_management_class').val();
+    if (management_class == ""){
+        $('#equipment_list').empty();
+        alert("区分(一番左の選択欄)を選択してください!!");
+    }else{
+        var equip_family = $('#sel_equip_family').val();
+        // var equip_type = $('#sel_equip_type').val();
+        var facility = $('#sel_facility_code').val();
+            $.ajax({
+                url: "/isk_tools/fms/parts/equipment_list/",
+                type: "POST",
+                data : {
+                    'equip_family' : equip_family,
+                    // 'equip_type' : equip_type,
+                    'facility' : facility,
+                    'management_class' : management_class,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 30000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#equipment_list').empty();
+                    $('#equipment_list').html(data);
+                    $("#loading_equipment").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    $('#equipment_list').fadeIn();//対象の一覧をフェードイン
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#equipment_list').empty();
+                    alert('<3>Error!' +textStatus+' ' +errorThrown);
+               });
+    }
+}
+//機器ファミリ選択時の機器マスタ絞込処理
+function equip_family_filter() {
+    var management_class = $('#sel_management_class').val();
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_equipment/filter_equip_family/",
+                type: "POST",
+                data : {
+                    'management_class' : management_class,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 30000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#sel_equip_family').empty();
+                    $('#sel_equip_family').html(data);
+
+                    reset_equipment_list();
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#sel_equip_family').empty();
+                    alert('<1>Error!' +textStatus+' ' +errorThrown);
+               });
+}
+// 関連機器一覧表示のリセット処理
+function reset_equipment_list() {
+    $.ajax({
+        url: "/isk_tools/fms/parts/reset_equipment_list/",
+        type: "POST",
+        data : {
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#equipment_list').empty();
+            $('#equipment_list').html(data);
+       })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('#equipment_list').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+       });
+}
+// //機器タイプ選択時の機器マスタ絞込処理
+// function equip_type_filter() {
+//     var management_class = $('#sel_management_class').val();
+//     var equip_family = $('#sel_equip_family').val();
+//     if (management_class == ""){
+//         $('#equipment_list').empty();
+//         alert("区分(一番左の選択欄)を選択してください!!");
+//     }else{
+//         $.ajax({
+//                 url: "/isk_tools/fms/parts/law_equipment/filter_equip_type/",
+//                 type: "POST",
+//                 data : {
+//                     'management_class' : management_class,
+//                     'equip_family' : equip_family,
+//                     'csrfmiddlewaretoken': "{{ csrf_token }}"
+//                 },
+//                 timeout: 30000,
+//                 dataType: 'html',
+//                 cache : false,
+//                 })
+//                 .done(function(data){
+//                     $('#sel_equip_type').empty();
+//                     $('#sel_equip_type').html(data);
+//                     equipment_filter();
+//                })
+//                .fail(function(jqXHR,textStatus,errorThrown){
+//                     $('#sel_equip_type').empty();
+//                     alert('<2>Error!' +textStatus+' ' +errorThrown);
+//                });
+//     }
+// }
+//機器タイプ選択時の機器マスタ絞込処理
+function equip_type_filter() {
+    var management_class = $('#sel_management_class').val();
+    if (management_class == ""){
+        $('#equipment_list').empty();
+        alert("区分(一番左の選択欄)を選択してください!!");
+    }else{
+        equipment_filter();
+    }
+}
+//ファシリティクラスコード選択時のファシリティコード(location_cd)絞込処理
+function facility_code_filter() {
+    var facility_class_code_skey = $('#sel_facility_class_code').val();
+    $.ajax({
+        url: "/isk_tools/fms/parts/law_equipment/filter_facility_code/",
+        type: "POST",
+        data : {
+            'facility_class_code_skey' : facility_class_code_skey,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#sel_facility_code').empty();
+            $('#sel_facility_code').html(data);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#sel_facility_code').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+window.onload = function() {
+    //var work_id = $('#target_work_id').val();･･･削除予定
+    //get_document_list(work_id);･･･削除予定
+};
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scrool_equipment_list {
+  width: auto;
+  height: 280px;
+  overflow: scroll;
+}
+#loading_equipment{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">関係機器</h2>
+    </div>
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+    <div style="border-style: ridge;"><h2 class="page-header">関連機器</h2>
+
+        <div id="loading_equipment">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+
+        <div style="float:left; border-style: ridge;">
+
+        <div>
+            <div style="float:left">
+                <select id="sel_management_class" name="sel_management_class" onchange="equip_family_filter();">
+                    <option value="" hidden></option>
+<!--                    <option value="M">機械</option>-->
+<!--                    <option value="E">電気</option>-->
+<!--                    <option value="I">計装</option>-->
+<!--                    <option value="C">土建</option>-->
+                    {% for management_class_lists in management_class_lists %}
+                        <option value="{{ management_class_lists.mgt_cls }}">{{ management_class_lists.mgt_cls_nm_1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <select id="sel_equip_family" name="sel_equip_family" onchange="equip_type_filter();">
+                    <option value="" hidden></option>
+                {% for equip_family_lists in equip_family_lists %}
+<!--                    <option value="{{ equip_family_lists.EQPT_FMLY }}">{{ equip_family_lists.EQPT_FMLY_NM }}</option>-->
+                    <option value="{{ equip_family_lists.fnc_ctg_cd }}">{{ equip_family_lists.fnc_ctg_nm_1 }}</option>
+<!--                    <option value="{{ equip_family_lists.family_cd }}">{{ equip_family_lists.family_nm_1 }}</option>-->
+                {% endfor %}
+            </select>
+<!--            <select id="sel_equip_type" name="sel_equip_type" onchange="equipment_filter();">-->
+<!--                <option value="" hidden></option>-->
+<!--                {% for equip_type_lists in equip_type_lists %}-->
+<!--                    <option value="{{ equip_type_lists.fnc_ctg_cd }}">{{ equip_type_lists.fnc_ctg_nm_1 }}</option>-->
+<!--                {% endfor %}-->
+<!--            </select>-->
+<!--            <select id="sel_facility" name="sel_facility" onchange="equipment_filter();">-->
+<!--                    <option value="" hidden></option>-->
+<!--                {% for facility_lists in facility_lists %}-->
+<!--&lt;!&ndash;                    <option value="{{ facility_lists.FCLTY_CD }}">{{ facility_lists.FCLTY_NM }}</option>&ndash;&gt;-->
+<!--                    <option value="{{ facility_lists.location_cd }}">{{ facility_lists.location_nm_1 }}</option>-->
+<!--                {% endfor %}-->
+<!--            </select>-->
+            <select id="sel_facility_class_code" name="sel_facility_class_code" onchange="facility_code_filter();">
+                    <option value="" hidden></option>
+                {% for facility_lists in facility_lists %}
+                    <option value="{{ facility_lists.m_location_skey }}">{{ facility_lists.location_nm_1 }}</option>
+                {% endfor %}
+            </select>
+            <select id="sel_facility_code" name="sel_facility_code" onchange="equipment_filter();">
+                    <option value="" hidden></option>
+                {% for fclty_cd_lists in fclty_cd_lists %}
+                    <option value="{{ fclty_cd_lists.location_cd }}">{{ fclty_cd_lists.location_nm_1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="border-style: ridge;"><h2 class="page-header">関連機器選択</h2></div>
+        <div id="equipment_list" class="scrool_equipment_list">
+            <ul id="equipment">
+                <li class="fms_sidebar-list"><font size="4">関連機器を選択してください</font></li>
+            </ul>
+        </div>
+    </div>
+
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;"><h2 class="page-header">新規登録</h2>
+            <div style="float:left;size=5px">　</div>
+            <div style="float:left;">
+                <table>
+                    <tr>
+                        <td><div><font size="4">関連機器NO</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="equipment_no" size="35" value="" readonly="readonly"></font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">関連機器名</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="equipment_name" size="35" value="" readonly="readonly"></font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">工事/機器判別</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <div class="item" style="float:left;margin-left:15px;"><input type="checkbox" id="sel_equipment_purchase" size="30">機器購入</div>
+                            <div class="item" style="float:left;margin-left:15px;"><input type="checkbox" id="sel_on_work" size="30">工事</div>
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">機器ファミリ</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="equip_family_nm" size="35" value="" readonly="readonly"></font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">機器タイプ</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="equip_type_nm" size="35" value="" readonly="readonly"></font></div></td>
+                    </tr>
+                </table>
+                <input type="hidden" id="management_class" value="" size="4" >
+                <input type="hidden" id="equip_family" value="" size="50" >
+                <input type="hidden" id="facility" value="" size="50" >
+                <input type="hidden" id="work_equipment_id" value="" size="4" >
+                <input type="hidden" id="equip_type" value="" size="50" >
+                <input type="hidden" id="edit_flag" value="0"  >
+                <br>
+                <div id="work_equipment_add_button_div" style="float:left;" >
+                    <input type="button" id="work_equipment_add_button" value="　追加　" onclick="work_equipment_edit('add')" >
+                </div>
+                <div id="work_equipment_edit_button_div" style="float:left;" >
+                    <input type="button" id="work_equipment_delete_button" value="　削除　" onclick="work_equipment_delete('delete')" >
+                </div>
+            </div>
+        </div>
+        <div style="float:left;size=10px">　</div>
+        <div style="float:left;"><h2 class="page-header">登録済関連機器リスト</h2>
+            <div id="work_equipment_list"></div>
+        </div>
+
+
+    </div>
+    </div><!--ng_character_checkここまで-->

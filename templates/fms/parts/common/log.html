@@ -1,0 +1,112 @@
+<script>
+//ログの対象を選択したときの処理
+function log_change() {
+    //var log_source = a;
+    var log_source = $('#log_class').val();
+    log_list(log_source);//ログ表示(選択した対象)のためのJS起動(detail_template.html内にプログラム有)
+}
+//ログの対象選択の値を呼び出した値と同期
+function log_class_value(a) {
+        var target_log_class = a;
+        if (target_log_class != "") {
+            var pulldown_option = document.getElementById("log_class").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_log_class){
+                    var value = pulldown_option[i].value;
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+</script>
+<style type="text/css">
+thead.log_scrollHead,tbody.log_scrollBody{
+    display:block;
+}
+tbody.log_scrollBody{
+    overflow-y:scroll;
+    height:730px;
+}
+td,th{
+    table-layout:fixed;
+}
+.log_operation_datetime{
+    width:120px;
+}
+.log_target_name{
+    width:60px;
+}
+.log_target_id{
+    width:60px;
+}
+.log_step_name{
+    width:160px;
+}
+.log_action_name{
+    width:80px;
+}
+.log_operator_name{
+    width:120px;
+}
+.log_comment{
+    width:915px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+    <div>
+        <div>
+            <select id="log_class" name="log_class" onchange="log_change();">
+                <option value="1">予算単位</option>
+                <option value="2">工事単位</option>
+                <option value="3">予算＋工事単位</option>
+                <option value="4">届出チェックシート単位</option>
+                <option value="5">小口工事関係</option>
+                <option value="9">予算に関係するすべて</option>
+            </select>
+        </div>
+        <div>処理履歴(新しい順)</div>
+        {% if log_lists_num > 0 %}
+        表示件数：{{ log_lists_num }}件
+            <div>
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="log_scrollHead">
+                    <tr>
+                        <th class="log_operation_datetime">日時</th>
+                        <th class="log_target_name">対象</th>
+                        <th class="log_target_id">ID</th>
+                        <th class="log_step_name">工程</th>
+                        <th class="log_action_name">操作</th>
+                        <th class="log_operator_name">作業者</th>
+                        <th class="log_comment">コメント</th>
+                    </tr>
+                </thead>
+                <tbody class="log_scrollBody">
+                {% for log_lists in log_lists %}
+                    <tr>
+                        <td class="log_operation_datetime">{{ log_lists.operation_datetime }}</td>
+                        <td class="log_target_name">{{ log_lists.target_name }}</td>
+                        <td class="log_target_id">{{ log_lists.target_id }}</td>
+                        <td class="log_step_name">{{ log_lists.step_name }}</td>
+                        {% if log_lists.action_name == "差戻"  %}
+                            <td class="log_action_name"><font color="yellow" style="background-color:red; font-weight:bold">
+                                {{ log_lists.action_name }}
+                            </font></td>
+                        {% else %}
+                            <td class="log_action_name">{{ log_lists.action_name }}</td>
+                        {% endif %}
+                        <td class="log_operator_name">{{ log_lists.last_name }}{{ log_lists.first_name }}</td>
+                        <td class="log_comment"><textarea id ="comment" name="comment" rows="2" cols="100" readonly>{{ log_lists.comment }}</textarea></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+            <div>対象データなし</div>
+        {% endif %}
+    </div>

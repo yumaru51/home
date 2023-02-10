@@ -1,0 +1,4 @@
+<option hidden value="{{ item_code }}">{{ item_code }}</option>
+{% for itemmaster in itemmaster %}
+    <option value="{{ itemmaster.品目コード }}">{{ itemmaster.品目コード }}: {{ itemmaster.品目テキスト }}</option>
+{% endfor %}

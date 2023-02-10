@@ -1,0 +1,109 @@
+<script>
+//進捗工程での表示内容の詳細表示処理
+function step_display_item_detail(a) {
+    var id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/step_display_item_detail/",
+                type: "POST",
+                data : {
+                    'id' : id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#step_display_item_id').val(data.step_display_item_id);
+                    $('#step_display_item_step_id').val(data.step_display_item_step_id);
+                    $('#step_display_item_page').val(data.step_display_item_page);
+                    $('#step_display_item_div_id_name').val(data.step_display_item_div_id_name);
+                    $('#step_display_item_item_name').val(data.step_display_item_item_name);
+                    $('#step_display_item_action_pb_flag').val(data.step_display_item_action_pb_flag);
+                    $('#step_display_item_default_page').val(data.step_display_item_default_page);
+                    $('#step_display_item_lost_flag').val(data.step_display_item_lost_flag);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.scroll_step_display_item_Head,tbody.scroll_step_display_item_Body{
+    display:block;
+}
+tbody.scroll_step_display_item_Body{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.step{
+    width:120px;
+}
+.page{
+    width:50px;
+}
+.div_id_name{
+    width:350px;
+}
+.item_name{
+    width:150px;
+}
+.action_pb_flag{
+    width:80px;
+}
+.default_page{
+    width:80px;
+}
+.lost_flag{
+    width:50px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if step_display_item_lists_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scroll_step_display_item_Head">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="step">ステップID</th>
+                        <th class="page">ページ</th>
+                        <th class="div_id_name">div_id名</th>
+                        <th class="item_name">表示名</th>
+                        <th class="action_pb_flag">アクションPB_FL</th>
+                        <th class="default_page">初期ページFL</th>
+                        <th class="lost_flag">無効FL</th>
+                    </tr>
+                </thead>
+                <tbody class="scroll_step_display_item_Body">
+                {% for step_display_item_lists in step_display_item_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" class="detailpb" onclick="step_display_item_detail({{ step_display_item_lists.id }});">詳細</a>
+                        </td>
+                        <td class="step">{{ step_display_item_lists.step }}</td>
+                        <td class="page">{{ step_display_item_lists.page }}</td>
+                        <td class="div_id_name">{{ step_display_item_lists.div_id_name }}</td>
+                        <td class="item_name">{{ step_display_item_lists.item_name }}</td>
+                        <td class="action_pb_flag">{{ step_display_item_lists.action_pb_flag }}</td>
+                        <td class="default_page">{{ step_display_item_lists.default_page }}</td>
+                        <td class="lost_flag">{{ step_display_item_lists.lost_flag }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

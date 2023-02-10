@@ -1,0 +1,10 @@
+            次部署：<select id="sel_next_person_department" name="sel_next_person_department" onchange="select_department(value);" style="font-size: 110%">
+                    <option value=""></option>
+                {% for next_departments_list in next_departments_list %}
+                    {% if next_departments_list.department_cd == department %}
+                        <option value="{{ next_departments_list.department_cd }}" selected>{{ next_departments_list.department_name }}</option>
+                    {% else %}
+                        <option value="{{ next_departments_list.department_cd }}">{{ next_departments_list.department_name }}</option>
+                    {% endif %}
+                {% endfor %}
+                </select>

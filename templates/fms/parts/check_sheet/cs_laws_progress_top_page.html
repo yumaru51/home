@@ -1,0 +1,316 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+//jQueryの処理はファイルの上から順に実行されてしまうため、
+//処理対象のHTML要素より上に書く場合は$( function() {       } );で囲う必要がある
+//(囲うことでHTML読込完了後に実行される)
+//class要素datepickerにDatepickerハンドラを追加
+$( function() {
+    $( '.datepicker' ).datepicker();
+} );
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//対象の法令への日付記入処理
+function cs_laws_progress_date_entry() {
+    $("#loading_cs_related_laws_progress_list").show();//呼び出し中に表示するgifを表示
+    laws_no = $('input[name=sel_selected_item]:checked').val()
+    submission_date = $('#txt_submission_date').val()
+    permit_date = $('#txt_permit_date').val()
+    notification_date = $('#txt_notification_date').val()
+    permit_no = $('#txt_permit_no').val()
+    if(laws_no != undefined){
+        $.ajax({
+                url: "/isk_tools/fms/action/cs_laws_progress_date_entry/",
+                type: "POST",
+                data : {
+                    'laws_no' : laws_no,
+                    'submission_date' : submission_date,
+                    'permit_date' : permit_date,
+                    'notification_date' : notification_date,
+                    'permit_no' : permit_no,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                async: false,
+                cache : false,
+                })
+                .done(function(data){
+                    $("#loading_cs_related_laws_progress_list").fadeOut();
+                    alert(data.msg);
+                    get_cs_laws_progress_list();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }else{
+        $("#loading_cs_related_laws_progress_list").fadeOut();
+        alert('ラジオボタンから日付を入力する届出を選択してください！！');
+    }
+};
+
+// クリックした行のラジオボタンを選択状態にする
+function select_radio(target_radio_button){
+    $('#'+target_radio_button).prop('checked', true)
+}
+
+// 絞込条件リセット
+function reset_cs_filter() {
+    //セッション情報の削除
+    session_value_cs_clear();
+    //フィルター再表示
+    cs_laws_progress_filter_call();
+}
+
+//届出チェックシート一覧絞込パーツ表示処理
+function cs_laws_progress_filter_call() {
+    var user = $('#user').val();
+    var user_department_cd = $('#user_department_cd').val();
+    $.ajax({
+        url: "/isk_tools/fms/parts/check_sheet/cs_laws_progress_filter/",
+        type: "POST",
+        data : {
+                'user' : user,
+                'user_department_cd' : user_department_cd,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#cs_laws_list_filter').empty();
+            $('#cs_laws_list_filter').html(data);
+            //画面表示時は検索条件保存は行わない
+            get_cs_laws_progress_list();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#cs_laws_list_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+//画面表示時の処理
+window.onload = function() {
+    cs_laws_progress_filter_call()
+    $("#loading_cs_related_laws_progress_list").fadeOut();//呼び出し中に表示するgifをフェードアウト
+}
+
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:610px;
+}
+input[type=radio] {
+    width: 20px;
+    height: 20px;
+    background-color: blue;
+    color: blue;
+}
+input[type=checkbox] {
+    width: 20px;
+    height: 20px;
+    background-color: blue;
+    color: blue;
+}
+input[type=checkbox]:disabled {
+    background-color: blue;
+    color: blue;
+    cursor: not-allowed;
+}
+.datepicker {
+    width:150px;
+}
+td,th{
+    table-layout:fixed;
+}
+.selected_item{
+    width:57px;
+    font-size: 100%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.laws_no{
+    width:60px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.business_year_id{
+    width:45px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.budget_main_department_id{
+    width:80px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.budget_id{
+    width:55px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.budget_no{
+    width:85px;
+    font-size: 100%;
+    padding: 7px 0px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.budget_name{
+    width:160px;
+    font-size: 100%;
+    padding: 7px 0px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.budget_stop{
+    width:40px;
+    font-size: 100%;
+    padding: 7px 0px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.laws_name{
+    width:120px;
+    font-size: 100%;
+    padding: 7px 0px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.laws_detail_name{
+    width:250px;
+    font-size: 100%;
+    padding: 7px 0px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.department_name{
+    width:110px;
+    font-size: 100%;
+    padding: 7px 0px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.limit_date{
+    width:130px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.witness_inspection{
+    width: 60px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.submission_date{
+    width:120px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.notification_date{
+    width:120px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.permit_date{
+    width:120px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.permit_no{
+    width:230px;
+    font-size: 100%;
+    padding: 7px 0px;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+.scroll_bar_head{
+    width:17px;
+    font-size: 100%;
+    padding: 7px 0px;
+}
+.scroll_bar_body{
+    width:0px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+#loading_cs_related_laws_progress_list{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+</style>
+    <div style="width: auto;">
+        <div style="float:left">
+            <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+                <h2 class="page-header2">{{ step_name }}</h2>
+            </div>
+        </div>
+        <div style="float:right;">
+        </div>
+    </div>
+    <div style="clear: both;" ></div>
+
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="this_step" value="{{ this_step }}">
+    <input type="hidden" id="user_division_cd" value="{{ user_division_cd }}">
+    <input type="hidden" id="user_department_cd" value="{{ user_department_cd }}">
+    <input type="hidden" id="user_authority" value="{{ user_authority }}">
+    <input type="hidden" id="confirm_user" value="{{ confirm_user }}">
+    <input type="hidden" id="permit_user" value="{{ permit_user }}">
+
+    <div id="loading_cs_related_laws_progress_list">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+        <div style="float:left"><font size="4" style="line-height:130%">届出進捗情報入力</font></div>
+        <table class="date_entry_table" style="text-indent:20px;">
+            <tr style="background-color:white">
+                <td><div><font size="4" style="line-height:130%">提出日：</font>
+                <input type="text" id="txt_submission_date" class="datepicker" value="" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('txt_submission_date');"></div></td>
+                <td><div><font size="4" style="line-height:130%">許可日　：</font>
+                <input type="text" id="txt_permit_date" class="datepicker" value="" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('txt_permit_date');"></div></td>
+                <td rowSpan=2 style="vertical-align:middle"><div>
+                    <input type="button" style="width:100px; padding:5px; font-size:20px;" value="登録" onclick="cs_laws_progress_date_entry()">
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4" style="line-height:130%">届出日：</font>
+                <input type="text" id="txt_notification_date" class="datepicker" value="" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('txt_notification_date');"></div></td>
+                <td><div><font size="4" style="line-height:130%">許可番号：</font>
+                <input type="text" id="txt_permit_no" size="40" maxlength="40"></div></td>
+            </tr>
+        </table>
+        <div id="cs_laws_list_filter"></div>
+        <div id="cs_laws_list_parts"></div>
+{% endblock %}

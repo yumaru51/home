@@ -1,0 +1,4 @@
+<option hidden value="{{ instruction_code }}">{{ instruction_code }}</option>
+{% for instructionnomaster in instructionnomaster %}
+    <option value="{{ instructionnomaster.指図書コード }}">{{ instructionnomaster.指図書コード }}: {{ instructionnomaster.テキスト短 }}</option>
+{% endfor %}

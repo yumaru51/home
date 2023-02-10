@@ -1,0 +1,91 @@
+<script>
+//登録済工事支給品から選択したときの表示処理
+function work_supplies_detail(a) {
+    var work_supplies_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/work_supplies_detail/",
+                type: "POST",
+                data : {
+                    'work_supplies_id' : work_supplies_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#supplies_name').val(data.work_supplies_name);
+                    $('#work_supplies_id').val(data.work_supplies_id);
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("work_supplies_add_button_div") != null){
+                        const p1 = document.getElementById("work_supplies_add_button_div");
+                        p1.style.display ="none";
+                    }
+                    if(document.getElementById("work_supplies_edit_button_div") != null){
+                        const p2 = document.getElementById("work_supplies_edit_button_div");
+                        p2.style.display ="block";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.work_supplies_scrollHead,tbody.work_supplies_scrollBody{
+    display:block;
+}
+tbody.work_supplies_scrollBody{
+    overflow-y:scroll;
+    height:280px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.work_supplies_name{
+    width:200px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if work_supplies_lists_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <th class="detail_pb"></th>
+                        {% endif %}
+                        <th class="work_supplies_name">支給品名</th>
+                    </tr>
+                </thead>
+                <tbody class="work_supplies_scrollBody">
+                {% for work_supplies_lists in work_supplies_lists %}
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <td class="detail_pb">
+                                <a href="#" id="{{ work_supplies_lists.id }}" class="detailpb" onclick="work_supplies_detail(id);">選択</a>
+                            </td>
+                        {% endif %}
+                        <td class="work_supplies_name">{{ work_supplies_lists.supplies_name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

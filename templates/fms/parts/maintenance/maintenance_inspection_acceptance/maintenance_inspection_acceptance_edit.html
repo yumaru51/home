@@ -1,0 +1,293 @@
+<style type="text/css">
+</style>
+
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <input type="hidden" id="phenomenon_unique_id" value="{{ phenomenon_unique_id }}">
+        <input type="hidden" id="phenomenon_id" value="{{ phenomenon_id }}">
+        <input type="hidden" id="div_id_name" value="{{ div_id_name }}">
+        <h2 class="page-header">調達検収</h2>
+    </div>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+    <div id="{{ div_id_name }}_input_check" ><!--input_check ここから-->
+        <div class="scroll_div" style="float: left; width:1000px;">
+            <table>
+                <tr>
+                    <td><div><font size="4">提出資料受領日</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4">
+                        <input type="text" id="documents_receipt_date" class="datepicker" value="{{ inspection_acceptance_data.documents_receipt_date | default_if_none:'' }}" autocomplete="off" readonly>
+                        <input type="button" class="date_clear_button" value="クリア" onclick="date_clear('documents_receipt_date');">
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">提出書類の備考欄</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><textarea id="documents_rem" input_check="length" data-max_length="400" rows="4" cols="50">{{ inspection_acceptance_data.documents_rem | default_if_none:'' }}</textarea></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">提出書類の内容確認結果</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4">
+                    <select id="documents_check_result" input_check="must">
+                            {% if inspection_acceptance_data.documents_check_result  == "OK" %}
+                                <option value="OK" selected>OK</option>
+                                <option value="NG">NG</option>
+                            {% else %}
+                                <option value="OK">OK</option>
+                                <option value="NG" selected>NG</option>
+                            {% endif %}</select></font></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">検収書送付日</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4">
+                        <input type="text" id="receipt_send_date" class="datepicker" value="{{ inspection_acceptance_data.receipt_send_date | default_if_none:'' }}" autocomplete="off" readonly>
+                        <input type="button" class="date_clear_button" value="クリア" onclick="date_clear('receipt_send_date');">
+                    </font></div></td>
+                </tr>
+            </table>
+        </div>
+    </div><!--input_check ここまで-->
+    </div><!--ng_character_checkここまで-->
+
+    <div style="clear: both;" > </div>
+    <div style="clear: both;" > </div>
+
+    <div>
+        <form id="{{ div_id_name }}_file_upload_form" name="file_upload_form" action="/isk_tools/fms/action/file_upload_other_type/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group"><font size="4">資料データ選択　　　　　　　：　<input type="file" id="attachment_file" name="file" />
+            <input type="hidden" id="file_target" name="file_target" value="FailureCorrespondence">
+            <input type="hidden" id="file_first_layer_id" name="file_first_layer_id" value="{{ phenomenon_id }}">
+            <input type="hidden" id="file_second_layer_id" name="file_second_layer_id" value="">
+            <input type="hidden" id="{{ div_id_name }}_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+            <input type="hidden" id="{{ div_id_name }}_div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <input type="hidden" id="{{ div_id_name }}_delete_pb_disp_flag" name="delete_pb_disp_flag" value="1">
+            <input type="hidden" id="{{ div_id_name }}_check_item" name="check_item" value="{{ phenomenon_id }}">
+            <input type="hidden" id="{{ div_id_name }}_file_class" name="file_class" value="InspectionAcceptance">
+            <input type="button" class="button" value="送信" onclick="file_upload_other_type('{{ div_id_name }}');">
+            </font></div>
+        </form>
+    </div>
+    <div id="upload_file_list_{{ div_id_name }}">添付ファイル無し</div>
+
+<script>
+
+
+// 入力項目チェック処理
+function common_input_check( target_id , check_type_list) {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    // チェック範囲のelementを取得
+    let target = document.querySelector('#' + target_id)
+
+    // 入力チェック対象の背景を初期化
+    let elements = target.querySelectorAll('[input_check]');
+    elements.forEach(function(element,num){
+        element.style.backgroundColor = 'white';
+    });
+
+    check_type_list.forEach(function(check_type){
+        if(check_type == 'length'){
+            //文字数上限チェック
+            elements = target.querySelectorAll('[input_check~="length"]');
+            elements.forEach(function(element,num){
+                let max_length = Number(element.dataset.max_length);
+                let check_val_length = count_char(element.value);
+                if ( check_val_length > max_length ){
+                    element.style.backgroundColor = 'silver';
+                    ng_str_count_flag = ng_str_count_flag + 1 ;
+                }
+            });
+        }else if (check_type == 'must'){
+            //必須入力チェック
+            elements = target.querySelectorAll('[input_check~="must"]');
+            elements.forEach(function(element,num){
+                let check_val_length = count_char(element.value);
+                if ( check_val_length == 0 ){
+                    element.style.backgroundColor = 'orange';
+                    ng_flag = ng_flag + 1 ;
+                }
+            });
+        }
+    });
+
+    return { 1:ng_flag , 2:ng_str_count_flag };
+}
+
+// 画面上の指定id要素以下の入力項目を全て取得する
+function common_get_all_input(target_id) {
+    var text_inputs;
+    let target = document.querySelector("#" + target_id)
+    text_inputs = target.querySelectorAll('input[type=text],textarea,select');
+    return text_inputs;
+}
+
+//入力項目チェック
+function input_check(this_step, next_step, action_cd) {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+
+    // 復旧確認側のProgressが工程完了しているか確認
+    if(this_step != next_step && {{ progress_end_flag }} != 1){
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        msg = '復旧確認が完了していません。';
+        alert(msg);
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+        return;
+    }
+
+    var check_type_list = ['length','must'];
+    var { 1:ng_flag_common , 2:ng_str_count_flag_common } = common_input_check("{{ div_id_name }}_input_check" , check_type_list);
+    ng_flag = ng_flag + ng_flag_common;
+    ng_str_count_flag = ng_str_count_flag + ng_str_count_flag_common;
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    if( ng_all_flag == 0){
+        //正常時処理
+        maintenance_inspection_acceptance_edit(this_step, next_step, action_cd);
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+//見積情報の保存処理
+function maintenance_inspection_acceptance_edit(this_step, next_step, action_cd) {
+
+    // 一時保存の時は、次作業者を変更しない
+    if ( this_step == next_step ){
+        var user_attribute_id = 0;
+    }else{
+        var user_attribute_id = $('#sel_next_person').val();
+    }
+    // hidden項目の取得
+    var phenomenon_unique_id = $('#phenomenon_unique_id').val();
+
+    // 画面上の指定id要素以下のinputを全て取得し、JSON形式でPOSTする
+    let text_inputs = common_get_all_input("{{ div_id_name }}_ng_character_check");
+    var input_value_array = {};
+    text_inputs.forEach(function(element,num){
+        input_value_array[element.id] = element.value;
+    });
+    var input_value_array_json = JSON.stringify(input_value_array);
+
+    $.ajax({
+    url: "/isk_tools/fms/action/maintenance_inspection_acceptance_entry/",
+    type: "POST",
+    data : {
+        'this_step' : this_step,
+        'next_step' : next_step,
+        'user_attribute_id' : user_attribute_id,
+        'next_division' : $('#next_division').val(),
+        'next_department' : $('#next_department').val(),
+        'this_division' : $('#user_division_cd').val(),
+        'this_department' : $('#user_department_cd').val(),
+        'phenomenon_unique_id' : phenomenon_unique_id,
+        'input_value_array' : input_value_array_json,
+        'action_cd' : action_cd,
+        'csrfmiddlewaretoken': "{{ csrf_token }}"
+    },
+    timeout: 10000,
+    dataType: 'json',
+    cache : false,
+    })
+    .done(function(data){
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        alert(data.msg);
+        if ( this_step != next_step ){
+            action_button_empty();
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        alert('Error!' +textStatus+' ' +errorThrown);
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    });
+}
+
+//操作PBを非表示にする
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();
+}
+
+//添付ファイルリストを表示する
+function upload_file_list_maintenance_inspection_acceptance() {
+    var file_folder = $('#{{ div_id_name }}_file_folder').val();
+    var div_id_name = $('#{{ div_id_name }}_div_id_name').val();
+    var delete_pb_disp_flag = $('#{{ div_id_name }}_delete_pb_disp_flag').val();
+    var file_class = $('#{{ div_id_name }}_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+}
+
+// datepicker設定
+$('.datepicker').datepicker();
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+</script>

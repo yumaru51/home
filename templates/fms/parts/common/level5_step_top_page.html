@@ -1,0 +1,153 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+//Lv4のトップページの表示処理
+function level4_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '/isk_tools/fms/level4_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level4_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+</script>
+<style type="text/css">
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 490px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+.square_small {
+   width: 160px;
+   height: 140px;
+   background: khaki;
+}
+.triangle_right_small {
+  width: 0;
+  height: 0;
+  border-left: 25px solid khaki;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+#budget_lists{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+#work_lists{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+.button{
+    width:100px;
+}
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+</style>
+
+    <div style="float:left">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+            <h2 class="page-header">{{ step_name }}トップページ</h2>
+        </div>
+    </div>
+    <div style="float:right;">
+{% if level5_step_id == 133009911 or level5_step_id == 136009911 or level5_step_id == 132008001%}
+    <input TYPE=button VALUE=前の画面に戻る NAME=disp_return size=3 style="width:120px"
+           onclick="irregular_menu();"/>
+{% elif level3_step_id %}
+    <input TYPE=button VALUE=前の画面に戻る NAME=disp_return size=3 style="width:120px"
+           onclick="level4_toppage({{ level3_step_id }});"/>
+{% else %}
+    <input TYPE=button VALUE=前の画面に戻る NAME=disp_return size=3 style="width:120px"
+           onclick="window.history.back(-1);"/>
+{% endif %}
+    </div>
+
+    <div class='clear'></div>
+    <div>
+        ユーザー：　<input TYPE=text VALUE="{{user_name}}" NAME=UseNM size=3 style="width:100px; height:20px"/>
+        　　　部門：　<input TYPE=text VALUE="{{user_division}}" NAME=user_division size=3 style="width:150px; height:20px"/>
+        　　　部署：　<input TYPE=text VALUE="{{user_department}}" NAME=User_department size=3 style="width:150px; height:20px"/>
+
+        <input TYPE=hidden id="user_division_cd" VALUE="{{user_division_cd}}" NAME=user_division_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="user" VALUE="{{t_user_name}}" NAME=user_name size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="user_department_cd" VALUE="{{user_department_cd}}" NAME=user_department_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="user_authority" VALUE="{{user_authority}}" NAME=user_authority size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="confirm_user" VALUE="{{confirm_user}}" NAME=confirm_user size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="permit_user" VALUE="{{permit_user}}" NAME=permit_user size=3 style="width:150px; height:20px"/>
+    </div>
+    <div style="float:left;width:5px">　　</div>
+
+    <div style="float:left;width:auto;">
+    {% for step_id, step_data in step_num_list.items %}
+            <div class="square_small" style="padding: 10px 5px 10px 5px; float:left; width:180px;align=center">
+                <div>
+                    <input TYPE=button VALUE="{{ step_data.0 }}" NAME=BdgEst size=3 style="width:180px; height:25px" /><br>
+                </div>
+                <div style="height: 5px">　</div>
+                <table>
+                    <tr>
+                        <td style="width:150px; align=center">部門：　</td>
+                        <td style="width:150px; align=center"><input TYPE=text NAME=IBP1 VALUE="{{ step_data.1 }}" SIZE=2 style=text-align:right; />件</td>
+                    </tr>
+                    <tr>
+                        <td style="width:150px; align=center">部署：　</td>
+                        <td style="width:150px; align=center"><input TYPE=text NAME=IBP1 VALUE="{{ step_data.2 }}" SIZE=2 style=text-align:right; />件</td>
+                    </tr>
+                    <tr>
+                        <td style="width:150px; align=center">自分：　</td>
+                        <td style="width:150px; align=center"><input TYPE=text NAME=IBP1 VALUE="{{ step_data.3 }}" SIZE=2 style=text-align:right; />件</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="triangle_right_small" style="float:left;"></div>
+    {% endfor %}
+    </div>
+
+    <div style="clear: both;" ></div>
+
+    <div style="float:left;width:auto;">
+        {% block sub_contents %}
+        {% endblock %}
+    </div>
+
+    <div style="clear: both;" ></div>
+    <div id="floatBox1Dialog" style="display:none;">
+        <div id="budget_detail">
+        </div>
+    </div>
+
+
+{% endblock %}

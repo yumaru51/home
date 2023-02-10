@@ -1,0 +1,157 @@
+<script>
+function position_target_change(value){
+    if(value == 1){
+        $('#position_x').css('background-color','#FFFFCC');
+        $('#position_y').css('background-color','#FFFFCC');
+        $('#blockage_position_x').css('background-color','white');
+        $('#blockage_position_y').css('background-color','white');
+    }else if(value == 2){
+        $('#position_x').css('background-color','white');
+        $('#position_y').css('background-color','white');
+        $('#blockage_position_x').css('background-color','#FFFFCC');
+        $('#blockage_position_y').css('background-color','#FFFFCC');
+    }else{
+        $('#position_x').css('background-color','white');
+        $('#position_y').css('background-color','white');
+        $('#blockage_position_x').css('background-color','white');
+        $('#blockage_position_y').css('background-color','white');
+    }
+}
+position_target_change(1);
+function data_entry() {
+    var target_id = $('#target_id').val();
+    var construction_date = $('#construction_date').val();
+    var position_x = $('#position_x').val();
+    var position_y = $('#position_y').val();
+    var blockage_position_x = $('#blockage_position_x').val();
+    var blockage_position_y = $('#blockage_position_y').val();
+    var blockage_flag = document.getElementsByName("blockage_flag").item(0).value;
+    if (construction_date == '' && position_x == '' && position_y == '' && blockage_position_x == '' && blockage_position_y == ''){
+        alert('登録する情報がありません！！');
+    }else{
+        $.ajax({
+            url: "/isk_tools/fms/action/position_data_entry/",
+            type: "POST",
+            data : {
+                'target_id': target_id,
+                'construction_date': construction_date,
+                'position_x': position_x,
+                'position_y': position_y,
+                'blockage_position_x': blockage_position_x,
+                'blockage_position_y': blockage_position_y,
+                'blockage_flag':blockage_flag,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+        })
+        .done(function(data){
+            alert(data.msg);
+            page_refresh();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#construction_detail').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+
+    }
+}
+function page_refresh() {
+    var start_date = $('#start_date').val();
+    var end_date = $('#end_date').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/daily_construction/daily_construction_entry_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'start_date', value: start_date}))
+    .append($('<input/>', {type: 'hidden', name: 'end_date', value: end_date}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+function check_box_change(){
+    if(document.getElementsByName("blockage_flag").item(0).checked == 1){
+        $("input[name='blockage_flag']").val(1);
+    }else{
+        $("input[name='blockage_flag']").val(0);
+    }
+    var value = $("input[name='blockage_flag']").val();
+}
+</script>
+
+
+<div>
+    <input type="hidden" id="target_id" value="{{ id }}">
+    <div style="float:left;margin-left:15px;">工事ID/小口依頼ID：{{ construction_id }}</div>
+    <div style="float:left;margin-left:30px;">工事区分：{{ construction_class }}</div>
+    <div style="float:left;margin-left:30px;">工事名：{{ construction_name }}</div>
+    <div style="float:left;margin-left:30px;">工事日：{{ construction_date }}</div>
+</div>
+<div style="clear: both;"></div>
+<div>
+    <div style="float:left;margin-left:15px;">
+        {% if fire_flag == 1 %}
+                <input type="checkbox" name="fire_flag" value="1" checked="checked">火気使用
+            {% else %}
+                <input type="checkbox" name="fire_flag" value="0">火気使用
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if high_place_flag == 1 %}
+                <input type="checkbox" name="high_place_flag" value="1" checked="checked">高所作業
+            {% else %}
+                <input type="checkbox" name="high_place_flag" value="0">高所作業
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if entering_the_tank_flag == 1 %}
+                <input type="checkbox" name="entering_the_tank_flag" value="1" checked="checked">入槽作業
+            {% else %}
+                <input type="checkbox" name="entering_the_tank_flag" value="0">入槽作業
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if heavy_equipment_flag == 1 %}
+                <input type="checkbox" name="heavy_equipment_flag" value="1" checked="checked">重機
+            {% else %}
+                <input type="checkbox" name="heavy_equipment_flag" value="0">重機
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if brake_off_flag == 1 %}
+                <input type="checkbox" name="brake_off_flag" value="1" checked="checked">縁切
+            {% else %}
+                <input type="checkbox" name="brake_off_flag" value="0">縁切
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if contamination_flag == 1 %}
+                <input type="checkbox" name="contamination_flag" value="1" checked="checked">異物
+            {% else %}
+                <input type="checkbox" name="contamination_flag" value="0">異物
+            {% endif %}
+    </div>
+    <div style="float:left;margin-left:15px;">
+        {% if blockage_flag == 1 %}
+            <input type="checkbox" name="blockage_flag" value="1" checked="checked" onclick="check_box_change();">交通遮断
+        {% else %}
+            <input type="checkbox" name="blockage_flag" value="0" onclick="check_box_change();">交通遮断
+        {% endif %}
+    </div>
+</div>
+<div style="clear: both;"></div>
+<div>
+    <div>
+        座標登録対象：
+        <select name="position_target" id="position_target" onchange="position_target_change(value);">
+            <option value="1">工事場所</option>
+            <option value="2">交通遮断場所</option>
+        </select>
+    </div>
+</div>
+<div>
+    <div style="float:left;margin-left:15px;">工事日：<input type="date" id="construction_date" value="{{ construction_date | date:'Y-m-d' }}"></div>
+    <div style="float:left;margin-left:30px;">工事場所X座標：<input type="text" id="position_x" value="{{ position_x }}"></div>
+    <div style="float:left;margin-left:30px;">工事場所Y座標：<input type="text" id="position_y" value="{{ position_y }}"></div>
+    <div style="float:left;margin-left:30px;">交通遮断X座標：<input type="text" id="blockage_position_x" value="{{ blockage_position_x }}"></div>
+    <div style="float:left;margin-left:30px;">交通遮断Y座標：<input type="text" id="blockage_position_y" value="{{ blockage_position_y }}"></div>
+    <div style="float:right;margin-right:15px;"><input type="button" value="　登録　" onclick="data_entry();"></div>
+</div>

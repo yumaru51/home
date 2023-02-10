@@ -1,0 +1,409 @@
+<script>
+// 建築基準法_確認申請_種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function building_standards_act_category_value_change() {
+    var target_building_standards_act_category = $('#building_standards_act_category').val();
+    if (target_building_standards_act_category != "") {
+        var pulldown_option = document.getElementById("sel_building_standards_act_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_building_standards_act_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+// 省エネ法_特定建築物届出_種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function energy_rationalization_act_category_value_change() {
+    var target_energy_rationalization_act_category = $('#energy_rationalization_act_category').val();
+    if (target_energy_rationalization_act_category != "") {
+        var pulldown_option = document.getElementById("sel_energy_rationalization_act_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_energy_rationalization_act_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//省エネ法_特定建築物届出_扱いのコンボボックスの選択を呼び出した値(引数?)と同期
+function energy_rationalization_act_action_value_change() {
+    var target_energy_rationalization_act_action = $('#energy_rationalization_act_action').val();
+    if (target_energy_rationalization_act_action != "") {
+        var pulldown_option = document.getElementById("sel_energy_rationalization_act_action").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_energy_rationalization_act_action){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//建設リサイクル法_種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function construction_recycling_category_value_change() {
+    var target_construction_recycling_category = $('#construction_recycling_category').val();
+    if (target_construction_recycling_category != "") {
+        var pulldown_option = document.getElementById("sel_construction_recycling_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_construction_recycling_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//建築基準法_確認申請_種類のコンボボックスを変更したときに選択値と格納値を同期
+function building_standards_act_category_change(a) {
+    var value = a;
+    $('#building_standards_act_category').val(value);
+}
+
+//省エネ法_特定建築物届出_種類のコンボボックスを変更したときに選択値と格納値を同期
+function energy_rationalization_act_category_change(a) {
+    var value = a;
+    $('#energy_rationalization_act_category').val(value);
+}
+
+//省エネ法_特定建築物届出_扱いのコンボボックスを変更したときに選択値と格納値を同期
+function energy_rationalization_act_action_change(a) {
+    var value = a;
+    $('#energy_rationalization_act_action').val(value);
+}
+
+//建設リサイクル法_種類のコンボボックスを変更したときに選択値と格納値を同期
+function construction_recycling_category_change(a) {
+    var value = a;
+    $('#construction_recycling_category').val(value);
+}
+
+// チェックボックスの状態同期
+function cs_eng_check_box_change(){
+    if($('#building_standards_act').val() == "True")
+    {
+        document.getElementById("sel_building_standards_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_building_standards_act").checked = 0;
+    }
+    if($('#energy_rationalization_act').val() == "True")
+    {
+        document.getElementById("sel_energy_rationalization_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_energy_rationalization_act").checked = 0;
+    }
+    if($('#construction_recycling').val() == "True")
+    {
+        document.getElementById("sel_construction_recycling").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_construction_recycling").checked = 0;
+    }
+}
+
+//入力項目の未入力、文字数オーバーをチェック
+function input_eng_check(a,b,d) {  // a:自工程id, b:次工程id,  d:action_cd
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var ng_count = 0;
+    var msg = "";
+    var alert_ng_ch_msg_str = ""
+
+    //必須入力チェック
+
+    // 建築基準法_確認申請
+    var building_standards_act = $('#sel_building_standards_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_building_standards_act_category').val() == "" && building_standards_act){
+        $('#sel_building_standards_act_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_building_standards_act_category').css('background-color','white');
+    }
+
+    // 省エネ法_特定建築物届出
+    var energy_rationalization_act = $('#sel_energy_rationalization_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_energy_rationalization_act_category').val() == "" && energy_rationalization_act){
+        $('#sel_energy_rationalization_act_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_energy_rationalization_act_category').css('background-color','white');
+    }
+    if ($('#sel_energy_rationalization_act_action').val() == "" && energy_rationalization_act){
+        $('#sel_energy_rationalization_act_action').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_energy_rationalization_act_action').css('background-color','white');
+    }
+
+    // 建設リサイクル法
+    var construction_recycling = $('#sel_construction_recycling').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_construction_recycling_category').val() == "" && construction_recycling){
+        $('#sel_construction_recycling_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_construction_recycling_category').css('background-color','white');
+    }
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //警告表示
+    if ( ng_flag > 0 ) {
+        msg += '工務管轄タブに未入力項目があります！！\n';
+    }
+    if ( ng_str_count_flag > 0 ) {
+        msg += '工務管轄タブにて文字数オーバーの項目があります！！\n';
+    }
+    if ( alert_ng_ch_msg_str.length > 0 ) {
+        msg += '工務管轄タブにて' + alert_ng_ch_msg_str;
+    }
+    if ( msg.length > 0 ) {
+        alert(msg);
+    }
+    ng_count = ng_all_flag;
+    return ng_count;
+}
+
+//データ登録･更新処理
+function cs_eng_edit(a,b) {  // a:自工程id, b:次工程id
+        //完了を通知するためのDeferredオブジェクトを作成
+        var deferred = new $.Deferred();
+        if ($('#eng_edit_flag').val() != 1){
+            deferred.resolve();
+            //完了を知らせるためにpromiseオブジェクトを返す
+            return deferred.promise();
+        }
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var budget_id = $('#target_budget_id').val();
+        var work_id = $('#work_id').val();
+        var cs_no = $('#cs_no').val();
+        var cs_rev_no = $('#cs_rev_no').val();
+        var building_standards_act = $('#sel_building_standards_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var building_standards_act_category = $('#sel_building_standards_act_category').val();
+        var energy_rationalization_act = $('#sel_energy_rationalization_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var energy_rationalization_act_category = $('#sel_energy_rationalization_act_category').val();
+        var energy_rationalization_act_action = $('#sel_energy_rationalization_act_action').val();
+        var construction_recycling = $('#sel_construction_recycling').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var construction_recycling_category = $('#sel_construction_recycling_category').val();
+        var comment = $('#comment').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if(document.getElementById("ga_edit_flag").value != 1
+           && document.getElementById("sh_edit_flag").value != 1
+           && document.getElementById("env_edit_flag").value != 1){
+            var eng_edit_flag = $('#eng_edit_flag').val();
+        }
+        else{
+            var eng_edit_flag = 0;
+        }
+        $.ajax({
+                url: "/isk_tools/fms/action/cs_engineering_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'budget_id' : budget_id,
+                    'work_id' : work_id,
+                    'eng_edit_flag': eng_edit_flag,
+                    'cs_no': cs_no,
+                    'cs_rev_no': cs_rev_no,
+                    'building_standards_act': building_standards_act,
+                    'building_standards_act_category': building_standards_act_category,
+                    'energy_rationalization_act': energy_rationalization_act,
+                    'energy_rationalization_act_category': energy_rationalization_act_category,
+                    'energy_rationalization_act_action': energy_rationalization_act_action,
+                    'construction_recycling': construction_recycling,
+                    'construction_recycling_category': construction_recycling_category,
+                    'comment' : comment,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                async: false,
+                cache : false,
+                })
+                .done(function(data){
+                    //新規登録、リビジョン変更時 画面のinputに反映
+                    var this_cs_id = data.cs_no
+                    $('#cs_no').val(this_cs_id);
+                    var this_cs_rev_no = data.cs_rev_no
+                    $('#cs_rev_no').val(this_cs_rev_no);
+                    var this_work_id = data.work_id;
+                    var this_budget_id = data.budget_id;
+                    $('#target_budget_id').val(this_budget_id);
+                    $('#work_id').val(this_work_id);
+
+                    //完了を通知
+                    deferred.resolve();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    //失敗を通知
+                    deferred.reject();
+                });
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+
+
+</script>
+
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+
+select {
+    font-size: 100%;
+    height:auto;
+}
+
+input[type=checkbox] {
+    width: 20px;
+    height: 20px;
+}
+
+table {
+    line-height: initial;
+    font-size: 100%;
+    height:100px;
+}
+
+
+/*
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+*/
+</style>
+
+<!--    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">-->
+    <div class="fms_col" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="cs_no" value="{{ cs_no }}">
+<!--    <input type="hidden" id="target_budget_id" value="{{ budget_id }}">-->
+    <input type="hidden" id="work_id" value="{{ work_id }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="cs_rev_no" value="{{cs_rev_no}}">
+    <input type="hidden" id="building_standards_act" value="{{ building_standards_act }}">
+    <input type="hidden" id="building_standards_act_category" value="{{ building_standards_act_category }}">
+    <input type="hidden" id="energy_rationalization_act" value="{{ energy_rationalization_act }}">
+    <input type="hidden" id="energy_rationalization_act_category" value="{{ energy_rationalization_act_category }}">
+    <input type="hidden" id="energy_rationalization_act_action" value="{{ energy_rationalization_act_action }}">
+    <input type="hidden" id="construction_recycling" value="{{ construction_recycling }}">
+    <input type="hidden" id="construction_recycling_category" value="{{ construction_recycling_category }}">
+    <input type="hidden" id="eng_edit_flag" value="{{eng_edit_flag}}">
+    </div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div style="float:left;">
+        <table class=cs_engineering_edit_table">
+            <tr>
+                <th><div><font size="6" style="line-height:130%">建築基準法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_building_standards_act" value="1"></font>
+                <font size="4">
+                    <select id="sel_building_standards_act_category" name="sel_building_standards_act_category" onchange="building_standards_act_category_change(value);">
+                    <option hidden value="">設置物種類</option>
+                        {% for building_standards_act_category_list in building_standards_act_category_list %}
+                            <option value="{{ building_standards_act_category_list.category }}">{{ building_standards_act_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="5"><label for="sel_building_standards_act">の確認申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">省エネ法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_energy_rationalization_act" value="1"></font>
+                <font size="4">
+                    <select id="sel_energy_rationalization_act_category" name="sel_energy_rationalization_act_category" onchange="energy_rationalization_act_category_change(value);">
+                    <option hidden value="">第Ｘ種</option>
+                        {% for energy_rationalization_act_category_list in energy_rationalization_act_category_list %}
+                            <option value="{{ energy_rationalization_act_category_list.category }}">{{ energy_rationalization_act_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_energy_rationalization_act">特定建築物</label></font>
+                <font size="4">
+                    <select id="sel_energy_rationalization_act_action" name="sel_energy_rationalization_act_action" onchange="energy_rationalization_act_action_change(value);">
+                    <option hidden value="">扱い</option>
+                        {% for energy_rationalization_act_action_list in energy_rationalization_act_action_list %}
+                            <option value="{{ energy_rationalization_act_action_list.action }}">{{ energy_rationalization_act_action_list.action }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_energy_rationalization_act">届出</label></font></div></td>
+                <td><div><font size="5">・・・21日前</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">建設リサイクル法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_construction_recycling" value="1"></font>
+                <font size="4">
+                    <select id="sel_construction_recycling_category" name="sel_construction_recycling_category" onchange="construction_recycling_category_change(value);">
+                    <option hidden value="">届出種類</option>
+                        {% for construction_recycling_category_list in construction_recycling_category_list %}
+                            <option value="{{ construction_recycling_category_list.category }}">{{ construction_recycling_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                </div></td>
+                <td><div><font size="5">・・・工事着手7日前</font></div></td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="clear: both;"></div>
+
+    </div><!--ng_character_checkここまで-->

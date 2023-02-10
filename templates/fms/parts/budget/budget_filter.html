@@ -1,0 +1,549 @@
+<script>
+//日付入力をカレンダー化
+$('.datepicker').datepicker();
+//カレンダーを日本語化
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+//対象の予算一覧の表示処理
+function get_budget_lists_search() {
+        // 検索条件を保持する
+        session_value_budget_write();
+        // 検索
+        get_budget_lists();
+}
+//対象の予算一覧の表示処理
+function get_budget_lists() {
+        $("#loading").show();//呼び出し中に表示するgifを表示
+        var sel_budget_condition = $('#sel_budget_budget_condition').val();
+        var sel_step = $('#sel_budget_step').val();
+        var sel_business_year = $('#sel_budget_business_year').val();
+        var sel_budget_class = $('#sel_budget_budget_class').val();
+        var sel_budget_id = $('#sel_budget_budget_id').val();
+        var sel_budget_no = $('#sel_budget_budget_no').val();
+        var sel_budget_name = $('#sel_budget_budget_name').val();
+        var sel_division = $('#sel_budget_division').val();
+        var sel_department = $('#sel_budget_department').val();
+        var sel_process = $('#sel_budget_process').val();
+        var sel_next_division = $('#sel_budget_next_division').val();
+        var sel_next_department = $('#sel_budget_next_department').val();
+        var sel_next_parson = $('#sel_budget_next_parson').val();
+        var sel_on_work = $('#sel_budget_on_work').prop('checked');
+        var level5_step_id = $('#level5_step_id').val();
+        var sel_display_order = $("input[name='sel_budget_display_order']:checked").val();
+        var sel_need_carry_over = $('#sel_budget_need_carry_over').prop('checked');
+        if(level5_step_id.substring(0, 3) == '136'){
+            var sel_show_additional_budget = 'true';
+        }else{
+            var sel_show_additional_budget = 'false';
+        }
+        var sel_main_charge_person_only = $('#sel_main_charge_person_only').prop('checked');
+        var list_kind = 'budget'
+        var start_work_stop_flag = 0
+
+        var req_url = '/isk_tools/fms/parts/budget/budget_list/';
+        var return_url = 'fms/parts/budget/budget_lists.html';
+        if(document.getElementById("step_name") != null){
+            var step_name_obj = document.getElementById("step_name");
+            if(step_name_obj.value == 'ヒアリング資料出力' || step_name_obj.value == '通常申請：予算No登録' || step_name_obj.value == '追加予算：予算No登録' || step_name_obj.value == '中期計画：単年度計画移行'){
+                return_url = 'fms/parts/temporary_response/budget_select_lists.html';
+                sel_on_work = 'false';
+                sel_main_charge_person_only = 'true';
+            }else if(step_name_obj.value == '予算繰越申請書出力'){
+                req_url = '/isk_tools/fms/parts/budget/budget_carry_forward_list/'
+                return_url = 'fms/parts/temporary_response/carry_forward_document_budget_list.html';
+                /// sel_on_work = 'false';
+                sel_main_charge_person_only = 'true';
+            }
+        }
+
+        $.ajax({
+                url: req_url,
+                type: "POST",
+                data : {
+                    'list_type': 0,
+                    'sel_budget_condition': sel_budget_condition,
+                    'sel_step': sel_step,
+                    'sel_business_year': sel_business_year,
+                    'sel_budget_class': sel_budget_class,
+                    'sel_budget_id': sel_budget_id,
+                    'sel_budget_no': sel_budget_no,
+                    'sel_budget_name': sel_budget_name,
+                    'sel_division': sel_division,
+                    'sel_department': sel_department,
+                    'sel_process': sel_process,
+                    'sel_next_division': sel_next_division,
+                    'sel_next_department': sel_next_department,
+                    'sel_next_parson': sel_next_parson,
+                    'sel_on_work': sel_on_work,
+                    'level5_step_id' : level5_step_id,
+                    'sel_display_order': sel_display_order,
+                    'sel_show_additional_budget': sel_show_additional_budget,
+                    'sel_show_complete_only': 'false',
+                    'sel_main_charge_person_only': sel_main_charge_person_only,
+                    'return_url': return_url,
+                    'start_work_stop_flag': start_work_stop_flag,
+                    'sel_area_manager': '',
+                    'list_kind': list_kind,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 100000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_lists').empty();
+                    $('#budget_lists').html(data);
+                    $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    $("#budget_lists").fadeIn();//対象の一覧をフェードイン
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+
+}
+
+// セッション情報削除
+function session_value_budget_clear() {
+    sessionStorage.removeItem("sel_budget_budget_condition");
+    sessionStorage.removeItem("sel_budget_step");
+    sessionStorage.removeItem("sel_budget_business_year");
+    sessionStorage.removeItem("sel_budget_budget_class");
+    sessionStorage.removeItem("sel_budget_budget_id");
+    sessionStorage.removeItem("sel_budget_budget_no");
+    sessionStorage.removeItem("sel_budget_budget_name");
+    sessionStorage.removeItem("sel_budget_division");
+    sessionStorage.removeItem("sel_budget_department");
+    sessionStorage.removeItem("sel_budget_process");
+    sessionStorage.removeItem("sel_budget_area_manager_parson");
+    sessionStorage.removeItem("sel_budget_next_division");
+    sessionStorage.removeItem("sel_budget_next_department");
+    sessionStorage.removeItem("sel_budget_next_parson");
+    sessionStorage.removeItem("sel_budget_on_work");
+    sessionStorage.removeItem("sel_budget_display_order");
+    sessionStorage.removeItem("sel_budget_main_person_only");
+}
+
+// セッション情報読込
+function session_value_budget_read() {
+    // 予算状態
+    if (sessionStorage.getItem('sel_budget_budget_condition'))
+    {
+        set_combo_value('sel_budget_budget_condition', sessionStorage.getItem('sel_budget_budget_condition'));
+    }else{
+        // 予算状態はデフォルト値を設定
+        var value = get_budget_condition_default_budget();
+        if(value){
+            set_combo_value('sel_budget_budget_condition', value);
+        }
+    }
+    // 進捗状況
+    if (sessionStorage.getItem('sel_budget_step'))
+    {
+        set_combo_value('sel_budget_step', sessionStorage.getItem('sel_budget_step'));
+    }else{
+        var value = get_budget_step_default_budget();
+        if(value){
+            set_combo_value('sel_budget_step', value);
+        }
+    }
+    // 年度
+    if (sessionStorage.getItem('sel_budget_business_year'))
+    {
+        set_combo_value('sel_budget_business_year', sessionStorage.getItem('sel_budget_business_year'));
+    }
+    // 工事区分
+    if (sessionStorage.getItem('sel_budget_budget_class'))
+    {
+        set_combo_value('sel_budget_budget_class', sessionStorage.getItem('sel_budget_budget_class'));
+    }
+    // 予算ID
+    if (sessionStorage.getItem('sel_budget_budget_id'))
+    {
+        $('#sel_budget_budget_id').val(sessionStorage.getItem('sel_budget_budget_id'));
+    }
+    // 予算NO
+    if (sessionStorage.getItem('sel_budget_budget_no'))
+    {
+        $('#sel_budget_budget_no').val(sessionStorage.getItem('sel_budget_budget_no'));
+    }
+    // 予算名
+    if (sessionStorage.getItem('sel_budget_budget_name'))
+    {
+        $('#sel_budget_budget_name').val(sessionStorage.getItem('sel_budget_budget_name'));
+    }
+    // 部門
+    if (sessionStorage.getItem('sel_budget_division'))
+    {
+        set_combo_value('sel_budget_division', sessionStorage.getItem('sel_budget_division'));
+    }
+    // 部署
+    if (sessionStorage.getItem('sel_budget_department'))
+    {
+        set_combo_value('sel_budget_department', sessionStorage.getItem('sel_budget_department'));
+    }
+    // 工程
+    if (sessionStorage.getItem('sel_budget_process'))
+    {
+         set_combo_value('sel_budget_process', sessionStorage.getItem('sel_budget_process'));
+    }
+
+    // 未処理のみ
+    if(sessionStorage.getItem('sel_budget_on_work'))
+    {
+        if(sessionStorage.getItem('sel_budget_on_work') == 'true')
+        {
+            $('#sel_budget_on_work').prop('checked', true);
+        }
+        else
+        {
+            $('#sel_budget_on_work').prop('checked', false);
+        }
+    }
+    // 表示順
+    if (sessionStorage.getItem('sel_budget_display_order'))
+    {
+        $('input[name=sel_budget_display_order]:eq(' + (sessionStorage.getItem('sel_budget_display_order') - 1) + ')').prop('checked', true);
+    }
+
+    //主担当者のみ
+    if (sessionStorage.getItem('sel_budget_main_person_only'))
+    {
+        if (sessionStorage.getItem('sel_budget_main_person_only') == 'true')
+        {
+            $('#sel_main_charge_person_only').prop('checked', true);
+        }
+        else
+        {
+            $('#sel_main_charge_person_only').prop('checked', false);
+        }
+    }
+}
+
+// セッション情報書込み
+function session_value_budget_write() {
+    // 予算状態
+    var value = $('#sel_budget_budget_condition').val();
+    sessionStorage.setItem('sel_budget_budget_condition', value);
+    // 進捗状況
+    value = $('#sel_budget_step').val();
+    sessionStorage.setItem('sel_budget_step', value);
+    // 年度
+    value = $('#sel_budget_business_year').val();
+    sessionStorage.setItem('sel_budget_business_year', value);
+    // 工事区分
+    value = $('#sel_budget_budget_class').val();
+    sessionStorage.setItem('sel_budget_budget_class', value);
+    // 予算ID
+    value = $('#sel_budget_budget_id').val();
+    sessionStorage.setItem('sel_budget_budget_id', value);
+    // 予算NO
+    value = $('#sel_budget_budget_no').val();
+    sessionStorage.setItem('sel_budget_budget_no', value);
+    // 予算名
+    value = $('#sel_budget_budget_name').val();
+    sessionStorage.setItem('sel_budget_budget_name', value);
+    // 部門
+    value = $('#sel_budget_division').val();
+    sessionStorage.setItem('sel_budget_division', value);
+    // 部署
+    value = $('#sel_budget_department').val();
+    sessionStorage.setItem('sel_budget_department', value);
+    // 工程
+    value = $('#sel_budget_process').val();
+    sessionStorage.setItem('sel_budget_process', value);
+
+    // 次作業者部門
+    value = $('#sel_budget_next_division').val();
+    sessionStorage.setItem('sel_budget_next_division', value);
+    // 次作業者部署
+    value = $('#sel_budget_next_department').val();
+    sessionStorage.setItem('sel_budget_next_department', value);
+    // 次作業者
+    value = $('#sel_budget_next_parson').val();
+    sessionStorage.setItem('sel_budget_next_parson', value);
+    // 未処理のみ
+    value = $('#sel_budget_on_work').prop('checked');
+    sessionStorage.setItem('sel_budget_on_work', value);
+    // 表示順
+    value = $("input[name='sel_budget_display_order']:checked").val();
+    sessionStorage.setItem('sel_budget_display_order', value);
+    //主担当者のみ
+    value = $('#sel_main_charge_person_only').prop('checked');
+    sessionStorage.setItem('sel_budget_main_person_only', value);
+}
+
+// 予算状態デフォルト値取得
+function get_budget_condition_default_budget(){
+    var ret_value = false;
+    var level5_step_id = $('#level5_step_id').val();
+    step_id_level3 = level5_step_id.substring(0, 3);
+    step_id_level4 = level5_step_id.substring(0, 6);
+    if(step_id_level3 == '133' && step_id_level4 != '133006' && level5_step_id != '133000000'){
+        ret_value = 11;
+    }
+    return ret_value;
+}
+
+// 進捗状態デフォルト値取得
+function get_budget_step_default_budget(){
+    var ret_value = false;
+    if(document.getElementById("step_name") != null){
+        var step_name_obj = document.getElementById("step_name");
+        if(step_name_obj.value == '通常申請：予算No登録'){
+            ret_value = 133006031;
+        }else if(step_name_obj.value == '追加予算：予算No登録'){
+            ret_value = 136006001;
+        }
+    }
+    return ret_value;
+}
+
+//コンボボックスを選択する
+function set_combo_value(id, val) {
+    if (val != "") {
+        document.getElementById(id).value = val;
+    }
+}
+
+//次部門選択時処理
+function budget_select_next_division(division){
+    var division = division;
+    var target = 'budget';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_next_division/",
+                type: "POST",
+                data : {
+                    'division' : division,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(budget_next_department).empty();
+                    $(budget_next_department).html(data);
+                    budget_select_next_department('');
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(budget_next_department).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//次部署選択時処理
+function budget_select_next_department(department){
+    var department = department;
+    var target = 'budget';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_next_department/",
+                type: "POST",
+                data : {
+                    'department' : department,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(budget_next_person).empty();
+                    $(budget_next_person).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(budget_next_person).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//部門選択時処理
+function budget_select_filter_division(division){
+    var division = division;
+    var target = 'budget';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_filter_division/",
+                type: "POST",
+                data : {
+                    'division' : division,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(budget_filter_department).empty();
+                    $(budget_filter_department).html(data);
+                    budget_select_filter_department('');
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(budget_filter_department).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//部署選択時処理
+function budget_select_filter_department(department){
+    var department = department;
+    var target = 'budget';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_filter_department/",
+                type: "POST",
+                data : {
+                    'department' : department,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(budget_filter_process_cd).empty();
+                    $(budget_filter_process_cd).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(budget_filter_process_cd).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+    <div style="width: auto;height:160px;background:#ffcccc; border-style:double none;">
+        絞込条件<br>
+        <div class="filter_item" style="float:left;">
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">
+                    予算状態：<select id="sel_budget_budget_condition" name="sel_budget_condition">
+                    <option value=""></option>
+                        {% for budget_condition_item in budget_condition_list %}
+                            <option value="{{ budget_condition_item.condition_id }}">{{ budget_condition_item.condition_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    進捗状況：<select id="sel_budget_step" name="sel_step">
+                    <option value=""></option>
+                        {% for step_item in step_list %}
+                            <option value="{{ step_item.step_id }}">{{ step_item.step_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    年度：<select id="sel_budget_business_year" name="sel_business_year">
+                    <option value=""></option>
+                        {% for business_year_item in business_year_list %}
+                            <option value="{{ business_year_item.business_year }}">{{ business_year_item.business_year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    工事区分：<select id="sel_budget_budget_class" name="sel_budget_class">
+                    <option value=""></option>
+                        {% for budget_class_item in budget_class_list %}
+                            <option value="{{ budget_class_item.budget_class_cd }}">{{ budget_class_item.budget_class_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">予算ID：<input type="text" id="sel_budget_budget_id" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">予算NO：<input type="text" id="sel_budget_budget_no" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">{{ budget_name_text }}：<input type="text" id="sel_budget_budget_name" value="" size="36">※あいまい</div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">部門：<select id="sel_budget_division" name="sel_division" onchange="budget_select_filter_division(value)">
+                    <option value=""></option>
+                        {% for division_item in division_list %}
+                            <option value="{{ division_item.division_cd }}">{{ division_item.division_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="budget_filter_department" class="item" style="float:left;margin-left:15px;">部署：<select id="sel_budget_department" name="sel_department" onchange="budget_select_filter_department(value)">
+                    <option value=""></option>
+                        {% for departments_item in departments_list %}
+                            <option value="{{ departments_item.department_cd }}">{{ departments_item.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="budget_filter_process_cd" class="item" style="float:left;margin-left:15px;">工程：<select id="sel_budget_process" name="sel_process">
+                        <option value=""></option>
+                        {% for process_item in process_list %}
+                            <option value="{{ process_item.process_cd2 }}">{{ process_item.process_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">次作業者部門：<select id="sel_budget_next_division" name="sel_next_division" onchange="budget_select_next_division(value);">
+                    <option value=""></option>
+                        {% for division_item in division_list %}
+                            {% if division_item.division_cd == user_division_cd %}
+                                <option value="{{ division_item.division_cd }}" selected>{{ division_item.division_name }}</option>
+                            {% else %}
+                                <option value="{{ division_item.division_cd }}">{{ division_item.division_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="budget_next_department" class="item" style="float:left;margin-left:15px;">次作業者部署：<select id="sel_budget_next_department" name="sel_next_department" onchange="budget_select_next_department(value);">
+                    <option value=""></option>
+                        {% for next_departments_item in next_departments_list %}
+                            {% if next_departments_item.department_cd == target_department %}
+                                <option value="{{ next_departments_item.department_cd }}" selected>{{ next_departments_item.department_name }}</option>
+                            {% else %}
+                                <option value="{{ next_departments_item.department_cd }}">{{ next_departments_item.department_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="budget_next_person" class="item" style="float:left;margin-left:15px;">次作業者：<select id="sel_budget_next_parson" name="sel_next_parson">
+                    <option value=""></option>
+                        {% for next_user in next_user_list %}
+                            {% if next_user.username == target_person %}
+                                <option value="{{ next_user.username }}" selected>{{ next_user.full_name }}</option>
+                            {% else %}
+                                <option value="{{ next_user.username }}">{{ next_user.full_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;"><input type="checkbox" id="sel_budget_on_work" size="18" checked>未処理のみ</div>
+                <div class="item" style="float:left;margin-left:15px;">表示順：
+                    <input type="radio" id="sel_display_order1" value="1" name="sel_budget_display_order" size="18" checked>予算ID
+                    <input type="radio" id="sel_display_order2" value="2" name="sel_budget_display_order" size="18" >予算NO
+                    <input type="radio" id="sel_display_order3" value="3" name="sel_budget_display_order" size="18" >滞留日数
+                    <input type="radio" id="sel_display_order4" value="4" name="sel_budget_display_order" size="18" >設備工程
+                </div>
+                <div class="item" style="float:left;margin-left:15px;"><input type="checkbox" id="sel_main_charge_person_only" size="18">主担当者のみ表示する</div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    session_value_budget_read();
+</script>

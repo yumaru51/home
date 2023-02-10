@@ -1,0 +1,708 @@
+<script>
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//入力項目の未入力、文字数オーバーのチェックだけを行う
+function maintenance_order_input_check() {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    //入力チェック対象リスト　val_id=該当id、set_id=背景色変更対象id、
+    //must_flg=必須項目フラグ(1で必須)、max_length=上限文字数(0はチェックしない)
+    let check_object_list =
+    { 0: { val_id:'#contact_request',           set_id:'contact_request',               must_flg:1, max_length:0},
+      1: { val_id:'#order_name',                set_id:'order_name',                    must_flg:1, max_length:25},
+      2: { val_id:'#order_name_extension',      set_id:'order_name_extension',          must_flg:1, max_length:0},
+      3: { val_id:'#expected_price',            set_id:'expected_price',                must_flg:1, max_length:0},
+      4: { val_id:'#start_date',                set_id:'start_date',                    must_flg:1, max_length:0},
+      5: { val_id:'#end_date',                  set_id:'end_date',                      must_flg:1, max_length:0},
+      6: { val_id:'#department',                set_id:'department',                    must_flg:1, max_length:0},
+      7: { val_id:'#plant_name',                set_id:'plant_name',                    must_flg:1, max_length:0},
+      8: { val_id:'#sel_cost_center',           set_id:'sel_cost_center',               must_flg:1, max_length:0},
+      9: { val_id:'#sel_account_code',          set_id:'sel_account_code',              must_flg:1, max_length:0},
+     10: { val_id:'#sel_instruction_no',        set_id:'sel_instruction_no',            must_flg:1, max_length:0},
+     11: { val_id:'#order_detail',              set_id:'order_detail',                  must_flg:1, max_length:0},
+     12: { val_id:'#order_vendor',              set_id:'order_vendor',                  must_flg:1, max_length:0},
+     13: { val_id:'#sel_person',                set_id:'sel_person',                    must_flg:1, max_length:0},
+     14: { val_id:'#sel_next_step',             set_id:'sel_next_step',                 must_flg:1, max_length:0},
+    };
+
+    for (let check_index in check_object_list){
+        var check_object = check_object_list[check_index];
+        var check_val = $(check_object.val_id).val();
+        var set_element = document.getElementById(check_object.set_id);
+        var ng_element_flag = 0;
+
+        //必須項目チェック
+        if(check_object.must_flg == 1 && check_val == ""){
+            set_element.style.backgroundColor = 'orange';
+            ng_element_flag =  1;
+            ng_flag = ng_flag + ng_element_flag;
+        }
+
+        //文字数上限チェック
+        if ( check_object.max_length > 0 && count_char(check_val) > check_object.max_length){
+           if(ng_element_flag == 0){
+             set_element.style.backgroundColor = 'silver';
+           }
+           ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else if(ng_element_flag == 0){
+           set_element.style.backgroundColor = 'white';
+        }
+    }
+    return { 1:ng_flag , 2:ng_str_count_flag };
+}
+
+//入力チェックを行うJS
+function input_check(a,b,d) {
+    var ng_select_flag = 0;
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+
+    //完了を通知するためのDeferredオブジェクトを作成
+    var deferred = new $.Deferred();
+
+    // 工事実施決裁ステップのみ所管部署の完了チェック
+    if ( a == 232001001 && a != b && {{ notification_check_complete_flag }} != 1 && b != 232009901){
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        msg += '届出チェックが完了していません！！\n';
+        alert(msg);
+        $(".button").prop("disabled", false);
+        deferred.reject();
+        return deferred.promise();
+    }
+
+    //共通チェック処理
+    var { 1:ng_flag , 2:ng_str_count_flag } = maintenance_order_input_check();
+
+    //特殊条件処理
+    if ($('#contact_request').val() != $('#sel_next_step').val() && $('#sel_next_step').val() != '232009901'){
+        $('#contact_request').css('background-color','orange');
+        ng_select_flag = ng_select_flag + 1 ;
+    }else{
+        $('#contact_request').css('contact_request-color','white');
+    }
+
+    //IEP依頼時のみ必須項目
+    if( $('#contact_request').val() == "232004001"){
+        if ($('#orders_received_person').val() == ""){
+            $('#orders_received_person').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#orders_received_person').css('background-color','white');
+        }
+
+        if ($('#is_need_input_plantia').val() == ""){
+            $('#is_need_input_plantia').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#is_need_input_plantia').css('background-color','white');
+        }
+    }else{
+        $('#orders_received_person').css('background-color','white');
+        $('#is_need_input_plantia').css('background-color','white');
+    }
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag + ng_select_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常処理を先に判定
+    if ( ng_all_flag == 0) {
+        var deferred_edit = maintenance_order_entry(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+        deferred_edit.done(function(){
+            //完了時の処理を登録
+            deferred.resolve();
+        })
+        .fail(function(){
+            //失敗時の処理を登録
+            deferred.reject();
+        });
+    }else{
+        //失敗時は待たせない
+        deferred.reject();
+
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( ng_select_flag > 0 ) {
+            msg += '依頼先と次工程が不一致です！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+// 依頼データ登録処理
+function maintenance_order_entry(a,b) {
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+            var action_type = "save";
+        }else{
+            var next_person = $('#sel_next_person').val();
+            var user_attribute_id = $('#sel_next_person').val();
+            var action_type = "comp";
+        }
+        var order_id = $('#order_id').val();
+        var phenomenon_id = $('#target_phenomenon_id').val();
+        var contact_request = $('#contact_request').val();
+        var order_name = $('#order_name').val();
+        var order_name_extension = $('#order_name_extension').val();
+        var expected_price = $('#expected_price').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+        var department = $('#department').val();
+        var plant_name = $('#plant_name').val();
+        var cost_center = $('#sel_cost_center').val();
+        var instruction_code = $('#sel_instruction_no').val();
+        var account_code = $('#sel_account_code').val();
+        var order_detail = $('#order_detail').val();
+        var order_vendor = $('#order_vendor').val();
+        var orders_received_person = $('#orders_received_person').val();
+        var order_permit_person = $('#sel_person').val();
+        var rem = $('#rem').val();
+        var is_need_input_plantia = $('#is_need_input_plantia').val();
+
+        //完了を通知するためのDeferredオブジェクトを作成
+        var deferred = new $.Deferred();
+
+                $.ajax({
+                url: "/isk_tools/fms/action/maintenance_order_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_person' : next_person,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_division' : this_division,
+                    'this_department' : this_department,
+                    'order_id' : order_id,
+                    'phenomenon_id' : phenomenon_id,
+                    'contact_request' : contact_request,
+                    'order_name' : order_name,
+                    'order_name_extension' : order_name_extension,
+                    'expected_price' : expected_price,
+                    'start_date' : start_date,
+                    'end_date' : end_date,
+                    'department' : department,
+                    'plant_name' : plant_name,
+                    'instruction_code' : instruction_code,
+                    'cost_center' : cost_center,
+                    'account_code' : account_code,
+                    'order_detail' : order_detail,
+                    'order_vendor' : order_vendor,
+                    'orders_received_person' : orders_received_person,
+                    //'order_permit_person' : order_permit_person,
+                    'order_permit_person' : order_permit_person,
+                    'rem' : rem,
+                    'is_need_input_plantia' : is_need_input_plantia,
+                    'action_type' : action_type,
+                    'order_no': $('#order_no').val(),
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#order_id').val(data.order_id);
+                    $('#subject_str').val(data.subject_str);
+                    $('#msg_body').val(data.msg_body);
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                        $('#maintenance_order_send_mail_button').empty();//別の場合は、「メール作成」ボタンを非表示に
+                    }
+                    //log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    //if($("#action_pb_loading") != null){
+                    //    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    //}
+                    maintenance_order_button_enable();
+                    //完了を通知
+                    deferred.resolve();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    //if($("#action_pb_loading") != null){
+                    //    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    //}
+                    maintenance_order_button_enable();
+                    //失敗を通知
+                    deferred.reject();
+                });
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+//ボタン抑止解除処理
+function maintenance_order_button_enable() {
+    if($("#action_pb_loading") != null){
+        $("#action_pb_loading").fadeOut();
+    }
+    // アクションボタン有効化
+    $(".button").prop("disabled", false);
+}
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+}
+
+// 一時保存＋メール送信
+function maintenance_order_mail_send_button() {
+    //ボタン抑止
+    $(".button").prop("disabled", true);
+    if($("#action_pb_loading") != null){
+        $("#action_pb_loading").show();
+    }
+
+    //一時保存機能を呼び出す(完了待ち対応)
+    var deferred = input_check({{ present_step }},{{ present_step }},'entry');
+
+    deferred.done(function(){
+        maintenance_order_button_enable();
+        //一時保存成功時、メール送信
+        maintenance_order_mail_send_check();
+    })
+    .fail(function(){
+        maintenance_order_button_enable();
+    });
+}
+
+// メール送信 文字列長チェック版
+function maintenance_order_mail_send_check() {
+    // 本文情報をHTMLから取得
+    var address, ccAddress, subject, body;
+        address = '';
+        ccAddress = '';
+
+    var subject = $('#subject_str').val();
+    var body_data = $('#msg_body').val();
+
+    // mailto用文字列作成
+    var mail_str = 'mailto:' + address + '?subject=' + subject + '&body=' + body_data;
+
+    // URIエンコード後の文字列長さを確認（改行文字を変換せずにencodeURIを実行すると、実際の文字列長と一致する）
+    var encode_mail_str = encodeURI(mail_str);
+
+    // mailto文字列長判定
+    //エンコード後の文字列長が2046を超えるとメーラーが起動しない、安全範囲で2040文字以上でクリップボード使用する
+    if(encode_mail_str.length > 2040){
+        var result = copy_to_clipboard(body_data);
+        if(!result){
+            console.log('iep_mail_send_check():copy_to_clipboard失敗');
+            alert('クリップボードへのコピーに失敗しました。メール作成を中止します。');
+            return;
+        }
+        alert('文字列が長いため、メール本文はクリップボードにコピーします。メール画面でペースト（ctrl+V）してください。');
+
+         // subjectのみに変更
+        mail_str = 'mailto:' + address + '?subject=' + subject;
+        encode_mail_str = encodeURI(mail_str);
+    }
+
+    // メール画面表示
+    location.href = encode_mail_str;
+}
+
+//絞込結果用共通パーツのhtmlを現状の処理に対応するように変更
+function set_select_id(input_id,input_id_old,select_id) {
+    //IDを変更
+    var element = document.getElementById( input_id ) ;
+    element.id = input_id_old;
+    element = document.getElementById( select_id ) ;
+    element.id = input_id;
+    element.name = input_id;
+    //イベントを削除
+    element.onchange = "";
+}
+
+//原課担当部署変更処理
+function maintenance_change_department(value) {
+    //あらかじめ原価センタフィルターをクリアしておく
+    $('#cost_center_filter').val('');
+    var order_department = value
+    $.ajax({
+        url: "/isk_tools/fms/action/maintenance_change_department/",
+        type: "POST",
+        data : {
+            'order_department' : order_department,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache : false,
+        })
+        .done(function(data){
+            $('[list=personlists]').empty();
+            $('[list=personlists]').html(data.person_lists);
+            $('[list=cost_center_option_list]').empty();
+            $('[list=cost_center_option_list]').html(data.cost_center_option_list);
+            $('[list=instruction_no_option_list]').empty();
+            $('[list=instruction_no_option_list]').html(data.instruction_no_option_list);
+            $('[list=account_code_option_list]').empty();
+            $('[list=account_code_option_list]').html(data.account_code_option_list);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('[list=personlists]').empty();
+            $('[list=cost_center_option_list]').empty();
+            $('[list=instruction_no_list]').empty();
+            $('[list=account_code_option_list]').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+//原価センター、指図書NO、勘定コード絞込
+function gc_list_filter(select_id,value) {
+    //optionリストから該当項目を絞込、それ以外は非表示化
+    var cost_center_options = $(select_id).children();
+
+    // 比較時に選択項目の前後の空白を削除
+    var filter_str = value.trim();
+
+    cost_center_options.each(function(num){
+        if(num == 0){
+            $(this).selected = true;
+        }else{
+            if($(this).data('filter_key').match(filter_str) || value == ''){
+                $(this).removeClass('hide');
+            }else{
+                $(this).addClass('hide');
+            }
+        }
+    });
+    //一旦非選択状態にする
+    $(select_id).val('');
+}
+
+// 依頼先変更時特殊処理（次工程を一致させる）
+function contact_request_change(value) {
+    set_selected('sel_next_step',value,get_value_func_normal);
+    select_next_step(value)
+}
+
+//画面表示時コンボボックス同期共通処理
+function set_selected(id_str, value , get_value_func) {
+    var select_value = get_value_func(value);
+    if (select_value != "") {
+        var pulldown_option_list = document.getElementById(id_str).getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option_list.length>i;i++){
+            if(get_value_func(pulldown_option_list[i].value) == select_value){
+                pulldown_option_list[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+//共通処理用関数
+function get_value_func_normal(value) {
+    return value;
+}
+//共通処理用関数
+function get_value_func_replace(value) {
+    return value.replace(/\s+/g, "");
+}
+
+//画面表示時コンボボックス同期処理
+function maintenance_order_display_open() {
+    set_selected('order_name_extension',"{{ order_name_extension }}",get_value_func_normal);
+    set_selected('department',"{{ department_cd | safe }}",get_value_func_normal);
+    set_selected('contact_request',"{{ contact_request }}",get_value_func_normal);
+    set_selected('is_need_input_plantia',"{{ is_need_input_plantia }}",get_value_func_normal);
+
+    //工場のみ条件付き
+    if( ({{target_order_id}} == 0 && {{ phenomenon_data_num }} > 0 ) ||
+         ({{target_order_id}} > 0) ){
+          set_selected('plant_name',"{{ plant_code }}",get_value_func_normal);
+    }
+}
+
+//画面表示時次工程選択
+function maintenance_order_select_step() {
+    // IEPの場合のみ、復旧確認選択
+    var contact_request = $('#contact_request').val()
+    if (contact_request == '232004001'){
+        contact_request_change(contact_request);
+    }
+}
+
+// 画面表示時に金額欄にカンマ追加
+function add_comma_value_at_open() {
+    var target_div_id = "#expected_price";
+    add_comma_target_value_at_open(target_div_id);  // fms_base.htmlにて定義
+}
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_maintenance_order_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+option.hide {
+    /* 表示の切り替えに使用する */
+    display: none;
+}
+</style>
+
+<div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+    <h2 class="page-header">工事依頼</h2>
+</div>
+    <div>
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="order_id" value="{{ order_id }}">
+        <!--小口依頼editモード判定用フラグ-->
+        <input type="hidden" id="maintenance_order_edit_mode_flag" value=1>
+    </div>
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+<div class="scroll_maintenance_order_div">
+    <div style="float:left;">
+        <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+        <table>
+            <tr>
+                <td><div><font size="4">依頼先</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="contact_request" name="contact_request" onchange="contact_request_change(value);">
+                        <!–
+                        {% for contact_request_list in contact_request_list %}
+                            <option value="{{ contact_request_list.contact_request_id }}">{{ contact_request_list.contact_request_name }}</option>
+                        {% endfor %}
+                        –>
+                        <option value="232004001">IEP</option>
+                        <option value="232001003">外部業者(直発注)</option>
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">保全名称(依頼名)</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="order_name" size="25" value="{{ order_name }}">
+                    <select id="order_name_extension" name="order_name_extension">
+                    <option value=""></option>
+                        <option value="検査">検査</option>
+                        <option value="校正">校正</option>
+                        <option value="修理">修理</option>
+                        <option value="水洗">水洗</option>
+                        <option value="切替">切替</option>
+                        <option value="点検">点検</option>
+                        <option value="塗装">塗装</option>
+                        <option value="補修">補修</option>
+                        <option value="移設">移設</option>
+                        <option value="交換">交換</option>
+                        <option value="取替">取替(材質変更なし)</option>
+                        <option value="防水">防水(材質変更なし)</option>
+                        <option value="整備">整備</option>
+                        <option value="調整">調整</option>
+                        <option value="増し締め">増し締め</option>
+                    </select>　※必須 25文字以内
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">概算(予想)金額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+<!--                        add_comma_value()はfms_base.htmlにて定義-->
+                <td><div><font size="3"><input type="text" id="expected_price"
+                                               onblur="add_comma_value(this)"
+                                               value="{{ expected_price }}">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望納期</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="start_date" class="datepicker" value="{{ desired_start_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('start_date');"> ～ <input type="text" id="end_date" class="datepicker" value="{{ desired_end_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('end_date');">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">部署</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="department" name="department_cd" onchange="maintenance_change_department(value);">
+                    <option value=""></option>
+                        {% for departments_list in departments_list %}
+                            <option value="{{ departments_list.department_cd }}">{{ departments_list.department_name }}</option>
+                        {% endfor %}
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工場</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="plant_name" name="plant_name">
+                        <option value=""></option>
+                        {% for facility_lists in facility_lists %}
+                        <option value="{{ facility_lists.m_location_skey }}">{{ facility_lists.location_nm_1 }}</option>
+                        {% endfor %}
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">原課担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <div id ="sel_order_person" >
+                            <select id="sel_person" name="sel_person" list="personlists">
+                                <option hidden></option>
+                                <datalist id="personlists">
+                                    {{ person_lists | safe }}
+                                </datalist>
+                            </select>　※必須
+                        </div>
+                    </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">原価センター</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <input type="text" id="cost_center_filter" value="" size="10" onchange="gc_list_filter('#sel_cost_center',value);gc_list_filter('#sel_instruction_no','');gc_list_filter('#sel_account_code','');">原価センタ名orコード絞込(あいまい検索)
+                    <div id ="select_cost_center" >
+                    <select id="sel_cost_center" name="sel_cost_center" list="cost_center_option_list"  onchange="gc_list_filter('#sel_instruction_no',value);gc_list_filter('#sel_account_code','');">
+                        <datalist id="cost_center_option_list">
+                            {{ cost_center_option_list | safe }}
+                        </datalist>
+                    </select>　※必須
+                    </div>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">指図書ＮＯ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_instruction_no" name="sel_instruction_no" list="instruction_no_option_list" onchange="gc_list_filter('#sel_account_code',value);">
+                        <datalist id="instruction_no_option_list">
+                            {{ instruction_no_option_list | safe }}
+                        </datalist>
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">勘定コード</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_account_code" name="sel_instruction_no" list="account_code_option_list">
+                        <datalist id="account_code_option_list">
+                            {{ account_code_option_list | safe }}
+                        </datalist>
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">注文番号</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="order_no" value="{{ order_no }}"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">依頼業者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="order_vendor" value="{{ order_vendor }}">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">依頼受付者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="orders_received_person" value="{{ orders_received_person }}">　※IEP依頼時は必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">PLANTIA入力要否</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="is_need_input_plantia" name="is_need_input_plantia">
+                        <option value=""></option>
+                        <option value="要">要</option>
+                        <option value="不要">不要</option>
+                    </select>※IEP依頼時は必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工事/依頼内容</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="order_detail" name="order_detail" rows="9" cols="45">{{ order_detail }}</textarea>　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">備考</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="rem" name="rem" rows="9" cols="45">{{ rem }}</textarea></font></div></td>
+            </tr>
+        </table>
+        </div><!--ng_character_checkここまで-->
+    </div>
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+        <br>
+        <div style="float:left;">
+            <div>メール本文</div>
+            <div>
+                <div>
+                    <font size="3"><textarea  id="msg_body" rows="18" cols="40" readonly>{{ msg_body }}</textarea></font>
+                    <input type="hidden" id="subject_str" value="{{ subject_str }}">
+                </div>
+                <div id="maintenance_order_send_mail_button" >
+                    <input type="button" class="button" value="メール作成" onclick="maintenance_order_mail_send_button()"><font size="3">※メール作成前に一時保存されます</font>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+</div>

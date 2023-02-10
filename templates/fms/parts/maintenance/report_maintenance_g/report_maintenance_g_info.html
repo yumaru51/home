@@ -1,0 +1,223 @@
+<script>
+//画面表示時処理
+function report_maintenance_g_display_open() {
+    var file_folder = $('#equipment_history_file_folder').val();
+    var div_id_name = $('#equipment_history_div_id_name').val();
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag_equipment_history').val();
+    var file_class = $('#equipment_history_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+}
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_maintenance_order_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+
+<div>
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+    <div style="float:left;">
+
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ mgt_class.mgt_cls_nm_1 }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工場名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ facility.location_nm_1 }}</font></div></td>
+            </tr>
+        </table>
+
+        <br><br>
+        機器一覧：
+        <div id="report_equipment_list" name="equipment_list">
+            {{ equipment_list | safe }}
+        </div>
+        <br>
+
+        <div><font size="4">報告内容：　</font></div>
+        <div><font size="3"><textarea id="report_detail" name="report_detail" rows="9" cols="45" readonly>{{ equipment_history_report_data.report_detail | default_if_none:'' }}</textarea></font></div>
+        <div><font size="4">原因詳細：　</font></div>
+        <div><font size="3"><textarea id="cause_detail" name="cause_detail" rows="9" cols="45" readonly>{{ equipment_history_report_data.cause_detail | default_if_none:'' }}</textarea></font></div>
+        <div><font size="4">対策：　</font></div>
+        <div><font size="3"><textarea id="countermeasure" name="countermeasure" rows="9" cols="45" readonly>{{ equipment_history_report_data.countermeasure | default_if_none:'' }}</textarea></font></div>
+
+    </div>
+
+    <div style="float:left;"></div>
+    <div style="float: left;"><br>
+
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">発見日時</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ equipment_history_report_data.time_of_occurrence | date:'Y-m-d' }}　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">工事完了日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ equipment_history_report_data.completion_date | default_if_none:"" }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">案件区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                {% for exe_cls_lists in exe_cls_lists %}
+                    {% if exe_cls_lists.m_exe_cls_skey == equipment_history_report_data.m_exe_cls_skey %}
+                        <option value="{{ exe_cls_lists.m_exe_cls_skey }}" selected></option>
+                        <td><div style="padding: 5px 0px;"><font size="5">{{ exe_cls_lists.exe_cls_nm_1 }}　</font></div></td>
+                    {% endif %}
+                {% endfor %}
+                <td><div style="padding: 5px 0px;"><font size="4">周期基準日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ equipment_history_report_data.cycle_reference_date | default_if_none:"" }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">故障/作業種別</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ equipment_history_report_data.failure_work_type | default_if_none:"" }}　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">工事着工日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ equipment_history_report_data.start_date | default_if_none:"" }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">保全区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for maintenance_classification_lists in maintenance_classification_lists %}
+                    {% if maintenance_classification_lists.s_specman_list_value_skey == equipment_history_report_data.s_specman_list_value_skey %}
+                        {{ maintenance_classification_lists.display_value_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">工事担当者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ construction_representative.user_nm | default_if_none:'' }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">状況</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for condition_lists in condition_lists %}
+                    {% if condition_lists.m_condition_cd_skey == equipment_history_report_data.m_condition_cd_skey %}
+                        {{ condition_lists.condition_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">状況部位</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for position_lists in position_lists %}
+                    {% if position_lists.m_position_cd_skey == equipment_history_report_data.m_position_cd_skey_condition %}
+                        {{ position_lists.position_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">現象</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for phenomenon_lists in phenomenon_lists %}
+                    {% if phenomenon_lists.m_phenomenon_cd_skey == equipment_history_report_data.m_phenomenon_cd_skey %}
+                        {{ phenomenon_lists.phenomenon_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">現象部位</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for position_lists in position_lists %}
+                    {% if position_lists.m_position_cd_skey == equipment_history_report_data.m_position_cd_skey_phenomenon %}
+                        {{ position_lists.position_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">原因</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for cause_lists in cause_lists %}
+                    {% if cause_lists.m_cause_cd_skey == equipment_history_report_data.m_cause_cd_skey %}
+                        {{ cause_lists.cause_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">原因部位</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for position_lists in position_lists %}
+                    {% if position_lists.m_position_cd_skey == equipment_history_report_data.m_position_cd_skey_cause %}
+                        {{ position_lists.position_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">処置</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for treatment_lists in treatment_lists %}
+                    {% if treatment_lists.m_treatment_cd_skey == equipment_history_report_data.m_treatment_cd_skey %}
+                        {{ treatment_lists.treatment_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">処置部位</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for position_lists in position_lists %}
+                    {% if position_lists.m_position_cd_skey == equipment_history_report_data.m_position_cd_skey_treatment %}
+                        {{ position_lists.position_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">結果</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                {% for result_lists in result_lists %}
+                    {% if result_lists.m_result_cd_skey == equipment_history_report_data.m_result_cd_skey %}
+                        {{ result_lists.result_nm_1 }}
+                    {% endif %}
+                {% endfor %}
+                </font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">修理時間(h)</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ equipment_history_report_data.repair_time | default_if_none:'' }}</font></div></td>
+            </tr>
+        </table>
+
+        <div><font size="4">現象詳細：　</font></div>
+        <div><font size="3"><textarea id="phenomenon_details" name="phenomenon_details" rows="8" cols="45" readonly>{{ equipment_history_report_data.phenomenon_details | default_if_none:"" }}</textarea></font></div>
+        <div><font size="4">特記：　</font></div>
+        <div><font size="3"><textarea id="special_mention" name="special_mention" rows="9" cols="45" readonly>{{ equipment_history_report_data.special_note_construction_work | default_if_none:'' }}</textarea></font></div>
+        <div><font size="4">申送事項：　</font></div>
+        <div><font size="3"><textarea id="message" name="message" rows="9" cols="45" readonly>{{ equipment_history_report_data.message | default_if_none:'' }}</textarea></font></div>
+    </div>
+
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+        <input type="hidden" id="delete_pb_disp_flag_equipment_history" value="0">
+        <input type="hidden" id="equipment_history_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_data.phenomenon_id }}\">
+        <input type="hidden" id="equipment_history_div_id_name" name="div_id_name" value="equipment_history">
+        <input type="hidden" id="equipment_history_file_class" name="file_class" value="Evaluation">
+
+        <div id="upload_file_list_equipment_history">添付ファイル無し</div>
+    </div>
+    <div style="clear: both;"></div>
+</div>

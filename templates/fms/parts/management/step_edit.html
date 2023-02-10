@@ -1,0 +1,573 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+//タブ表示のためのJS
+var tab = {
+	init: function(a){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		for(i=0; i<pages.length; i++) {
+			if(i == a) {
+                            pages[a].style.display = 'block';
+                            tabs[a].className = 'present';
+                            tabs[a].onclick = function(){ tab.showpage(this); return false; };
+                        }
+                        else{
+                            pages[i].style.display = 'none';
+                            tabs[i].className = null;
+                            tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                        }
+		}
+	},
+	showpage: function(obj){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var num;
+		for(num=0; num<tabs.length; num++) {
+			if(tabs[num] === obj) break;
+		}
+		for(var i=0; i<pages.length; i++) {
+			if(i == num) {
+				pages[num].style.display = 'block';
+				tabs[num].className = 'present';
+			}
+			else{
+				pages[i].style.display = 'none';
+				tabs[i].className = null;
+			}
+		}
+	}
+}
+//進捗工程一覧(マスタの情報)の表示処理
+function get_step_list() {
+        $.ajax({
+            url: "/isk_tools/fms/parts/management/step_list/",
+            type: "POST",
+            data : {
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#step_list').empty();
+                $('#step_list').html(data);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#step_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+
+}
+//対象の進捗工程の操作一覧(マスタの情報)の表示処理
+function get_step_action_list(a) {
+    var step_id = a;
+        $.ajax({
+            url: "/isk_tools/fms/parts/management/step_action_list/",
+            type: "POST",
+            data : {
+                'step_id' : step_id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#step_action_list').empty();
+                $('#step_action_list').html(data);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#step_action_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+//対象の進捗工程の関係工程(次の工程、前の工程)一覧(マスタの情報)の表示処理
+function get_step_relation_list(a) {
+    var step_id = a;
+        $.ajax({
+            url: "/isk_tools/fms/parts/management/step_relation_list/",
+            type: "POST",
+            data : {
+                'step_id' : step_id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#step_relation_list').empty();
+                $('#step_relation_list').html(data);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#step_relation_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+//対象の進捗工程の表示内容一覧(マスタの情報)の表示処理
+function get_step_display_item_list(a) {
+    var step_id = a;
+        $.ajax({
+            url: "/isk_tools/fms/parts/management/step_display_item_list/",
+            type: "POST",
+            data : {
+                'step_id' : step_id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#step_display_item_list').empty();
+                $('#step_display_item_list').html(data);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#step_display_item_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+//対象の進捗工程の登録対象一覧(マスタの情報)の表示処理
+function get_data_entry_step_list(a) {
+    var step_id = a;
+        $.ajax({
+            url: "/isk_tools/fms/parts/management/data_entry_step_list/",
+            type: "POST",
+            data : {
+                'step_id' : step_id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#data_entry_step_list').empty();
+                $('#data_entry_step_list').html(data);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#data_entry_step_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+//操作マスタの一覧の表示処理
+function get_action_master_list() {
+    //var step_id = a;
+        $.ajax({
+            url: "/isk_tools/fms/parts/management/action_master_list/",
+            type: "POST",
+            data : {
+                //'step_id' : step_id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#action_master_list').empty();
+                $('#action_master_list').html(data);
+                $('#step_action_list').empty();
+                $('#step_action_list').html(data);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#action_master_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+//対象の進捗工程のイメージ情報表示処理
+function step_management_info(a) {
+    var step_id = a;
+        $.ajax({
+            url: "/isk_tools/fms/parts/management/step_management/",
+            type: "POST",
+            data : {
+                'step_id' : step_id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#step_management').empty();
+                $('#step_management').html(data);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#step_management').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+window.onload = function() {
+        get_step_list();
+        get_action_master_list();
+};
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    height: 35px;
+}
+th, td {
+    font-size: 125%;
+    padding: 5px 0px;
+}
+</style>
+
+    <input TYPE="hidden" id="user_division_cd" VALUE="{{user_division_cd}}"/>
+    <input TYPE="hidden" id="user_department_cd" VALUE="{{user_department_cd}}"/>
+    <input TYPE="hidden" id="user_authority" VALUE="{{user_authority}}"/>
+    <input TYPE="hidden" id="confirm_user" VALUE="{{confirm_user}}"/>
+    <input TYPE="hidden" id="permit_user" VALUE="{{permit_user}}"/>
+
+    <div style="width: auto;">
+        <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+            <h2 class="page-header">進捗マスター登録/更新</h2>
+        </div>
+    </div>
+    <ul id="tab" style="width: auto;">
+        <li class="present"><a href="#page1">進捗マスタ</a></li>
+        <li><a href="#page2">進捗工程遷移</a></li>
+        <li><a href="#page3">進捗工程アクション</a></li>
+        <li><a href="#page4">進捗工程表示項目</a></li>
+        <li><a href="#page5">更新テーブル</a></li>
+        <li><a href="#page6">アクションマスタ</a></li>
+        <li><a href="#page7">管理イメージ</a></li>
+    </ul>
+    <div id="page1" class="pagetitle">
+        <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+            <h2 class="page-header">進捗マスター登録/更新</h2>
+        </div>
+        <div style="float: left;">
+            <table>
+                <tr>
+                    <td><div><font size="4">ステップid</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_id" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">ステップ名</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_name" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">担当部署区分</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="charge_department_class" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">ステップレベル</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_level" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">テンプレート区分</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="template_class" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">新規作成FL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="new_entry_flag" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">対象</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="target" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">無効FL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="lost_flag" value="" ></font></div></td>
+                </tr>
+            </table>
+            <div id="step_add_button_div" style="float:left;" >
+                <input type="button" value="　追加　" onclick="step_edit('add')" >
+            </div>
+            <div id="step_edit_button_div" style="float:left;" >
+                <input type="button" value="　変更　" onclick="step_edit('edit')" >　　　　　
+                <input type="button" value="　削除　" onclick="step_delete('delete')" >
+            </div>
+        </div>
+        <div style="float: left;">
+            <div id="step_list" style="width: auto;">
+                登録済進捗工程一覧
+            </div>
+        </div>
+    </div>
+    <div id="page2" class="pagetitle">
+        <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+            <h2 class="page-header">進捗工程遷移</h2>
+        </div>
+        <div style="float: left;">
+            <input type="text" id="step_relation_id" value="">
+            <table>
+                <tr>
+                    <td><div><font size="4">ステップid</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_relation_step_id" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">次ステップ</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_relation_next_step" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">表示順</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_relation_display_order" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">無効FL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_relation_lost_flag" value="" ></font></div></td>
+                </tr>
+            </table>
+            <div id="step_relation_add_button_div" style="float:left;" >
+                <input type="button" value="　追加　" onclick="step_relation_edit('add')" >
+            </div>
+            <div id="step_relation_edit_button_div" style="float:left;" >
+                <input type="button" value="　変更　" onclick="step_relation_edit('edit')" >　　　　　
+                <input type="button" value="　削除　" onclick="step_relation_delete('delete')" >
+            </div>
+        </div>
+        <div style="float: left;">
+            <div id="step_relation_list" style="width: auto;">
+                登録済遷移一覧
+            </div>
+        </div>
+    </div>
+    <div id="page3" class="pagetitle">
+        <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+            <h2 class="page-header">進捗工程アクション</h2>
+        </div>
+        <div style="float: left;">
+            <input type="text" id="step_action_id" value="">
+            <table>
+                <tr>
+                    <td><div><font size="4">ステップid</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_action_step_id" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">アクションCD</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_action_action_cd" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">次ステップ</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_action_next_step" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">対象</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_action_target" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">表示順</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_action_display_order" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">無効FL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_action_lost_flag" value="" ></font></div></td>
+                </tr>
+            </table>
+            <div id="step_action_add_button_div" style="float:left;" >
+                <input type="button" value="　追加　" onclick="step_action_edit('add')" >
+            </div>
+            <div id="step_action_edit_button_div" style="float:left;" >
+                <input type="button" value="　変更　" onclick="step_action_edit('edit')" >　　　　　
+                <input type="button" value="　削除　" onclick="step_action_delete('delete')" >
+            </div>
+        </div>
+        <div style="float: left;">
+            <div id="step_action_list" style="width: auto;">
+                登録済アクション一覧
+            </div>
+        </div>
+    </div>
+    <div id="page4" class="pagetitle">
+        <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+            <h2 class="page-header">進捗工程表示項目</h2>
+        </div>
+        <div style="float: left;">
+            <input type="text" id="step_display_item_id" value="">
+            <table>
+                <tr>
+                    <td><div><font size="4">ステップid</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_display_item_step_id" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">ページ</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_display_item_page" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">div_id名</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_display_item_div_id_name" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">表示名</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_display_item_item_name" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">アクションPBFL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_display_item_action_pb_flag" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">初期ページFL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_display_item_default_page" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">無効FL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="step_display_item_lost_flag" value="" ></font></div></td>
+                </tr>
+            </table>
+            <div id="step_display_item_add_button_div" style="float:left;" >
+                <input type="button" value="　追加　" onclick="step_display_item_edit('add')" >
+            </div>
+            <div id="step_display_item_edit_button_div" style="float:left;" >
+                <input type="button" value="　変更　" onclick="step_display_item_edit('edit')" >　　　　　
+                <input type="button" value="　削除　" onclick="step_display_item_delete('delete')" >
+            </div>
+        </div>
+        <div style="float: left;">
+            <div id="step_display_item_list" style="width: auto;">
+                登録済表示内容一覧
+            </div>
+        </div>
+    </div>
+    <div id="page5" class="pagetitle">
+        <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+            <h2 class="page-header">更新テーブル</h2>
+        </div>
+        <div style="float: left;">
+            <input type="text" id="data_entry_step_id" value="">
+            <table>
+                <tr>
+                    <td><div><font size="4">ステップid</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="data_entry_step_step_id" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">対象テーブル</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="data_entry_step_target_table" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">無効FL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="data_entry_step_lost_flag" value="" ></font></div></td>
+                </tr>
+            </table>
+            <div id="data_entry_step_add_button_div" style="float:left;" >
+                <input type="button" value="　追加　" onclick="data_entry_step_edit('add')" >
+            </div>
+            <div id="data_entry_step_edit_button_div" style="float:left;" >
+                <input type="button" value="　変更　" onclick="data_entry_step_edit('edit')" >　　　　　
+                <input type="button" value="　削除　" onclick="data_entry_step_delete('delete')" >
+            </div>
+        </div>
+        <div style="float: left;">
+            <div id="data_entry_step_list" style="width: auto;">
+                登録済更新テーブル一覧
+            </div>
+        </div>
+    </div>
+    <div id="page6" class="pagetitle">
+        <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+            <h2 class="page-header">アクション登録/更新</h2>
+        </div>
+        <div style="float: left;">
+            <table>
+                <tr>
+                    <td><div><font size="4">アクションCD</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="action_master_action_cd" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">アクション名</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="action_master_action_name" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">アクション後進捗</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="action_master_status_after_action" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">権限</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="action_master_action_authority" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">アクション区分</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="action_master_action_class" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">表示順</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="action_master_display_order" value="" ></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">無効FL</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="action_master_lost_flag" value="" ></font></div></td>
+                </tr>
+            </table>
+            <div id="action_master_add_button_div" style="float:left;" >
+                <input type="button" value="　追加　" onclick="action_master_edit('add')" >
+            </div>
+            <div id="action_master_edit_button_div" style="float:left;" >
+                <input type="button" value="　変更　" onclick="action_master_edit('edit')" >　　　　　
+                <input type="button" value="　削除　" onclick="action_master_delete('delete')" >
+            </div>
+        </div>
+        <div style="float: left;">
+            <div id="action_master_list" style="width: auto;">
+                登録済更新テーブル一覧
+            </div>
+        </div>
+    </div>
+    <div id="page7" class="pagetitle">
+        <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+            <h2 class="page-header">step管理イメージ</h2>
+        </div>
+        <div id="step_management">
+            step管理イメージ
+        </div>
+<script type="text/javascript">
+        tab.setup = {
+            tabs: document.getElementById('tab').getElementsByTagName('li'),
+                pages: [
+                    document.getElementById('page1'),
+                    document.getElementById('page2'),
+                    document.getElementById('page3'),
+                    document.getElementById('page4'),
+                    document.getElementById('page5'),
+                    document.getElementById('page6'),
+                    document.getElementById('page7')
+                ]
+        }
+        tab.init(0);
+</script>
+
+
+
+{% endblock %}

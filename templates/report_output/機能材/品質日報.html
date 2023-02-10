@@ -1,108 +1,39 @@
-<!DOCTYPE html>
-<html lang="ja">
+{% extends 'report_output/layout.html' %}
 {% load staticfiles %}
-<head>
-    <meta charset="UTF-8">
-    <title>品質日報</title>
-    <link rel="icon" href="{% static 'img/favicon.ico' %}">
-</head>
-<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
-<script>
-//ファイルアップロード処理
-function output(){
-    // フォームデータ取得
-    var formdata = new FormData($(output).get(0));
 
-    // POSTでアップロード
-    $.ajax({
-            url  : "./OUTPUT/",
-            type : "POST",
-            data : formdata,
-            cache       : false,
-            contentType : false,
-            processData : false,
-            dataType    : "json"
-    })
-    .done(function(data){
-        $('#print').empty();
-        $('#print').html(data.aggregate);
-        alert(data.msg);
-    })
-    .fail(function(jqXHR,textStatus,errorThrown){
-        $('#print').empty();
-        alert('Error!' +textStatus+' ' +errorThrown);
-    });
-    setTimeout(function () {
-        // アクションボタン有効化
-        $(".button").prop("disabled", false);
-        cancelFlag = false;
-    }, 2000);
-}
+{% block title %}品質日報{% endblock %}
+{% block header %}{% endblock %}
 
-function report_download(){
-    console.log(document.getElementById('startTime').value);
-    console.log(document.getElementById('endTime').value);
-    var startTime = document.getElementById('startTime').value;
-    var endTime = document.getElementById('endTime').value;
-    var downLoadLink = document.createElement("a");
-    downLoadLink.href = "./report/download/" + startTime + "/" + endTime + "/";
-    downLoadLink.download = "品質日報.xlsx";
-    downLoadLink.click();
-}
-
-function report() {
-    $.ajax({
-        url: "./REPORT/",
-        type: "POST",
-        data : {
-            'csrfmiddlewaretoken': "{{ csrf_token }}"
-        },
-        timeout: 1000000,
-        dataType: 'json',
-        cache : false,
-    })
-    .done(function(data){
-        alert('出力完了！' + data.test);
-    })
-   .fail(function(jqXHR,textStatus,errorThrown){
-        alert('Error!' +textStatus+' ' +errorThrown);
-    });
-}
-
-</script>
-<style>
-#tblmembers1 {
-  display: flex;
-  justify-content: space-around;
-}
-#tblmembers1 > table {
-  border: 1px solid;
-  width: 80%;
-}
-</style>
-<body>
-
-
+{% block content %}
+<!--品質日報-->
 <h1>品質日報</h1>
+<form action="#" method="post" class="rounded border border-info">
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-1">
+                <input type="date" id="startTime" class="form-control">(07:00)
+            </div>
+            <div class="col-auto">
+                ～
+            </div>
+            <div class="col-1">
+                <input type="date" id="endTime" class="form-control">(07:00)
+            </div>
+            <div class="col-1">
+                <input class="form-control" type="button" value="帳票出力" onclick="report_download();">
+            </div>
+        </div>
+    </div>
+    <br>
+</form>
+<br><br>
 
-<form id="output" action="#" method="post">
-    <input type="date" id="startTime">
-    <input type="date" id="endTime">
-    <br><br><br>
-    <input type="button" value="帳票出力" onclick="report_download();">
-<!--    <input type="submit" value="データ表示" onclick="output();">-->
-</form><br>
 
+<!--javascript処理-->
+<script type="text/javascript">
+    var csrf_token = '{{ csrf_token }}';
+</script>
+<script src="{% static 'js/report_output.js' %}"></script>
 
-<br>
-<br>
-<br>
-<!--<iframe id="inlineFrameExample" title="Inline Frame Example" width="1280" height="720"-->
-<!--    src="http://YBIENTRY:8787/motionboard/sso/iwa?mbid=fidwwroh4dp4ra6xcw3aaablsxszu&boardpath=%2F%E9%85%B8%E5%8C%96%E3%83%81%E3%82%BF%E3%83%B3%E7%94%9F%E7%94%A3%E9%83%A8%2F%E9%85%B8%E5%8C%96%E3%83%81%E3%82%BF%E3%83%B3_%E3%83%88%E3%83%AC%E3%83%BC%E3%82%B9%E3%83%AC%E3%83%9D%E3%83%BC%E3%83%88"-->
-<!--        >-->
-<!--</iframe>-->
-
-
-
-</body>
-</html>
+{% endblock %}

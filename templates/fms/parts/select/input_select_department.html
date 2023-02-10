@@ -1,0 +1,13 @@
+                <font size="4">
+                    {% if div_add_name == "" %}
+                        <input type="hidden" id="department" size="10" value="{{ department }}">
+                    {% else %}
+                        <input type="hidden" id="{{ div_add_name }}department" size="10" value="">
+                    {% endif %}
+                    <select id="sel_{{ div_add_name }}department" name="sel_{{ div_add_name }}department" onchange="{{ div_add_name }}department_change(value);">
+                        <option value=""></option>
+                        {% for department_lists in department_lists %}
+                            <option value="{{ department_lists.department_cd }}">{{ department_lists.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </font>

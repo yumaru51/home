@@ -1,0 +1,60 @@
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:300px;
+}
+td,th{
+    table-layout:fixed;
+}
+.cancel_pb{
+    width:60px;
+    text-align: center;
+}
+.supplemental_task_name{
+    width:200px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+        <div>
+            <h2 class="page-header">選択付帯作業</h2>
+        </div>
+        <div style="float: left;width:320px;">
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="cancel_pb"></th>
+                        <th class="supplemental_task_name">付帯作業名</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for supplemental_task_list in supplemental_task_list %}
+                    <tr class="{{ sell_color }}">
+                        {% if pb_disp == 1 %}
+                            <td class="cancel_pb">
+                                <input type="button" value="取消" onclick="supplemental_task_select_cancel({{ supplemental_task_list.id }});">
+                            </td>
+                        {% else %}
+                            <td class="cancel_pb">
+
+                            </td>
+                        {% endif %}
+                        <td  class="supplemental_task_name">{{ supplemental_task_list.incidental_name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="float: left;width:450px;">
+            <div>その他付帯作業：
+                <textarea id="other_supplemental_task_order" rows="12" cols="40">
+                    {% if other_supplemental_task is not None %}
+                        {{ other_supplemental_task }}
+                    {% endif %}
+                    </textarea>
+            </div>
+        </div>

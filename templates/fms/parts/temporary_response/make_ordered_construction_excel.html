@@ -1,0 +1,111 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//台帳問い合わせExcelファイル作成
+function make_ordered_construction_excel(){
+    var department = document.getElementById("sel_department").value;
+    if(department == ""){
+        department = "NON"
+    }
+    var business_year = $('#business_year').val();
+    if(business_year == ""){
+        business_year = "NON"
+    }
+    var start_date = $('#start_date').val();
+    if(start_date == ""){
+        start_date = "NON"
+    }
+    var end_date = $('#end_date').val();
+    if(end_date == ""){
+        end_date = "NON"
+    }
+    var file_name = "台帳問い合わせ.xlsx";
+    var link_str = "/isk_tools/fms/action/make_ordered_construction_excel/"+ department + "/" + business_year + "/" + start_date + "/" + end_date + "/";
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = file_name;
+    downLoadLink.href = link_str ;
+    downLoadLink.click();
+}
+
+</script>
+<style type="text/css">
+.datepicker {
+    width:150px;
+}
+</style>
+    <input TYPE="hidden" id="user_division_cd" VALUE="{{user_division_cd}}"/>
+    <input TYPE="hidden" id="user_department_cd" VALUE="{{user_department_cd}}"/>
+    <input TYPE="hidden" id="user_authority" VALUE="{{user_authority}}"/>
+    <input TYPE="hidden" id="confirm_user" VALUE="{{confirm_user}}"/>
+    <input TYPE="hidden" id="permit_user" VALUE="{{permit_user}}"/>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">台帳問い合わせExcelファイル作成</h2>
+    </div>
+    <br>
+    <br>
+    <div class='clear'></div>
+    <div style="float:left;width:5px">　　</div>
+    <div style="float:left;width: auto">
+        <table>
+            <tr>
+                <td><div><font size="4">部署</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_department" name="sel_department">
+                        <option value="" ></option>
+                        {% for departments_list in departments_list %}
+                            <option value="{{ departments_list.department_cd }}">{{ departments_list.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">年度</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="business_year" value="" size="4">
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">期間絞込</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <input type="text" id="start_date" class="datepicker" value="" autocomplete="off"> ～ <input type="text" id="end_date" class="datepicker" value="" autocomplete="off">　※注文日基準(2021-04-01形式で入力)
+                </font></div></td>
+            </tr>
+         </table>
+        <br>
+        <input type="button" value="　作　成　" onclick="make_ordered_construction_excel()">
+    </div>
+    <div style="float:left;width:5px">　　</div>
+    <div style="float:left;width: auto">
+
+    </div>
+
+{% endblock %}

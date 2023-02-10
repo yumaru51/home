@@ -1,0 +1,605 @@
+<script>
+
+//プルダウン絞り込み機能 console.log($('#').val());
+function __select__discoverer__change() {
+    $.ajax({
+        url: "/isk_tools/fms/parts/mainte/ResponseRequest/__select__discoverer/",
+        type: "POST",
+        data : {
+            'department': $('#department').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'html',
+        cache : false,
+    })
+    .done(function(data){
+        $('#discoverer').empty();
+        $('#discoverer').html(data);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $('#discoverer').empty();
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+function __select__status__change() {
+    $.ajax({
+        url: "/isk_tools/fms/parts/mainte/ResponseRequest/__select__status/",
+        type: "POST",
+        data : {
+            'management_kbn': $('#management_kbn').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'html',
+        cache : false,
+    })
+    .done(function(data){
+        $('#status').empty();
+        $('#status').html(data);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $('#status').empty();
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+function __select__equipment_no__change() {
+    $.ajax({
+        url: "/isk_tools/fms/parts/mainte/ResponseRequest/__select__equipment_no/",
+        type: "POST",
+        data : {
+            'factory_name': $('#factory_name').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'html',
+        cache : false,
+    })
+    .done(function(data){
+        $('#equipment_no').empty();
+        $('#equipment_no').html(data);
+        __select__cost_center__change();
+        __div__plantia__change();
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $('#equipment_no').empty();
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+function __select__cost_center__change() {
+    $.ajax({
+        url: "/isk_tools/fms/parts/mainte/ResponseRequest/__select__cost_center/",
+        type: "POST",
+        data : {
+            'factory_name': $('#factory_name option:selected').text(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'html',
+        cache : false,
+    })
+    .done(function(data){
+        $('#cost_center').empty();
+        $('#cost_center').html(data);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $('#cost_center').empty();
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+function __div__plantia__change() {
+    $.ajax({
+        url: "/isk_tools/fms/parts/mainte/ResponseRequest/__div__plantia/",
+        type: "POST",
+        data : {
+            'factory_name': $('#factory_name').val(),
+            'equipment_no': $('#equipment_no').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'html',
+        cache : false,
+    })
+    .done(function(data){
+    console.log(data)
+        $('#plantia').empty();
+        $('#plantia').html(data);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $('#plantia').empty();
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+function __select__person_in_charge__change() {
+    $.ajax({
+        url: "/isk_tools/fms/parts/mainte/ResponseRequest/__select__person_in_charge/",
+        type: "POST",
+        data : {
+            'department_p': $('#department_p').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 30000,
+        dataType: 'html',
+        cache : false,
+    })
+    .done(function(data){
+    console.log(data)
+        $('#person_in_charge').empty();
+        $('#person_in_charge').html(data);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $('#person_in_charge').empty();
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+//データ登録･更新処理
+function ResponseRequest_edit(a,b) {  // a:自工程id, b:次工程id
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var budget_id = $('#budget_id').val();
+        var work_id = $('#work_id').val();
+        var cs_no = $('#cs_no').val();
+        var cs_rev_no = $('#cs_rev_no').val();
+        var factory_location_act = $('#sel_factory_location_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var motive = $('#sel_factory_location_act_motive').val();
+        var port_harbour_act = $('#sel_port_harbour_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var port_regulations = $('#sel_port_regulations').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var buildings_regulations = $('#sel_buildings_regulations').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var cityscape_regulations = $('#sel_cityscape_regulations').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var comment = $('#comment').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+
+// 20201201y-kawauchi DB入力
+        var request_id = $('#request_id').val();
+        var sub_no = $('#sub_no').val();
+        var project_title = $('#project_title').val();
+        var discovery_datetime = $('#discovery_datetime').val();
+        var department = $('#department option:selected').text();
+        var discoverer = $('#discoverer').val();
+        var management_kbn = $('#management_kbn option:selected').text()
+        var factory_name = $('#factory_name option:selected').text()
+        var equipment_no = $('#equipment_no option:selected').val()
+        var status = $('#status option:selected').text()
+        var status_detail = $('#status_detail').val();
+        var improvement_proposal = $('#improvement_proposal').val();
+        var request_contents_notification = $('#request_contents_notification').val();
+        var item_kbn = $('#item_kbn').val();
+        var desired_delivery_date_f = $('#desired_delivery_date_f').val();
+        var desired_delivery_date_t = $('#desired_delivery_date_t').val();
+        var department_p = $('#department_p option:selected').text();
+        var person_in_charge = $('#person_in_charge').val();
+        var cost_center = $('#cost_center').val();
+        var account_cd = $('#account_cd').val();
+        var instruction_no = $('#instruction_no').val();
+        var notification_required_kbn = $('[name=notification_required_kbn]:checked').val();
+        var diagnosis_kbn = $('[name=diagnosis_kbn]:checked').val();
+        var maintenance_kbn = $('[name=maintenance_kbn]:checked').val();
+        var response_request_date = $('#response_request_date').val();
+        var dangerous_goods_facility_kbn = ($('#dangerous_goods_facility_kbn').prop("checked") - 0);
+        var high_pressure_gas_facility_kbn = ($('#high_pressure_gas_facility_kbn').prop("checked") - 0);
+        var one_pressure_boiler_kbn = ($('#one_pressure_boiler_kbn').prop("checked") - 0);
+        var firefighting_equipment = ($('#firefighting_equipment').prop("checked") - 0);
+        var use_asbestos_kbn = ($('#use_asbestos_kbn').prop("checked") - 0);
+        var other = ($('#other').prop("checked") - 0);
+        var other_memo = $('#other_memo').val();
+        var construction_details_for_notification = $('#construction_details_for_notification').val();
+        var employer = $('#employer').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/mainte/ResponseRequest_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'budget_id' : budget_id,
+                    'work_id' : work_id,
+                    'cs_no': cs_no,
+                    'cs_rev_no': cs_rev_no,
+                    'factory_location_act': factory_location_act,
+                    'motive': motive,
+                    'port_harbour_act': port_harbour_act,
+                    'port_regulations': port_regulations,
+                    'buildings_regulations': buildings_regulations,
+                    'cityscape_regulations': cityscape_regulations,
+                    'comment' : comment,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}",
+// 20201201y-kawauchi DB入力
+                    'request_id': request_id,
+                    'sub_no': sub_no,
+                    'project_title': project_title,
+                    'department': department,
+                    'discovery_datetime': discovery_datetime,
+                    'department': department,
+                    'discoverer': discoverer,
+                    'management_kbn': management_kbn,
+                    'factory_name': factory_name,
+                    'equipment_no': equipment_no,
+                    'status': status,
+                    'status_detail': status_detail,
+                    'improvement_proposal': improvement_proposal,
+                    'request_contents_notification':  request_contents_notification,
+                    'item_kbn': item_kbn,
+                    'desired_delivery_date_f': desired_delivery_date_f,
+                    'desired_delivery_date_t': desired_delivery_date_t,
+                    'department_p': department_p,
+                    'person_in_charge': person_in_charge,
+                    'cost_center': cost_center,
+                    'account_cd': account_cd,
+                    'instruction_no': instruction_no,
+                    'notification_required_kbn': notification_required_kbn,
+                    'diagnosis_kbn': diagnosis_kbn,
+                    'maintenance_kbn': maintenance_kbn,
+                    'response_request_date': response_request_date,
+                    'dangerous_goods_facility_kbn': dangerous_goods_facility_kbn,
+                    'high_pressure_gas_facility_kbn': high_pressure_gas_facility_kbn,
+                    'one_pressure_boiler_kbn': one_pressure_boiler_kbn,
+                    'firefighting_equipment': firefighting_equipment,
+                    'use_asbestos_kbn': use_asbestos_kbn,
+                    'other': other,
+                    'other_memo': other_memo,
+                    'construction_details_for_notification':construction_details_for_notification,
+                    'employer': employer,
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    var this_cs_id = data.cs_no
+                    $('#cs_no').val(this_cs_id);
+                    var this_cs_rev_no = data.cs_rev_no
+                    $('#cs_rev_no').val(this_cs_rev_no);
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    // if ( this_step != next_step ){
+                    //     $('#action_button').empty();//別の場合は、「操作」ボタンを非表示に
+                    // }
+                    // cs_log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    var this_work_id = data.work_id;
+                    var this_budget_id = data.budget_id;
+                    $('#budget_id').val(this_budget_id);
+                    $('#work_id').val(this_work_id);
+                    //cs_common_edit(this_cs_id,this_step,next_step);//工事基本情報登録･更新をするJSを起動(このhtml内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+</script>
+
+<style type="text/css">
+table {
+    line-height: initial;
+    font-size: 100%;
+    height:100px;
+    border-color: black;
+}
+
+/*20201130y-kawauchi tableのレコード内容がつぶれる問題対処*/
+td, th {
+    font-size: 13px;
+    line-height: 16px;
+    vertical-align: top;
+    border-bottom: 0px solid #eee;
+    padding: 0px 0px 0px 0px;
+}
+
+/*20201201y-kawauchi 入力フォームレイアウトtableから変えたい*/
+dl {
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+dl dt{
+  width: 150px;
+  padding: 0px;
+  float:left;
+  clear:both;
+  font-weight: normal;
+/*  margin-top: 0px; */
+  font-size: 18px;
+}
+dl dd{
+  padding: 0px;
+  font-size: 16px;
+}
+
+/*20201201y-kawauchi inputフォームレイアウト漏れ*/
+input[type=datetime-local], input[type=date], .vTextField {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 6px;
+    margin-top: 0;
+    margin-right: 0.5em;
+}
+input[type=radio] {
+    width: 0.8em;
+    height: 0.8em;
+    font-size: 20px;
+    margin-top: 0.2em;
+    padding: 5px 6px;
+}
+
+</style>
+
+
+<!--この処理は？タブ下のタイトル-->
+<!--<div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">-->
+<div class="fms_col" style="width: auto;">
+<h2 class="page-header">{{ budget_step_name }}</h2>
+</div>
+<div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+    <h2 class="page-header">{{ budget_step_name }}</h2>
+</div>
+
+<!--パラメータ-->
+    <div style="width: auto;">
+<!--    <input type="hidden" id="mainte_no" value="{{ mainte_no }}">-->
+<!--    <input type="hidden" id="budget_id" value="{{ budget_id }}">-->
+<!--    <input type="hidden" id="work_id" value="{{ work_id }}">-->
+<!--    <input type="hidden" id="this_user" value="{{ t_username }}">-->
+    <input type="hidden" id="mainte_rev_no" value="{{mainte_rev_no}}">
+    <input type="hidden" id="budget_detail_id" value="{{ budget_lists.id }}">
+    <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+    <input type="hidden" id="last_operator" value="{{ last_operator }}">
+    <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">
+    <input type="hidden" id="action" value="{{ action }}">
+    <input type="hidden" id="action_sub" value="{{ action_sub }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="budget_rev_no" value="{{ budget_rev_no }}">
+    </div>
+
+<!--ボタン配置-->
+    <div id="mainte_action_button" style="width: auto;"></div>
+    <div class="scroll_mainte_div" id="left" style="float:left;">
+        <div style="background-color: #daeef3;"><font size="7">発見者入力</font>
+            <dl>
+                <dt>依頼ID：</dt><dd><input type="text" id="request_id" value="" readonly="readonly">※自動取得</dd>
+                <dt>サブNO：</dt><dd><input type="text" id="sub_no" value="" readonly="readonly">※修正回数を枝番とする</dd>
+                <dt>案件名：</dt><dd><input type="text" id="project_title" size="38" value=""></dd>
+                <dt>発見日時：</dt><dd><input type="datetime-local" id="discovery_datetime" value="" step="300"></dd>
+                <dt>部署：</dt>
+                <dd>
+                    <select id="department" name="department" onchange="__select__discoverer__change();">
+                            <option hidden value="{{ division_default.department_cd }}">{{ division_default.department_name }}</option>
+                        {% for DEPARTMENTMASTER in DEPARTMENTMASTER %}
+                            <option value="{{ DEPARTMENTMASTER.department_cd }}">{{ DEPARTMENTMASTER.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+                <dt>発見者：</dt>
+                <dd>
+                    <select id="discoverer" name="discoverer">
+                            <option hidden value="{{ discoverer_default.username }}">{{ discoverer_default.username }}</option>
+                        {% for DISCOVERER in DISCOVERER %}
+                            <option value="{{ DISCOVERER.username }}">{{ DISCOVERER.username }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+                <dt>管理区分：</dt>
+                <dd>
+                    <select id="management_kbn" name="management_kbn" onchange="__select__status__change();">
+                        {% for MGT_CLS_MST in MGT_CLS_MST %}
+                            <option value="{{ MGT_CLS_MST.0 }}">{{ MGT_CLS_MST.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+                <dt>工場名：</dt>
+                <dd>
+                    <select id="factory_name" name="factory_name" onchange="__select__equipment_no__change();">
+                        {% for FCLTY_CD in FCLTY_CD %}
+                            <option value="{{ FCLTY_CD.0 }}">{{ FCLTY_CD.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+                <dt>機器番号：</dt>
+                <dd>
+                    <select id="equipment_no" name="equipment_no" onchange="__div__plantia__change();">
+                        {% for EQPT_BASIC_MST in EQPT_BASIC_MST %}
+                            <option value="{{ EQPT_BASIC_MST.0 }}">{{ EQPT_BASIC_MST.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+                <dt>状況：</dt>
+                <dd>
+                    <select id="status" name="status">
+                        {% for CONDITION_CD in CONDITION_CD %}
+                            <option value="{{ CONDITION_CD.0 }}">{{ CONDITION_CD.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+                <dt>状況詳細：</dt><br><br>
+                <dd><textarea id="status_detail" name="status_detail" rows="5" cols="65"></textarea></dd>
+                <dt>改善提案：</dt><br><br>
+                <dd><textarea id="improvement_proposal" name="improvement_proposal" rows="2" cols="65"></textarea></dd>
+                <dt>資料データ：</dt><dd><font size="3"><input type="text" id="" value="" ></dd>
+            </dl>
+        </div>
+
+        <div style="background-color: #fde9d9;"><font size="7">対応方針</font>
+            <dl>
+                <dt>工事/依頼内容：</dt><dd><textarea id="request_contents_notification" name="request_contents_notification" rows="5" cols="65"></textarea></dd>
+                <dt>案件区分：</dt>
+                <dd>
+                    <select id="item_kbn" name="item_kbn">
+                        <option value="0">緊急</option>
+                        <option value="1">定常</option>
+                        <option value="2">自主整備</option>
+                    </select>
+                </dd>
+                <dt>希望納期：</dt><dd><input type="date" id="desired_delivery_date_f" value=""> ～ <input type="date" id="desired_delivery_date_t" value=""></dd>
+                <dt>部署：</dt>
+                <dd>
+                    <select id="department_p" name="department_p" onchange="__select__person_in_charge__change();">
+                        {% for DEPARTMENTMASTER in DEPARTMENTMASTER %}
+                            <option value="{{ DEPARTMENTMASTER.department_cd }}">{{ DEPARTMENTMASTER.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+                <dt>原課担当者：</dt>
+                <dd>
+                    <select id="person_in_charge" name="person_in_charge">
+                        {% for DISCOVERER in DISCOVERER %}
+                            <option value="{{ DISCOVERER.username }}">{{ DISCOVERER.username }}</option>
+                        {% endfor %}
+                    </select>
+                </dd>
+                <dt>原価センタ：</dt>
+                <dd>
+                    <select id="cost_center" name="cost_center">
+                            <option value=""></option>
+                    </select>
+                </dd>
+                <dt>勘定コード：</dt>
+                <dd>
+                    <select id="account_cd" name="account_cd">
+                            <option value="1721125623">生/修繕･委託小口工事代(IEP)</option>
+                            <option value="1721125621">生/修繕料･小口工事代(直発注)</option>
+                    </select>
+                </dd>
+                <dt>指図書NO：</dt>
+                <dd>
+                    <select id="instruction_no" name="instruction_no">
+                            <option value=""></option>
+                    </select>
+                </dd>
+                <dt>届出必要：</dt>
+                <dd><input type="radio" name="notification_required_kbn" value="1">必要　<input type="radio" name="notification_required_kbn" value="0">不要　</dd>
+                <dt>整備診断区分：</dt>
+                <dd><input type="radio" name="diagnosis_kbn" value="0">機械診断　<input type="radio" name="diagnosis_kbn" value="1">電気整備　<input type="radio" name="diagnosis_kbn" value="2">計装整備　</dd>
+            </dl>
+            <dl bordercolor="#333333" style="border: solid 1px">
+                <input type="radio" name="maintenance_kbn" value="0" style="font-size: 20px;">小口依頼済　　
+                <input type="radio" name="maintenance_kbn" value="1" style="font-size: 20px;">電気整備依頼済　　
+                <input type="radio" name="maintenance_kbn" value="2" style="font-size: 20px;">計装整備依頼済　　
+                <br>
+                <dt>対応依頼日：</dt><dd><input type="text" id="response_request_date" value="" readonly="readonly">※自動取得</dd>
+            </dl>
+
+            <div style="background-color: #ddd9c4;"><font size="4">届出チェック項目</font>
+                <table style="height: 40px;">
+                    <tr>
+                        <td style="line-height: normal;">
+                            <font size="3"><input type="checkbox" id="dangerous_goods_facility_kbn" value="1">危険物施設有無　</font>
+                        </td>
+                        <td style="line-height: normal;">
+                            <font size="3"><input type="checkbox" id="high_pressure_gas_facility_kbn" value="2">高圧ガス施設　</font>
+                        </td>
+                        <td style="line-height: normal;">
+                            <font size="3"><input type="checkbox" id="one_pressure_boiler_kbn" value="3">一圧・ボイラー整備　</font>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="line-height: normal;">
+                            <font size="3"><input type="checkbox" id="firefighting_equipment" value="4">消防設備（条例）　</font>
+                        </td>
+                        <td style="line-height: normal;">
+                            <font size="3"><input type="checkbox" id="use_asbestos_kbn" value="5">アスベスト仕様設備　</font>
+                        </td>
+                        <td style="line-height: normal;">
+                            <font size="3"><input type="checkbox" id="other" value="6">その他<input type="text" id="other_memo" value="">　</font>
+                        </td>
+                    </tr>
+                </table>
+                <font size="4">工事内容（届出用）：<br></font>
+                　　　　<textarea id="construction_details_for_notification" name="construction_details_for_notification" rows="5" cols="65"></textarea>
+            </div>
+            <font size="4">起用業者：　</font><input type="text" id="employer" value="IEP">
+        </div>
+    </div>
+
+    <div style="float:right; background-color: lightgray;" id="plantia"><font size="7">PLANTIA情報</font>
+        <table>
+            <tr>
+                <td style="line-height: normal;"><div><font size="4">工場名</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value=""></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">適用法規1</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value=""></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+            </tr>
+            <tr>
+                <td style="line-height: normal;"><div><font size="4">機器番号</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value="" ></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">適用法規2</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value=""></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+            </tr>
+            <tr>
+                <td style="line-height: normal;"><div><font size="4">機器名称</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value="" ></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">適用法規3</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value=""></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+            </tr>
+            <tr>
+                <td style="line-height: normal;"><div><font size="4">機器ファミリ</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value="" ></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">適用法規4</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value=""></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+            </tr>
+            <tr>
+                <td style="line-height: normal;"><div><font size="4">機器カテゴリ</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value="" ></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">適用法規5</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value=""></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+            </tr>
+            <tr>
+                <td style="line-height: normal;"><div><font size="4"></font></div></td>
+                <td style="line-height: normal;"><div><font size="4"></font></div></td>
+                <td style="line-height: normal;"><div><font size="4"></font></div></td>
+                <td style="line-height: normal;"><div><font size="4"></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">法的エリア</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value=""></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+            </tr>
+            <tr>
+                <td style="line-height: normal;"><div><font size="4"></font></div></td>
+                <td style="line-height: normal;"><div><font size="4"></font></div></td>
+                <td style="line-height: normal;"><div><font size="4"></font></div></td>
+                <td style="line-height: normal;"><div><font size="4"></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">法的施設名</font></div></td>
+                <td style="line-height: normal;"><div><font size="4">：　</font></div></td>
+                <td style="line-height: normal;"><div><font size="3"><input type="text" value=""></font></div></td>
+                <td style="line-height: normal;"><div><font size="4">　　　</font></div></td>
+            </tr>
+        </table>
+    </div>
+    <div style="clear: both;"></div>

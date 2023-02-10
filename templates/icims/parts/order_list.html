@@ -1,0 +1,266 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+function getorderdetail(a) {
+        var order_id = a;
+        var from_page = $('#from_page').val();
+        //var basic_page = $('#this_page').val();
+        $.ajax({
+                url: "/imsds/parts/order_detail/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    //'basic_page': basic_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#order_detail').empty();
+                    $('#order_detail').html(data);
+
+                    $("#floatBoxDialog").dialog({
+                        modal:true,
+                        width: 1650,
+                        height: 500,
+                        title:"詳細受注画面",
+                    });
+                    incidental_work_check();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+window.onload = function() {
+    getstockdata();
+};
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:520px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.status{
+    width:100px;
+}
+.allocation_type{
+    width:40px;
+}
+.order_id{
+    width:80px;
+}
+.order_date{
+    width:160px;
+}
+.order_no{
+    width:140px;
+}
+.delivery_no{
+    width:60px;
+}
+.item_category{
+    width:80px;
+}
+.item_category_name{
+    width:80px;
+}
+.voucher_type{
+    width:100px;
+}
+.voucher_type_name{
+    width:80px;
+}
+.registration_division{
+    width:90px;
+}
+.registration_division_name{
+    width:60px;
+}
+.delivery_date{
+    width:100px;
+}
+.ship_date{
+    width:100px;
+}
+.order_route{
+    width:80px;
+}
+.place_for_receipt_of_goods{
+    width:70px;
+}
+.place_for_receipt_of_goods_name{
+    width:315px;
+}
+.prefecture{
+    width:60px;
+}
+.address{
+    width:450px;
+}
+.post_no{
+    width:60px;
+}
+.phone_no{
+    width:100px;
+}
+.delivery_point{
+    width:100px;
+}
+.delivery_point_name{
+    width:80px;
+}
+.handling_office{
+    width:50px;
+}
+.carrier{
+    width:40px;
+}
+.item_group{
+    width:80px;
+}
+.item_code{
+    width:160px;
+}
+.item_name{
+    width:280px;
+}
+.order_packed_amount{
+    width:70px;
+}
+.non_stock_allocation_packed_amount{
+    width:80px;
+}
+.unit{
+    width:30px;
+}
+.order_amount{
+    width:80px;
+}
+.non_stock_allocation_amount{
+    width:60px;
+}
+.incoterm{
+    width:60px;
+}
+.customer_order_no{
+    width:100px;
+}
+.two_lot_select_flag{
+    width:60px;
+}
+.designated_lot{
+    width:100px;
+}
+.rem{
+    width:240px;
+    overflow: hidden;
+}
+.supplemental_task_flag{
+    width:50px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+<input type="hidden" id="from_page" value="{{ from_page }}" >
+<div>〇受注データ件数：{{ order_lists_count }}　　☆引当データ件数：{{ stock_allocation_count }}　　※残件数：{{ remind_count }}</div>
+
+        {% if order_lists_count > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="status">引当状態</th>
+                        <th class="item_code">品目コード</th>
+                        <th class="item_name">品目名</th>
+                        <th class="place_for_receipt_of_goods">荷受先</th>
+                        <th class="place_for_receipt_of_goods_name">荷受先名</th>
+                        <th class="delivery_date">指定納入期日</th>
+                        <th class="ship_date">出荷日</th>
+                        <th class="order_packed_amount">受注数量</th>
+                        <th class="order_amount">受払数量</th>
+                        <th class="supplemental_task_flag">付帯作業</th>
+                        <th class="rem">備考</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for order_lists in order_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" id="{{ order_lists.id }}" class="detailpb" onclick="{{ JS }}">{{ link_label }}</a>
+                        </td>
+                        <td class="status">{{ order_lists.stock_allocation_status_name }}</td>
+                        <td class="item_code">{{ order_lists.item_code }}</td>
+                        <td class="item_name">{{ order_lists.item_name }}</td>
+                        <td class="place_for_receipt_of_goods">{{ order_lists.place_for_receipt_of_goods }}</td>
+                        <td class="place_for_receipt_of_goods_name">{{ order_lists.company_name }}</td>
+                        <td class="delivery_date">{{ order_lists.delivery_date }}</td>
+                        <td class="ship_date">
+                            {% if order_lists.ship_date is not None %}
+                                {{ order_lists.ship_date }}
+                            {% endif %}
+                        </td>
+                        <td class="order_packed_amount">{{ order_lists.order_packed_amount }}{{ order_lists.order_packed_amount_unit }}</td>
+                        <td class="order_amount">{{ order_lists.order_amount }}{{ order_lists.order_amount_unit }}</td>
+                        <td class="supplemental_task_flag">
+                            {% if order_lists.supplemental_task_flag == 1 %}
+                                有
+                            {% else %}
+                                無
+                            {% endif %}
+                        </td>
+                        <td class="rem">{{ order_lists.rem2 }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}
+
+    <div id="floatBoxDialog" style="display:none;">
+        <div id="order_detail">
+        </div>
+    </div>

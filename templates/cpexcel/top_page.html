@@ -1,0 +1,139 @@
+{% extends 'cpexcel/base.html' %}
+
+{% block contents %}
+
+<script>
+function program_entry_img(a) {
+    var img_no = a;
+    document.getElementById("manual_img").src="/static/img/cpexcel/manual/img/" + img_no + "_program_entry_top_page.jpg"
+}
+
+window.onload = function() {
+        //order_filter_call();
+};
+
+</script>
+<style type="text/css">
+#order_list{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+#mntce_list{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+.manual:hover {
+    color: #f00;
+}
+
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">Automatic copy & past for Excel　トップページ</h2>
+    </div>
+    <div>
+        <h3>ツールの概要</h3>
+        <div style="float:left;width=2px">　</div>
+        <div style="float:left;width=400px">
+            1つのエクセルファイルのセルの値を別のエクセルファイルのセルにコピーします。
+            <br>
+            　※コピー先ファイルをコピー元ファイルと同じファイルを指定すれば、同一ファイル内でのコピペにも使用可能です。
+            <br>
+            登録時にコピー元の「シート」→「セル」、コピー先の「シート」→「セル」を設定していきます。登録数に制限はありません。
+            <br>
+            なお、コピー元のファイルに変更があったかを確認する「ファイル変更チェック」機能もあります。
+        </div>
+        <div style="clear: both;"></div>
+        <br>
+        <div style="float:left;width=500px">
+            <h3>操作説明</h3>
+            <div style="float:left;width=2px">　</div>
+            <div style="float:left;width=400px">
+                <h3>1.プログラム登録</h3>
+                <a class="manual" href="#" onClick="program_entry_img(1);">①左の「プログラム登録」をクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(2);">②既に登録されているプログラムのリストが表示されます。リストを更新する場合は、「リスト更新」ボタンをクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(3);">③-1新規に登録する場合は、「新規登録」ボタンをクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(4);">③-2既に登録済のプログラムを修正する場合は、リストの左端の「変更」をクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(5);">④表示された画面の必要事項(プログラム名、説明、コピー元ファイル名、コピー先ファイル名)を記入する。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(6);">　※ファイル名は「参照」ボタンで、選択することも出来る。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(7);">⑤新規の場合は「登録」ボタン、</a><a class="manual" href="#" onClick="program_entry_img(8);">変更の場合は「更新」ボタンをクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(9);">⑥タスク(作業)の登録を行う。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(10);">⑦新規登録の場合は、必要事項を記入し、「登録」ボタンをクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(11);">⑧既に登録済のタスクを変更する場合は、リストの左端の「変更」をクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(12);">⑨-1変更内容を記入し、「更新」をクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(13);">⑨-2内容を変更し新規に追加する場合は、「新規登録」をクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(14);">⑨-3不要となったタスクは「削除」をクリックする。</a>
+                <br>
+                エクセルのインポートファイルを使用してタスクを登録できる。･･･以下の手順
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(15);">⑩タスクインポートファイルをダウンロードする</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(16);">⑪ダウンロードしたエクセルファイルを編集する。</a><a class="manual" href="#" onClick="program_entry_img(161);">ファイルの説明。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(17);">⑫インポートするファイルを選択する。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(18);">⑬「インポート」をクリックし、登録する。</a>
+            </div>
+            <div style="clear: both;"></div>
+            <br>
+            <div style="float:left;width=2px">　</div>
+            <div style="float:left;width=400px">
+                <h3>2.プログラム実行</h3>
+                <a class="manual" href="#" onClick="program_entry_img(21);">①左の「プログラム実行」をクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(22);">②既に登録されているプログラムのリストが表示されます。リストを更新する場合は、「リスト更新」ボタンをクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(23);">③登録済のプログラムの中から、実行するプログラムを得選んでリストの左端の「選択」をクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(24);">④コピー元のファイルを選択し、</a><a class="manual" href="#" onClick="program_entry_img(25);">送信(アップロード)する。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(26);">⑤コピー先のファイルを選択し、</a><a class="manual" href="#" onClick="program_entry_img(27);">送信(アップロード)する。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(28);">⑥「実行」ボタンをクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(29);">⑦「コピー先ファイル名」の頭に「作業完了_」が追加されたファイルがダウンロードされる。</a>
+            </div>
+            <div style="clear: both;"></div>
+            <br>
+            <div style="float:left;width=2px">　</div>
+            <div style="float:left;width=400px">
+                <h3>3.ファイル変更チェック</h3>
+                <a class="manual" href="#" onClick="program_entry_img(41);">①左の「ファイル変更チェック」をクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(42);">②チェックの基準となるファイルを選択し、</a><a class="manual" href="#" onClick="program_entry_img(43);">送信(アップロード)する。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(44);">③チェック対象のファイルを選択し、</a><a class="manual" href="#" onClick="program_entry_img(45);">送信(アップロード)する。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(46);">④「ファイルチェック」ボタンをクリックする。</a>
+                <br>
+                <a class="manual" href="#" onClick="program_entry_img(47);">⑤「チェック対象ファイル名」の頭に「確認完了_」が追加されたファイルがダウンロードされる。</a>
+            </div>
+        </div>
+        <div style="float:left;width=10px">　　</div>
+        <div style="float:left;width=400px">
+            <div>
+                <img id="manual_img" src="" width="800" height="560">
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

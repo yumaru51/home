@@ -1,0 +1,219 @@
+<script>
+//選択した取扱物質の表示
+function handling_material_detail(a,b,c) {
+        var target_id = a;
+        var data_source = b;
+        var work_id = '';
+        budget_spec_handling_material_info(target_id,data_source, work_id);//予算取扱物質詳細情報を表示するJS起動(detail_template.html内にプログラム有)
+}
+// ここから下は変更前のJS･･･削除予定
+function old_handling_material_detail(a,b) {
+        var target_id = a;
+        var data_source = b;
+                $.ajax({
+                url: "/isk_tools/fms/parts/handling_material_detail/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    // alert(data.msg);
+                    $('#handling_material_name').val(data.handling_material);
+                    $('#sub_no').val(data.sub_no);
+                    $('#chemical_formula').val(data.chemical_formula);
+                    $('#normal_pressure').val(data.normal_pressure);
+                    $('#maximum_pressure').val(data.maximum_pressure);
+                    $('#minimum_pressure').val(data.minimum_pressure);
+                    $('#pressure_unit').val(data.pressure_unit);
+                    $('#normal_temperature').val(data.normal_temperature);
+                    $('#maximum_temperature').val(data.maximum_temperature);
+                    $('#minimum_temperature').val(data.minimum_temperature);
+                    $('#state').val(data.state);
+                    $('#concentration').val(data.concentration);
+                    $('#concentration_unit').val(data.concentration_unit);
+                    $('#pH').val(data.pH);
+                    $('#viscosity').val(data.viscosity);
+                    $('#bulk_specific_gravity').val(data.bulk_specific_gravity);
+                    $('#true_specific_gravity').val(data.true_specific_gravity);
+                    $('#apparent_specific_gravity').val(data.apparent_specific_gravity);
+                    $('#particle_size').val(data.particle_size);
+                    $('#moisture').val(data.moisture);
+                    $('#others').val(data.others);
+                    $('#handling_material_id').val(data.handling_material_id);
+                    material_state_change();
+                    concentration_unit_change();
+                    pressure_unit_change();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.handling_material_scrollHead,tbody.handling_material_scrollBody{
+    display:block;
+    width:auto;
+}
+tbody.handling_material_scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.handling_material_select_pb{
+    width:40px;
+    text-align: center;
+}
+.handling_material_material_name{
+    width:180px;
+}
+.handling_material_normal_pressure{
+    width:80px;
+}
+.handling_material_maximum_pressure{
+    width:40px;
+}
+.handling_material_minimum_pressure{
+    width:40px;
+}
+.handling_material_normal_temperature{
+    width:80px;
+}
+.handling_material_maximum_temperature{
+    width:40px;
+}
+.handling_material_minimum_temperature{
+    width:40px;
+}
+.handling_material_state{
+    width:80px;
+}
+.handling_material_concentration{
+    width:80px;
+}
+.handling_material_unit{
+    width:50px;
+}
+.handling_material_ph{
+    width:80px;
+}
+.handling_material_viscosity{
+    width:80px;
+}
+.handling_material_others{
+    width:280px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+                <input type="hidden" value="{{ handling_material_lists_num }}">
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="handling_material_scrollHead">
+                    <tr>
+                        <th class="handling_material_select_pb" rowspan="2"></th>
+                        <th class="handling_material_material_name" rowspan="2" style="text-align:center; vertical-align:middle;">取扱物質名</th>
+                        <th colspan="4" style="text-align:center;">圧力</th>
+                        <th colspan="3" style="text-align:center;">温度(℃)</th>
+                        <th class="handling_material_state" rowspan="2" style="text-align:center; vertical-align:middle;">状態</th>
+                        <th class="handling_material_concentration" rowspan="2" style="text-align:center; vertical-align:middle;">濃度</th>
+                        <th class="handling_material_unit" rowspan="2" style="text-align:center; vertical-align:middle;">単位</th>
+                        <th class="handling_material_ph" rowspan="2" style="text-align:center; vertical-align:middle;">pH</th>
+                        <th class="handling_material_viscosity" rowspan="2" style="text-align:center; vertical-align:middle;">粘度(cP)</th>
+                        <th class="handling_material_others" rowspan="2" style="text-align:center; vertical-align:middle;">その他</th>
+                    </tr>
+                    <tr>
+                        <th class="handling_material_normal_pressure" style="text-align : center;">通常</th>
+                        <th class="handling_material_maximum_pressure" style="text-align : center;">最高</th>
+                        <th class="handling_material_minimum_pressure" style="text-align : center;">最低</th>
+                        <th class="handling_material_unit" style="text-align : center;">単位</th>
+                        <th class="handling_material_normal_temperature" style="text-align : center;">通常</th>
+                        <th class="handling_material_maximum_temperature" style="text-align : center;">最高</th>
+                        <th class="handling_material_minimum_temperature" style="text-align : center;">最低</th>
+                    </tr>
+                </thead>
+                <tbody class="handling_material_scrollBody">
+
+                {% if handling_material_lists_num > 0 %}
+                    {% for handling_material_lists in handling_material_lists %}
+                        <tr>
+                            <td class="handling_material_select_pb">
+                                <a href="#" id="{{ handling_material_lists.id }}" class="select_pb" onclick="handling_material_detail(id,'{{ data_source }}', '{{ handling_material_lists.work_id }}');">選択</a>
+                            </td>
+                            <td class="handling_material_material_name">
+                                {% if handling_material_lists.material_name is　not None %}
+                                    {{ handling_material_lists.material_name }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_normal_pressure">
+                                {% if handling_material_lists.str_normal_pressure is　not None %}
+                                    {{ handling_material_lists.str_normal_pressure }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_maximum_pressure">
+                                {% if handling_material_lists.maximum_pressure is　not None %}
+                                    {{ handling_material_lists.maximum_pressure }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_minimum_pressure">
+                                {% if handling_material_lists.minimum_pressure is　not None %}
+                                    {{ handling_material_lists.minimum_pressure }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_unit">
+                                {% if handling_material_lists.p_unit is　not None %}
+                                    {{ handling_material_lists.p_unit }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_normal_temperature">
+                                {% if handling_material_lists.str_normal_temperature is　not None %}
+                                    {{ handling_material_lists.str_normal_temperature }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_maximum_temperature">
+                                {% if handling_material_lists.maximum_temperature is　not None %}
+                                    {{ handling_material_lists.maximum_temperature }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_minimum_temperature">
+                                {% if handling_material_lists.minimum_temperature is　not None %}
+                                    {{ handling_material_lists.minimum_temperature }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_state">
+                                {% if handling_material_lists.state_name is　not None %}
+                                    {{ handling_material_lists.state_name }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_concentration">
+                                {% if handling_material_lists.concentration is　not None %}
+                                    {{ handling_material_lists.concentration }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_unit">
+                                {% if handling_material_lists.c_unit is　not None %}
+                                    {{ handling_material_lists.c_unit }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_ph">
+                                {% if handling_material_lists.str_ph is　not None %}
+                                    {{ handling_material_lists.str_ph }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_viscosity">
+                                {% if handling_material_lists.viscosity is　not None %}
+                                    {{ handling_material_lists.viscosity }}
+                                {% endif %}
+                            </td>
+                            <td class="handling_material_others">{{ handling_material_lists.others }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>

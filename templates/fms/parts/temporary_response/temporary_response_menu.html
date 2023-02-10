@@ -1,0 +1,182 @@
+
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+// 台帳問い合わせExcelファイル作成ページ表示
+function make_ordered_construction_excel_page() {
+    $('<form/>', {action: '/isk_tools/fms/parts/temporary_response/make_ordered_construction_excel/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: '{{ user_division_cd | safe }}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: '{{ user_department_cd | safe }}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: '{{user_authority}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: '{{confirm_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: '{{permit_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+// PLANTIAインポートファイル出力ページ表示
+function make_plantia_import_excel_page() {
+    $('<form/>', {action: '/isk_tools/fms/parts/temporary_response/make_plantia_import_excel_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: '{{ user_division_cd | safe }}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: '{{ user_department_cd | safe }}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: '{{user_authority}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: '{{confirm_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: '{{permit_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+function top_page() {
+    var start_date = '';
+    var end_date = '';
+    $('<form/>', {action: '/isk_tools/fms/parts/daily_construction/daily_construction_display/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'start_date', value: start_date}))
+    .append($('<input/>', {type: 'hidden', name: 'end_date', value: end_date}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_fire_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_high_place_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_entering_the_tank_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_heavy_equipment_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_brake_off_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_contamination_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_blockage_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+// ヒアリング資料出力ページ表示
+function make_hearing_document_page() {
+    $('<form/>', {action: '/isk_tools/fms/parts/temporary_response/make_hearing_document_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: '{{ user_division_cd | safe }}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: '{{ user_department_cd | safe }}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: '{{user_authority}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: '{{confirm_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: '{{permit_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+function make_carry_forward_document_page() {
+    $('<form/>', {action: '/isk_tools/fms/parts/temporary_response/make_carry_forward_document_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: '{{ user_division_cd | safe }}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: '{{ user_department_cd | safe }}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: '{{user_authority}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: '{{confirm_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: '{{permit_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+// 予算No登録ページ表示(単年度計画、追加予算共通処理)
+function make_budget_registration_list_page(budget_type) {
+    var this_division = $('#user_division_cd').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/temporary_response/make_budget_registration_list_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: this_division }))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: '{{user_department_cd}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: '{{user_authority}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: '{{confirm_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: '{{permit_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'budget_type', value: budget_type }))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+// 中期計画：単年度計画移行ページ表示
+function go_next_budget_plan_page() {
+    var this_division = $('#user_division_cd').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/temporary_response/go_next_budget_plan_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: this_division }))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: '{{user_department_cd}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: '{{user_authority}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: '{{confirm_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: '{{permit_user}}' }))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+</script>
+<style type="text/css">
+td.a {
+    height : 30px;
+    vertical-align: middle;
+}
+
+
+</style>
+    <input TYPE="hidden" id="user_division_cd" VALUE="{{user_division_cd}}"/>
+    <input TYPE="hidden" id="user_department_cd" VALUE="{{user_department_cd}}"/>
+    <input TYPE="hidden" id="user_authority" VALUE="{{user_authority}}"/>
+    <input TYPE="hidden" id="confirm_user" VALUE="{{confirm_user}}"/>
+    <input TYPE="hidden" id="permit_user" VALUE="{{permit_user}}"/>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">一時対応一覧</h2>
+    </div>
+    <br>
+    <br>
+    <div class='clear'></div>
+    <div style="float:left;width:5px">　　</div>
+    <div style="float:left;width: auto">
+        <table class="table_list" border="0" cellspacing="20" cellpadding="20" bordercolor="#000000" style="border-collapse: collapse">
+            <tr>
+                <td height="30" style="vertical-align: middle;"><font size="4"><a href="#" style="cursor:pointer;" onclick="make_ordered_construction_excel_page();">台帳問い合わせExcelファイル作成</a></font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4"> 　:　 </font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4">【説明】発注完了工事データERP登録用Excelファイル作成</font></td>
+            </tr>
+            {% for plantia_import_permission in plantia_import_permission_list %}
+            {% if forloop.first %}
+            <tr>
+                <td height="30" style="vertical-align: middle;"><font size="4"><a href="#" style="cursor:pointer;" onclick="make_plantia_import_excel_page();">PLANTIAインポートファイル出力</a></font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4"> 　:　 </font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4">【説明】PLANTIAインポートファイル出力機能</font></td>
+            </tr>
+            {% endif %}
+            {% endfor %}
+            <tr>
+                <td height="30" style="vertical-align: middle;"><font size="4"><a href="#" style="cursor:pointer;" onclick="top_page();">工事施工場所表示</a></font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4"> 　:　 </font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4">【説明】工場地図上に対象日の工事場所を表示/登録</font></td>
+            </tr>
+            <tr>
+                <td height="30" style="vertical-align: middle;"><font size="4"><a href="#" style="cursor:pointer;" onclick="make_hearing_document_page();">ヒアリング資料出力</a></font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4"> 　:　 </font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4">【説明】ヒアリング資料出力機能</font></td>
+            </tr>
+            <tr>
+                <td height="30" style="vertical-align: middle;"><font size="4"><a href="#" style="cursor:pointer;" onclick="make_carry_forward_document_page();">予算繰越申請書出力</a></font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4"> 　:　 </font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4">【説明】予算繰越申請書出力</font></td>
+            </tr>
+            {% if user_department_cd == 'CPG' %}
+            <tr>
+                <td height="30" style="vertical-align: middle;"><font size="4"><a href="#" style="cursor:pointer;" onclick="make_budget_registration_list_page('normal');">通常申請：予算No登録</a></font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4"> 　:　 </font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4">【説明】通常申請：予算No登録機能</font></td>
+            </tr>
+            {% endif %}
+            {% if user_department_cd == 'CPG' %}
+            <tr>
+                <td height="30" style="vertical-align: middle;"><font size="4"><a href="#" style="cursor:pointer;" onclick="make_budget_registration_list_page('append');">追加予算：予算No登録</a></font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4"> 　:　 </font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4">【説明】追加予算：予算No登録機能</font></td>
+            </tr>
+            {% endif %}
+            {% if user_department_cd == 'CPG' %}
+            <tr>
+                <td height="30" style="vertical-align: middle;"><font size="4"><a href="#" style="cursor:pointer;" onclick="go_next_budget_plan_page();">中期計画：単年度計画移行</a></font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4"> 　:　 </font></td>
+                <td height="30" style="vertical-align: middle;"><font size="4">【説明】中期計画を元に、単年度計画の予算を作成します</font></td>
+            </tr>
+            {% endif %}
+         </table>
+    </div>
+    <div style="float:left;width:5px">　　</div>
+    <div style="float:left;width: auto">
+
+    </div>
+{% endblock %}

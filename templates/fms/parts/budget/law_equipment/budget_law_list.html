@@ -1,0 +1,91 @@
+<script>
+//予算関連法令詳細表示
+function budget_law_detail(a) {
+    var budget_law_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/budget_law_detail/",
+                type: "POST",
+                data : {
+                    'budget_law_id' : budget_law_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_law_name').val(data.budget_law_name);
+                    $('#budget_law_id').val(data.budget_law_id);
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("budget_law_add_button_div") != null){
+                        const p1 = document.getElementById("budget_law_add_button_div");
+                        p1.style.display ="none";
+                    }
+                    if(document.getElementById("budget_law_edit_button_div") != null){
+                        const p2 = document.getElementById("budget_law_edit_button_div");
+                        p2.style.display ="block";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.budget_law_scrollHead,tbody.budget_law_scrollBody{
+    display:block;
+}
+tbody.budget_law_scrollBody{
+    overflow-y:scroll;
+    height:240px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.budget_law_name{
+    width:400px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if budget_law_lists_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="budget_law_scrollHead">
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <th class="detail_pb"></th>
+                        {% endif %}
+                        <th class="budget_law_name">関係法令</th>
+                    </tr>
+                </thead>
+                <tbody class="budget_law_scrollBody">
+                {% for budget_law_lists in budget_law_lists %}
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <td class="detail_pb">
+                                <a href="#" id="{{ budget_law_lists.id }}" class="detailpb" onclick="budget_law_detail(id);">選択</a>
+                            </td>
+                        {% endif %}
+                        <td class="budget_law_name">{{ budget_law_lists.law_name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

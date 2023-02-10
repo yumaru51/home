@@ -1,0 +1,835 @@
+<script>
+function select_step(a) {
+    step_detail(a);
+}
+//進捗工程での表示内容の詳細表示処理
+function step_display_item_select(a) {
+    var id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/step_display_item_detail/",
+                type: "POST",
+                data : {
+                    'id' : id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#input_step_display_item_id').val(data.step_display_item_id);
+                    //$('#input_step_display_item_step_id').val(data.step_display_item_step_id);
+                    $('#input_step_display_item_page').val(data.step_display_item_page);
+                    $('#input_step_display_item_div_id_name').val(data.step_display_item_div_id_name);
+                    $('#input_step_display_item_item_name').val(data.step_display_item_item_name);
+                    $('#input_step_display_item_action_pb_flag').val(data.step_display_item_action_pb_flag);
+                    $('#input_step_display_item_default_page').val(data.step_display_item_default_page);
+                    $('#input_step_display_item_lost_flag').val(data.step_display_item_lost_flag);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//進捗工程での操作の詳細表示処理
+function step_action_select(a) {
+    var id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/step_action_detail/",
+                type: "POST",
+                data : {
+                    'id' : id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#input_step_action_id').val(data.step_action_id);
+                    //$('#input_step_action_step_id').val(data.step_action_step_id);
+                    $('#input_step_action_action_cd').val(data.step_action_action_cd);
+                    $('#input_step_action_action_name').val(data.step_action_action_name);
+                    $('#input_step_action_target').val(data.step_action_target);
+                    $('#input_step_action_display_order').val(data.step_action_display_order);
+                    $('#input_step_action_lost_flag').val(data.step_action_lost_flag);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//情報登録有無の詳細表示処理
+function data_entry_step_select(a) {
+    var id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/data_entry_step_detail/",
+                type: "POST",
+                data : {
+                    'id' : id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#input_data_entry_step_master_id').val(data.data_entry_step_id);
+                    $('#input_data_entry_step_master_target_table').val(data.data_entry_step_target_table);
+                    $('#input_data_entry_step_master_lost_flag').val(data.data_entry_step_lost_flag);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//stepmasterデータ登録･更新処理
+function step_data_entry(a) {
+        var entry_type = a;
+        var target_step_id = $('#target_step_id').val();
+        var target_step_name = $('#target_step_name').val();
+        var target_charge_department_class = $('#target_charge_department_class').val();
+        var target_step_level = $('#target_step_level').val();
+        var target_target = $('#target_target').val();
+        var target_new_entry_flag = $('#target_new_entry_flag').val();
+        var target_display_order = $('#target_display_order').val();
+        var target_lost_flag = $('#target_lost_flag').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/step_data_entry/",
+                type: "POST",
+                data : {
+                    'entry_type' : entry_type,
+                    'target_step_id' : target_step_id,
+                    'target_step_name' : target_step_name,
+                    'target_charge_department_class' : target_charge_department_class,
+                    'target_step_level' : target_step_level,
+                    'target_target' : target_target,
+                    'target_new_entry_flag' : target_new_entry_flag,
+                    'target_display_order' : target_display_order,
+                    'target_lost_flag' : target_lost_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//stepmasterデータ削除処理
+function step_data_delete(a) {
+        var target_step_id = a;
+        $.ajax({
+                url: "/isk_tools/fms/action/step_data_delete/",
+                type: "POST",
+                data : {
+                    'target_step_id' : target_step_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//stepdisplayitemデータ登録･更新処理
+function step_display_item_entry(a) {
+        var entry_type = a;
+        var target_id = $('#input_step_display_item_id').val();
+        var page = $('#input_step_display_item_page').val();
+        var div_id_name = $('#input_step_display_item_div_id_name').val();
+        var item_name = $('#input_step_display_item_item_name').val();
+        var action_pb_flag = $('#input_step_display_item_action_pb_flag').val();
+        var default_page = $('#input_step_display_item_default_page').val();
+        var lost_flag = $('#input_step_display_item_lost_flag').val();
+        var target_step_id = $('#target_step_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/step_display_item_entry/",
+                type: "POST",
+                data : {
+                    'entry_type' : entry_type,
+                    'target_id' : target_id,
+                    'page' : page,
+                    'div_id_name' : div_id_name,
+                    'item_name' : item_name,
+                    'action_pb_flag' : action_pb_flag,
+                    'default_page' : default_page,
+                    'lost_flag' : lost_flag,
+                    'target_step_id' : target_step_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//stepdisplayitemデータ削除処理
+function step_display_item_delete() {
+        var target_id = $('#input_step_display_item_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/step_display_item_delete/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//stepactionデータ登録･更新処理
+function step_action_entry(a) {
+        var entry_type = a;
+        var target_id = $('#input_step_action_id').val();
+        var action_cd = $('#input_step_action_action_cd').val();
+        var target = $('#input_step_action_target').val();
+        var display_order = $('#input_step_action_display_order').val();
+        var lost_flag = $('#input_step_action_lost_flag').val();
+        var target_step_id = $('#target_step_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/step_action_entry/",
+                type: "POST",
+                data : {
+                    'entry_type' : entry_type,
+                    'target_id' : target_id,
+                    'action_cd' : action_cd,
+                    'target' : target,
+                    'display_order' : display_order,
+                    'lost_flag' : lost_flag,
+                    'target_step_id' : target_step_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//stepactionデータ削除処理
+function step_action_delete() {
+        var target_id = $('#input_step_action_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/step_action_delete/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//dataentrystepmasterデータ登録･更新処理
+function data_entry_step_master_entry(a) {
+        var entry_type = a;
+        var target_id = $('#input_data_entry_step_master_id').val();
+        var target_table = $('#input_data_entry_step_master_target_table').val();
+        var lost_flag = $('#input_data_entry_step_master_lost_flag').val();
+        var target_step_id = $('#target_step_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/data_entry_step_master_entry/",
+                type: "POST",
+                data : {
+                    'entry_type' : entry_type,
+                    'target_id' : target_id,
+                    'target_table' : target_table,
+                    'lost_flag' : lost_flag,
+                    'target_step_id' : target_step_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//dataentrystepmasterデータ削除処理
+function data_entry_step_master_delete() {
+        var target_id = $('#input_step_action_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/data_entry_step_master_delete/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//steprelationデータ登録･更新処理
+function step_relation_entry(a) {
+        var target_id = a;
+        //新規登録時処理･･･next_stepのデータ取得先をdiv id「new_next_step_id」に
+        if ( a == 0 ) {
+            var target_div_name = '#new_next_step_id';
+            var target_div_name2 = '#new_display_order';
+        //更新時処理･･･next_stepのデータ取得先をdiv id「next_step_id_」+ steprelationのid
+        }else{
+            var target_div_name = '#next_step_id_' + a;
+            var target_div_name2 = '#next_display_order_' + a;
+        }
+        var next_step = $(target_div_name).val();
+        var display_order = $(target_div_name2).val();
+        var target_step_id = $('#target_step_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/step_relation_entry/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'next_step' : next_step,
+                    'target_step_id' : target_step_id,
+                    'display_order' : display_order,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+}
+//steprelationデータ削除処理
+function step_relation_delete(a) {
+        var target_id = a;
+        $.ajax({
+                url: "/isk_tools/fms/action/step_relation_delete/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    step_management_info(target_step_id);//step管理イメージのためのJS起動(step_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    height: 35px;
+}
+th, td {
+    font-size: 125%;
+    padding: 5px 0px;
+}
+.box1 {
+    width: 360px;
+    border: solid 3px #000;
+    margin: -2px 0px 0px 0px;
+    background-color: #CCFFCC;
+    text-align: center;
+}
+.box2 {
+    width: 900px;
+    border: solid 3px #000;
+    margin: -2px 0px 0px 0px;
+    background-color: #CCFFFF;
+    text-align: center;
+}
+.box3 {
+    width: 430px;
+    border: solid 3px #000;
+    margin: -2px 0px 0px 0px;
+    background-color: #FFFFEE;
+    text-align: center;
+}
+.box_child {
+    width: 330px;
+    border: solid 3px #000;
+    margin: 10px 5px;
+    padding: 5px 5px 5px 10px;
+    background-color: #FFFFFF;
+}
+. step_table {
+    margin: 2px 0px 0px 20px;
+}
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:120px;
+}
+thead.scroll_step_display_item_Head,tbody.scroll_step_display_item_Body{
+    display:block;
+}
+tbody.scroll_step_display_item_Body{
+    overflow-y:scroll;
+    height:300px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.action_cd{
+    width:200px;
+}
+.action_name{
+    width:200px;
+}
+.target{
+    width:100px;
+}
+.display_order{
+    width:80px;
+}
+.lost_flag{
+    width:50px;
+}
+.page{
+    width:50px;
+}
+.div_id_name{
+    width:350px;
+}
+.item_name{
+    width:150px;
+}
+.action_pb_flag{
+    width:80px;
+}
+.default_page{
+    width:80px;
+}
+.target_table{
+    width:150px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+tr:nth-child(2n) {
+    background: #FFFFFF;
+}
+.selector {
+    cursor:pointer
+}
+</style>
+    <div style="float: left;">
+        <div class="box1">
+            <h2 class="page-header">差戻step・・・自動判定</h2>
+        </div>
+        <div class="box1">
+            {% if return_step_list_num > 0 %}
+                {% for return_step_list in return_step_list %}
+                    <div class="box_child">
+                        <table class="step_table">
+                            <tr>
+                                <td class="selector" onclick="select_step({{ return_step_list.step_id }});">step_id ：</td>
+                                <td><input type="text" value="{{ return_step_list.step_id }}" size="10"></td>
+                            </tr>
+                            <tr>
+                                <td class="selector" onclick="select_step({{ return_step_list.step_id }});">step名 ：</td>
+                                <td><input type="text" value="{{ return_step_list.step_name }}" size="16"></td>
+                            </tr>
+                        </table>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    <div style="float:left;width:10px;" >　</div>
+    <div style="float: left;">
+        <div class="box2">
+            <h2 class="page-header">Lv5 対象step</h2>
+        </div>
+        <div class="box2">
+            <div>
+                <table class="step_table">
+                    <tr>
+                        <td>step_id</td>
+                        <td>　</td>
+                        <td>step名</td>
+                        <td>　</td>
+                        <td>担当部署区分</td>
+                        <td>　</td>
+                        <td>工程レベル</td>
+                        <td>　</td>
+                        <td>対象</td>
+                        <td>　</td>
+                        <td>新規登録</td>
+                        <td>　</td>
+                        <td>表示順</td>
+                        <td>　</td>
+                        <td>無効</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="target_step_id" value="{{ target_step_id }}" size="10"></td>
+                        <td>　</td>
+                        <td><input type="text" id="target_step_name" value="{{ target_step_name }}" size="16"></td>
+                        <td>　</td>
+                        <td><input type="text" id="target_charge_department_class" value="{{ target_charge_department_class }}" size="4"></td>
+                        <td>　</td>
+                        <td><input type="text" id="target_step_level" value="{{ target_step_level }}" size="1"></td>
+                        <td>　</td>
+                        <td><input type="text" id="target_target" value="{{ target_target }}" size="4"></td>
+                        <td>　</td>
+                        <td><input type="text" id="target_new_entry_flag" value="{{ target_new_entry_flag }}" size="1"></td>
+                        <td>　</td>
+                        <td><input type="text" id="target_display_order" value="{{ target_display_order }}" size="1"></td>
+                        <td>　</td>
+                        <td><input type="text" id="target_lost_flag" value="{{ target_lost_flag }}" size="1"></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float: left;">
+                <input type="button" value="新規登録" onclick="step_data_entry(0);">
+            </div>
+            <div style="float: left;;width:20px;">　</div>
+            <div style="float: left;">
+                <input type="button" value="　更新　" onclick="step_data_entry({{ target_step_id }});">
+            </div>
+            <div style="float: right;">
+                <input type="button" value="　削除　" onclick="step_data_delete({{ target_step_id }});">
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+
+        <div class="box2">
+            <input type="hidden" id="input_step_display_item_id" value="">
+            <div>
+                <table class="step_table">
+                    <tr>
+                        <td>ページ</td>
+                        <td>　</td>
+                        <td>対象要素(div_id名)</td>
+                        <td>　</td>
+                        <td>表示名</td>
+                        <td>　</td>
+                        <td>ボタン有無</td>
+                        <td>　</td>
+                        <td>初期ページ</td>
+                        <td>　</td>
+                        <td>無効</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="input_step_display_item_page" value="" size="2"></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_display_item_div_id_name" value=""></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_display_item_item_name" value="" size="10"></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_display_item_action_pb_flag" value="" size="3"></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_display_item_default_page" value="" size="3"></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_display_item_lost_flag" value="" size="3"></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float: left;">
+                <input type="button" value="新規登録" onclick="step_display_item_entry(0);">
+            </div>
+            <div style="float: left;;width:20px;">　</div>
+            <div style="float: left;">
+                <input type="button" value="　更新　" onclick="step_display_item_entry(1);">
+            </div>
+            <div style="float: right;">
+                <input type="button" value="　削除　" onclick="step_display_item_delete();">
+            </div>
+            <div style="clear: both;"></div>
+            <div id="step_display_item_list">
+                登録済step_display_item
+                {% if step_display_item_list_num > 0 %}
+                    <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                        <thead class="scroll_step_display_item_Head">
+                            <tr>
+                                <th class="detail_pb"></th>
+                                <th class="page">ページ</th>
+                                <th class="div_id_name">div_id名</th>
+                                <th class="item_name">表示名</th>
+                                <th class="action_pb_flag">アクションPB_FL</th>
+                                <th class="default_page">初期ページFL</th>
+                                <th class="lost_flag">無効FL</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scroll_step_display_item_Body">
+                        {% for step_display_item_list in step_display_item_list %}
+                            <tr>
+                                <td class="detail_pb">
+                                    <a href="#" class="detailpb" onclick="step_display_item_select({{ step_display_item_list.id }});">詳細</a>
+                                </td>
+                                <td class="page">{{ step_display_item_list.page }}</td>
+                                <td class="div_id_name">{{ step_display_item_list.div_id_name }}</td>
+                                <td class="item_name">{{ step_display_item_list.item_name }}</td>
+                                <td class="action_pb_flag">{{ step_display_item_list.action_pb_flag }}</td>
+                                <td class="default_page">{{ step_display_item_list.default_page }}</td>
+                                <td class="lost_flag">{{ step_display_item_list.lost_flag }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <div>対象データなし</div>
+                {% endif %}
+            </div>
+            <br>
+        </div>
+
+        <div class="box2">
+            <input type="hidden" id="input_step_action_id" value="">
+            <div>
+                <table class="step_table">
+                    <tr>
+                        <td>アクションCD</td>
+                        <td>　</td>
+                        <td>アクション名</td>
+                        <td>　</td>
+                        <td>対象</td>
+                        <td>　</td>
+                        <td>表示順</td>
+                        <td>　</td>
+                        <td>無効</td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" id="input_step_action_action_cd"></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_action_action_name" size="8"></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_action_target" size="8"></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_action_display_order" size="2"></td>
+                        <td>　</td>
+                        <td><input type="text" id="input_step_action_lost_flag" size="2"></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float: left;">
+                <input type="button" value="新規登録" onclick="step_action_entry(0);">
+            </div>
+            <div style="float: left;;width:20px;">　</div>
+            <div style="float: left;">
+                <input type="button" value="　更新　" onclick="step_action_entry(1);">
+            </div>
+            <div style="float: right;">
+                <input type="button" value="　削除　" onclick="step_action_delete();">
+            </div>
+            <div style="clear: both;"></div>
+            <div id="step_action_list">
+                登録済step_action
+            {% if step_action_list_num > 0 %}
+                <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                    <thead class="scrollHead">
+                        <tr>
+                            <th class="detail_pb"></th>
+                            <th class="action_cd">アクションCD</th>
+                            <th class="action_name">アクション名</th>
+                            <th class="target">対象</th>
+                            <th class="display_order">表示順</th>
+                            <th class="lost_flag">無効FL</th>
+                        </tr>
+                    </thead>
+                    <tbody class="scrollBody">
+                    {% for step_action_list in step_action_list %}
+                        <tr>
+                            <td class="detail_pb">
+                                <a href="#" class="detailpb" onclick="step_action_select({{ step_action_list.id }});">詳細</a>
+                            </td>
+                            <td class="action_cd">{{ step_action_list.action_cd }}</td>
+                            <td class="action_name">{{ step_action_list.action_name }}</td>
+                            <td class="target">{{ step_action_list.target }}</td>
+                            <td class="display_order">{{ step_action_list.display_order }}</td>
+                            <td class="lost_flag">{{ step_action_list.lost_flag }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div>対象データなし</div>
+            {% endif %}
+            <br>
+            </div>
+        </div>
+
+        <div class="box2">
+            <input type="hidden" id="input_data_entry_step_master_id" value="">
+            <table class="step_table">
+                <tr>
+                    <td>対象テーブル</td>
+                    <td>　</td>
+                    <td>無効</td>
+                </tr>
+                <tr>
+                    <td><input type="text" id="input_data_entry_step_master_target_table"></td>
+                    <td>　</td>
+                    <td><input type="text" id="input_data_entry_step_master_lost_flag" size="2"></td>
+                </tr>
+            </table>
+            <div style="float: left;">
+                <input type="button" value="新規登録" onclick="data_entry_step_master_entry(0);">
+            </div>
+            <div style="float: left;;width:20px;">　</div>
+            <div style="float: left;">
+                <input type="button" value="　更新　" onclick="data_entry_step_master_entry(1);">
+            </div>
+            <div style="float: right;">
+                <input type="button" value="　削除　" onclick="data_entry_step_master_delete();">
+            </div>
+            <div style="clear: both;"></div>
+            <div id="data_entry_step_list">
+                登録済data_entry_step
+            {% if data_entry_step_list_num > 0 %}
+                <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                    <thead class="scrollHead">
+                        <tr>
+                            <th class="detail_pb"></th>
+                            <th class="target_table">対象テーブル</th>
+                            <th class="lost_flag">無効FL</th>
+                        </tr>
+                    </thead>
+                    <tbody class="scrollBody">
+                    {% for data_entry_step_list in data_entry_step_list %}
+                        <tr>
+                            <td class="detail_pb">
+                                <a href="#" class="detailpb" onclick="data_entry_step_select({{ data_entry_step_list.id }});">詳細</a>
+                            </td>
+                            <td class="target_table">{{ data_entry_step_list.target_table }}</td>
+                            <td class="lost_flag">{{ data_entry_step_list.lost_flag }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div>対象データなし</div>
+            {% endif %}
+            </div>
+            <br>
+        </div>
+
+    </div>
+    <div style="float:left;width:10px;" >　</div>
+    <div style="float: left;">
+        <div class="box3">
+            <h2 class="page-header">正規進捗step</h2>
+        </div>
+        <div class="box3">
+            {% if next_step_list_num > 0 %}
+                {% for next_step_list in next_step_list %}
+                    <div class="box_child" style="float: left;">
+                        <table class="step_table">
+                            <tr>
+                                <td class="selector" onclick="select_step({{ next_step_list.next_step }});">step_id ：</td>
+                                <td><input type="text" id="next_step_id_{{ next_step_list.id }}" value="{{ next_step_list.next_step }}" size="10"></td>
+                            </tr>
+                            <tr>
+                                <td class="selector" onclick="select_step({{ next_step_list.next_step }});">step名 ：</td>
+                                <td><input type="text" value="{{ next_step_list.step_name }}" size="16"></td>
+                            </tr>
+                            <tr>
+                                <td class="selector" onclick="select_step({{ next_step_list.next_step }});">表示順 ：</td>
+                                <td><input type="text" id="next_display_order_{{ next_step_list.id }}" value="{{ next_step_list.display_order }}" size="1"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div style="float: left;">
+                        <br>
+                        <input type="button" value="  更新  " onclick="step_relation_entry({{ next_step_list.id }});">
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <br>
+                        <input type="button" value="　削除　" onclick="step_relation_delete({{ next_step_list.id }});">
+                    </div>
+                    <div style="clear: both;"></div>
+                {% endfor %}
+            {% endif %}
+        </div>
+        <div>
+            新規登録
+        </div>
+        <div>
+            <div class="box_child" style="float: left;">
+                <table class="step_table">
+                    <tr>
+                        <td>step_id ：</td>
+                        <td><input type="text" id="new_next_step_id" value="" size="10"></td>
+                    </tr>
+                    <tr>
+                        <td>step名 ：</td>
+                        <td><input type="text" value="" size="16"></td>
+                    </tr>
+                    <tr>
+                        <td>表示順 ：</td>
+                        <td><input type="text" id="new_display_order" value="" size="1"></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="clear: both;"></div>
+            <div>
+                <input type="button" value="新規登録" onclick="step_relation_entry(0);">
+            </div>
+        </div>
+    </div>

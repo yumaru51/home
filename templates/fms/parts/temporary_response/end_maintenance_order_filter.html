@@ -1,0 +1,297 @@
+<script>
+//日付入力をカレンダー化
+$('.datepicker').datepicker();
+//カレンダーを日本語化
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+// 対象の予算一覧の表示処理
+function get_phenomenon_lists_search() {
+        // 検索条件を保持する
+        session_value_phenomenon_write();
+        // 検索
+        get_phenomenon_lists();
+}
+// 対象の故障対応工程完了済み案件一覧の表示処理
+function end_maintenance_order_list() {
+        $("#loading").show();//呼び出し中に表示するgifを表示
+        var sel_phenomenon_id = $('#sel_phenomenon_id').val();
+        var sel_project_name = $('#sel_project_name').val();
+
+        var mgt_cls = $('#mgt_cls').val();
+        var facility = $('#facility').val();
+        var eqpt_no = $('#eqpt_no').val();
+
+        var sel_completion_date = $('#sel_completion_date').val();
+
+        var sel_mng_charge_person = $('#sel_mng_charge_person').val();
+
+        var sel_filter_export_complete_flag_list = document.getElementsByName('sel_filter_export_complete_flag');
+        var filter_export_complete_flag_list = []
+
+        for (let sel_filter_export_complete_flag of sel_filter_export_complete_flag_list) {
+            if(sel_filter_export_complete_flag.checked == true){
+                filter_export_complete_flag_list.push(sel_filter_export_complete_flag.value)
+            }
+        }
+
+        $.ajax({
+                url: "/isk_tools/fms/parts/temporary_response/end_maintenance_order_list/",
+                type: "POST",
+                data : {
+                    'sel_phenomenon_id': sel_phenomenon_id,
+                    'sel_project_name': sel_project_name,
+
+                    'mgt_cls' : mgt_cls,
+                    'facility' : facility,
+                    'eqpt_no' : eqpt_no,
+
+                    'sel_completion_date' : sel_completion_date,
+
+                    'sel_mng_charge_person': sel_mng_charge_person,
+                    'filter_export_complete_flag_list': filter_export_complete_flag_list,
+                    'return_url': 'fms/parts/maintenance/maintenance_list.html',
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 100000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#end_maintenance_order_list').empty();
+                    $('#end_maintenance_order_list').html(data);
+                    $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    $("#end_maintenance_order_list").fadeIn();//対象の一覧をフェードイン
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#end_maintenance_order_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+// セッション情報削除
+function session_value_phenomenon_clear() {
+    sessionStorage.removeItem("sel_phenomenon_id");
+    sessionStorage.removeItem("sel_phenomenon_project_name");
+
+    sessionStorage.removeItem("mgt_cls");
+    sessionStorage.removeItem("facility");
+    sessionStorage.removeItem("eqpt_no");
+
+    sessionStorage.removeItem("sel_phenomenon_delivery_date_start");
+
+    sessionStorage.removeItem("sel_mng_charge_person");
+
+    //sessionStorage.removeItem("sel_phenomenon_display_order");
+}
+
+// セッション情報読込
+function session_value_phenomenon_read() {
+    // 案件ID
+    if (sessionStorage.getItem('sel_phenomenon_id'))
+    {
+        $('#sel_phenomenon_id').val(sessionStorage.getItem('sel_phenomenon_id'));
+    }
+    // 案件名
+    if (sessionStorage.getItem('sel_phenomenon_project_name'))
+    {
+        $('#sel_project_name').val(sessionStorage.getItem('sel_phenomenon_project_name'));
+    }
+
+    // 案件区分
+    if (sessionStorage.getItem('mgt_cls'))
+    {
+        $('#mgt_cls').val(sessionStorage.getItem('mgt_cls'));
+    }
+    // 工場
+    if (sessionStorage.getItem('facility'))
+    {
+        $('#facility').val(sessionStorage.getItem('facility'));
+    }
+    // 故障/作業種別
+    if (sessionStorage.getItem('eqpt_no'))
+    {
+        $('#eqpt_no').val(sessionStorage.getItem('eqpt_no'));
+    }
+
+    // 工事完了日
+    if (sessionStorage.getItem('sel_completion_date'))
+    {
+        $('#sel_completion_date').val(sessionStorage.getItem('sel_completion_date'));
+    }
+
+    // 保全G担当者
+    if (sessionStorage.getItem('sel_mng_charge_person'))
+    {
+         set_combo_value('sel_mng_charge_person', sessionStorage.getItem('sel_mng_charge_person'));
+    }
+
+    //// 表示順
+    //if (sessionStorage.getItem('sel_phenomenon_display_order'))
+    //{
+    //    $('input[name=sel_phenomenon_display_order]:eq(' + (sessionStorage.getItem('sel_phenomenon_display_order') - 1) + ')').prop('checked', true);
+    //}
+}
+
+// セッション情報書込み
+function session_value_phenomenon_write() {
+    // 案件ID
+    value = $('#sel_phenomenon_id').val();
+    sessionStorage.setItem('sel_phenomenon_id', value);
+    // 案件名
+    value = $('#sel_project_name').val();
+    sessionStorage.setItem('sel_phenomenon_project_name', value);
+
+    // 管理区分
+    value = $('#mgt_cls').val();
+    sessionStorage.setItem('mgt_cls', value);
+    // 工場
+    value = $('#facility').val();
+    sessionStorage.setItem('facility', value);
+    // 機器番号
+    value = $('#eqpt_no').val();
+    sessionStorage.setItem('eqpt_no', value);
+
+    // 工事完了日
+    value = $('#sel_completion_date').val();
+    sessionStorage.setItem('sel_completion_date', value);
+
+    // 保全G担当者
+    value = $('#sel_mng_charge_person').val();
+    sessionStorage.setItem('sel_mng_charge_person', value);
+
+    //// 表示順
+    //value = $("input[name='sel_phenomenon_display_order']:checked").val();
+    //sessionStorage.setItem('sel_phenomenon_display_order', value);
+}
+
+//管理区分選択のコンボボックスを変更したときに選択値と格納値を同期
+function mgt_cls_change() {
+    equipment_list_change();
+}
+
+//工場選択のコンボボックスを変更したときに選択値と格納値を同期
+function facility_change() {
+    equipment_list_change();
+}
+
+//機器リストソース取得
+function equipment_list_change() {
+    var mgt_cls = $('#mgt_cls').val();
+    var facility = $('#facility').val();
+
+    if (mgt_cls != "" && facility !="") {
+            $.ajax({
+                url: "/isk_tools/fms/parts/input_select_equipment_list/",
+                type: "POST",
+                data : {
+                    'mgt_cls': mgt_cls,
+                    'facility' : facility,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#eqpt_no').empty();
+                    $('#eqpt_no').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#eqpt_no').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//コンボボックスを選択する
+function set_combo_value(id, val) {
+    if (val != "") {
+        document.getElementById(id).value = val;
+    }
+}
+</script>
+    <div style="width: auto;height:150px;background:#ffcccc; border-style:double none;">
+        絞込条件<br>
+        <div class="filter_item" style="float:left;">
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">案件ID：<input type="text" id="sel_phenomenon_id" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">案件名：<input type="text" id="sel_project_name" value="" size="36">※あいまい</div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">管理区分：<select id="mgt_cls" name="mgt_cls" onchange= "mgt_cls_change(value);">
+                        <option value = "" hidden></option>
+                        {% for mgt_cls_lists in mgt_cls_lists %}
+                            {% if mgt_cls_lists.m_mgt_cls_skey == phenomenon_data.m_mgt_cls_skey %}
+                                <option value="{{ mgt_cls_lists.m_mgt_cls_skey }}" selected>{{ mgt_cls_lists.mgt_cls_nm_1 }}</option>
+                            {% else %}
+                                <option value="{{ mgt_cls_lists.m_mgt_cls_skey }}">{{ mgt_cls_lists.mgt_cls_nm_1 }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="process_cd" class="item" style="float:left;margin-left:15px;">工場：<select id="facility" name="facility" onchange= "facility_change(value);">
+                        <option value=""></option>
+                        {% for facility_list in facility_lists %}
+                            {% if facility_list.facility_cd == "0" %}
+<!--                                <option value="{{ facility_list.FCLTY_CD }}" selected>{{ facility_list.FCLTY_NM }}</option>-->
+                                <option value="{{ facility_list.m_location_skey }}" selected>{{ facility_list.location_nm_1 }}</option>
+                            {% else %}
+<!--                                <option value="{{ facility_list.FCLTY_CD }}">{{ facility_list.FCLTY_NM }}</option>-->
+                                <option value="{{ facility_list.m_location_skey }}">{{ facility_list.location_nm_1 }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="eqpt" style="float:left;margin-left:15px;">機器番号：<select id="eqpt_no" name="eqpt_no">
+                        <option value=""></option>
+                    </select>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="line" style="float:left;margin-left:15px;">工事完了日：
+                    <input type="text" id="sel_completion_date" class="datepicker" size="12" value="" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button" value="クリア" onclick="date_clear('sel_completion_date');">
+                </div>
+                <div id="mng_charge_person" class="item" style="float:left;margin-left:15px;">保全G担当者：<select id="sel_mng_charge_person" name="sel_mng_charge_person">
+                    <option value=""></option>
+                        {% for mng_charge_person in mng_charge_person_list %}
+                            <option value="{{ mng_charge_person.username }}">{{ mng_charge_person.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">出力状態：
+                    <input type="checkbox" id="sel_filter_export_complete_flag1" value="1" name="sel_filter_export_complete_flag" size="18" checked>未出力
+                    <input type="checkbox" id="sel_filter_export_complete_flag2" value="2" name="sel_filter_export_complete_flag" size="18" >出力済
+                    <input type="checkbox" id="sel_filter_export_complete_flag3" value="3" name="sel_filter_export_complete_flag" size="18" >変更有
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    session_value_phenomenon_read();
+</script>

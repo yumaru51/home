@@ -1,0 +1,7 @@
+                            <input type="hidden" id="cost_center" value="{{ cost_center }}">
+                            <select id="sel_cost_center" name="sel_cost_center" onchange= "cost_center_change(value);">
+                                <option value=""></option>
+                                {% for cost_center_lists in cost_center_lists %}
+                                    <option value="{{ cost_center_lists.原価センタ }}">{{ cost_center_lists.原価センタ }}：{{ cost_center_lists.原価センタテキスト }}</option>
+                                {% endfor %}
+                            </select>　※工事は必須

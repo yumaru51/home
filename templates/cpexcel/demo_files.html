@@ -1,0 +1,43 @@
+{% extends 'cpexcel/base.html' %}
+
+{% block contents %}
+
+<script>
+
+function demo_file_download(b) {
+    //var resultJson = JSON.stringify($scope.jsonObj);
+    //var program_id = $('#program_entry_program_id').val();
+    var downLoadLink = document.createElement("a");
+    if (b == 1 ){
+        downLoadLink.download = "デモコピー元ファイル.xlsx";
+        var file_name = "デモコピー元ファイル.xlsx";
+    }else{
+        if (b == 2 ){
+            downLoadLink.download = "デモコピー先ファイル.xlsx";
+            var file_name = "デモコピー先ファイル.xlsx";
+        }else{
+            downLoadLink.download = "デモ変更チェックファイル.xlsx";
+            var file_name = "デモ変更チェックファイル.xlsx";
+        }
+    }
+    //downLoadLink.href = URL.createObjectURL(new Blob([resultJson], {type: "text.plain"}));
+    downLoadLink.href = "/isk_tools/cpexcel/action/demo_file_download?file_name=" + file_name ;
+    downLoadLink.dataset.downloadurl = ["text/plain", downLoadLink.download, downLoadLink.href].join(":");
+    downLoadLink.click();
+}
+
+</script>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">Automatic copy & past for Excel　デモファイル</h2>
+    </div>
+    <div>
+        <div>　・コピペのデモ用のコピー元のエクセルファイルをダウンロード　：　<input type="button" value="ダウンロード" onclick="demo_file_download(1);" ></div>
+        <div>　・コピペのデモ用のコピー先のエクセルファイルをダウンロード　：　<input type="button" value="ダウンロード" onclick="demo_file_download(2);" ></div>
+        <div>　・ファイルチェックのデモ用のエクセルファイルをダウンロード　：　<input type="button" value="ダウンロード" onclick="demo_file_download(3);" ></div>
+                　　※チェックの基本となるファイルは、コピペ実行用のコピー元のエクセルファイル(デモコピー元ファイル.xlsx)を使用する。
+
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,137 @@
+<script>
+//工事関連機器詳細表示
+function work_equipment_detail(a) {
+    var work_equipment_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/work_equipment_detail/",
+                type: "POST",
+                data : {
+                    'work_equipment_id' : work_equipment_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#equipment_no').val(data.equipment_no);
+                    $('#equipment_name').val(data.equipment_name);
+                    $('#management_class').val(data.management_class);
+                    $('#equip_family_nm').val(data.equip_family);
+                    $('#equip_type_nm').val(data.equip_type);
+                    $('#facility').val(data.facility);
+                    $('#work_equipment_id').val(data.work_equipment_id);
+
+                    if (data.equipment_purchase == 1) {
+                        $('#sel_equipment_purchase').prop('checked', true);
+                    } else {
+                        $('#sel_equipment_purchase').prop('checked', false);
+                    }
+                    if (data.construction == 1) {
+                        $('#sel_on_work').prop('checked', true);
+                    } else {
+                        $('#sel_on_work').prop('checked', false);
+                    }
+                    //$('#sel_equipment_purchase').prop('disabled', 'disabled');
+                    //$('#sel_on_work').prop('disabled', 'disabled');
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("work_equipment_add_button_div") != null){
+                        const p3 = document.getElementById("work_equipment_add_button_div");
+                        p3.style.display ="none";
+                    }
+                    if(document.getElementById("work_equipment_edit_button_div") != null){
+                        const p4 = document.getElementById("work_equipment_edit_button_div");
+                        p4.style.display ="block";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.work_equipment_scrollHead,tbody.work_equipment_scrollBody{
+    display:block;
+}
+tbody.work_equipment_scrollBody{
+    overflow-y:scroll;
+    height:280px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.work_equipment_no{
+    width:200px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.work_equipment_name{
+    width:280px;
+    font-size: 120%;
+    padding: 5px 5px 5px 5px;
+}
+.work_equipment_purchase{
+    width:100px;
+    font-size: 120%;
+    padding: 5px 5px 5px 5px;
+}
+.work_equip_family_nm{
+    width:200px;
+    font-size: 120%;
+    padding: 5px 5px 5px 5px;
+}
+.work_equip_type_nm{
+    width:200px;
+    font-size: 120%;
+    padding: 5px 5px 5px 5px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if work_equipment_lists_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="work_equipment_scrollHead">
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <th class="detail_pb"></th>
+                        {% endif %}
+                        <th class="work_equipment_no">関係機器NO</th>
+                        <th class="work_equipment_name">関係機器名</th>
+                        <th class="work_equipment_purchase">工事/機器判別</th>
+                        <th class="work_equip_family_nm">機器ファミリ</th>
+                        <th class="work_equip_type_nm">機器タイプ</th>
+                    </tr>
+                </thead>
+                <tbody class="work_equipment_scrollBody">
+                {% for work_equipment_lists in work_equipment_lists %}
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <td class="detail_pb">
+                                <a href="#" id="{{ work_equipment_lists.id }}" class="detailpb" onclick="work_equipment_detail(id);">選択</a>
+                            </td>
+                        {% endif %}
+                        <td class="work_equipment_no">{{ work_equipment_lists.equip_no }}</td>
+                        <td class="work_equipment_name" style="overflow:hidden;">{{ work_equipment_lists.equip_name }}</td>
+                        <td class="work_equipment_purchase" style="overflow:hidden;">{{ work_equipment_lists.purchase }}</td>
+                        <td class="work_equip_family_nm" style="overflow:hidden;">{{ work_equipment_lists.equipment_family_name }}</td>
+                        <td class="work_equip_type_nm" style="overflow:hidden;">{{ work_equipment_lists.eqpt_cat_nm }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

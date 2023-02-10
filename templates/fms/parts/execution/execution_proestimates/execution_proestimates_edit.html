@@ -1,0 +1,1187 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+{% load humanize %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+// 20210114 y-kawauchi 候補業者決定チェック処理
+function decision_check(id) {
+    var ID = '#' + id
+    $('[name=decision]').prop("checked", false);
+    $(ID).prop("checked", 1);
+}
+
+// 予算残高チェック
+function budget_price_check(confirmed_amount_nego) {
+    var ret_bool = false;
+    if( {{ check_budget_price_flag }} == 1 ){
+        if(confirmed_amount_nego > {{ balance_budget_price_execution }} ){
+            if(window.confirm('予算実行額をオーバーしています。\n進捗を進めても良いですか？')){
+                ret_bool = true;
+            }
+        }else if( confirmed_amount_nego > {{ balance_budget_price_prospect }} ){
+            if(window.confirm('予算見込額をオーバーしています。\n進捗を進めても良いですか？')){
+                ret_bool = true;
+            }
+        }else{
+            // 超えていない場合は許可
+            ret_bool = true;
+        }
+    }else{
+        // チェック対象以外のステップでは許可
+        ret_bool = true;
+    }
+    return ret_bool;
+}
+
+//入力項目チェック(入力忘れ、文字数オーバー等)の処理
+function input_check(this_step,　next_step,　action_cd) {
+    var date_check_flag = 0;
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var goods_construct_kbn = $('#goods_construct_kbn').val();
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+    var confirmed_amount = 0;
+    var confirmed_amount_nego = 0;
+
+    // いったん決定業者の必須データのチェック部の色を標準に戻す（idを前方一致で検索）
+    $('input[id^="candidate_vendor"]').css('background-color','white');
+    $('input[id^="last_estimated_amount"]').css('background-color','white');
+    $('input[id^="estimated_amount_af_nego"]').css('background-color','white');
+
+    // 次工程に進む場合のみチェックする項目(一時保存は許可)
+    if( this_step != next_step ) {
+
+        // 届出CS完了チェック
+        if ( {{ check_cs_complete_flag}} == 1 && {{ cs_complete_flag }} != 1 ) {
+            if($("#action_pb_loading") != null){
+                $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            }
+            alert('完了していない届出CSがあります！！');
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            return;
+        }
+
+        // 業者選択チェック
+        if( {{ check_vendor_flag}} == 1 ) {
+            var decision_check_val = $('[name=decision]:checked').val();
+            // 決定業者未選択の場合はエラーとする
+            if(typeof decision_check_val === "undefined"){
+                if($("#action_pb_loading") != null){
+                    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                }
+                alert('決定業者を選択してください！！\n');
+                // アクションボタン有効化
+                $(".button").prop("disabled", false);
+                return;
+            }
+
+            // 決定業者の必須データチェック（業者名、見積額）
+            var candidate_vendor_id = '#candidate_vendor' + String(decision_check_val);
+            var last_estimated_amount_id = '#last_estimated_amount' + String(decision_check_val);
+            var estimated_amount_af_nego_id = '#estimated_amount_af_nego' + String(decision_check_val);
+
+            // 決定業者名
+            var candidate_vendor_str = $(candidate_vendor_id).val().replace(/\s+/g, "");
+            if(candidate_vendor_str.length < 1){
+                $(candidate_vendor_id).css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }
+
+            confirmed_amount = $(last_estimated_amount_id).val() != '' ? Number($(last_estimated_amount_id).val().replace(/,/g, "")) : '';
+            confirmed_amount_nego = $(estimated_amount_af_nego_id).val() != '' ? Number($(estimated_amount_af_nego_id).val().replace(/,/g, "")) : '';
+
+            // 本見積額
+            if(confirmed_amount == "" || confirmed_amount < 1){
+                $(last_estimated_amount_id).css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }
+            // 交渉後見積額
+            if(confirmed_amount_nego == "" || confirmed_amount_nego < 1){
+                $(estimated_amount_af_nego_id).css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }
+        }
+
+        // 最終金額評価必須チェック
+        if( {{ edit_eva_final_price_flag}} == 1 ) {
+            var eva_final_price =  $('#eva_final_price_e').val();
+            if (eva_final_price == "" ){
+                $('#eva_final_price_e').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#eva_final_price_e').css('background-color','white');
+            }
+        }
+
+        // 以下 次工程に進む場合は常時チェックする項目
+
+        // 決定見積提出期限
+        var estimated_deadline_date = $('#estimated_deadline_date').val();
+        if (estimated_deadline_date == "" ){
+            $('#estimated_deadline_date').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#estimated_deadline_date').css('background-color','white');
+        }
+
+        // 決定納入場所
+        var fixed_delivery_location = $('#fixed_delivery_location').val();
+        var stringCount = fixed_delivery_location.length
+        if (fixed_delivery_location == "" ){
+            $('#fixed_delivery_location').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else if (stringCount > 100){
+            $('#fixed_delivery_location').css('background-color','silver');
+            ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else{
+            $('#fixed_delivery_location').css('background-color','white');
+        }
+
+        // 決定工期FROM
+        var fixed_delivery_date_from = $('#fixed_delivery_date_from').val();
+        if (goods_construct_kbn == 2) {
+            if (fixed_delivery_date_from == "" ){
+                $('#fixed_delivery_date_from').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#fixed_delivery_date_from').css('background-color','white');
+            }
+        }else{
+            $('#fixed_delivery_date_from').css('background-color','white');
+        }
+
+        // 決定工期TO
+        var fixed_delivery_date_to = $('#fixed_delivery_date_to').val();
+        if (goods_construct_kbn == 2) {
+            if (fixed_delivery_date_to == "" ){
+                $('#fixed_delivery_date_to').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#fixed_delivery_date_to').css('background-color','white');
+            }
+        }else{
+            $('#fixed_delivery_date_to').css('background-color','white');
+        }
+
+        // 決定納期
+        var fixed_delivery_date = $('#fixed_delivery_date').val();
+        if (goods_construct_kbn == 1) {
+            if (fixed_delivery_date == "" ){
+                $('#fixed_delivery_date').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#fixed_delivery_date').css('background-color','white');
+            }
+        }else{
+            $('#fixed_delivery_date').css('background-color','white');
+        }
+    }
+    // ここまで次工程に進む場合のみチェックする項目
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常時処理
+    if( ng_all_flag == 0){
+        // 全て正常時のみ、予算残高確認
+        if( this_step != next_step ) {
+            if( !budget_price_check(confirmed_amount_nego) ){
+                //呼び出し中に表示するgifをフェードアウト
+                if($("#action_pb_loading") != null){
+                    $("#action_pb_loading").fadeOut();
+                }
+                // アクションボタン有効化
+                $(".button").prop("disabled", false);
+                return;
+            }
+        }
+        // 保存実行
+        proestimates_edit(this_step, next_step);
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+</script>
+<script>
+
+// 工事納入情報テーブル登録･更新処理
+function proestimates_edit(this_step , next_step) {
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( this_step == next_step ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var comment = $('#comment').val();
+
+        var budget_id = $('#budget_id').val();
+        var rev_no = $('#rev_no').val();
+        var budget_no = $('#budget_no').val();
+        var budget_name = $('#budget_name').val();
+        var construction_id = $('#construction_id').val();
+        var sub_id = $('#sub_id').val();
+        var estimated_deadline_date = $('#estimated_deadline_date').val();
+        var fixed_delivery_location = $('#fixed_delivery_location').val();
+        var fixed_delivery_date_from = $('#fixed_delivery_date_from').val();
+        var fixed_delivery_date_to = $('#fixed_delivery_date_to').val();
+        var fixed_delivery_date = $('#fixed_delivery_date').val();
+
+        var candidate_vendor1 = $('#candidate_vendor1').val();
+        var maker_name1 = $('#maker_name1').val();
+        var quotation_req_date1 = $('#quotation_req_date1').val();
+        var estimated_reply_date1 = $('#estimated_reply_date1').val();
+        var last_estimated_amount1 = $('#last_estimated_amount1').val();
+        var last_estimated_discount1 = $('#last_estimated_discount1').val();
+        var estimated_amount_af_nego1 = $('#estimated_amount_af_nego1').val();
+        var estimated_data1 = $('#estimated_data1').val();
+        var eva_delivery_date1 = $('#eva_delivery_date1').val();
+        var eva_estimated_valuation_amount1 = $('#eva_estimated_valuation_amount1').val();
+        var eva_estimated_assessment_price1 = $('#eva_estimated_assessment_price1').val();
+        var eva_final_price1 = $('#eva_final_price1').val();
+        var eva_other1 = $('#eva_other1').val();
+
+        var candidate_vendor2 = $('#candidate_vendor2').val();
+        var maker_name2 = $('#maker_name2').val();
+        var quotation_req_date2 = $('#quotation_req_date2').val();
+        var estimated_reply_date2 = $('#estimated_reply_date2').val();
+        var last_estimated_amount2 = $('#last_estimated_amount2').val();
+        var last_estimated_discount2 = $('#last_estimated_discount2').val();
+        var estimated_amount_af_nego2 = $('#estimated_amount_af_nego2').val();
+        var estimated_data2 = $('#estimated_data2').val();
+        var eva_delivery_date2 = $('#eva_delivery_date2').val();
+        var eva_estimated_valuation_amount2 = $('#eva_estimated_valuation_amount2').val();
+        var eva_estimated_assessment_price2 = $('#eva_estimated_assessment_price2').val();
+        var eva_final_price2 = $('#eva_final_price2').val();
+        var eva_other2 = $('#eva_other2').val();
+
+        var candidate_vendor3 = $('#candidate_vendor3').val();
+        var maker_name3 = $('#maker_name3').val();
+        var quotation_req_date3 = $('#quotation_req_date3').val();
+        var estimated_reply_date3 = $('#estimated_reply_date3').val();
+        var last_estimated_amount3 = $('#last_estimated_amount3').val();
+        var last_estimated_discount3 = $('#last_estimated_discount3').val();
+        var estimated_amount_af_nego3 = $('#estimated_amount_af_nego3').val();
+        var estimated_data3 = $('#estimated_data3').val();
+        var eva_delivery_date3 = $('#eva_delivery_date3').val();
+        var eva_estimated_valuation_amount3 = $('#eva_estimated_valuation_amount3').val();
+        var eva_estimated_assessment_price3 = $('#eva_estimated_assessment_price3').val();
+        var eva_final_price3 =  $('#eva_final_price3').val();
+        var eva_other3 = $('#eva_other3').val();
+
+        var candidate_vendor4 = $('#candidate_vendor4').val();
+        var maker_name4 = $('#maker_name4').val();
+        var quotation_req_date4 = $('#quotation_req_date4').val();
+        var estimated_reply_date4 = $('#estimated_reply_date4').val();
+        var last_estimated_amount4 = $('#last_estimated_amount4').val();
+        var last_estimated_discount4 = $('#last_estimated_discount4').val();
+        var estimated_amount_af_nego4 = $('#estimated_amount_af_nego4').val();
+        var estimated_data4 = $('#estimated_data4').val();
+        var eva_delivery_date4 = $('#eva_delivery_date4').val();
+        var eva_estimated_valuation_amount4 = $('#eva_estimated_valuation_amount4').val();
+        var eva_estimated_assessment_price4 = $('#eva_estimated_assessment_price4').val();
+        var eva_final_price4 = $('#eva_final_price4').val();
+        var eva_other4 = $('#eva_other4').val();
+
+        var candidate_vendor5 = $('#candidate_vendor5').val();
+        var maker_name5 = $('#maker_name5').val();
+        var quotation_req_date5 = $('#quotation_req_date5').val();
+        var estimated_reply_date5 = $('#estimated_reply_date5').val();
+        var last_estimated_amount5 = $('#last_estimated_amount5').val();
+        var last_estimated_discount5 = $('#last_estimated_discount5').val();
+        var estimated_amount_af_nego5 = $('#estimated_amount_af_nego5').val();
+        var estimated_data5 = $('#estimated_data5').val();
+        var eva_delivery_date5 = $('#eva_delivery_date5').val();
+        var eva_estimated_valuation_amount5 = $('#eva_estimated_valuation_amount5').val();
+        var eva_estimated_assessment_price5 = $('#eva_estimated_assessment_price5').val();
+        var eva_final_price5 = $('#eva_final_price5').val();
+        var eva_other5 = $('#eva_other5').val();
+
+        // 決定業者未選択の場合は0とする
+        var decision_check_val = $('[name=decision]:checked').val();
+        if(typeof decision_check_val === "undefined"){
+            decision_check_val = 0;
+        }
+
+        $.ajax({
+                url: "/isk_tools/fms/action/execution_proestimates_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'comment' : comment,
+                    'budget_id' : budget_id,
+                    'rev_no' : rev_no,
+                    'construction_id' : construction_id,
+                    'sub_id' : sub_id,
+                    'estimated_deadline_date': estimated_deadline_date,
+                    'fixed_delivery_location': fixed_delivery_location,
+                    'fixed_delivery_date_from': fixed_delivery_date_from,
+                    'fixed_delivery_date_to': fixed_delivery_date_to,
+                    'fixed_delivery_date': fixed_delivery_date,
+
+                    'candidate_vendor1' : candidate_vendor1,
+                    'maker_name1' : maker_name1,
+                    'quotation_req_date1' : quotation_req_date1,
+                    'estimated_reply_date1' : estimated_reply_date1,
+                    'last_estimated_amount1' : last_estimated_amount1,
+                    'last_estimated_discount1' : last_estimated_discount1,
+                    'estimated_amount_af_nego1' : estimated_amount_af_nego1,
+                    'estimated_data1' : estimated_data1,
+                    'eva_delivery_date1' : eva_delivery_date1,
+                    'eva_estimated_valuation_amount1' : eva_estimated_valuation_amount1,
+                    'eva_estimated_assessment_price1' : eva_estimated_assessment_price1,
+                    'eva_final_price1' : eva_final_price1,
+                    'eva_other1' : eva_other1,
+
+                    'candidate_vendor2' : candidate_vendor2,
+                    'maker_name2' : maker_name2,
+                    'quotation_req_date2' : quotation_req_date2,
+                    'estimated_reply_date2' : estimated_reply_date2,
+                    'last_estimated_amount2' : last_estimated_amount2,
+                    'last_estimated_discount2' : last_estimated_discount2,
+                    'estimated_amount_af_nego2' : estimated_amount_af_nego2,
+                    'estimated_data2' : estimated_data2,
+                    'eva_delivery_date2' : eva_delivery_date2,
+                    'eva_estimated_valuation_amount2' : eva_estimated_valuation_amount2,
+                    'eva_estimated_assessment_price2' : eva_estimated_assessment_price2,
+                    'eva_final_price2' : eva_final_price2,
+                    'eva_other2' : eva_other2,
+
+                    'candidate_vendor3' : candidate_vendor3,
+                    'maker_name3' : maker_name3,
+                    'quotation_req_date3' : quotation_req_date3,
+                    'estimated_reply_date3' : estimated_reply_date3,
+                    'last_estimated_amount3' : last_estimated_amount3,
+                    'last_estimated_discount3' : last_estimated_discount3,
+                    'estimated_amount_af_nego3' : estimated_amount_af_nego3,
+                    'estimated_data3' : estimated_data3,
+                    'eva_delivery_date3' : eva_delivery_date3,
+                    'eva_estimated_valuation_amount3' : eva_estimated_valuation_amount3,
+                    'eva_estimated_assessment_price3' : eva_estimated_assessment_price3,
+                    'eva_final_price3' : eva_final_price3,
+                    'eva_other3' : eva_other3,
+
+                    'candidate_vendor4' : candidate_vendor4,
+                    'maker_name4' : maker_name4,
+                    'quotation_req_date4' : quotation_req_date4,
+                    'estimated_reply_date4' : estimated_reply_date4,
+                    'last_estimated_amount4' : last_estimated_amount4,
+                    'last_estimated_discount4' : last_estimated_discount4,
+                    'estimated_amount_af_nego4' : estimated_amount_af_nego4,
+                    'estimated_data4' : estimated_data4,
+                    'eva_delivery_date4' : eva_delivery_date4,
+                    'eva_estimated_valuation_amount4' : eva_estimated_valuation_amount4,
+                    'eva_estimated_assessment_price4' : eva_estimated_assessment_price4,
+                    'eva_final_price4' : eva_final_price4,
+                    'eva_other4' : eva_other4,
+
+                    'candidate_vendor5' : candidate_vendor5,
+                    'maker_name5' : maker_name5,
+                    'quotation_req_date5' : quotation_req_date5,
+                    'estimated_reply_date5' : estimated_reply_date5,
+                    'last_estimated_amount5' : last_estimated_amount5,
+                    'last_estimated_discount5' : last_estimated_discount5,
+                    'estimated_amount_af_nego5' : estimated_amount_af_nego5,
+                    'estimated_data5' : estimated_data5,
+                    'eva_delivery_date5' : eva_delivery_date5,
+                    'eva_estimated_valuation_amount5' : eva_estimated_valuation_amount5,
+                    'eva_estimated_assessment_price5' : eva_estimated_assessment_price5,
+                    'eva_final_price5' : eva_final_price5,
+                    'eva_other5' : eva_other5,
+
+                    'eva_final_price' : $('#eva_final_price_e').val(),
+                    'edit_eva_final_price_flag' : "{{ edit_eva_final_price_flag }}",
+                    'user_attribute_id' : user_attribute_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'decision_check': decision_check_val,
+
+                    'special_vendor_si_comment' : $('#special_vendor_si_comment').val(),
+
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                    }
+                    log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    budget_information();//予算関連情報を表示するJSを起動(detail_template.html内にプログラム有)
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert(data.msg);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+}
+</script>
+<script>
+//画面表示時に値引き率計算
+function calc_discount_rate_at_open() {
+    for (let i = 1; i < 6; i++) {
+        calc_discount_rate(String(i));
+    }
+}
+
+// 値引き率計算処理
+function calc_discount_rate(vendor_no_str){
+
+    // ベンダーごとのIDに変換
+    var price_id = '#last_estimated_amount' + vendor_no_str;
+    var discount_id = '#last_estimated_discount' + vendor_no_str;
+    var discount_rate_id = '#discount_rate_' + vendor_no_str;
+    var nego_id = '#estimated_amount_af_nego' + vendor_no_str;
+    var nego_rate_id = '#nego_discount_rate_' + vendor_no_str;
+
+    // 入力値取得
+    var price_str = $(price_id).val();
+    var discount_str = $(discount_id).val();
+    var nego_str = $(nego_id).val();
+
+    // いったん値引き率をクリア
+    $(discount_rate_id).val("");
+    $(nego_rate_id).val("");
+
+    // 値引き率計算
+    if(price_str != ""){
+        let price = Number(price_str.replace(/,/g, ""))
+
+        if(discount_str != ""){
+            let discount = Number(discount_str.replace(/,/g, ""))
+            if( price != 0 ){
+                let discount_rate = (discount / (price + discount)) * 100;
+                let discount_rate_str =  discount_rate.toFixed(1) + '%';
+                $(discount_rate_id).val(discount_rate_str);
+            }
+        }
+
+        if(nego_str != ""){
+            let nego = Number(nego_str.replace(/,/g, ""))
+            if( price != 0 && nego != 0 && price >= nego ){
+                let nego_rate = ((price - nego) / price) * 100;
+                let nego_rate_str =  nego_rate.toFixed(1) + '%';
+                $(nego_rate_id).val(nego_rate_str);
+            }
+        }
+    }
+}
+
+</script>
+<style type="text/css">
+.proestimate_data_div{
+    overflow-x: scroll;
+    width: 1000px;
+    padding: 0px 0px;
+    margin: 0;
+}
+.proestimate_data_div table{
+    width: 150%;
+    margin: 0;
+    border: 1px solid #999;
+    border-spacing: 1;
+    padding: 0px 0px;
+}
+.proestimate_data_div td{
+    width: 100px;
+    white-space: nowrap;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-spacing: 1;
+    background: #FFF;
+    padding: auto;
+    vertical-align: middle;
+}
+.proestimate_data_div th{
+    width: 100px;
+    white-space: nowrap;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-spacing: 1;
+    color: #000;
+    background: #f2f2f2;
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: auto;
+    vertical-align: middle;
+}
+.proestimate_data_div tr:first-child{
+    border-top: 1px solid #999;
+    top: 0;
+    left: 0;
+}
+.proestimate_data_div th:first-child{
+    border-left: 1px solid #999;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+.proestimate_data_div input[type=checkbox] {
+	transform: scale(2);
+	z-index: -10;
+    margin: 10px;
+}
+</style>
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_proestimates_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="execution_proestimates_edit">
+        <input type="hidden" id="estimate_submission_date" value="{{ estimate_submission_date }}">
+        <input type="hidden" id="delivery_location" value="{{ delivery_location }}">
+        <input type="hidden" id="desired_construct_period_from" value="{{ desired_construct_period_from }}">
+        <input type="hidden" id="desired_construct_period_to" value="{{ desired_construct_period_to }}">
+        <input type="hidden" id="desired_delivery_date" value="{{ desired_delivery_date }}">
+        <input type="hidden" id="goods_construct_kbn" value="{{ goods_construct_kbn }}">
+        <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    </div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div style="float:left; width: auto;">
+        <table>
+            <tr>
+                <td><div><font size="4">決定見積提出期日</font></div></td>
+                <td><div><font size="4">：</font></div></td>
+                <td><div><font size="4"><input type="text" id="estimated_deadline_date" class="datepicker"
+                                              value="{{ estimated_deadline_date }}"
+                                              autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('estimated_deadline_date');">
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">決定納入場所</font></div></td>
+                <td><div><font size="4">：</font></div></td>
+                <td><div><font size="4"><input type="text" id="fixed_delivery_location"
+                                              value="{{ fixed_delivery_location }}">
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">決定工期</font></div></td>
+                <td><div><font size="4">：</font></div></td>
+                <td><div><font size="4"><input type="text" id="fixed_delivery_date_from" class="datepicker"
+                                              value="{{ fixed_delivery_date_from }}"
+                                              autocomplete="off" readonly
+                                        ><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('fixed_delivery_date_from');"> ～ <input type="text" id="fixed_delivery_date_to" class="datepicker"
+                                              value="{{ fixed_delivery_date_to }}"
+                                              autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('fixed_delivery_date_to');">
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">決定納期</font></div></td>
+                <td><div><font size="4">：</font></div></td>
+                <td><div><font size="4"><input type="text" id="fixed_delivery_date" class="datepicker"
+                                              value="{{ fixed_delivery_date }}"
+                                              autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('fixed_delivery_date');">
+                </font></div></td>
+            </tr>
+        </table>
+
+    </div>
+
+    <div style="float:left; width: 10px;">　</div>
+
+    <div style="float:left; width: auto;">
+        <table>
+            <tr>
+                <td><div><font size="4">最終金額評価：</font>{% if edit_eva_final_price_flag == 1 %}※必須{% endif %}</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4"><textarea id="eva_final_price_e" name="eva_final_price" rows="5" cols="30"
+                {% if edit_eva_final_price_flag != 1 %}
+                    disabled readonly
+                {% endif %}
+                >{{ provendorevaluation_data.eva_final_price|default_if_none:'' }}</textarea></font></div></td>
+            </tr>
+        </table>
+    </div>
+
+        <!--FileUploadForm        -->
+            <form id="file_upload_form_{{ div_id_name }}" name="file_upload_form_{{ div_id_name }}"
+                  action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">
+
+    <div class="proestimate_data_div">
+    <font size="4">
+    <table class = "proestimate_data_table">
+        <thead>
+        <tr>
+            <th><font size="4">候補業者一覧</font></th>
+            <th><font size="4">候補業者１</font></th>
+            <th><font size="4">候補業者２</font></th>
+            <th><font size="4">候補業者３</font></th>
+            <th><font size="4">候補業者４</font></th>
+            <th><font size="4">候補業者５</font></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th><font size="4">決定</font></th>
+            <td>
+                <div><font size="4"><input type="checkbox" class="proestimate_table_cell" id="decision1" name="decision" value="1"
+                {% if decision_flag == 1 %} checked="checked" {% endif %}
+                onchange="decision_check(id);" ></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="checkbox" class="proestimate_table_cell" id="decision2" name="decision" value="2"
+                {% if decision_flag == 2 %} checked="checked" {% endif %}
+                onchange="decision_check(id);" ></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="checkbox" class="proestimate_table_cell" id="decision3" name="decision" value="3"
+                {% if decision_flag == 3 %} checked="checked" {% endif %}
+                onchange="decision_check(id);" ></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="checkbox" class="proestimate_table_cell" id="decision4" name="decision" value="4"
+                {% if decision_flag == 4 %} checked="checked" {% endif %}
+                onchange="decision_check(id);" ></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="checkbox" class="proestimate_table_cell" id="decision5" name="decision" value="5"
+                {% if decision_flag == 5 %} checked="checked" {% endif %}
+                onchange="decision_check(id);" ></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">候補業者名</font></th>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="candidate_vendor1" size="18" value="{{ candidate_vendor1|default_if_none:'' }}"></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="candidate_vendor2" size="18" value="{{ candidate_vendor2|default_if_none:'' }}"></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="candidate_vendor3" size="18" value="{{ candidate_vendor3|default_if_none:'' }}"></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="candidate_vendor4" size="18" value="{{ candidate_vendor4|default_if_none:'' }}"></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="candidate_vendor5" size="18" value="{{ candidate_vendor5|default_if_none:'' }}"></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">メーカー名</font></th>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="maker_name1" size="18" value="{{ proestimates_data.maker_name1|default_if_none:'' }}"></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="maker_name2" size="18" value="{{ proestimates_data.maker_name2|default_if_none:'' }}"></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="maker_name3" size="18" value="{{ proestimates_data.maker_name3|default_if_none:'' }}"></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="maker_name4" size="18" value="{{ proestimates_data.maker_name4|default_if_none:'' }}"></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell" id="maker_name5" size="18" value="{{ proestimates_data.maker_name5|default_if_none:'' }}"></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">見積依頼日</font></th>
+            <td>
+                <div><font size="4"><input type="text" id="quotation_req_date1" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.quotation_req_date1|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('quotation_req_date1');">
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" id="quotation_req_date2" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.quotation_req_date2|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('quotation_req_date2');">
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" id="quotation_req_date3" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.quotation_req_date3|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('quotation_req_date3');">
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" id="quotation_req_date4" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.quotation_req_date4|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('quotation_req_date4');">
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" id="quotation_req_date5" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.quotation_req_date5|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('quotation_req_date5');">
+                </font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">見積回答期日</font></th>
+            <td>
+                <div><font size="4"><input type="text" id="estimated_reply_date1" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.estimated_reply_date1|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('estimated_reply_date1');">
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" id="estimated_reply_date2" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.estimated_reply_date2|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('estimated_reply_date2');">
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" id="estimated_reply_date3" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.estimated_reply_date3|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('estimated_reply_date3');">
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" id="estimated_reply_date4" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.estimated_reply_date4|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('estimated_reply_date4');">
+                </font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" id="estimated_reply_date5" class="datepicker proestimate_table_cell"
+                                           value="{{ proestimates_data.estimated_reply_date5|default_if_none:'' }}" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button " value="クリア" onclick="date_clear('estimated_reply_date5');">
+                </font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">本見積額</font></th>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount1" size="14" onblur="add_comma_value(this);calc_discount_rate('1');"
+                                           value="{{ proestimates_data.last_estimated_amount1|default_if_none:''|intcomma  }}" ></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount2" size="14" onblur="add_comma_value(this);calc_discount_rate('2');"
+                                           value="{{ proestimates_data.last_estimated_amount2|default_if_none:''|intcomma  }}" ></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount3" size="14" onblur="add_comma_value(this);calc_discount_rate('3');"
+                                           value="{{ proestimates_data.last_estimated_amount3|default_if_none:''|intcomma  }}" ></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount4" size="14" onblur="add_comma_value(this);calc_discount_rate('4');"
+                                           value="{{ proestimates_data.last_estimated_amount4|default_if_none:''|intcomma  }}" ></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_amount5" size="14" onblur="add_comma_value(this);calc_discount_rate('5');"
+                                           value="{{ proestimates_data.last_estimated_amount5|default_if_none:''|intcomma  }}" ></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">出精値引額</font></th>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount1" size="14" onblur="add_comma_value(this);calc_discount_rate('1');"
+                                           value="{{ proestimates_data.last_estimated_discount1|default_if_none:''|intcomma  }}">
+                <input type="text" id="discount_rate_1" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount2" size="14" onblur="add_comma_value(this);calc_discount_rate('2');"
+                                           value="{{ proestimates_data.last_estimated_discount2|default_if_none:''|intcomma  }}">
+                <input type="text" id="discount_rate_2" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount3" size="14" onblur="add_comma_value(this);calc_discount_rate('3');"
+                                           value="{{ proestimates_data.last_estimated_discount3|default_if_none:''|intcomma  }}">
+                <input type="text" id="discount_rate_3" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount4" size="14" onblur="add_comma_value(this);calc_discount_rate('4');"
+                                           value="{{ proestimates_data.last_estimated_discount4|default_if_none:''|intcomma  }}">
+                <input type="text" id="discount_rate_4" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="last_estimated_discount5" size="14" onblur="add_comma_value(this);calc_discount_rate('5');"
+                                           value="{{ proestimates_data.last_estimated_discount5|default_if_none:''|intcomma  }}">
+                <input type="text" id="discount_rate_5" size="4" value="" readonly></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">交渉後見積額</font></th>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego1" size="14" onblur="add_comma_value(this);calc_discount_rate('1');"
+                                           value="{{ proestimates_data.estimated_amount_af_nego1|default_if_none:''|intcomma  }}">
+                <input type="text" id="nego_discount_rate_1" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego2" size="14" onblur="add_comma_value(this);calc_discount_rate('2');"
+                                           value="{{ proestimates_data.estimated_amount_af_nego2|default_if_none:''|intcomma  }}">
+                <input type="text" id="nego_discount_rate_2" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego3" size="14" onblur="add_comma_value(this);calc_discount_rate('3');"
+                                           value="{{ proestimates_data.estimated_amount_af_nego3|default_if_none:''|intcomma  }}">
+                <input type="text" id="nego_discount_rate_3" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego4" size="14" onblur="add_comma_value(this);calc_discount_rate('4');"
+                                           value="{{ proestimates_data.estimated_amount_af_nego4|default_if_none:''|intcomma  }}">
+                <input type="text" id="nego_discount_rate_4" size="4" value="" readonly></font></div>
+            </td>
+            <td>
+                <div><font size="4"><input type="text" class="proestimate_table_cell price_input" id="estimated_amount_af_nego5" size="14" onblur="add_comma_value(this);calc_discount_rate('5');"
+                                           value="{{ proestimates_data.estimated_amount_af_nego5|default_if_none:''|intcomma  }}">
+                <input type="text" id="nego_discount_rate_5" size="4" value="" readonly></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th style="height: 35px;"><font size="5">評価</font></th>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <th><font size="4">工期/納期</font></th>
+            <td>
+                <div><font size="4"><textarea id="eva_delivery_date1" class="proestimate_table_cell" name="eva_delivery_date1" rows="1" cols="18" >{{ proestimates_data.eva_delivery_date1|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_delivery_date2" class="proestimate_table_cell" name="eva_delivery_date2" rows="1" cols="18" >{{ proestimates_data.eva_delivery_date2|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_delivery_date3" class="proestimate_table_cell" name="eva_delivery_date3" rows="1" cols="18" >{{ proestimates_data.eva_delivery_date3|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_delivery_date4" class="proestimate_table_cell" name="eva_delivery_date4" rows="1" cols="18" >{{ proestimates_data.eva_delivery_date4|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_delivery_date5" class="proestimate_table_cell" name="eva_delivery_date5" rows="1" cols="18" >{{ proestimates_data.eva_delivery_date5|default_if_none:'' }}</textarea></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">見積査定額</font></th>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_assessment_price1" class="proestimate_table_cell" name="eva_estimated_assessment_price1" rows="1" cols="18"  onblur="add_comma_value(this)">{{ proestimates_data.eva_estimated_assessment_price1|default_if_none:''|intcomma  }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_assessment_price2" class="proestimate_table_cell" name="eva_estimated_assessment_price2" rows="1" cols="18"  onblur="add_comma_value(this)">{{ proestimates_data.eva_estimated_assessment_price2|default_if_none:''|intcomma  }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_assessment_price3" class="proestimate_table_cell" name="eva_estimated_assessment_price3" rows="1" cols="18"  onblur="add_comma_value(this)">{{ proestimates_data.eva_estimated_assessment_price3|default_if_none:''|intcomma  }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_assessment_price4" class="proestimate_table_cell" name="eva_estimated_assessment_price4" rows="1" cols="18"  onblur="add_comma_value(this)">{{ proestimates_data.eva_estimated_assessment_price4|default_if_none:''|intcomma  }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_assessment_price5" class="proestimate_table_cell" name="eva_estimated_assessment_price5" rows="1" cols="18"  onblur="add_comma_value(this)">{{ proestimates_data.eva_estimated_assessment_price5|default_if_none:''|intcomma  }}</textarea></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">見積査定</font></th>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_valuation_amount1" class="proestimate_table_cell" name="eva_estimated_valuation_amount1" rows="8" cols="18" >{{ proestimates_data.eva_estimated_valuation_amount1|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_valuation_amount2" class="proestimate_table_cell" name="eva_estimated_valuation_amount2" rows="8" cols="18" >{{ proestimates_data.eva_estimated_valuation_amount2|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_valuation_amount3" class="proestimate_table_cell" name="eva_estimated_valuation_amount3" rows="8" cols="18" >{{ proestimates_data.eva_estimated_valuation_amount3|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_valuation_amount4" class="proestimate_table_cell" name="eva_estimated_valuation_amount4" rows="8" cols="18" >{{ proestimates_data.eva_estimated_valuation_amount4|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_estimated_valuation_amount5" class="proestimate_table_cell" name="eva_estimated_valuation_amount5" rows="8" cols="18" >{{ proestimates_data.eva_estimated_valuation_amount5|default_if_none:'' }}</textarea></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">最終金額評価</font></th>
+            <td>
+                <div><font size="4"><textarea id="eva_final_price1" class="proestimate_table_cell" name="eva_final_price1" rows="1" cols="18" >{{ proestimates_data.eva_final_price1|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_final_price2" class="proestimate_table_cell" name="eva_final_price2" rows="1" cols="18" >{{ proestimates_data.eva_final_price2|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_final_price3" class="proestimate_table_cell" name="eva_final_price3" rows="1" cols="18" >{{ proestimates_data.eva_final_price3|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_final_price4" class="proestimate_table_cell" name="eva_final_price4" rows="1" cols="18" >{{ proestimates_data.eva_final_price4|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_final_price5" class="proestimate_table_cell" name="eva_final_price5" rows="1" cols="18" >{{ proestimates_data.eva_final_price5|default_if_none:'' }}</textarea></font></div>
+            </td>
+        </tr>
+        <tr>
+            <th><font size="4">その他</font></th>
+            <td>
+                <div><font size="4"><textarea id="eva_other1" class="proestimate_table_cell" name="eva_other1" rows="1" cols="18" >{{ proestimates_data.eva_other1|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_other2" class="proestimate_table_cell" name="eva_other2" rows="1" cols="18" >{{ proestimates_data.eva_other2|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_other3" class="proestimate_table_cell" name="eva_other3" rows="1" cols="18" >{{ proestimates_data.eva_other3|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_other4" class="proestimate_table_cell" name="eva_other4" rows="1" cols="18" >{{ proestimates_data.eva_other4|default_if_none:'' }}</textarea></font></div>
+            </td>
+            <td>
+                <div><font size="4"><textarea id="eva_other5" class="proestimate_table_cell" name="eva_other5" rows="1" cols="18" >{{ proestimates_data.eva_other5|default_if_none:'' }}</textarea></font></div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    </font>
+    </div>
+
+
+<script>
+// タブキーで上下にフォーカスを移動する処理
+ $('.proestimate_table_cell').on("keydown", function (e) {
+        const eval_label_row = 9;
+        //-----tab-----
+        if (e.keyCode == 9) {
+            //今フォーカスがあたっている行を取得
+            let $row = $(this).closest("tr");
+            let rowIndex = $row.index();
+            let $col = $(this).closest("td");
+            let colIndex = $col.index();
+            //console.log(rowIndex);
+            //console.log(colIndex);
+            setRowIndex = rowIndex;
+            setColIndex = colIndex;
+
+            let $row_next = $row.next("tr");
+            if(e.shiftKey){
+                setColIndex = colIndex + 1;
+                //評価の行にはinputがないので、飛ばす
+                if( rowIndex == eval_label_row ){
+                    setRowIndex = (eval_label_row - 2);
+                }else if(rowIndex != 0){
+                    setRowIndex = rowIndex - 1;
+                }
+            }else{
+                setColIndex = colIndex - 1;
+                //評価の行にはinputがないので、飛ばす
+                if( rowIndex == (eval_label_row - 2) ){
+                    setRowIndex = eval_label_row;
+                }else if ($row_next.length){
+                    setRowIndex = rowIndex + 1;
+                }
+            }
+
+            //inputの場合と、textareaの両方の場合があるので両方記述する
+            $(".proestimate_data_table tbody tr").eq(setRowIndex).children().eq(colIndex).find("input, .proestimate_table_cell").focus();
+            $(".proestimate_data_table tbody tr").eq(setRowIndex).children().eq(colIndex).find("textarea, .proestimate_table_cell").focus();
+
+            //通常のイベント処理は行わない
+            e.preventDefault();
+        }
+    });
+</script>
+
+        <div><font size="4">見積書データ：　<input type="file" id="estimated_data" name="estimated_data"></font></div>
+        <br><br>
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            {% csrf_token %}
+            <input type="button" value=" 格納 " onclick="file_upload('{{ div_id_name }}');">
+            </form><br>
+
+            </div><!--ng_character_checkここまで-->
+        <!--FileUploadForm        -->
+        <!--UploadFileList        -->
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+    <div style="clear: both;"></div>
+
+{% endblock %}
+
+
+{% block under_sub_contents %}
+        <br>
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予想額</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.probable_price | default_if_none:''|intcomma  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.probable_price == work_common_data.old_prospecificationunit_data.probable_price %}
+                        <font size="5" color="black">{{ work_common_data.probable_price | default_if_none:''|intcomma  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.probable_price | default_if_none:''|intcomma  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者1</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:'' }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor1 == work_common_data.old_prospecificationunit_data.candidate_vendor1 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:''  }}</font>
+                    {% endif %}
+
+                        <div style="float:right;" >
+                    {% if work_common_data.prospecificationunit_data.special_vendor_check %}
+                        <font size="4"><input type="checkbox" checked="checked" disabled='disabled'> 特命</font>
+                    {% else %}
+                        <font size="4"><input type="checkbox" disabled='disabled'> 特命</font>
+                    {% endif %}
+                        </div>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者2</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor2 == work_common_data.old_prospecificationunit_data.candidate_vendor2 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者3</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor3 == work_common_data.old_prospecificationunit_data.candidate_vendor3 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者4</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor4 == work_common_data.old_prospecificationunit_data.candidate_vendor4 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者5</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor5 == work_common_data.old_prospecificationunit_data.candidate_vendor5 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">備考</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.memo == work_common_data.old_prospecificationunit_data.memo %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">特命コメント</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.special_vendor_comment == work_common_data.old_prospecificationunit_data.special_vendor_comment %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">調達G特命コメント</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                <font size="4"><textarea id="special_vendor_si_comment" rows="5" cols="40">{{ work_common_data.prospecificationunit_data.special_vendor_si_comment | default_if_none:'' }}</textarea></font>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事概要</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.construction_outline == work_common_data.old_prospecificationunit_data.construction_outline %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+        </table>
+{% endblock %}

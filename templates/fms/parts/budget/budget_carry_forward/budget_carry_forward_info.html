@@ -1,0 +1,80 @@
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+    <font size="5">
+        <div>予算繰越情報</div>
+    </font>
+    </div>
+
+    <div style="width: auto;">
+    <input type="hidden" id="budget_carry_forward_page" value="{{ this_page }}">
+    <input type="hidden" id="budget_detail_id" value="{{ budget_data.id }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    </div>
+
+    <div class="scroll_budget_carry_forward_div">
+    <div style="float:left;">
+        <table>
+            <tr>
+                <td><div><font size="4">予算繰越理由</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><textarea id="carry_forward_reason" rows="5" cols="45" readonly>{{ carry_forward_data.carry_forward_reason | default_if_none:'' }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">完了予定工期</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">{{ carry_forward_data.end_date | default_if_none:'' }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">発注完了状態</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                        {% if carry_forward_data.order_complete_flag == 1 %}
+                            発注完了
+                        {% else %}
+                            発注未完了
+                        {% endif %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">繰越額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">{{ carry_forward_price_str | default_if_none:'' }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">繰越決済No</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">{{ carry_forward_data.settlement_no | default_if_none:'' }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">繰越元年度</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">{{ carry_forward_data.carry_forward_year_from_id | default_if_none:'' }}</font>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">繰越先年度</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">{{ carry_forward_data.carry_forward_year_to_id }}
+                </font></div></td>
+            </tr>
+        </table>
+    </div>
+    </div>
+
+    <div style="clear: both;"></div>

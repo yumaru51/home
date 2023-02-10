@@ -1,0 +1,117 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+<style type="text/css">
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+
+#loading_gif{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+	z-index: 10;
+}
+</style>
+    <div id="loading_gif" style="display: none">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+    <div><font size="3">
+        ユーザー：　<input TYPE=text VALUE="{{user_name}}" NAME=UseNM size=3 style="width:100px; height:25px"/>
+        　　　部門：　<input TYPE=text id="user_division_name" VALUE="{{user_division_name}}" NAME=user_division_name size=3 style="width:200px; height:25px"/>
+        　　　部署：　<select id="user_department" name="user_department" style="height:35px" onchange="department_change(value);">
+                        {% for user_departments_list in user_departments_list %}
+                            <option value="{{ user_departments_list.department }}">{{ user_departments_list.department_name }}</option>
+                        {% endfor %}
+                    </select>
+        </font>
+        <input TYPE=hidden id="user_division_cd" VALUE="{{user_division_cd}}" NAME=user_division_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="user_department_cd" VALUE="{{user_department_cd}}" NAME=user_department_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="user_authority" VALUE="{{user_authority}}" NAME=user_authority size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="confirm_user" VALUE="{{confirm_user}}" NAME=confirm_user size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="permit_user" VALUE="{{permit_user}}" NAME=permit_user size=3 style="width:150px; height:20px"/>
+    </div>
+    <div id="top_page_body">
+        トップページ内容
+    </div>
+
+<script>
+//トップページの部署を変更したときの処理
+function department_change() {
+    var department = $('#user_department').val();
+    // 辞書から該当情報を取得して、hiddenに設定
+    var division_cd = top_page_department_dict[department][1];
+    $('#user_department_cd').val(department);
+    $('#user_division_cd').val(division_cd);
+    $('#user_division_name').val(top_page_division_dict[ division_cd ][0]);
+    $('#user_authority').val(top_page_user_attribute_dict[department][1]);
+    $('#confirm_user').val(top_page_user_attribute_dict[department][2]);
+    $('#permit_user').val(top_page_user_attribute_dict[department][3]);
+    //トップページの件数等の表示部分を表示させるJSを起動(このhtml内にプログラム有)
+    top_page_detail();
+}
+
+//トップページの件数等の表示部分の表示処理
+function top_page_detail(){
+    if($("#loading_gif") != null){
+        $("#loading_gif").show();
+    }
+    $.ajax({
+        url: "/isk_tools/fms/action/top_page_detail/",
+        type: "POST",
+        data : {
+            'department' : $('#user_department').val(),
+            'division' : $('#user_division_cd').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#top_page_body').html(data);
+            if($("#loading_gif") != null){
+                $("#loading_gif").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            }
+       })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('#top_page_body').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+            if($("#loading_gif") != null){
+                $("#loading_gif").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            }
+        });
+}
+
+// ユーザー情報辞書
+var top_page_user_attribute_dict = {
+{% for user_attribute in user_attribute_list %}'{{ user_attribute.department | safe  }}':['{{ user_attribute.division | safe  }}','{{ user_attribute.authority }}','{{ user_attribute.confirm_username }}','{{ user_attribute.permit_username }}'],
+{% endfor %}
+};
+
+// 部署名辞書
+var top_page_department_dict = {
+{% for department_data in department_data_list %}'{{ department_data.department_cd | safe  }}':['{{ department_data.department_name }}','{{ department_data.division_cd | safe  }}'],
+{% endfor %}
+};
+
+// 部門名辞書
+var top_page_division_dict = {
+{% for division_data in division_data_list %}'{{ division_data.division_cd | safe }}':['{{ division_data.division_name }}'],
+{% endfor %}
+};
+
+// 画面表示時処理
+window.onload = function() {
+    department_change();
+};
+
+</script>
+
+{% endblock %}

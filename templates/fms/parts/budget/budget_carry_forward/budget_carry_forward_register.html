@@ -1,0 +1,323 @@
+{% load humanize %}
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//入力チェック・背景色変更処理
+function budget_carry_forward_must_check() {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    //入力チェック対象リスト　val_id=該当id、set_id=背景色変更対象id、
+    //must_flg=必須項目フラグ(1で必須)、max_length=上限文字数(0はチェックしない)
+    let check_object_list =
+    { 0: { val_id:'#carry_forward_reason',      set_id:'carry_forward_reason',      must_flg:1, max_length:400},
+      1: { val_id:'#end_date',                  set_id:'end_date',                  must_flg:1, max_length:0},
+      2: { val_id:'#sel_order_complete_flag',   set_id:'sel_order_complete_flag',   must_flg:1, max_length:0},
+      3: { val_id:'#carry_forward_price',       set_id:'carry_forward_price',       must_flg:1, max_length:0},
+      4: { val_id:'#settlement_no',             set_id:'settlement_no',             must_flg:1, max_length:40},
+      5: { val_id:'#sel_business_year',         set_id:'sel_business_year',         must_flg:1, max_length:0},
+      6: { val_id:'#input_budget_price',        set_id:'input_budget_price',        must_flg:1, max_length:0},
+    };
+
+    for (let check_index in check_object_list){
+        var check_object = check_object_list[check_index];
+        var check_val = $(check_object.val_id).val();
+        var set_element = document.getElementById(check_object.set_id);
+        var ng_element_flag = 0;
+
+        //必須項目チェック
+        if(check_object.must_flg == 1 && check_val == ""){
+            set_element.style.backgroundColor = 'orange';
+            ng_element_flag =  1;
+            ng_flag = ng_flag + ng_element_flag;
+        }
+
+        //文字数上限チェック
+        if ( check_object.max_length > 0 && count_char(check_val) > check_object.max_length){
+           if(ng_element_flag == 0){
+             set_element.style.backgroundColor = 'silver';
+           }
+           ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else if(ng_element_flag == 0){
+           set_element.style.backgroundColor = 'white';
+        }
+    }
+    return { 1:ng_flag , 2:ng_str_count_flag };
+}
+
+//入力チェックの実施、対応処理
+function input_check(a,b,d) {
+    var { 1:ng_flag , 2:ng_str_count_flag  } = budget_carry_forward_must_check();
+
+    //正常処理を先に判定
+    if ( ng_flag == 0 &&  ng_str_count_flag == 0) {
+        budget_carry_forward_entry(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+    }
+
+    if($("#action_pb_loading") != null){
+        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+    }
+
+    if ( ng_flag > 0 ) {
+        alert('未入力項目があります！！');
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+
+    if ( ng_str_count_flag > 0 ) {
+        alert('文字数オーバーです！！');
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+//登録処理
+function budget_carry_forward_entry(a,b) {
+    var target_unique_carry_forward_id = $('#target_unique_carry_forward_id').val();
+    if (target_unique_carry_forward_id == 0){
+        alert("予算繰越データを先に登録してください！！");
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }else{
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var target_budget_id = $('#target_budget_id').val();
+
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var target_budget_id = $('#target_budget_id').val();
+
+        $.ajax({
+                url: "/isk_tools/fms/action/budget_carry_forward_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'this_division' : this_division,
+                    'this_department' : this_department,
+                    'user_attribute_id' : user_attribute_id,
+                    'target_unique_carry_forward_id' : target_unique_carry_forward_id,
+                    'target_budget_id' : target_budget_id,
+                    'carry_forward_reason': $('#carry_forward_reason').val(),
+                    'end_date': $('#end_date').val(),
+                    'sel_order_complete_flag': $('#sel_order_complete_flag').val(),
+                    'carry_forward_price': $('#carry_forward_price').val(),
+                    'settlement_no': $('#settlement_no').val(),
+                    'sel_business_year': $('#sel_business_year').val(),
+                    'input_budget_price': $('#input_budget_price').val(),
+
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                    }
+
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert(data.msg);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+    }
+}
+
+//操作PBを非表示にするプログラム
+function carry_forward_action_button_empty() {
+    $('#{{ action_button_id }}').empty();
+}
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+    <font size="5">
+        <div>予算繰越情報</div>
+    </font>
+    </div>
+
+    <div style="width: auto;">
+    <input type="hidden" id="budget_carry_forward_register_page" value="{{ this_page }}">
+    <input type="hidden" id="budget_detail_id" value="{{ budget_data.id }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    </div>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div class="scroll_budget_carry_forward_div">
+
+    <div style="float:left;">
+        <table>
+            <tr>
+                <td><div><font size="4">予算繰越理由</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><textarea id="carry_forward_reason" rows="5" cols="45">{{ carry_forward_data.carry_forward_reason | default_if_none:'' }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">完了予定工期</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="end_date" class="datepicker" value="{{ carry_forward_data.end_date | default_if_none:'' }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('end_date');">
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">発注完了状態</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_order_complete_flag" name="sel_order_complete_flag">
+                        {% if carry_forward_data.order_complete_flag == 1 %}
+                            <option value="1" selected>発注完了</option>
+                            <option value="0">発注未完了</option>
+                        {% else %}
+                            <option value="1" >発注完了</option>
+                            <option value="0" selected>発注未完了</option>
+                        {% endif %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">繰越額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                        <input type="text" id="carry_forward_price" name="carry_forward_price"
+                                               onblur="add_comma_value(this)"
+                                               value="{{ carry_forward_data.carry_forward_price | default_if_none:'' }}">
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">繰越決済No</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="settlement_no" value="{{ carry_forward_data.settlement_no | default_if_none:'' }}"></font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">繰越元年度</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    <font size="5" color="black">{{ carry_forward_data.carry_forward_year_from_id | default_if_none:'' }}</font>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">繰越先年度</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_business_year" name="sel_business_year">
+                    {% for business_year_list in business_year_list %}
+                        {% if business_year_list.business_year == carry_forward_data.carry_forward_year_to_id %}
+                            <option value="{{ business_year_list.business_year }}" selected>{{ business_year_list.business_year }}</option>
+                        {% else %}
+                            <option value="{{ business_year_list.business_year }}">{{ business_year_list.business_year }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">現予算額</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ budget_data.budget_price | default_if_none:'' | intcomma }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">変更予算額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                        <input type="text" id="input_budget_price" name="input_budget_price"
+                                               onblur="add_comma_value(this)"
+                                               value="{{ budget_data.budget_price | default_if_none:'' | intcomma }}">
+                </font>※一時保存では保存されません、作成完了で予算額に反映されます。</div></td>
+            </tr>
+        </table>
+    </div>
+    </div>
+
+    <div style="clear: both;"></div>
+<script>
+/* HTML描画完了後処理 */
+/* data-type='number' のテキストボックスを取得 */
+var NBR = document.querySelectorAll( "[data-type='number']" );
+
+/* 入力時に実行する処理に checkInput を指定 */
+for(var i=0;i<NBR.length;i++){ NBR[ i ].oninput = fmtInput }
+
+/* 入力時に実行する処理 checkInput を作る */
+function fmtInput( evt ){
+    // 入力が行われたテキストボックスを取得
+    var target = evt.target;
+    // 入力された値を取得
+    var data = target.value[ target.value.length-1 ];
+    // 入力された値が数値以外であれば受け付けない
+    if( ! data.match( /[0-9]/ ) ){
+        target.value = target.value.slice( 0, target.value.length-1 );
+    }
+    // テキストボックスの数値を３桁区切りに変換
+    target.value = target.value
+    .replace( /,/g, '' )
+    .replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,' );
+}
+
+/* 画面表示時に金額欄にカンマ追加 */
+add_comma_target_value_at_open('#carry_forward_price');
+
+</script>

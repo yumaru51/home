@@ -1,0 +1,287 @@
+<style type="text/css">
+
+</style>
+
+            <div><h2 class="page-header">取扱物質</h2></div>
+            <div style="float: left;">
+                <table>
+                    <tr>
+                        <td><div><font size="4" style="padding: 5px 0px;">取扱物質</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.material_name }}</font>
+                            {% elif budget_material_data.material_name == old_budget_material_data.material_name %}
+                                <font size="5" color="black">{{ budget_material_data.material_name }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.material_name }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4" style="padding: 5px 0px;">化学式</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.chemical_formula }}</font>
+                            {% elif budget_material_data.chemical_formula == old_budget_material_data.chemical_formula %}
+                                <font size="5" color="black">{{ budget_material_data.chemical_formula }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.chemical_formula }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4" style="padding: 5px 0px;">サブNo</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.sub_no }}</font>
+                            {% elif budget_material_data.sub_no == old_budget_material_data.sub_no %}
+                                <font size="5" color="black">{{ budget_material_data.sub_no }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.sub_no }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">状態</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.state }}</font>
+                            {% elif budget_material_data.state == old_budget_material_data.state %}
+                                <font size="5" color="black">{{ budget_material_data.state }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.state }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">通常圧力</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.normal_pressure }}</font>
+                            {% elif budget_material_data.normal_pressure == old_budget_material_data.normal_pressure %}
+                                <font size="5" color="black">{{ budget_material_data.normal_pressure }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.normal_pressure }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">最高圧力</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.maximum_pressure }}</font>
+                            {% elif budget_material_data.maximum_pressure == old_budget_material_data.maximum_pressure %}
+                                <font size="5" color="black">{{ budget_material_data.maximum_pressure }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.maximum_pressure }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">最低圧力</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.minimum_pressure }}</font>
+                            {% elif budget_material_data.minimum_pressure == old_budget_material_data.minimum_pressure %}
+                                <font size="5" color="black">{{ budget_material_data.minimum_pressure }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.minimum_pressure }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">圧力単位</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.pressure_unit }}</font>
+                            {% elif budget_material_data.pressure_unit == old_budget_material_data.pressure_unit %}
+                                <font size="5" color="black">{{ budget_material_data.pressure_unit }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.pressure_unit }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">通常温度</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.normal_temperature }} ℃</font>
+                            {% elif budget_material_data.normal_temperature == old_budget_material_data.normal_temperature %}
+                                <font size="5" color="black">{{ budget_material_data.normal_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.normal_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">最高温度</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.maximum_temperature }} ℃</font>
+                            {% elif budget_material_data.maximum_temperature == old_budget_material_data.maximum_temperature %}
+                                <font size="5" color="black">{{ budget_material_data.maximum_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.maximum_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">最低温度</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.minimum_temperature }} ℃</font>
+                            {% elif budget_material_data.minimum_temperature == old_budget_material_data.minimum_temperature %}
+                                <font size="5" color="black">{{ budget_material_data.minimum_temperature }} ℃</font>
+                            {% else %}maximum_temperature
+                                <font size="5" color="red">{{ budget_material_data.minimum_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">濃度</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.concentration }}</font>
+                            {% elif budget_material_data.concentration == old_budget_material_data.concentration %}
+                                <font size="5" color="black">{{ budget_material_data.concentration }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.concentration }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">濃度単位</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.concentration_unit }}</font>
+                            {% elif budget_material_data.concentration_unit == old_budget_material_data.concentration_unit %}
+                                <font size="5" color="black">{{ budget_material_data.concentration_unit }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.concentration_unit }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">pH</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.ph }}</font>
+                            {% elif budget_material_data.ph == old_budget_material_data.ph %}
+                                <font size="5" color="black">{{ budget_material_data.ph }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.ph }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">粘度</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.viscosity }}</font>
+                            {% elif budget_material_data.viscosity == old_budget_material_data.viscosity %}
+                                <font size="5" color="black">{{ budget_material_data.viscosity }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.viscosity }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">嵩密度</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.bulk_specific_gravity }}</font>
+                            {% elif budget_material_data.bulk_specific_gravity == old_budget_material_data.bulk_specific_gravity %}
+                                <font size="5" color="black">{{ budget_material_data.bulk_specific_gravity }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.bulk_specific_gravity }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">真比重</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.true_specific_gravity }}</font>
+                            {% elif budget_material_data.true_specific_gravity == old_budget_material_data.true_specific_gravity %}
+                                <font size="5" color="black">{{ budget_material_data.true_specific_gravity }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.true_specific_gravity }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">見掛比重</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.apparent_specific_gravity }}</font>
+                            {% elif budget_material_data.apparent_specific_gravity == old_budget_material_data.apparent_specific_gravity %}
+                                <font size="5" color="black">{{ budget_material_data.apparent_specific_gravity }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.apparent_specific_gravity }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">粒径</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.particle_size }}</font>
+                            {% elif budget_material_data.particle_size == old_budget_material_data.particle_size %}
+                                <font size="5" color="black">{{ budget_material_data.particle_size }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.particle_size }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">水分</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="5" color="black">{{ budget_material_data.moisture }}</font>
+                            {% elif budget_material_data.moisture == old_budget_material_data.moisture %}
+                                <font size="5" color="black">{{ budget_material_data.moisture }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ budget_material_data.moisture }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font sze="4" style="padding: 5px 0px;">その他</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div>
+                            {% if old_budget_material_data_num == 0 %}
+                                <font size="4" color="black"><textarea class="textarea" name="required_others" rows="5" cols="25" style="color:black;" readonly>{{ budget_material_data.others }}</textarea></font>
+                            {% elif budget_material_data.others == old_budget_material_data.others %}
+                                <font size="4" color="black"><textarea class="textarea" name="required_others" rows="5" cols="25" style="color:black;" readonly>{{ budget_material_data.others }}</textarea></font>
+                            {% else %}
+                                <font size="4" color="red"><textarea class="textarea" name="required_others" rows="5" cols="25" style="color:red;" readonly>{{ budget_material_data.others }}</textarea></font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float: left;">
+                <div id="handling_material_lists" style="width: auto;">
+                        取扱物質リスト
+                </div>
+            </div>

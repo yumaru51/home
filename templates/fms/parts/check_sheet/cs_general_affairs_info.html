@@ -1,0 +1,134 @@
+<script>
+
+function cs_action_button_empty() {
+    $('#cs_action_button').empty();
+}
+
+// チェックボックスの状態を同期
+function cs_ga_check_box_change(){
+    if($('#factory_location_act').val() == "True")
+    {
+        document.getElementById("sel_factory_location_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_factory_location_act").checked = 0;
+    }
+    if($('#port_harbour_act').val() == "True")
+    {
+        document.getElementById("sel_port_harbour_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_port_harbour_act").checked = 0;
+    }
+    if($('#port_regulations').val() == "True")
+    {
+        document.getElementById("sel_port_regulations").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_port_regulations").checked = 0;
+    }
+    if($('#buildings_regulations').val() == "True")
+    {
+        document.getElementById("sel_buildings_regulations").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_buildings_regulations").checked = 0;
+    }
+    if($('#cityscape_regulations').val() == "True")
+    {
+        document.getElementById("sel_cityscape_regulations").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_cityscape_regulations").checked = 0;
+    }
+
+}
+//データ登録･更新処理（edit側と同じ関数を用意するためのダミーで即完了する）
+function cs_ga_edit(a,b) {  // a:自工程id, b:次工程id
+    var deferred = new $.Deferred();
+    deferred.resolve();
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+</script>
+
+<style type="text/css">
+    input[type=checkbox] {
+        width: 20px;
+        height: 20px;
+    }
+    tr td div {
+        line-height:200%
+    }
+</style>
+
+    <div class="fms_col" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="cs_no" value="{{ cs_no }}">
+<!--    <input type="hidden" id="target_budget_id" value="{{ budget_id }}">-->
+    <input type="hidden" id="budget_id_edit_flg" value="{{ budget_id_edit_flg }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="cs_rev_no" value="{{cs_rev_no}}">
+    <input type="hidden" id="factory_location_act" value="{{factory_location_act}}">
+    <input type="hidden" id="factory_location_act_motive" value="{{factory_location_act_motive}}">
+    <input type="hidden" id="factory_location_act_motive_list" value="{{factory_location_act_motive_list}}">
+    <input type="hidden" id="port_harbour_act" value="{{port_harbour_act}}">
+    <input type="hidden" id="port_regulations" value="{{port_regulations}}">
+    <input type="hidden" id="buildings_regulations" value="{{buildings_regulations}}">
+    <input type="hidden" id="cityscape_regulations" value="{{cityscape_regulations}}">
+    <input type="hidden" id="ga_edit_flag" value="{{ga_edit_flag}}">
+    </div>
+    <div id="cs_action_button" style="width: auto;"></div>
+    <div style="float:left;">
+        <table class="cs_ga_general_affairs_table">
+            <tr>
+                <th><div><font size="6" style="line-height:130%">工事立地法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_factory_location_act" value="1" onclick='return false;'>特定工場</font>
+                <font size="5">{{ factory_location_act_motive }}</font>
+                <font size="5">及び期間短縮</font></div></td>
+                <td><div><font size="5">・・・90日前(立)</font></div></td>
+            </tr>
+            <tr>
+                <th><div><font size="6" style="line-height:130%">港湾法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_port_harbour_act" value="2" onclick='return false;'>水域占用内工作物占用・工事申請</font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">港則法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_port_regulations" value="3" onclick='return false;'>港内工事申請</font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">市中高層建築物等に関する条例</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_buildings_regulations" value="4" onclick='return false;'>標識設置届</font></div></td>
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">市都市景観条例</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_cityscape_regulations" value="5" onclick='return false;'>大規模建築物等行為届（高15m超、面積1000㎡超）</font></div></td>
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+        </table>
+    </div>
+    <div style="clear: both;"></div>

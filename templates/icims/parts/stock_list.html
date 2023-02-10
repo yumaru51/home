@@ -1,0 +1,312 @@
+{% load imsds_common %}
+
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+function getstockdetail(a) {
+        var stock_id = a.replace( 's', '' );
+        var from_page = 0;
+        //alert(order_id);
+        $.ajax({
+                url: "/imsds/parts/stock_detail/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#stock_detail').empty();
+                    $('#stock_detail').html(data);
+
+                    $("#floatBox2Dialog").dialog({
+                        modal:true,
+                        width: 1600,
+                        height: 500,
+                        title:"詳細在庫画面",
+                    });
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#stock_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function allocationselect(a) {
+    var target_stock_id = a;
+    var target_order_id = $('#order_detail_id').val();
+    var target_amount_id = '#amount' + a;
+    // var unallocated_amount = $('#nonallocatedamount').val();
+    var specified_quantity = $(target_amount_id).val();
+    //var select_item_code = $('#selectitemcode7').val();
+    //var select_warehouse = $('#selectwarehouse7').val();
+    //var select_start_lot_no = $('#selectstartlotno7').val();
+    //var select_end_lot_no = $('#selectendlotno7').val();
+    //var select_quality1 = $('#selectquality17').val();
+    //var select_quality2 = $('#selectquality27').val();
+    //var select_quality3 = $('#selectquality37').val();
+    var from_page = 10021;
+    //$('#arrivalid').val() = a;
+    //alert(target_arrival_id);
+    //alert(target_order_id);
+    //alert(target_amount_id);
+    //alert(specified_quantity);
+    //alert(unallocated_amount);
+    //alert(select_item_code);
+    //alert(select_warehouse);
+    //alert(select_start_lot_no);
+    //alert(select_end_lot_no);
+    //alert("ok1");
+    $.ajax({
+                url: "/imsds/manual_allocate/",
+                type: "POST",
+                data : {
+                        'stock_id': target_stock_id,
+                        'order_id': target_order_id,
+                        //'unallocated_amount': unallocated_amount,
+                        'specified_quantity': specified_quantity,
+                        //'select_item_code': select_item_code,
+                        //'select_warehouse': select_warehouse,
+                        //'select_start_lot_no': select_start\lot_no,
+                        //'select_end_lot_no': select\end\lot_no,
+                        //'select_quality1': select_quality1,
+                        //'select_quality2': select_quality2,
+                        //'select_quality3': select_quality3,
+                        'from_page': from_page,
+                        'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    get_allocation_list(data.order_id);
+                    stock_filter_call()
+
+                    $('#non_stock_allocation_packed_amount').val(data.unallocated_amount);
+                    //order_entry_pb_refresh();
+                    getstockdata(1003);
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_entry').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+window.onload = function() {
+    getstockdata();
+};
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:560px;
+}
+td,th{
+    table-layout:fixed;
+}
+.stock_detail_pb{
+    width:40px;
+    text-align: center;
+}
+.stock_sel_pb{
+    width:55px;
+    text-align: center;
+}
+.amount{
+    width:60px;
+    text-align: center;
+}
+.stock_id{
+    width:50px;
+}
+.packed_date{
+    width:110px;
+}
+.lot{
+    width:45px;
+}
+.palette_no{
+    width:35px;
+}
+.warehouse_code{
+    width:140px;
+}
+.warehouse_name{
+    width:100px;
+}
+.item_grade_type{
+    width:35px;
+}
+.item_group{
+    width:80px;
+}
+.item_code{
+    width:150px;
+}
+.item_name{
+    width:260px;
+}
+.packing_amount{
+    width:75px;
+}
+.unit{
+    width:40px;
+}
+.stock_amount{
+    width:75px;
+}
+.reserve_company{
+    width:200px;
+}
+.qname{
+    width:80px;
+}
+.stock_status{
+    width:50px;
+}
+.allocation_status{
+    width:70px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+
+</style>
+{% if from_page == 10001 %}
+    <div><font size="4" color="#ff0000">〇対象在庫データ件数：{{ stock_lists_count }}　　☆引当可能数：{{ temporary_stock_packing_amount }}{{ packing_unit }}　　※受注可能数：{{ orders_possible_packing_amount }}{{ packing_unit }}</font></div>
+{% elif from_page == 13001 %}
+    <div><font size="4" color="#ff0000">〇対象在庫データ件数：{{ stock_lists_count }}　　☆引当可能数：{{ temporary_stock_packing_amount }}{{ packing_unit }}　　※受注可能数：{{ orders_possible_packing_amount }}{{ packing_unit }}</font></div>
+{% else %}
+    <div>〇在庫データ件数：{{ stock_lists_count }}</div>
+{% endif %}
+        {% if stock_lists_count > 0 %}
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="stock_detail_pb"></th>
+                        {% if pb_disp == 1 %}
+                            <th class="stock_sel_pb"></th>
+                            <th class="amount">引当量</th>
+                        {% endif %}
+                        <th class="stock_id">在庫ID</th>
+                        <th class="packed_date">包装日</th>
+                        <th class="lot">LOTNO</th>
+                        <th class="palette_no">P_NO</th>
+                        <th class="warehouse_code">保管倉庫</th>
+                        <th class="item_grade_type">型</th>
+                        <th class="item_group">品目グループ</th>
+                        <th class="item_code">品目コード</th>
+                        <th class="item_name">品目名</th>
+                        <th class="packing_amount">在庫袋数</th>
+                        <th class="stock_amount">在庫数量</th>
+                        <th class="reserve_company">予約先</th>
+                        <th class="qname">品質情報</th>
+                        <th class="qname">品質情報</th>
+                        <th class="stock_status">状態</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% set sell_color = "W" %}
+                {% for stock_lists in stock_lists %}
+                    {% if sell_color == "W" %}
+                        {% set sell_color = "G" %}
+                    {% else %}
+                        {% set sell_color = "W" %}
+                    {% endif %}
+                    <tr class="{{ sell_color }}">
+                        <td class="stock_detail_pb">
+                            <a href="#" id="{{ stock_lists.id }}" class="stock_detail_pb" onclick="{{ JS }}">{{ link_label }}</a>
+                        </td>
+                        {% if pb_disp == 1 %}
+                            <td class="stock_sel_pb">
+                                <input type="button" style="HEIGHT: 25px" value="選択" onclick="allocationselect({{ stock_lists.id }});">
+                            </td>
+                            <td class="amount">
+                                <input type="text" id="amount{{ stock_lists.id }}" value="{{ stock_lists.temporary_stock_packing_amount }}" size="1">{{ stock_lists.packing_amount_unit }}
+                            </td>
+                        {% endif %}
+                        <td class="stock_id">{{ stock_lists.id }}</td>
+                        <td class="packed_date">{{ stock_lists.packed_date }}</td>
+                        <td class="lot">{{ stock_lists.lot_no }}</td>
+                        <td class="palette_no">{{ stock_lists.pallet_no }}</td>
+                        <td class="warehouse_code">
+                            {% if stock_lists.stock_ware_code is not None %}
+                                {{ stock_lists.stock_ware_code }}:{{ stock_lists.warehouse_name }}
+                            {% else %}
+
+                            {% endif %}
+                        </td>
+                        <td class="item_grade_type">{{ stock_lists.item_grade_type }}</td>
+                        <td class="item_group">{{ stock_lists.item_group }}</td>
+                        <td class="item_code">{{ stock_lists.item_code }}</td>
+                        <td class="item_name">{{ stock_lists.item_name }}</td>
+                        <td class="packing_amount">{{ stock_lists.stock_packing_amount }}{{ stock_lists.packing_unit }}</td>
+                        <td class="stock_amount">{{ stock_lists.temporary_stock_amount }}{{ stock_lists.basic_unit }}</td>
+                        <td class="reserve_company">
+                            {% if stock_lists.company1_name is not None %}
+                                {{ stock_lists.company1_name }}
+                            {% else %}
+
+                            {% endif %}
+                        </td>
+                        <td class="qname">
+                            {% if stock_lists.qm1_name is not None %}
+                                {{ stock_lists.qm1_name }}
+                            {% else %}
+
+                            {% endif %}
+                        </td>
+                        <td class="qname">
+                            {% if stock_lists.qm2_name is not None %}
+                                {{ stock_lists.qm2_name }}
+                            {% else %}
+
+                            {% endif %}
+                        </td>
+                        <td class="stock_status">
+                            {% if stock_lists.stock_status == 11 %}
+                                移動中
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}
+

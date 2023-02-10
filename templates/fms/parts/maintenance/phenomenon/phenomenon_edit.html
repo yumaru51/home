@@ -1,0 +1,580 @@
+<script>
+
+//機器リストソース取得
+function equipment_list_change() {
+    var mgt_cls = $('#mgt_cls').val();
+    var facility = $('#facility').val();
+
+    if (mgt_cls != "" && facility !="") {
+        $.ajax({
+            url: "/isk_tools/fms/parts/input_select_equipment_list/",
+            type: "POST",
+            data : {
+                'mgt_cls': mgt_cls,
+                'facility' : facility,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#eqpt_no').empty();
+                $('#eqpt_no').html(data);
+                //$('#budget_department').val(department);
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#eqpt_no').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+    }else{
+        $('#eqpt_no').empty();
+    }
+}
+
+//状況リストソース取得
+function condition_list_change(condition="None") {
+    var mgt_cls = $('#mgt_cls').val();
+    if (mgt_cls != "") {
+        $.ajax({
+            url: "/isk_tools/fms/parts/input_select_condition_list/",
+            type: "POST",
+            data : {
+                'mgt_cls': mgt_cls,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#condition').empty();
+                $('#condition').html(data);
+                if (condition != "None"){
+                    $('#condition').val(condition);
+                }
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#condition').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+    }else{
+        $('#condition').empty();
+    }
+}
+//入力項目の未入力、文字数オーバーのチェックだけを行う
+function phenomenon_input_check() {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    //入力チェック対象リスト　val_id=該当id、set_id=背景色変更対象id、
+    //must_flg=必須項目フラグ(1で必須)、max_length=上限文字数(0はチェックしない)
+    let check_object_list =
+    { 0: { val_id:'#project_title',         set_id:'project_title',         must_flg:1, max_length:40},
+      1: { val_id:'#discovery_date',        set_id:'discovery_date',        must_flg:1, max_length:0},
+      //2: { val_id:'#order_department',      set_id:'order_department',      must_flg:1, max_length:0},
+      3: { val_id:'#discovery_person',      set_id:'discovery_person',      must_flg:1, max_length:20},
+      4: { val_id:'#mgt_cls',               set_id:'mgt_cls',               must_flg:1, max_length:0},
+      5: { val_id:'#facility',              set_id:'facility',              must_flg:1, max_length:20},
+      6: { val_id:'#condition_detail',      set_id:'condition_detail',      must_flg:0, max_length:200},
+      7: { val_id:'#improvement_proposal',  set_id:'improvement_proposal',  must_flg:0, max_length:400},
+    };
+    //注意:condition_detailは、equipmenthistoryreport.phenomenon_details ( max_length=200) に代入されるので200文字制限とする
+
+    for (let check_index in check_object_list){
+        var check_object = check_object_list[check_index];
+        var check_val = $(check_object.val_id).val();
+        var set_element = document.getElementById(check_object.set_id);
+        var ng_element_flag = 0;
+
+        //必須項目チェック
+        if(check_object.must_flg == 1 && check_val == ""){
+            set_element.style.backgroundColor = 'orange';
+            ng_element_flag =  1;
+            ng_flag = ng_flag + ng_element_flag;
+        }
+
+        //文字数上限チェック
+        if ( check_object.max_length > 0 && count_char(check_val) > check_object.max_length){
+           if(ng_element_flag == 0){
+             set_element.style.backgroundColor = 'silver';
+           }
+           ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else if(ng_element_flag == 0){
+           set_element.style.backgroundColor = 'white';
+        }
+    }
+
+    return { 1:ng_flag , 2:ng_str_count_flag };
+}
+
+//対応方針タブ側の入力チェックが必要か判定
+function is_measure_need_check(next_step) {
+    var need_flag = 0;
+    if(document.getElementById("measure_entry") != null) {
+        need_flag = measure_need_check_edit(next_step)
+    }
+    return need_flag;
+}
+
+//入力項目チェック後に保存処理を実行
+function phenomenon_check_edit(a,b,d) {
+    var measure_check_flag = 0;
+    var unmatch_flag = 0;
+    var errmsg = ''
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+
+    var { 1:ng_flag , 2:ng_str_count_flag  } = phenomenon_input_check();
+
+    //対応方針タブの入力チェックが必要であれば実行する
+    if (is_measure_need_check(b) != 0) {
+        var { 1:measure_ng_flag , 2:measure_ng_str_count_flag , 3:measure_alert_ng_ch_msg_str  } = measure_input_check();
+        ng_flag = ng_flag + measure_ng_flag;
+        ng_str_count_flag = ng_str_count_flag + measure_ng_str_count_flag;
+        var ans_array = check_malfunction_class(unmatch_flag);
+        unmatch_flag += ans_array[0];
+        errmsg = ans_array[1];
+    }else{
+        var measure_alert_ng_ch_msg_str = '';
+    }
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag + unmatch_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+            if (measure_alert_ng_ch_msg_str.length > 0 ) {
+                alert_ng_ch_msg_str += measure_alert_ng_ch_msg_str;
+            }
+        }
+    }
+
+    //正常処理を先に判定
+    if ( ng_all_flag == 0) {
+        phenomenon_edit(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( unmatch_flag > 0 ) {
+            msg += errmsg;
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+//データ登録･更新処理
+function phenomenon_edit(a,b) {
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = $('#sel_next_person').val();
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var phenomenon_id = $('#phenomenon_id').val();
+        var project_title = $('#project_title').val();
+        //var department = $('#order_department').val();
+        var discoverer = $('#discovery_person').val();
+        var discovery_date = $('#discovery_date').val();
+        //var jurisdiction_area = $('#jurisdiction_area').val();
+        var management_class = $('#mgt_cls').val();
+        var factory_name = $('#facility').val();
+        var equipment_no = $('#eqpt_no').val();
+        var condition = $('#condition').val();
+        var condition_detail = $('#condition_detail').val();
+        var improvement_proposal = $('#improvement_proposal').val();
+
+        //完了を通知するためのDeferredオブジェクトを作成
+        var deferred = new $.Deferred();
+
+        $.ajax({
+            url: "/isk_tools/fms/action/phenomenon_entry/",
+            type: "POST",
+            data : {
+                'this_step' : this_step,
+                'next_step' : next_step,
+                'next_person' : next_person,
+                'user_attribute_id' : user_attribute_id,
+                'next_division' : next_division,
+                'next_department' : next_department,
+                'this_division' : this_division,
+                'this_department' : this_department,
+                'phenomenon_id' : phenomenon_id,
+                'project_title' : project_title,
+                'discoverer' : discoverer,
+                'discovery_date' : discovery_date,
+                'management_class' : management_class,
+                'factory_name' : factory_name,
+                'equipment_no' : equipment_no,
+                'condition' : condition,
+                'condition_detail' : condition_detail,
+                'improvement_proposal' : improvement_proposal,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                $('#target_phenomenon_id').val(data.phenomenon_id);
+                $('#phenomenon_check_item').val(data.phenomenon_id);
+                $('#phenomenon_file_first_layer_id').val(data.phenomenon_id);
+                $('#measure_check_item').val(data.phenomenon_id);
+                $('#measure_file_first_layer_id').val(data.phenomenon_id);
+                var phenomenon_folder_name = "\xA5FailureCorrespondence\xA5" + String(data.phenomenon_id) + "\xA5AbnormalityReport\xA5";
+                var measure_folder_name = "\xA5FailureCorrespondence\xA5" + String(data.phenomenon_id) + "\xA5CorrespondencePolicyDecision\xA5";
+                $('#phenomenon_file_folder').val(phenomenon_folder_name);
+                $('#measure_file_folder').val(measure_folder_name);
+
+                var phenomenon_unique_id = data.phenomenon_unique_id
+                $('#target_phenomenon_unique_id').val(phenomenon_unique_id);
+                $('#check_item').val(phenomenon_unique_id);
+                $('#file_first_layer_id').val(phenomenon_unique_id);
+                var this_phenomenon_id = data.phenomenon_id;
+                $('#phenomenon_id').val(this_phenomenon_id);
+                $('#target_phenomenon_id').val(this_phenomenon_id);
+                var this_rev_no = data.rev_no;
+                $('#rev_no').val(this_rev_no);
+                $('#phenomenon_equipment_list').html(data.equipment_list);
+
+                alert(data.msg);
+
+                //対応方針タブの保存が必要であれば実行する
+                if(is_measure_need_check(next_step)) {
+                    var deferred_measure = measure_edit(this_step,next_step);
+                    deferred_measure.done(function(){
+                        // アクションボタン非表示以外の処理は、呼出し先で実行される
+                        if ( this_step != next_step ){
+                            $('#{{ action_button_id }}').empty();
+                        }
+                        deferred.resolve();
+                    }).fail(function(){
+                        deferred.reject();
+                    });
+                }else{
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                    }
+                    $(".button").prop("disabled", false);
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    //完了を通知
+                    deferred.resolve();
+                }
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+                if($("#action_pb_loading") != null){
+                    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                }
+                // アクションボタン有効化
+                $(".button").prop("disabled", false);
+                //失敗を通知
+                deferred.reject();
+            });
+        //完了を知らせるためにpromiseオブジェクトを返す
+        return deferred.promise();
+}
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+}
+
+//工事関連機器削除処理
+function equipment_delete(id) {
+            $.ajax({
+                url: "/isk_tools/fms/action/phenomenon_equipment_delete/",
+                type: "POST",
+                data : {
+                    'id': id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#phenomenon_equipment_list').html(data.equipment_list);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                });
+}
+
+//発見者者リスト絞込
+function discovery_person_list_filter(value) {
+    var filter_chara = value;
+        $.ajax({
+                url: "/isk_tools/fms/parts/select_discovery_person/",
+                type: "POST",
+                data : {
+                    'filter_chara' : filter_chara,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(sel_discovery_person_div).empty();
+                    $(sel_discovery_person_div).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(sel_discovery_person_div).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//管理区分選択のコンボボックスを変更したときに選択値と格納値を同期
+function mgt_cls_change(a) {
+    equipment_list_change();
+    condition_list_change();
+}
+
+//工場選択のコンボボックスを変更したときに選択値と格納値を同期
+function facility_change(a) {
+    equipment_list_change();
+}
+
+//画面表示時コンボックス同期処理
+function phenomenon_display_open() {
+    var file_folder = $('#phenomenon_file_folder').val();
+    var div_id_name = $('#phenomenon_div_id_name').val();
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag_phenomenon').val();
+    var file_class = $('#phenomenon_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+    equipment_list_change();
+
+    //var discovery_person_filter_name = $('#discovery_person_filter').val();
+    //if(discovery_person_filter_name != ""){
+    //    discovery_person_list_filter(discovery_person_filter_name);
+    //}
+}
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:250px;;
+}
+div.scroll_maintenance_order_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header"><font size="6">異常報告(発見者(現場、作業長、副作業長、保全G)入力)</font></h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="budget_detail_id" value="{{ budget_lists.id }}">
+    <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+    <input type="hidden" id="last_operator" value="{{ last_operator }}">
+    <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">
+    <input type="hidden" id="action" value="{{ action }}">
+    <input type="hidden" id="action_sub" value="{{ action_sub }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="budget_rev_no" value="{{ budget_rev_no }}">
+    <input type="hidden" id="sub_no" size="8" value="{{ phenomenon_data.sub_no }}" >
+    </div>
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+    <br>
+    <div id="phenomenon_entry"></div>
+    <div class="scroll_maintenance_order_div">
+
+
+    <div style="float:left;">
+        <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+        <table>
+            <tr>
+                <td><div><font size="4">依頼ID</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="phenomenon_id" value="{{ phenomenon_data.phenomenon_id }}" readonly="readonly">※自動取得</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">案件名</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="project_title" size="38" value="{{ phenomenon_data.project_title }}">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">発見日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="date" id="discovery_date" value="{{ phenomenon_data.discovery_date | date:'Y-m-d' }}">　※必須</font></div></td>
+            </tr>
+<!--            <tr>-->
+<!--                <td><div><font size="4">部署</font></div></td>-->
+<!--                <td><div><font size="4">：　</font></div></td>-->
+<!--                <td><div><font size="3">-->
+<!--                    <select id="order_department" name="order_department">-->
+<!--                            <option value="{{ phenomenon_data.department.department_cd }}" hidden>{{ phenomenon_data.department.department_name }}</option>-->
+<!--                        {% for departments_list in departments_list %}-->
+<!--                            <option value="{{ departments_list.department_cd }}">{{ departments_list.department_name }}</option>-->
+<!--                        {% endfor %}-->
+<!--                    </select>　※必須-->
+<!--                </font></div></td>-->
+<!--            </tr>-->
+            <tr>
+                <td><div><font size="4">発見者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <input type="text" id="discovery_person_filter" value="" size="10" onchange="discovery_person_list_filter(value);">発見者絞込(あいまい検索 & 苗字か名前入力)
+                    <div id ="sel_discovery_person_div" >
+                        <select id="discovery_person" name="discovery_person">
+                            {% if discovery_user_name == "" %}
+                                <option value="{{ phenomenon_data.user.username }}" hidden>{{ phenomenon_data.user }}</option>
+                            {% else %}
+                                <option value="{{ discovery_user_name }}" hidden>{{ t_user_last_name }}　{{ t_user_first_name }}</option>
+                            {% endif %}
+
+                            {% for discoverer_item in discoverer_list %}
+                                <option value="{{ discoverer_item.username }}">{{ discoverer_item.last_name }}　{{ discoverer_item.first_name }}</option>
+                            {% endfor %}
+                        </select>　※必須
+                    </div>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">状況詳細</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="condition_detail" name="condition_detail" rows="7" cols="50">{{ phenomenon_data.condition_detail }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">改善提案</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="improvement_proposal" name="improvement_proposal" rows="7" cols="50">{{ phenomenon_data.improvement_proposal }}</textarea></font></div></td>
+            </tr>
+        </table>
+        </div><!--ng_character_checkここまで-->
+    </div>
+
+
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+            <table>
+            <tr>
+                <td><div><font size="4">管理区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="mgt_cls" name="mgt_cls" onchange= "mgt_cls_change(value);">
+                            <option value = "" hidden></option>
+                        {% for mgt_cls_lists in mgt_cls_lists %}
+                            {% if mgt_cls_lists.m_mgt_cls_skey == phenomenon_data.m_mgt_cls_skey %}
+                                <option value="{{ mgt_cls_lists.m_mgt_cls_skey }}" selected>{{ mgt_cls_lists.mgt_cls_nm_1 }}</option>
+                            {% else %}
+                                <option value="{{ mgt_cls_lists.m_mgt_cls_skey }}">{{ mgt_cls_lists.mgt_cls_nm_1 }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>　※必須　　<font size="4"><input type="button" class="date_clear_button" value="　　クリア　　" onclick="date_clear('mgt_cls');date_clear('condition');date_clear('facility');date_clear('eqpt_no');mgt_cls_change('');"></font>
+                </font></div>
+
+                </td>
+            </tr>
+            <tr>
+                <td><div><font size="4">状況</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><font size="3">
+                    <select id="condition" name="condition">
+                            <option value=""></option>
+                    {% for condition_list in condition_list %}
+                        {% if condition_list.m_condition_cd_skey == phenomenon_data.m_condition_cd_skey %}
+                            <option value="{{ condition_list.m_condition_cd_skey }}" selected>{{ condition_list.condition_nm_1 }}</option>
+                        {% else %}
+                            <option value="{{ condition_list.m_condition_cd_skey }}">{{ condition_list.condition_nm_1 }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工場</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="facility" name="facility" onchange= "facility_change(value);">
+                                <option value="" hidden></option>
+                        {% for facility_lists in facility_lists %}
+                            {% if facility_lists.m_location_skey == phenomenon_data.m_location_skey%}
+                                <option value="{{ facility_lists.m_location_skey }}" selected>{{ facility_lists.location_nm_1 }}</option>
+                            {% else %}
+                                <option value="{{ facility_lists.m_location_skey }}">{{ facility_lists.location_nm_1 }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">機器番号</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><font size="3">
+                    <select id="eqpt_no" name="eqpt_no" onchange= "eqpt_no_change(value);">
+                        <option value=""></option>
+                    </select>
+                </font></td>
+            </tr>
+        </table>
+            {% if equipment_add_button_display_flag == 1 %}
+                <input type="button" id="equipment_add_button" value="　追加　" onclick="action(231001001,231001001,'entry','temporarily_saved');" >
+            {% endif %}
+        <br><br>
+        <font size="4">機器一覧：</font>
+        <div id="phenomenon_equipment_list" name="equipment_list">
+            {{ equipment_list | safe }}
+        </div>
+        <br>
+
+        <form id="phenomenon_file_upload_form" name="file_upload_form" action="/isk_tools/fms/action/file_upload_other_type/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group"><font size="4">
+                    資料データ選択　　：　<input type="file" id="attachment_file" name="file" onchange="get_attachment_file();" />
+                <input type="hidden" id="file_target" name="file_target" value="FailureCorrespondence">
+                <input type="hidden" id="phenomenon_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+                <input type="hidden" id="phenomenon_div_id_name" name="div_id_name" value="phenomenon">
+                <input type="hidden" id="delete_pb_disp_flag_phenomenon" name="delete_pb_disp_flag" value="1">
+                <input type="hidden" id="phenomenon_check_item" name="check_item" value="{{ phenomenon_id }}">
+                <input type="hidden" id="phenomenon_file_first_layer_id" name="file_first_layer_id" value="{{ phenomenon_id }}">
+                <input type="hidden" id="phenomenon_file_second_layer_id" name="file_second_layer_id" value="">
+                <input type="hidden" id="phenomenon_file_class" name="file_class" value="AbnormalityReport">
+                <input type="button" class="button" value="　保存　" onclick="file_upload_other_type('phenomenon');">
+            </font></div>
+        </form>
+
+        <div id="upload_file_list_phenomenon">添付ファイル無し</div>
+
+    </div>
+    <div style="clear: both;"></div>
+    </div>

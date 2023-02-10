@@ -1,0 +1,293 @@
+<script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+<script>
+function __select__discoverer__change() {
+    var jikan = '2020-12-02T08:00';
+    document.getElementById("discovery_datetime").value = jikan;
+    console.log(jikan);
+
+    {% comment %}
+    //debugger;
+    {% endcomment %}
+}
+
+function __select__file__number() {
+    var file_target = 'budget';
+    var file_id = document.getElementById('file_no').value;
+    var file_step = '133001001';
+        $.ajax({
+            url: "/isk_tools/fms/parts/common/upload_file_list/",
+            type: "POST",
+            data : {
+                'file_target': file_target,
+                'file_id': file_id,
+                'file_step': file_step,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#upload_file_list').empty();
+                    $('#upload_file_list').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#upload_file_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+
+<style type="text/css">
+/*20201201y-kawauchi 入力フォームレイアウトtableから変えたい*/
+dl {
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+dl dt{
+  width: 200px;
+  padding: 4px;
+  float:left;
+  clear:both;
+  font-weight: normal;
+  margin-top: 0px;
+  font-size: 16px;
+}
+dl dd{
+  padding: 4px;
+  font-size: 12px;
+}
+
+/*20201201y-kawauchi inputフォームレイアウト漏れ*/
+input[type=datetime-local], input[type=date], .vTextField {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 6px;
+    margin-top: 0;
+}
+/*フィールド範囲*/
+.area {
+  width: 500px;
+  margin: auto;
+  flex-wrap: wrap;
+  display: flex;
+}
+
+/*タブ部分(ラベル)の設定*/
+.tab_class {
+  width: calc(100%/5);
+  height: 50px;
+  background-color: darkgrey;
+  line-height: 50px;
+  font-size: 15px;
+  text-align: center;
+  display: block;
+  float: left;
+  order: -1;
+}
+
+/*ラジオボタン非表示*/
+input[name="tab_name"] {
+  display: none;
+}
+
+/*選択中のタブ色設定*/
+input:checked + .tab_class {
+  background-color: cadetblue;
+  color: aliceblue;
+}
+
+/*内容を非表示にする*/
+.content_class {
+  display: none;
+  width: 100%;
+}
+
+/*選択された内容のみ非表示を解除＝表示*/
+input:checked + .tab_class + .content_class {
+  display: block;
+}
+</style>
+
+{% comment %}
+{% for user in user %}
+    {{user}}
+{% endfor %}
+{% endcomment %}
+
+  <div class="area">
+    <input type="radio" name="tab_name" id="tab1" checked>
+    <label class="tab_class" for="tab1">タブ1</label>
+    <div class="content_class">
+      <p>タブ1のコンテンツを表示します</p>
+    </div>
+    <input type="radio" name="tab_name" id="tab2" >
+    <label class="tab_class" for="tab2">タブ2</label>
+    <div class="content_class">
+        <p>タブ2のコンテンツを表示します</p>
+    </div>
+    <input type="radio" name="tab_name" id="tab3" >
+    <label class="tab_class" for="tab3">タブ3</label>
+    <div class="content_class">
+      <p>タブ3のコンテンツを表示します</p>
+    </div>
+    <input type="radio" name="tab_name" id="tab4" >
+    <label class="tab_class" for="tab4">タブ4</label>
+    <div class="content_class">
+      <p>タブ4のコンテンツを表示します</p>
+    </div>
+    <input type="radio" name="tab_name" id="tab5" >
+    <label class="tab_class" for="tab5">タブ5</label>
+    <div class="content_class">
+      <p>タブ5のコンテンツを表示します</p>
+    </div>
+  </div>
+
+<br>
+URLから取得したid: {{ id }}<br><br>
+URLから取得したname: {{ name }}<br><br>
+msg: {{ msg | safe }}<br>
+<a href="../../1/test/">太字</a>
+<a href="../../2/test/">下線</a>
+<a href="../../3/test/">打消</a>
+<br>
+<br>
+<button id="download" class="button">CSV出力</button><br>
+
+<br>
+input文字を出力<br>
+<form onsubmit="return false" oninput="o.value = a.valueAsNumber + b.valueAsNumber">
+    <input name=a type=number step=any value=5> +
+    <input name=b type=number step=any value=3> =
+    <output name=o>8</output>
+</form>
+
+input文字を出力<br>
+<form onsubmit="return false" oninput="answer.value = nameplate.value">
+    <input  name=nameplate type=text value='kawauchi'>
+    <output id=answer name=answer></output>
+</form>
+
+ListデータをHTMLで保持＆呼出<br>
+<input type="text" list="todofuken_list">
+<datalist id="todofuken_list">
+    <option value="東京都">
+    <option value="大阪府">
+    <option value="京都府">
+    <option value="福岡県">
+    <option value="北海道">
+</datalist>
+
+<dl>
+    <dt>ファイルリストNo.</dt>
+    <dd>：
+        <select id="file_no" name="file_no" onchange="__select__file__number();">
+            <option value="10">10</option>
+            <option value="100">100</option>
+            <option value="9">9</option>
+        </select>
+</dl>
+<div id="upload_file_list" name="upload_file_list"></div>
+
+<iframe src="../../../TEST2/1/test/" width="1280" height="640"></iframe>
+<iframe src="http://ybientry:8787/motionboard/login" width="1280" height="640"></iframe>
+<iframe src="http://ypicore/PIVision/#/Displays/New" width="1280" height="640"></iframe>
+
+
+{% comment %}
+<div style="background-color: #daeef3;"><font size="7">発見者入力</font><br>
+<dl>
+    <dt>依頼ID</dt><dd>：<input type="text" id="request_id" value="" readonly="readonly">※自動取得</dd>
+    <dt>サブNO</dt><dd>：<input type="text" id="sub_no" value="" readonly="readonly">※修正回数を枝番とする</dd>
+    <dt>案件名</dt><dd>：<input type="text" id="project_title" size="38" value=""></dd>
+    <dt>発見日時</dt><dd>：<input type="datetime-local" id="discovery_datetime" value="{% now 'Y-m-d\TH:i' %}"></dd>
+    <dt>部署</dt>
+    <dd>：
+        <select id="department" name="department" onchange="__select__discoverer__change();">
+                <option value="0">A</option>
+                <option value="1">B</option>
+                <option value="2">C</option>
+        </select>
+    </dd>
+    <dt>発見者</dt>
+    <dd>：
+        <select id="discoverer" name="discoverer">
+                <option hidden value="{{ discoverer_default.username }}">{{ discoverer_default.username }}</option>
+            {% for DISCOVERER in DISCOVERER %}
+                <option value="{{ DISCOVERER.username }}">{{ DISCOVERER.username }}</option>
+            {% endfor %}
+        </select>
+    </dd>
+    <dt>管理区分</dt>
+    <dd>：
+        <select id="management_kbn" name="management_kbn" onchange="__select__status__change();">
+            {% for MGT_CLS_MST in MGT_CLS_MST %}
+                <option value="{{ MGT_CLS_MST.0 }}">{{ MGT_CLS_MST.1 }}</option>
+            {% endfor %}
+        </select>
+    </dd>
+    <dt>工場名</dt>
+    <dd>：
+        <select id="factory_name" name="factory_name" onchange="__select__equipment_no__change();">
+            {% for FCLTY_CD in FCLTY_CD %}
+                <option value="{{ FCLTY_CD.0 }}">{{ FCLTY_CD.1 }}</option>
+            {% endfor %}
+        </select>
+    </dd>
+    <dt>機器番号</dt>
+    <dd>：
+        <select id="equipment_no" name="equipment_no" onchange="__div__plantia__change();">
+            {% for EQPT_BASIC_MST in EQPT_BASIC_MST %}
+                <option value="{{ EQPT_BASIC_MST.0 }}">{{ EQPT_BASIC_MST.1 }}</option>
+            {% endfor %}
+        </select>
+    </dd>
+    <dt>状況</dt>
+    <dl>：
+        <select id="status" name="status">
+            {% for CONDITION_CD in CONDITION_CD %}
+                <option value="{{ CONDITION_CD.0 }}">{{ CONDITION_CD.1 }}</option>
+            {% endfor %}
+        </select>
+    </dl>
+    <dt>状況詳細：</dt>
+    <dd><textarea id="status_detail" name="status_detail" rows="5" cols="65"></textarea></dd>
+    <dt>改善提案：</dt>
+    <dd><textarea id="improvement_proposal" name="improvement_proposal" rows="2" cols="65"></textarea></dd>
+    <dt>資料データ</dt><dd>：</dd>
+</dl>
+</div>
+{% endcomment %}
+
+
+{% comment %}
+<script>
+//File出力
+download = function (data){
+  var blob = new Blob(data, {type: "text/plain"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.target = '_blank';
+  a.download = '工事基本情報.csv';
+  a.click();
+
+
+//CSV出力
+download = function (data){
+  var blob = new Blob(data, {type: "text/plain"});
+  var a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.target = '_blank';
+  a.download = '工事基本情報.csv';
+  a.click();
+}
+
+document.getElementById('download').addEventListener('click', function() {
+  var dat = [[1, 2, 3, '\n'], [1, 1, 1, '\n']];
+  download(dat);
+});
+</script>
+{% endcomment %}

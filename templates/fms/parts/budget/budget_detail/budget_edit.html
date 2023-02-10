@@ -1,0 +1,1150 @@
+{% load humanize %}
+
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//削除予定
+//部署を選択したときに工程選択の一覧を絞込
+function process_filter(a) {
+        var department = a;
+        $.ajax({
+                url: "/isk_tools/fms/parts/select_department/",
+                type: "POST",
+                data : {
+                    'department': department,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#sel_process').empty();
+                    $('#sel_process').html(data);
+                    $('#sel_budget_department').val(department);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#select_process').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//申請区分を選択したときに届出CS作成要否の表示を変更
+function application_class_change(value){
+    if(value == 3 || value == 5){
+        $("#make_cs_flag").show();
+    }else{
+        $("#make_cs_flag").hide();
+    }
+}
+
+//部署を選択したときにユーザー・工程選択の一覧を絞込
+function change_department(department) {
+        //完了を通知するためのDeferredオブジェクトを作成
+        var deferred = new $.Deferred();
+
+        $.ajax({
+                url: "/isk_tools/fms/action/budget/budget/budget_change_department/",
+                type: "POST",
+                data : {
+                    'department': department,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('[list=userList]').empty();
+                    $('[list=userList]').html(data.user_list);
+                    $('[list=processList]').empty();
+                    $('[list=processList]').html(data.processmaster_list);
+                    $('[list=charge_person_list]').empty();
+                    $('[list=charge_person_list]').html(data.charge_person_list);
+
+                    //完了を通知
+                    deferred.resolve();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    //失敗を通知
+                    deferred.reject();
+
+                    $('#select_process').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+        //完了を知らせるためにpromiseオブジェクトを返す
+        return deferred.promise();
+}
+
+//入力項目の未入力、文字数オーバーをチェック
+function input_check(a,b,d) {
+        var budget_id = $('#budget_id').val();
+        var relation_budget_id = $('#relation_budget_id').val();
+        var budget_condition = $('#sel_budget_condition').val();
+        var business_year = $('#sel_business_year').val();
+        var application_class = $('#sel_application_class').val();
+        var budget_class = $('#sel_budget_class').val();
+        var period_class = $('#sel_period_class').val();
+        var application_price = $('#application_price').val();
+        var department = $('#sel_budget_department').val();
+        var budget_department_charge_person = $('#sel_budget_department_charge_person').val();
+        var process = $('#sel_process').val();
+        var request_name = $('#request_name').val();
+        var budget_name = $('#budget_name').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+        var order_date = $('#order_date').val();
+        var pre_order_flag = $('#sel_pre_order_flag').val();
+        var asdm_flag = $('#sel_asdm_flag').val();
+        var purpose_class = $('#sel_purpose_class').val();
+        var purpose = $('#purpose').val();
+        var request_detail = $('#request_detail').val();
+        var detail = $('#detail').val();
+        var effect = $('#effect').val();
+        var influence_for_operation = $('#influence_for_operation').val();
+        var influence_for_quality = $('#influence_for_quality').val();
+        var rem = $('#rem').val();
+        var ng_flag = 0;
+        var ng_str_count_flag = 0;
+        var ng_relation_budget_id_flag =0;
+        var action_cd = d;
+        var msg = "";
+        var importance_eval = $('#sel_budget_importance_eval').val();
+        var importance_point = $('#sel_budget_importance_point').val();
+        var urgency_eval = $('#sel_budget_urgency_eval').val();
+        var urgency_point = $('#sel_budget_urgency_point').val();
+
+        //予算名が空欄で、依頼側が入力されている場合、コピーする
+        if (budget_name == "" && request_name != "" ){
+            document.getElementById('budget_name').value = request_name;
+            budget_name = $('#budget_name').val();
+        }
+        //要求仕様検討ステップのみ依頼内容をコピーする
+        if( a == 133001001 || a == 136001001 ){
+            if (request_detail != "" ){
+                document.getElementById('detail').value = request_detail;
+                detail = $('#detail').val();
+            }
+        }
+
+        if(relation_budget_id == "0" || ((application_class == "3" || application_class == "5") && (relation_budget_id == "" || relation_budget_id == budget_id))){
+            $('#relation_budget_id').css('background-color','orange');
+            ng_relation_budget_id_flag += 1 ;
+        }else{
+            $('#relation_budget_id').css('background-color','white');
+        }
+        if (budget_condition == "" ){
+            $('#sel_budget_condition').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#sel_budget_condition').css('background-color','white');
+        }
+        if (business_year == "" ){
+            $('#sel_business_year').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#sel_business_year').css('background-color','white');
+        }
+        if (application_class == "" ){
+            $('#sel_application_class').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#sel_application_class').css('background-color','white');
+        }
+        if (budget_class == "" ){
+            $('#sel_budget_class').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#sel_budget_class').css('background-color','white');
+        }
+        if (period_class == "" ){
+            $('#sel_period_class').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#sel_period_class').css('background-color','white');
+        }
+        if (department == "" ){
+            $('#sel_budget_department').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#sel_budget_department').css('background-color','white');
+        }
+        if (budget_department_charge_person == "" ){
+            $('#sel_budget_department_charge_person').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#sel_budget_department_charge_person').css('background-color','white');
+        }
+        if (process == "" || process == null){
+            $('#sel_process').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#sel_process').css('background-color','white');
+        }
+        if (request_name == "" ){
+            $('#request_name').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else if (request_name.length > 70){
+            $('#request_name').css('background-color','silver');
+            ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else{
+            $('#request_name').css('background-color','white');
+        }
+        // 文字列長チェックは一時保存でも行う
+        if (budget_name.length > 70){
+            $('#budget_name').css('background-color','silver');
+            ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else{
+            $('#budget_name').css('background-color','white');
+        }
+        if (start_date == "" ){
+            $('#start_date').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#start_date').css('background-color','white');
+        }
+        if (end_date == "" ){
+            $('#end_date').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }else{
+            $('#end_date').css('background-color','white');
+        }
+
+        // 以下は作成完了の場合のみチェック
+        if ( action_cd == "entry") {
+
+            //定量評価部分入力チェック
+            //一部のみ未選択は禁止
+            //通常申請、四日市追加、本社追加の場合、定量評価は必須項目
+            if (
+                    (   (importance_eval != "0" || importance_point != "0" || urgency_eval != "0" || urgency_point != "0") &&
+                        (importance_eval == "0" || importance_point == "0" || urgency_eval == "0" || urgency_point == "0")
+                    )
+                    ||
+                    (   ( application_class == "1" || application_class == "2" || application_class == "4" ) &&
+                        (importance_eval == "0" || importance_point == "0" || urgency_eval == "0" || urgency_point == "0")
+                    )
+               ){
+                    $('#sel_budget_importance_eval').css('background-color','orange');
+                    $('#sel_budget_importance_point').css('background-color','orange');
+                    $('#sel_budget_urgency_eval').css('background-color','orange');
+                    $('#sel_budget_urgency_point').css('background-color','orange');
+                    $('#budget_quantitative_evaluation').css('background-color','orange');
+                    ng_flag = ng_flag + 1 ;
+               }else{
+                    $('#sel_budget_importance_eval').css('background-color','white');
+                    $('#sel_budget_importance_point').css('background-color','white');
+                    $('#sel_budget_urgency_eval').css('background-color','white');
+                    $('#sel_budget_urgency_point').css('background-color','white');
+                    $('#budget_quantitative_evaluation').css('background-color','white');
+               }
+
+            if (budget_name == "" ){
+                $('#budget_name').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#budget_name').css('background-color','white');
+            }
+
+            if (asdm_flag == "" ){
+                $('#sel_asdm_flag').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#sel_asdm_flag').css('background-color','white');
+            }
+
+            if (purpose_class == "" || purpose_class == "NON"){
+                $('#sel_purpose_class').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#sel_purpose_class').css('background-color','white');
+            }
+
+            if (purpose == "" ){
+                $('#purpose').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#purpose').css('background-color','white');
+            }
+
+            if (request_detail == "" ){
+                $('#request_detail').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#request_detail').css('background-color','white');
+            }
+
+            if (detail == "" ){
+                $('#detail').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#detail').css('background-color','white');
+            }
+
+            if (effect == "" ){
+                $('#effect').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#effect').css('background-color','white');
+            }
+
+            if (influence_for_operation == "" ){
+                $('#influence_for_operation').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#influence_for_operation').css('background-color','white');
+            }
+
+            if (influence_for_quality == "" ){
+                $('#influence_for_quality').css('background-color','orange');
+                ng_flag = ng_flag + 1 ;
+            }else{
+                $('#influence_for_quality').css('background-color','white');
+            }
+        }//作成完了のみチェックend
+
+        // 全て正常時のみ禁止文字チェック
+        var ng_all_flag = ng_flag + ng_relation_budget_id_flag + ng_str_count_flag;
+        var alert_ng_ch_msg_str = ""
+        if ( ng_all_flag == 0) {
+            alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+            if ( alert_ng_ch_msg_str.length > 0 ) {
+                ng_all_flag += 1;
+            }
+        }
+
+        //正常時処理
+        if ( ng_all_flag == 0) {
+            budget_edit(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+        }else{
+            if($("#action_pb_loading") != null){
+                $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            }
+
+            if (ng_relation_budget_id_flag > 0){
+                msg += '正しい関連予算IDを入力してください！！\n';
+            }
+            if ( ng_flag > 0) {
+                msg += '未入力項目があります！！\n';
+            }
+            if ( ng_str_count_flag > 0 ) {
+                msg += '文字数オーバーです！！\n';
+            }
+            if ( alert_ng_ch_msg_str.length > 0 ) {
+                msg += alert_ng_ch_msg_str;
+            }
+            if ( msg.length > 0 ) {
+                alert(msg);
+            }
+
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+        }
+}
+//データ登録･更新処理
+function budget_edit(a,b) {
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var budget_id = $('#budget_id').val();
+        var relation_budget_id = $('#relation_budget_id').val();
+        var decision_no = $('#decision_no').val();
+        var budget_condition = $('#sel_budget_condition').val();
+        var business_year = $('#sel_business_year').val();
+        var application_class = $('#sel_application_class').val();
+        var budget_class = $('#sel_budget_class').val();
+        var period_class = $('#sel_period_class').val();
+        var application_price = $('#application_price').val();
+        var budget_price = $('#budget_price').val();
+        var department = $('#sel_budget_department').val();
+        var budget_department_charge_person = $('#sel_budget_department_charge_person').val();
+        var budget_person = $('#sel_budget_person').val();
+        var process = $('#sel_process').val();
+        var request_name = $('#request_name').val();
+        var budget_name = $('#budget_name').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+        var order_date = $('#order_date').val();
+        var delivery_date = $('#delivery_date').val();
+        var pre_order_flag = $('#sel_pre_order_flag').val();
+        var asdm_flag = $('#sel_asdm_flag').val();
+        var check_material_flag = $('#sel_check_material').val();
+        var purpose_class = $('#sel_purpose_class').val();
+        var purpose = $('#purpose').val();
+        var request_detail = $('#request_detail').val();
+        var detail = $('#detail').val();
+        var effect = $('#effect').val();
+        var influence_for_operation = $('#influence_for_operation').val();
+        var influence_for_quality = $('#influence_for_quality').val();
+        var remove_assets = $('#remove_assets').val();
+        var rem = $('#rem').val();
+        //var law_name_1 = $('#law_name_1').val();
+        //var law_name_2 = $('#law_name_2').val();
+        //var law_name_3 = $('#law_name_3').val();
+        //var law_name_4 = $('#law_name_4').val();
+        //var law_name_5 = $('#law_name_5').val();
+        //var equip_name_1 = $('#equip_name_1').val();
+        //var equip_name_2 = $('#equip_name_2').val();
+        //var equip_name_3 = $('#equip_name_3').val();
+        //var equip_name_4 = $('#equip_name_4').val();
+        //var equip_name_5 = $('#equip_name_5').val();
+        var comment = $('#comment').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var management_class_cd = ""; ///$('#sel_management_class_cd').val();
+
+        var importance_eval = $('#sel_budget_importance_eval').val();
+        var importance_point = $('#sel_budget_importance_point').val();
+        var urgency_eval = $('#sel_budget_urgency_eval').val();
+        var urgency_point = $('#sel_budget_urgency_point').val();
+        var no_make_cs_flag = $('#sel_make_cs_flag').val();
+        if( application_class != 3 && application_class != 5){
+            // 申請区分が予算額追加以外の場合、届出CS作成は必須
+            no_make_cs_flag = 0;
+        }
+
+        $.ajax({
+                url: "/isk_tools/fms/action/budget_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'budget_id' : budget_id,
+                    'relation_budget_id' : relation_budget_id,
+                    'decision_no' : decision_no,
+                    'budget_condition' : budget_condition,
+                    'business_year' : business_year,
+                    'application_class' : application_class,
+                    'budget_class': budget_class,
+                    'period_class' : period_class,
+                    'application_price' : application_price,
+                    'budget_price' : budget_price,
+                    'department' : department,
+                    'budget_department_charge_person' : budget_department_charge_person,
+                    'budget_person' : budget_person,
+                    'process' : process,
+                    'request_name' : request_name,
+                    'budget_name' : budget_name,
+                    'start_date' : start_date,
+                    'end_date' : end_date,
+                    'order_date' : order_date,
+                    'delivery_date' : delivery_date,
+                    'pre_order_flag' : pre_order_flag,
+                    'asdm_flag' : asdm_flag,
+                    'check_material_flag' : check_material_flag,
+                    'purpose_class' : purpose_class,
+                    'purpose' : purpose,
+                    'request_detail' : request_detail,
+                    'detail' : detail,
+                    'effect' : effect,
+                    'influence_for_operation' : influence_for_operation,
+                    'influence_for_quality' : influence_for_quality,
+                    'remove_assets' : remove_assets,
+                    'rem' : rem,
+                    'comment' : comment,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'management_class_cd': management_class_cd,
+                    'importance_eval': importance_eval,
+                    'importance_point': importance_point,
+                    'urgency_eval': urgency_eval,
+                    'urgency_point': urgency_point,
+                    'no_make_cs_flag': no_make_cs_flag,
+                    'last_plan_id': $('#last_plan_id').val(),
+                    'plan_class_id': $('#plan_class_id').val(),
+                    'mplan_adjustment_amount': $('#mplan_adjustment_amount').val(),
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    if (data.entry_success_flag == 1){
+                        var this_budget_id = data.budget_id;
+                        $('#budget_id').val(this_budget_id);
+                        $('#target_budget_id').val(this_budget_id);
+                        $('#target_id').val(this_budget_id);
+                        $('#target_budget_unique_id').val( data.target_unique_budget_id);
+                        // 20210112 y-kawauchi データ作成後id更新
+                        $('#file_budget_id').val(this_budget_id);
+                        var this_budget_rev_no = data.budget_rev_no
+                        $('#budget_rev_no').val(this_budget_rev_no);
+                        //現状の進捗工程と処理後の進捗工程とが別かを判定
+                        if ( this_step != next_step ){
+                            $('#budget_budget_detail_action_button').empty();//別の場合は、「操作」ボタンを非表示に
+                        }else{
+                            //一時保存した時、物質情報画面を再描画する
+                            budget_spec_handling_material_info(0,'d','');//予算取扱物質詳細情報を表示するJSを起動
+                        }
+                        log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    }
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+</script>
+<script>
+//定量評価入力用仮実装
+
+/// 選択時処理用辞書を保存 start
+var budget_importance_point_dict = {{ evaluation_dict.2 | safe }};
+var budget_urgency_point_dict = {{ evaluation_dict.3 | safe }};
+var budget_evaluation_dict = {{ evaluation_dict.4 | safe }};
+/// 選択時処理用辞書を保存 end
+
+//子要素を全削除
+function remove_budget_evaluation_point(x)
+{
+    if (x.hasChildNodes()) {
+        while (x.childNodes.length > 0) {
+            x.removeChild(x.firstChild);
+        }
+    }
+}
+
+//子要素を追加
+function add_budget_evaluation_point(select_element, unique_id, text, point) {
+    //option要素を新しく作る
+    const option1 = document.createElement('option');
+    //option要素にvalueと表示名を設定
+    option1.value = unique_id;
+    option1.textContent = text;
+    option1.setAttribute('data-point', point);
+    //select要素にoption要素を追加する
+    select_element.appendChild(option1);
+}
+
+// 重要度選択時処理
+function change_budget_importance(value) {
+    //select要素の取得
+    const select_element = document.getElementById("sel_budget_importance_point");
+    //子要素の削除
+    remove_budget_evaluation_point(select_element);
+    //子要素の追加（未選択用）
+    add_budget_evaluation_point(select_element,"0","","0");
+    //未選択状態に変更
+    change_budget_evaluation_point();
+    if(value != '0'){
+        var importance_point_list = budget_importance_point_dict[value];
+        for (var i = 0;i < importance_point_list.length; i++) {
+            add_budget_evaluation_point(select_element, importance_point_list[i][0], importance_point_list[i][1], importance_point_list[i][2]);
+        }
+    }
+}
+
+// 緊急度選択時処理
+function change_budget_urgency(value) {
+    //select要素の取得
+    const select_element = document.getElementById("sel_budget_urgency_point");
+    //子要素の削除
+    remove_budget_evaluation_point(select_element);
+    //子要素の追加（未選択用）
+    add_budget_evaluation_point(select_element,"0","","0");
+    //未選択状態に変更
+    change_budget_evaluation_point();
+    if(value != '0'){
+        var urgency_point_list = budget_urgency_point_dict[value];
+        for (var i = 0;i < urgency_point_list.length; i++) {
+            add_budget_evaluation_point(select_element, urgency_point_list[i][0], urgency_point_list[i][1], urgency_point_list[i][2]);
+        }
+    }
+}
+
+// 定量評価 判定表示
+function change_budget_evaluation_point() {
+    // 重要度、緊急度の点数選択状態を取得
+    var importance_point_value = $('#sel_budget_importance_point option:selected').data("point");
+    var urgency_point_value = $('#sel_budget_urgency_point option:selected').data("point");
+    if(importance_point_value != "0" && urgency_point_value != "0"){
+        var select_point = Number(importance_point_value) * Number(urgency_point_value);
+        var point_str = String(select_point);
+        // 点数を掛け合わせた数値を辞書取得し、文字列を表示
+        $('#budget_quantitative_evaluation').val(budget_evaluation_dict[point_str]);
+    }else{
+        $('#budget_quantitative_evaluation').val('未選択');
+    }
+}
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="budget_detail_id" value="{{ budget_lists.id }}">
+    <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+    <input type="hidden" id="last_operator" value="{{ last_operator }}">
+    <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">
+    <input type="hidden" id="action" value="{{ action }}">
+    <input type="hidden" id="action_sub" value="{{ action_sub }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="budget_rev_no" value="{{ budget_rev_no }}">
+
+    <!--中期計画用項目-->
+    <input type="hidden" id="last_plan_id" value="{{ budget_data.last_plan_id | default_if_none:''}}">
+    <input type="hidden" id="plan_class_id" value="{{ budget_data.plan_class_id | default_if_none:'' }}">
+    <input type="hidden" id="mplan_adjustment_amount" value="{{ budget_data.mplan_adjustment_amount | default_if_none:'' }}">
+    </div>
+    <div id="budget_budget_detail_action_button" style="width: auto;"></div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+<!--scroll_budget_div-->
+    <div class="scroll_budget_div">
+
+<!--FileUploadForm        -->
+    <form id="file_upload_form_{{ div_id_name }}" name="file_upload_form_{{ div_id_name }}" action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">
+        <div style="float:left;">
+        <table>
+            {% if budget_data.last_plan_id %}
+            <tr>
+                <td><div><font size="4">中計ＩＤ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" value="{{ budget_data.last_plan_id }}" readonly="readonly">
+                </font></div></td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td><div><font size="4">予算ＩＤ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="budget_id" value="{{ budget_id }}" readonly="readonly">
+                </font>※自動取得</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算ＮＯ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" value="{{ budget_no }}" readonly="readonly"></font>
+                </font>※入力不可</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">関連予算ＩＤ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="relation_budget_id" value="{{ relation_budget_id }}" readonly="readonly">
+                </font>※予算額追加の場合は必須、予算コピータブでID転記</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">決裁番号</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="decision_no" value="{{ decision_no }}"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算状態</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_condition" name="sel_budget_condition">
+                            <option value=""></option>
+                    {% for budget_condition_list in budget_condition_list %}
+                        {% if budget_condition_list.condition_id == budget_condition %}
+                            <option value="{{ budget_condition_list.condition_id }}" selected>{{ budget_condition_list.condition_name }}</option>
+                        {% else %}
+                            <option value="{{ budget_condition_list.condition_id }}">{{ budget_condition_list.condition_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">年度</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_business_year" name="sel_business_year">
+                    {% for business_year_list in business_year_list %}
+                        {% if business_year_list.business_year == business_year %}
+                            <option value="{{ business_year_list.business_year }}" selected>{{ business_year_list.business_year }}</option>
+                        {% else %}
+                            <option value="{{ business_year_list.business_year }}">{{ business_year_list.business_year }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">申請区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_application_class" name="sel_application_class" onchange= "application_class_change(value);">
+                            <option value=""></option>
+                    {% for application_class_list in application_class_list %}
+                        {% if application_class_list.application_class_cd == application_class %}
+                            <option value="{{ application_class_list.application_class_cd }}" selected>{{ application_class_list.application_class_name }}</option>
+                        {% else %}
+                            <option value="{{ application_class_list.application_class_cd }}">{{ application_class_list.application_class_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工事区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_class" name="sel_budget_class">
+                        <option value=""></option>
+                    {% for budget_class_list in budget_class_list %}
+                        {% if budget_class_list.budget_class_cd == budget_class_cd %}
+                            <option value="{{ budget_class_list.budget_class_cd }}" selected>{{ budget_class_list.budget_class_name }}</option>
+                        {% else %}
+                            <option value="{{ budget_class_list.budget_class_cd }}">{{ budget_class_list.budget_class_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">期区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_period_class" name="sel_period_class">
+                            <option hidden value=1 >通期</option>
+                    {% for period_class_list in period_class_list %}
+                        {% if period_class_list.period_class_cd == period_class_cd %}
+                            <option value="{{ period_class_list.period_class_cd }}" selected>{{ period_class_list.period_class_name }}</option>
+                        {% else %}
+                            <option value="{{ period_class_list.period_class_cd }}">{{ period_class_list.period_class_name }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            {% if budget_data.last_plan_id %}
+            <tr>
+                <td><div><font size="4">申請後調整額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" data-type="number" inputmode="numeric" value="{{ budget_data.mplan_adjustment_amount | default_if_none:'' | intcomma }}" onfocus="this.select();" disabled>
+                </font>※入力不可</div></td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td><div><font size="4">仕様単位の積み上げ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="application_price" data-type="number" inputmode="numeric" value="{{ application_price }}" onfocus="this.select();" disabled>
+                </font>※入力不可</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算見積額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_price" data-type="number" inputmode="numeric" value="{{ budget_price }}" onfocus="this.select();" disabled>
+                </font>※入力不可</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">部署</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_department" name="sel_budget_department" list="departmentList" onchange="change_department(value);">
+                        <option hidden></option>
+                    <datalist id="departmentList">
+                        {{ departments_list | safe }}
+                    </datalist>
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">原課担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_budget_department_charge_person" name="sel_budget_department_charge_person" list="userList">
+                        <option hidden></option>
+                    <datalist id="userList">
+                        {{ user_list | safe }}
+                    </datalist>
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <input type="hidden" id="sel_budget_person" value="{{ budget_person |default_if_none:''  }}">
+                    <input type="text" id="budget_person_name"  size="10" value="{{ budget_person_name |default_if_none:'' }}" readonly="readonly" disabled>
+                </font>※選択不可</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">設備工程</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_process" name="sel_process" list="processList">
+                    <datalist id="processList">
+                        {{ processmaster_list | safe }}
+                    </datalist>
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+<!--            <tr>-->
+<!--                <td><div><font size="4">管理区分</font></div></td>-->
+<!--                <td><div><font size="4">：　</font></div></td>-->
+<!--                <td><div><font size="3">-->
+<!--                    <select id="sel_management_class_cd" name="sel_management_class_cd">-->
+<!--                        <option hidden value="" ></option>-->
+<!--                        {% for management_class_list in management_class_list %}-->
+<!--                            {% if management_class_list.management_class_cd == management_class_cd %}-->
+<!--                                <option value="{{ management_class_list.management_class_cd }}" selected>{{ management_class_list.management_class_name }}</option>-->
+<!--                            {% else %}-->
+<!--                                <option value="{{ management_class_list.management_class_cd }}">{{ management_class_list.management_class_name }}</option>-->
+<!--                            {% endif %}-->
+<!--                        {% endfor %}-->
+<!--                    </select>-->
+<!--                </font></div></td>-->
+<!--            </tr>-->
+            <tr>
+                <td><div><font size="4">依頼名</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="request_name" size="38" value="{{ request_name }}"></font>※必須、原課入力</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算名</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_name" size="38" value="{{ budget_name }}"></font>※{{ budget_planning_team_name }}入力</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望工期</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="start_date" class="datepicker" value="{{ start_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('start_date');"> ～ <input type="text" id="end_date" class="datepicker" value="{{ end_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('end_date');">
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望発注日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="order_date" class="datepicker" value="{{ order_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('order_date');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望納期日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="delivery_date" class="datepicker" value="{{ delivery_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('delivery_date');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">事前発注</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_pre_order_flag" name="sel_department">
+                        <option hidden value=""></option>
+                        {% if pre_order_flag == "不要" %}
+                            <option value="不要" selected>不要</option>
+                            <option value="要">要</option>
+                        {% elif pre_order_flag == "要" %}
+                            <option value="不要">不要</option>
+                            <option value="要" selected>要</option>
+                        {% else %}
+                            <option value="不要">不要</option>
+                            <option value="要">要</option>
+                        {% endif %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">定修区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_asdm_flag" name="sel_asdm_flag">
+                        <option hidden value=""></option>
+                        {% if asdm_flag == "定修" %}
+                            <option value="定修" selected>定修</option>
+                            <option value="定修外">定修外</option>
+                        {% elif asdm_flag == "定修外" %}
+                            <option value="定修">定修</option>
+                            <option value="定修外" selected>定修外</option>
+                        {% else %}
+                            <option value="定修">定修</option>
+                            <option value="定修外">定修外</option>
+                        {% endif %}
+                    </select>
+                </font>　※必須</div></td>
+            </tr>
+            <tr id="make_cs_flag">
+                <td><div><font size="4">届出CS作成</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_make_cs_flag" name="sel_make_cs_flag">
+                        <option value="0">要</option>
+                        {% if no_make_cs_flag == 1 %}
+                        <option value="1" selected>不要</option>
+                        {% else %}
+                        <option value="1">不要</option>
+                        {% endif %}
+                    </select>
+                </font>※予算額追加の場合のみ選択可能</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">定量評価</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">重要度
+                    <select id="sel_budget_importance_eval" name="sel_budget_importance_eval" style="width:200px;" onchange="change_budget_importance(value);">
+                        <option value="0"></option>
+                        {% for importance_item in evaluation_dict.0 %}
+                            <option value='{{importance_item.id}}'>{{importance_item.criteria_detail}}</option>
+                        {% endfor %}
+                    </select>　点数
+                    <select id="sel_budget_importance_point" name="sel_budget_importance_point" style="width:250px;" onchange="change_budget_evaluation_point();">
+                        <option hidden data-point="0" value="0" ></option>
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="3"><input id="get_quantitative_help_file_button" type="button" name="get_quantitative_help_file_button" value="定量評価表 取得" onclick='download_server_file("\\\\Ydomnserv\\COMMON\\部門間フォルダ\\FacilityData\\template_files\\manuals\\定量評価表","評価表.xlsx")'></font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">緊急度
+                    <select id="sel_budget_urgency_eval" name="sel_budget_urgency_eval" style="width:200px;"  onchange="change_budget_urgency(value);">
+                        <option value="0"></option>
+                        {% for urgency_item in evaluation_dict.1 %}
+                            <option value='{{urgency_item.id}}'>{{urgency_item.criteria_detail}}</option>
+                        {% endfor %}
+                    </select>　点数
+                    <select id="sel_budget_urgency_point" name="sel_budget_urgency_point" style="width:250px;"  onchange="change_budget_evaluation_point();">
+                        <option hidden data-point="0" value="0"></option>
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4"></font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">　判定
+                    <input type="text" id="budget_quantitative_evaluation" size="10" value="未選択" style="width:100px;" readonly="readonly">
+                </font>※自動入力 ※申請区分が通常申請,追加(四日市,本社)の場合は必須</div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">物質情報入力の該当</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_check_material" name="sel_check_material">
+                        <option
+                            {% if "有り" == budget_data.check_material_flag %}
+                            selected
+                            {% endif %}
+                            value="有り" >有り</option>
+                        <option
+                            {% if "無し" == budget_data.check_material_flag %}
+                            selected
+                            {% endif %}
+                                value="無し" >無し</option>
+                    </select>
+                </font></div></td>
+            </tr>
+        </table>
+        <div><font size="4">※基本的に機器更新/配管工事等に係る工事の場合は必要です。<br>
+                            　有りとした場合、「物質情報」タブでの情報入力は必須となります。
+        </font></div>
+    </div>
+    <div style="float:left;width:10px;" >　</div>
+    <div style="float:left;" >
+        <table>
+            <tr>
+                <td><div><font size="4">目的区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_purpose_class" name="sel_purpose_class">
+                        <option hidden value="" ></option>
+                        {% for purpose_class_list in purpose_class_list %}
+                            {% if purpose_class_list.purpose_class_cd == purpose_class %}
+                                <option value="{{ purpose_class_list.purpose_class_cd }}" selected>{{ purpose_class_list.purpose_class_cd }} : {{ purpose_class_list.purpose_class_name }}</option>
+                            {% else %}
+                                <option value="{{ purpose_class_list.purpose_class_cd }}">{{ purpose_class_list.purpose_class_cd }} : {{ purpose_class_list.purpose_class_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </font>※必須</div></td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">目的詳細</font>
+                <font size="3"><p style="margin: 0;">※必須</p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="purpose" name="purpose" rows="9" cols="45">{{ purpose }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div>
+                    <font size="4">依頼内容</font>
+                    <font size="3">
+                        <p style="margin: 0;">※必須、原課入力</p>
+                        <strong>
+                        <font color="red">
+                            <p style="margin: 0;">詳細は、要求仕様</p>
+                            <p style="margin: 0;">タブに記載のこと</p>
+                        </font>
+                        </strong>
+                        <input id="get_detail_help_file_button" type="button" name="get_detail_help_file_button" value="記載例 取得" onclick='download_server_file("\\\\Ydomnserv\\COMMON\\部門間フォルダ\\FacilityData\\template_files\\manuals\\要求仕様入力方法","要求仕様検討入力方法-予算見積依頼（原課操作）.pptx")'>
+                    </font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td>
+                    <div>
+                        <font size="3"><textarea id="request_detail" name="detail" rows="9" cols="45">{{ request_detail }}</textarea></font>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><div>
+                    <font size="4">内容</font>
+                    <font size="3">
+                        <p style="margin: 0;">※{{ budget_planning_team_name }}入力</p>
+                    </font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td>
+                    <div>
+                        <font size="3"><textarea id="detail" name="detail" rows="9" cols="45">{{ detail }}</textarea></font>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">効果</font>
+                <font size="3"><p style="margin: 0;">※必須</p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="effect" name="effect" rows="6" cols="45">{{ effect }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">操業への影響</font>
+                <font size="3"><p style="margin: 0;">※必須</p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="influence_for_operation" name="influence_for_operation" rows="6" cols="45">{{ influence_for_operation }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div>
+                <font size="4">品質への影響</font>
+                <font size="3"><p style="margin: 0;">※必須</p></font>
+                </div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="influence_for_quality" name="influence_for_quality" rows="6" cols="45">{{ influence_for_quality }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">除去資産</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="remove_assets" name="remove_assets" rows="6" cols="45">{{ remove_assets }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">備考</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="rem" name="rem" rows="6" cols="45">{{ rem }}</textarea></font></div></td>
+            </tr>
+        </table>
+    </div>
+
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            資料データ選択：<input type="file" id="required_specifications" name="required_specifications">
+            {% csrf_token %}
+            <input type="button" value=" 格納 " onclick="file_upload('{{ div_id_name }}');">
+    </form><br>
+<!--FileUploadForm        -->
+<!--UploadFileList        -->
+    <div id="upload_file_list_{{ div_id_name }}"></div>
+<!--UploadFileList        -->
+
+    <div style="clear: both;"></div>
+    </div>
+<!--scroll_budget_div-->
+
+    </div><!--ng_character_checkここまで-->
+
+<script>
+/* HTML描画完了後処理 */
+
+/* data-type='number' のテキストボックスを取得 */
+var NBR = document.querySelectorAll( "[data-type='number']" );
+
+/* 入力時に実行する処理に checkInput を指定 */
+for(var i=0;i<NBR.length;i++){ NBR[ i ].oninput = fmtInput }
+
+/* 入力時に実行する処理 checkInput を作る */
+function fmtInput( evt ){
+    // 入力が行われたテキストボックスを取得
+    var target = evt.target;
+    // 入力された値を取得
+    var data = target.value[ target.value.length-1 ];
+    // 入力された値が数値以外であれば受け付けない
+    if( ! data.match( /[0-9]/ ) ){
+        target.value = target.value.slice( 0, target.value.length-1 );
+    }
+    // テキストボックスの数値を３桁区切りに変換
+    target.value = target.value
+    .replace( /,/g, '' )
+    .replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,' );
+}
+
+{% if budget_data.importance_criteria_id is not None %}
+    /* 定量評価情報の復元 */
+    // 重要度
+    var sel_importance_eval = document.getElementById('sel_budget_importance_eval');
+    sel_importance_eval.value =  {{ budget_data.importance_criteria.id }};
+    sel_importance_eval.onchange();
+    document.getElementById('sel_budget_importance_point').value = {{ budget_data.importance_point.id }};
+
+    // 緊急度
+    var sel_urgency_eval = document.getElementById('sel_budget_urgency_eval');
+    sel_urgency_eval.value =  {{ budget_data.urgency_criteria.id }};
+    sel_urgency_eval.onchange();
+    document.getElementById('sel_budget_urgency_point').value = {{ budget_data.urgency_point.id }};
+
+    // 判定
+    change_budget_evaluation_point();
+{% endif %}
+
+</script>

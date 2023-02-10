@@ -1,0 +1,174 @@
+<script>
+
+//入力項目チェック
+function policy_overview_input_check() {
+    var alert_input_check_msg = "";
+
+    //禁止文字チェック
+    var alert_ng_ch_msg = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+    alert_input_check_msg += alert_ng_ch_msg;
+
+    return alert_input_check_msg;
+}
+
+//工事方針概要登録･更新処理
+function policy_overview_entry(a) {
+    //予算ID登録済チェック
+    var budget_id = $('#target_budget_id').val();
+    if (budget_id == 0){
+        alert("予算データを先に登録(一時保存)してください！！");
+        return;
+    }
+
+    //入力項目チェック
+    var alert_input_check_msg = policy_overview_input_check();
+    if ( alert_input_check_msg.length > 0 ) {
+        alert(alert_input_check_msg);
+        return;
+    }
+
+    var budget_rev_no = $('#budget_rev_no').val();
+    var construction_policy_id = $('#construction_policy_id').val();
+    var action_type = a;
+    var no = $('#no').val();
+    var rs_no = $('#rs_no').val();
+    var policy = $('#policy').val();
+    var overview = $('#overview').val();
+    var this_department = $('#user_department_cd').val();
+    var this_division = $('#user_division_cd').val();
+    var this_step = $('#this_step').val();
+    $.ajax({
+        url: "/isk_tools/fms/action/policy_overview_entry/",
+        type: "POST",
+        data : {
+            'action_type' : action_type,
+            'budget_id' : budget_id,
+            'budget_rev_no' : budget_rev_no,
+            'construction_policy_id' : construction_policy_id,
+            'no' : no,
+            'rs_no' : rs_no,
+            'policy' : policy,
+            'overview' : overview,
+            'this_department' : this_department,
+            'this_division' : this_division,
+            'this_step' : this_step,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache : false,
+        })
+        .done(function(data){
+            alert(data.msg);
+            $('#required_spec_id').val(data.required_spec_id);
+            $('#no').val(data.no);
+            var div_id_name = 'construction_policy_overview'
+            construction_policy_overview_list(div_id_name);//工事方針概要一覧表示のためのJS起動(detail_template.html内にプログラム有)
+            $('#construction_policy_id').val(0);
+            $('#no').val('');
+            $('#rs_no').val('');
+            $('#policy').val('');
+            $('#overview').val('');
+            construction_policy_overview_list('{{ div_id_name }}');//工事方針概要一覧表示のためのJS起動(detail_template.html内にプログラム有)
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+//工事方針概要削除処理
+function policy_overview_delete() {
+    var construction_policy_id = $('#construction_policy_id').val();
+    if (construction_policy_id != 0) {
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var this_step = $('#this_step').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/policy_overview_delete/",
+                type: "POST",
+                data : {
+                    'construction_policy_id' : construction_policy_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#construction_policy_id').val(0);
+
+                    $('#no').val('');
+                    $('#rs_no').val('');
+                    $('#policy').val('');
+                    $('#overview').val('');
+
+                    var div_id_name = 'construction_policy_overview'
+                    construction_policy_overview_list(div_id_name);//工事方針概要一覧表示のためのJS起動(detail_template.html内にプログラム有)
+                    $('#no').val('');
+                    $('#rs_no').val('');
+                    $('#policy').val('');
+                    $('#overview').val('');
+                    construction_policy_overview_list('{{ div_id_name }}');//工事方針概要一覧表示のためのJS起動(detail_template.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+</script>
+<style type="text/css">
+div.scroll_required_spec_div {
+  width: 440px;
+  height: 880px;
+  overflow: scroll;
+}
+</style>
+    <div style="float: left;size=10px">　</div>
+    <div style="float: left;"><h2 class="page-header">登録済要求仕様一覧</h2>
+        <div id="required_spec_lists" style="width: auto;">
+            要求仕様リスト
+        </div>
+    </div>
+<div style="float: left;width:10px;">　</div>
+    <div style="float: left;"><h2 class="page-header">工事方針＆概要</h2>
+        <input type="hidden" id="construction_policy_id" value="{{ construction_policy_id }}" size="4">
+
+        <div>
+            <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+            <div>
+                <div><font size="4">NO：　</font><font size="3"><input type="text" id="no" value="{{ no }}" size="2" readonly>※自動取得　　　</font>
+                    <font size="4">要求仕様NO：　</font><font size="3"><input type="text" id="rs_no" value="{{ rs_no }}" size="16"></font></div>
+            </div>
+            <div style="float: left;">
+                <div><font size="4">工事方針：</font></div>
+                <div><font size="3"><textarea id="policy" name="policy" rows="16" cols="60" >{{ policy }}</textarea></font></div>
+            </div>
+            <div style="float: left;width:10px;">　</div>
+            <div style="float: left;">
+                <div><font size="4">工事概要：</font></div>
+                <div><font size="3"><textarea id="overview" name="overview" rows="16" cols="60" >{{ overview }}</textarea></font></div>
+            </div>
+            </div><!--ng_character_checkここまで-->
+
+            <div style="clear: both;"></div>
+            {% if edit_flag == 1 %}
+                <div style="float: left;">
+                    <input type="button" value="新規登録" onclick="policy_overview_entry('add');">　
+                    <input type="button" value="　更新　" onclick="policy_overview_entry('update');">
+                </div>
+                <div style="float: right;">
+                    <input type="button" value="　削除　" onclick="policy_overview_delete();">
+                </div>
+            {% endif %}
+            <div style="clear: both;"></div>
+            <div ><h2 class="page-header">登録済工事方針・概要一覧</h2>
+                <div id="{{ div_id_name }}_construction_policy_overview_lists" style="width: auto;">
+                    工事方針・概要リスト
+                </div>
+            </div>
+        </div>
+    </div>

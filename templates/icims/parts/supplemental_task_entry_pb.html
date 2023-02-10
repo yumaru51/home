@@ -1,0 +1,179 @@
+<script>
+
+function supplemental_task_select(a) {
+    var supplemental_task_id = a;
+    var order_id = $('#order_detail_id').val();
+    var supplemental_task_select_id = "supplemental_task_select_" + supplemental_task_id
+    $.ajax({
+            url: "/imsds/action/supplemental_task_select/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'supplemental_task_id': supplemental_task_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    supplemental_task_list_refresh();
+                    supplemental_task_master_list_refresh();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function supplemental_task_select_cancel(a) {
+    var supplemental_task_id = a;
+    var supplemental_task_select_id = "supplemental_task_select_" + supplemental_task_id
+    $.ajax({
+            url: "/imsds/action/supplemental_task_cancel/",
+            type: "POST",
+            data : {
+                    'supplemental_task_id': supplemental_task_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    supplemental_task_list_refresh();
+                    supplemental_task_master_list_refresh();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function supplemental_task_list_refresh() {
+    var order_id = $('#order_detail_id').val();
+        $.ajax({
+            url: "/imsds/action/supplemental_task_list/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#supplemental_task_list').empty();
+                    $('#supplemental_task_list').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#supplemental_task_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function supplemental_task_master_list_refresh() {
+    var order_id = $('#order_detail_id').val();
+        $.ajax({
+            url: "/imsds/action/supplemental_task_master_list/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#supplemental_task_master_list').empty();
+                    $('#supplemental_task_master_list').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#supplemental_task_master_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function make_directions() {
+    alert("ok1");
+    var order_id = $('#order_detail_id').val();
+        $.ajax({
+            url: "/imsds/action/supplemental_task_job_order/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'binary',
+                responseType:'blob',
+                cache : false,
+                })
+                .done(function(data){
+                    alert("ok2");
+                    //alert(data.msg);
+                    //supplemental_task_list_refresh();
+                    //supplemental_task_master_list_refresh();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function download_directions() {
+    var order_id = $('#order_detail_id').val();
+    var blob = new Blob([ content ], { "type" : "application/vnd.ms-excel" });
+    var a = document.createElement('a');
+    a.download = name;
+    a.target   = '_blank';
+
+        if (window.navigator.msSaveBlob) {
+            window.navigator.msSaveBlob(blob, "supplemental_task_job_order.xlsx");
+
+                    // msSaveOrOpenBlobの場合はファイルを保存せずに開ける
+            window.navigator.msSaveOrOpenBlob(blob, "supplemental_task_job_order.xlsx");
+        } else {
+            document.getElementById("download").href = window.URL.createObjectURL(blob);
+        }
+
+}
+</script>
+<style>
+
+.like_button{
+    height: 23px;
+    background: #79aec8;
+    padding: 5px 5px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+
+}
+.like_button:hover {
+    background: #609ab6;
+}
+
+ </style>
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+            <h2 class="page-header">付帯作業(物流部指示)</h2>
+        </div>
+        <div style="float: left;width:20px;">　　　　　</div>
+        <div style="float: left;width:950px;">
+            <div id="supplemental_task_list" ></div>
+        </div>
+        <div style="float: left;width:20px;">　　　　　</div>
+        <div style="float: left;width:450px;">
+            <div id="supplemental_task_master_list" ></div>
+        </div>
+        <div style="clear: both;"></div>
+        <br>
+        <div style="float: left;width:150px;">
+            <input type="button" value=" 付帯作業仮決定 " onclick="supplemental_task_entry(100501);" >
+        </div>
+        <div style="float: left;width:150px;">
+            <input type="button" value="  付帯作業決定  " onclick="supplemental_task_entry(100551);" >
+        </div>
+        <div class="like_button" style="float: left;width:140px;">
+            <p><a href="/imsds/action/supplemental_task_job_order?order_id={{ order_id }}" download="{{ order_id }}_付帯作業指示書.xlsx" style="color: #fff; padding: 5px 5px; text-decoration:none;">付帯作業指示書作成</a></p>
+        </div>
+
+    </div>

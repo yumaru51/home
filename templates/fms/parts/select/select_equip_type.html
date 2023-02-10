@@ -1,0 +1,6 @@
+<select id="sel_equip_type" name="sel_equip_type" onchange="equipment_filter();">
+        <option value="" hidden></option>
+    {% for equip_type_lists in equip_type_lists %}
+        <option value="{{ equip_type_lists.fnc_ctg_cd }}">{{ equip_type_lists.fnc_ctg_nm_1 }}</option>
+    {% endfor %}
+</select>

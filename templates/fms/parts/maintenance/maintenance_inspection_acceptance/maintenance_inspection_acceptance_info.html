@@ -1,0 +1,69 @@
+<style type="text/css">
+</style>
+
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <input type="hidden" id="phenomenon_unique_id" value="{{ phenomenon_unique_id }}">
+        <input type="hidden" id="phenomenon_id" value="{{ phenomenon_id }}">
+        <input type="hidden" id="div_id_name" value="{{ div_id_name }}">
+        <h2 class="page-header">調達検収</h2>
+    </div>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+    <div id="{{ div_id_name }}_input_check" ><!--input_check ここから-->
+        <div class="scroll_div" style="float: left; width:1000px;">
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">提出資料受領日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ inspection_acceptance_data.documents_receipt_date | default_if_none:'' }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">提出書類の備考欄</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5"><textarea id="documents_rem" rows="4" cols="50" readonly>{{ inspection_acceptance_data.documents_rem | default_if_none:'' }}</textarea></font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">提出書類の内容確認結果</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ inspection_acceptance_data.documents_check_result | default_if_none:'' }}</font></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">検収書送付日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ inspection_acceptance_data.receipt_send_date | default_if_none:'' }}</font></div></td>
+                </tr>
+            </table>
+        </div>
+    </div><!--input_check ここまで-->
+    </div><!--ng_character_checkここまで-->
+
+    <div style="clear: both;" > </div>
+    <div style="clear: both;" > </div>
+
+    <div>
+        <input type="hidden" id="{{ div_id_name }}_delete_pb_disp_flag" value="0">
+        <input type="hidden" id="{{ div_id_name }}_file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+        <input type="hidden" id="{{ div_id_name }}_div_id_name" value="{{ div_id_name }}">
+        <input type="hidden" id="{{ div_id_name }}_file_class" name="file_class" value="InspectionAcceptance">
+        <div id="upload_file_list_{{ div_id_name }}">添付ファイル無し</div>
+    </div>
+<script>
+
+//操作PBを非表示にする
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();
+}
+
+//添付ファイルリストを表示する
+function upload_file_list_maintenance_inspection_acceptance() {
+    var file_folder = $('#{{ div_id_name }}_file_folder').val();
+    var div_id_name = $('#{{ div_id_name }}_div_id_name').val();
+    var delete_pb_disp_flag = $('#{{ div_id_name }}_delete_pb_disp_flag').val();
+    var file_class = $('#{{ div_id_name }}_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+}
+
+</script>

@@ -1,0 +1,162 @@
+{% extends 'cpexcel/base.html' %}
+
+{% block contents %}
+
+<script>
+
+function program_filter_call() {
+
+    $.ajax({
+        url: "/isk_tools/cpexcel/parts/program_filter/",
+        type: "POST",
+        data : {
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#program_filter').empty();
+            $('#program_filter').html(data);
+            list_refresh(1);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#program_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+function entry_page_open(a) {
+    var program_id = a;
+    $('#task_entry_page').empty();
+    $('#task_list').empty();
+        $.ajax({
+                url: "/isk_tools/cpexcel/parts/program_entry_page/",
+                type: "POST",
+                data : {
+                    'program_id': program_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#program_entry_page').empty();
+                    $('#program_entry_page').html(data);
+
+                    $("#floatBox1Dialog").dialog({
+                        modal:true,
+                        width: 1500,
+                        height: 820,
+                        title:"プログラム登録画面",
+                    });
+                    if (program_id != 0) {
+                        task_entry_page(program_id, 0);
+                        task_list_refresh(program_id);
+                    };
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#program_entry_page').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function task_entry_page(a, b) {
+    var program_id = a;
+    var task_id = b;
+        $.ajax({
+                url: "/isk_tools/cpexcel/parts/task_entry_page/",
+                type: "POST",
+                data : {
+                    'program_id': program_id,
+                    'task_id': task_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#task_entry_page').empty();
+                    $('#task_entry_page').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#task_entry_page').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function task_list_refresh(a) {
+    var program_id = a;
+        $.ajax({
+                url: "/isk_tools/cpexcel/parts/task_list/",
+                type: "POST",
+                data : {
+                    'program_id': program_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#task_list').empty();
+                    $('#task_list').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#task_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+window.onload = function() {
+        program_filter_call();
+};
+
+</script>
+<style type="text/css">
+#program_list{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">Automatic copy & past for Excel　プログラム登録</h2>
+    </div>
+
+    <div id="entry_pb" >
+        <input type="hidden" id="program_id" value="{{ program_id }}">
+        <input type="button" value="リスト更新" onclick="list_refresh(1);">　　
+        {% if program_id == 0 %}
+            <input type="button" value="新規登録" onclick="entry_page_open(0);">
+        {% else %}
+            <input type="button" value="　変更　" onclick="entry_page_open({{ program_id }});">
+        {% endif %}
+    </div>
+
+    <div id="program_filter">
+    </div>
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+    <div id="program_list">
+    </div>
+    <div id="floatBox1Dialog" style="display:none;">
+        <div style=" float:left;">
+            <div id="program_entry_page"></div>
+        </div>
+        <div  style=" float:left;width:20px;">　　</div>
+        <div  style=" float:left;">
+            <div>
+                <div id="task_entry_page"></div>
+            </div>
+            <br>
+            <div id="task_list" ></div>
+        </div>
+    </div>
+
+{% endblock %}

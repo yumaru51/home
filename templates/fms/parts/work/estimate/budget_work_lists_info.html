@@ -1,0 +1,355 @@
+{% load humanize %}
+
+<script>
+
+// チェックボックスのクリックイベントで、イベントの伝播を防ぐ
+$(".select_pb").on("click", function(e){
+   e.stopPropagation();
+});
+
+// 登録ボタンクリック時の処理
+function entry_prospect_price() {
+    // 変更対象のEstimateテーブルのIDと価格を取り込み
+    id = $('#target_entry_new_price_id').val();
+    new_price = $('#txt_prospect_price').val() != '' ? Number($('#txt_prospect_price').val().replace(/,/g, "")) : '';
+    // 予算見積調整額の数値判定
+    if(Number.isInteger(new_price)){
+        // 予算見積合計額の再計算と表示(実際は画面の再表示)
+        estimate_work_lists_display(id, new_price);
+    }else{
+        alert('予算見積調整額には整数値を入力してください！！');
+    }
+}
+//選択した予算の見積額を表示
+function display_prospect_price(id, prospect_price) {
+
+    $('#target_entry_new_price_id').val(id);
+    $('#txt_prospect_price').val(prospect_price);
+
+}
+
+//画面表示時に金額欄にカンマ追加
+function add_comma_value_at_open() {
+    var target_div_id_1 = "#txt_total_prospect_price";
+    if(document.getElementById("txt_total_prospect_price") != null) {
+        add_comma_target_value_at_open(target_div_id_1);  // fms_base.htmlにて定義
+    }
+}
+
+//工事一覧から選択されたコピー元工事データの詳細を別タブでの表示処理
+function work_detail(id, work_id, budget_unique_id, budget_id, present_operator) {
+    window.open('', 'work_copy_source');
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var level5_step_id = $('#level5_step_id').val();
+    var new_step = Number(level5_step_id) + 1;
+    var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+    var probudget_step_flag = {{ probudget_step_flag }};
+    if(level5_step_id > 200000000 && probudget_step_flag == 0){
+        target_url = '/isk_tools/fms/parts/execution/execution_detail_template/';
+        target_val = 'prospecificationunit';
+    }else{
+        target_url = '/isk_tools/fms/parts/common/detail_template/';
+        target_val = 'work';
+    }
+    $('<form/>', {action: target_url, target: 'work_copy_source', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'id', value: id}))
+    .append($('<input/>', {type: 'hidden', name: 'work_id', value: work_id}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: budget_unique_id}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: target_val}))
+    .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: '920000000'}))
+    .append($('<input/>', {type: 'hidden', name: 'present_operator', value: present_operator}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+    .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+//工事一覧から選択された工事データの詳細を別タブでの表示処理
+function work_detail_check(a,b,c,d,present_operator) {
+    window.open('', 'work_copy_source');
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var level5_step_id = $('#level5_step_id').val();
+    var new_step = Number(level5_step_id) + 1;
+    var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+    if(level5_step_id > 200000000 && level5_step_id != 211001000 && level5_step_id != 211002000){
+        target_url = '/isk_tools/fms/parts/execution/execution_detail_template/';
+        target_val = 'prospecificationunit';
+    }else{
+        target_url = '/isk_tools/fms/parts/common/detail_template/';
+        target_val = 'work';
+    }
+    $('<form/>', {action: target_url, target: 'work_copy_source', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'work_id', value: b}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: c}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_id', value: d}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: target_val}))
+    .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: '920000000'}))
+    .append($('<input/>', {type: 'hidden', name: 'present_operator', value: present_operator}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+    .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+// 新規仕様書作成完了処理
+function new_work_entry_complete(budget_id) {
+        var budget_id = budget_id;
+        var this_step = $('#this_step').val();
+        $.ajax({
+            url: "/isk_tools/fms/action/budget_new_work_entry_complete/",
+            type: "POST",
+            data : {
+                'budget_id': budget_id,
+                'this_step': this_step,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            async: false,
+            cache: false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                if (data.result_ok_flag == 1) {
+                    //13?002000のlevel5_toppageを表示
+                    level5_toppage(this_step.substring(0, 3) + '002000');
+                }
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+
+}
+// 見積作成画面での差戻処理
+function work_return(work_id,budget_id) {
+        var work_id = work_id;
+        var budget_id = budget_id;
+        $.ajax({
+            url: "/isk_tools/fms/action/work_return/",
+            type: "POST",
+            data : {
+                'work_id': work_id,
+                'budget_id': budget_id,
+                'this_step': $('#this_step').val() ,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            async: false,
+            cache: false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                if (data.result_ok_flag == 1) {
+                    if ( $('#target').val() == "work" && $('#target_work_id').val() == work_id){
+                        // 現在詳細画面で開いている仕様書を差し戻した場合はリスト画面に戻る
+                        level5_toppage($('#level5_step_id').val());
+                    }else{
+                        //画面の再表示
+                        estimate_work_lists_display(0, 0);
+                    }
+                }
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#work_in_budget_list').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+// アクションボタン非表示処理
+function budget_estimate_work_list_action_button_empty() {
+    //現状の進捗工程と処理後の進捗工程とが別かを判定
+    if ( this_step != next_step ){
+        $('#budget_budget_work_lists_action_button').empty();//別の場合は、「操作」ボタンを非表示に
+        if(document.getElementById('revise_budget') != null){
+            document.getElementById('revise_budget').disabled=true;  //登録ボタンを無効化
+        }
+    }
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody_work_list{
+    display:block;
+}
+tbody.scrollBody_work_list{
+    overflow-y:scroll;
+    width:980px;
+    height:520px;
+}
+td,th{
+    table-layout:fixed;
+}
+.select_pb{
+    width:80px;
+    text-align: center;
+}
+.detail_pb{
+    width:40px;
+    text-align: center;
+}
+.work_id{
+    width:80px;
+}
+.work_name{
+    width:250px;
+}
+.budget_price{
+    width:120px;
+}
+.prospect_price{
+    width:120px;
+}
+.step_name{
+    width:150px;
+}
+.return_pb{
+    width:50px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+        <input type="hidden" id="val_work_price_lists" value="{{ work_price_lists }}">
+        <input type="hidden" value="{{ work_price_lists_num }}">
+        <input type="hidden" id="target_entry_new_price_id">
+        <input type="hidden" id="action_sub" value="{{ action_sub }}">
+        <input type="hidden" id="edit_flag" value="{{ edit_flag }}">
+        <input type="hidden" id="action_button_display_flag" value="{{ action_button_display_flag }}" >
+
+        <div id="budget_budget_work_lists_action_button" style="width: auto;"></div>
+
+        {% if work_entry_complete_flag == 1 %}
+
+        <div>
+            <input type="button" value="新規仕様書作成完了" onclick="new_work_entry_complete({{ target_budget_id }});" >
+        </div>
+
+        {% endif %}
+
+            <div style="float:left">
+                <table>
+                    {% if work_entry_possible_flag == 0 %}
+                        <tr><td><font size="4" style="line-height:130%">予算見積調整額</font></td></tr>
+                        <tr><td><input type="tel" id="txt_prospect_price" size="15" maxlength="11"
+                                       onblur="add_comma_value(this)"></td></tr>
+                        {% if edit_flag == 1 %}
+                            <tr><td><input type="button" id="revise_budget" style="width:100px; padding:5px; font-size:15px;" value="登録"
+                                       onclick="entry_prospect_price({{ work_price_lists.id }});"></td></tr>
+                        {% endif %}
+                    {% endif %}
+                    <tr><td><font size="4" style="line-height:130%">予算見積調整合計額</font></td></tr>
+                    <tr><td><input type="text" id="txt_total_prospect_price" size="15" maxlength="11"
+                                   value="{{ total_prospect_price_value }}" readonly="readonly"></td></tr>
+                </table>
+            </div>
+            <div style="float:left">　</div>
+            <div id="work_in_budget_list" style="float:left">
+                <input type="hidden" id="complete_flag" value="{{ complete_flag }}" >
+                {% if probudget_step_flag == 0 %}
+                <div>予算内工事数：{{ total_work_num }}　　　個別見積完了工事数：{{ complete_work_num }}　　※中止した工事は除く</div>
+                {% endif %}
+                <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5"
+                       style="border-collapse: collapse;">
+                    <thead class="scrollHead">
+                        <tr>
+                            {% if work_entry_possible_flag == 0 %}
+                            <th class="select_pb"></th>
+                            {% endif %}
+                            <th class="detail_pb"></th>
+                            <th class="work_id" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">工事ID</font>
+                            </th>
+                            <th class="work_name" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">
+                                {% if probudget_step_flag == 1 %}
+                                企画工事名
+                                {% else %}
+                                工事名
+                                {% endif %}
+                                </font>
+                            </th>
+                            <th class="budget_price" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">予算見積額</font>
+                            </th>
+                            <th class="prospect_price" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">予算見積調整額</font>
+                            </th>
+                            {% if probudget_step_flag == 0 %}
+                            <th class="step_name" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">進捗状況</font>
+                            </th>
+                            {% endif %}
+                            {% if return_pb_disp_flag == 1 %}
+                             <th class="return_pb" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">差戻</font>
+                            </th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody class="scrollBody_work_list">
+
+                    {% if work_price_lists_num > 0 %}
+                        {% for work_price_lists in work_price_lists %}
+                            <tr >
+                                {% if work_entry_possible_flag == 0 %}
+                                <td class="select_pb"><font size="4" style="line-height:130%">
+                                    <a href="#" id="{{ work_price_lists.id }}" class="select_pb"
+                                       onclick="display_prospect_price({{ work_price_lists.id }}, '{{ work_price_lists.prospect_price }}');">見積調整</a>
+                                </font></td>
+                                {% endif %}
+                                <td class="detail_pb"><font size="4" style="line-height:130%">
+                                    <a href="#" id="derail_{{ work_price_lists.id }}" class="select_pb"
+                                       onclick="work_detail_check({{ work_price_lists.work_unique_id }}, {{ work_price_lists.work_id }}, {{ work_price_lists.budget_unique_id }}, {{ work_price_lists.budget_id }}, '{{ work_price_lists.present_operator | default_if_none:'END' }}');">詳細</a>
+                                </font></td>
+                                <td class="work_id">
+                                    <font size="4" style="line-height:130%">{{ work_price_lists.work_id | default_if_none:''}}</font></td>
+                                <td class="work_name">
+                                    <font size="4" style="line-height:130%">{{ work_price_lists.work_name | default_if_none:''}}</font></td>
+                                <td class="budget_price">
+                                    <font size="4" style="line-height:130%">{{ work_price_lists.estimate_price | default_if_none:''|intcomma }}</font></td>
+                                <td class="prospect_price">
+                                    <font size="4" style="line-height:130%">{{ work_price_lists.prospect_price |default_if_none:''|intcomma }}</font></td>
+                                {% if probudget_step_flag == 0 %}
+                                <td class="step_name">
+                                    <font size="4" style="line-height:130%">{{ work_price_lists.step_name | default_if_none:'' }}</font></td>
+                                {% endif %}
+                                {% if return_pb_disp_flag == 1 %}
+                                    <td class="return_pb">
+                                        <input type="button" value="差戻" onclick="work_return({{ work_price_lists.work_id }},{{ work_price_lists.budget_id }});"
+                                       {% if return_pb_disable_id == work_price_lists.step_id %}
+                                               disabled
+                                       {% endif %}
+                                        >
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <div>対象データなし</div>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>

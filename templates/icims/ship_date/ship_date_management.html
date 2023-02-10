@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+<script language="javascript" type="text/javascript" charset="UTF-8" xmlns="http://www.w3.org/1999/html">
+
+function order_filter_call() {
+    var from_page = 12001;
+    var status1 = 100251;
+    var status2 = 100401;
+    var status3 = 0;
+    $.ajax({
+        url: "/imsds/parts/order_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'status1': status1,
+                'status2': status2,
+                'status3': status3,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#order_filter').empty();
+            $('#order_filter').html(data);
+            getorderdata(12001);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#order_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+function ship_date_open(a) {
+        var order_id = a ;
+        var from_page = 12001 ;
+        $.ajax({
+                url: "/imsds/parts/order_detail/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+
+                    $("#floatBox4Dialog").dialog({
+                        modal:true,
+                        width: 1650,
+                        height: 700,
+                        title:"出荷日決定画面",
+                    });
+                    $('#order_ditail2').empty();
+                    $('#order_ditail2').html(data);
+
+                    ship_date_entry_pb(order_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_ditail2').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function ship_date_entry_pb(a) {
+        var order_id = a ;
+        $.ajax({
+                url: "/imsds/action/ship_date_entry_pb/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#ship_date_entry').empty();
+                    $('#ship_date_entry').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#ship_date_entry').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function ship_date_entry(a) {
+    var to_status = a;
+    var order_id = $('#order_detail_id').val();
+    var ship_date_before = $('#ship_date').val();
+    var ship_date_before = ship_date_before.replace( '年', '-' );
+    var ship_date_before = ship_date_before.replace( '月', '-' );
+    var ship_date = ship_date_before.replace( '日', '' );
+        $.ajax({
+            url: "/imsds/action/ship_date_entry/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'ship_date': ship_date,
+                    'to_status': to_status,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    ship_date_entry_pb(order_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+
+window.onload = function() {
+        order_filter_call();
+};
+</script>
+<style type="text/css">
+#order_list{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:150px;
+}
+#stock_list{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+#allocation_result_list{display:none;}
+#loading3{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">出荷日管理</h2>
+    </div>
+
+    <div class="pagetitle">
+        <input type="hidden" id="this_page" value="1">
+        <div>
+            <input type="button" name="getorderdata" value=" 受注データ更新 " onclick="getorderdata(10001);">　　
+        </div>
+    </div>
+    <div id="order_filter"></div>
+    <div>
+            受注リスト
+    </div>
+
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+
+    <div id="order_list" style="width: 1680px;">
+    </div>
+
+    <div id="floatBox4Dialog" style="display:none;">
+        <div id="order_ditail2" style="width: 1680px;">
+        </div>
+        <div id="ship_date_entry" style="width: 1680px;">
+        </div>
+    </div>
+
+{% endblock %}

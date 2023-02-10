@@ -1,0 +1,133 @@
+{% extends 'cpexcel/base.html' %}
+
+{% block contents %}
+
+<script>
+
+function file_check() {
+    var old_file_path = $('#old_file_path').val();
+    var new_file_path = $('#new_file_path').val();
+    var old_file_name = $('#old_file_name').val();
+    var new_file_name = $('#new_file_name').val();
+    $("#loading").show();
+        $.ajax({
+                url: "/isk_tools/cpexcel/action/file_check/",
+                type: "POST",
+                data : {
+                    'old_file_path': old_file_path,
+                    'new_file_path': new_file_path,
+                    'old_file_name': old_file_name,
+                    'new_file_name': new_file_name,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $("#loading").fadeOut();
+                    alert(data.msg);
+                    file_download(new_file_name)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function file_download(file_name) {
+    //var resultJson = JSON.stringify($scope.jsonObj);
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = "確認完了_" + file_name;
+    //downLoadLink.href = URL.createObjectURL(new Blob([resultJson], {type: "text.plain"}));
+    downLoadLink.href = "/isk_tools/cpexcel/action/file_download?file_name=確認完了_" + file_name ;
+    downLoadLink.dataset.downloadurl = ["text/plain", downLoadLink.download, downLoadLink.href].join(":");
+    downLoadLink.click();
+}
+
+
+function get_old_file() {
+
+    //var old_file_name_full_path = $('#old_file').val();
+    var old_file_name_full_path = $('#old_file').prop('files')[0].name;
+    $('#old_file_name').val(old_file_name_full_path);
+
+}
+function get_new_file() {
+
+    //var new_file_name_full_path = $('#new_file').val();
+    var new_file_name_full_path = $('#new_file').prop('files')[0].name;
+    $('#new_file_name').val(new_file_name_full_path);
+
+}
+function file_upload(a){
+    // フォームデータを取得
+    if (a ==1 ) {
+        var formdata = new FormData($('#file_upload_form1').get(0));
+    }else{
+        var formdata = new FormData($('#file_upload_form2').get(0));
+    }
+    // POSTでアップロード
+        $.ajax({
+                url  : "/isk_tools/cpexcel/action/file_upload/",
+                type : "POST",
+                data : formdata,
+                cache       : false,
+                contentType : false,
+                processData : false,
+                dataType    : "json"
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    if (a ==1) {
+                        $('#upload_pb1').val("送信完了");
+                        get_old_file();
+                    }else{
+                        $('#upload_pb2').val("送信完了");
+                        get_new_file();
+                    }
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+window.onload = function() {
+        $("#loading").fadeOut();
+};
+</script>
+<style type="text/css">
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">Automatic copy & past for Excel　ファイル変更チェック</h2>
+    </div>
+     <div>
+         <input type="button" value="ファイルチェック" onclick="file_check();">
+     </div>
+
+    <div>
+        <div>　基準ファイル名　　　　　　　　：　<input type="text" id="old_file_name" value="" style="width:500px;"></div>
+        <div>　チェックファイル名　　　　　　：　<input type="text" id="new_file_name" value="" style="width:500px;"></div>
+        <form id="file_upload_form1" name="file_upload_form" action="/rpa_for_excel/action/file_upload/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+            <div class="form-group">
+                　基準ファイル選択　　　　　　　：　<input type="file" id="old_file" name="file" />
+                <input type="button" id="upload_pb1" value="送信" onclick="file_upload(1);">
+            </div>
+        </form>
+        <form id="file_upload_form2" name="file_upload_form" action="/rpa_for_excel/action/file_upload/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+            <div class="form-group">
+                　チェックファイル選択　　　　　：　<input type="file" id="new_file" name="file" />
+                <input type="button" id="upload_pb2" value="送信" onclick="file_upload(2);">
+            </div>
+        </form>
+    </div>
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+{% endblock %}

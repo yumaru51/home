@@ -1,0 +1,63 @@
+<script>
+//登録済提出書類一覧の表示処理
+function get_document_list(a) {
+        var work_id = a;
+        var select_pb_disp_flag = 0;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+            $.ajax({
+                url: "/isk_tools/fms/parts/document/document_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step' : this_step,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#document_list').empty();
+                    $('#document_list').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#document_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+
+
+}
+window.onload = function() {
+    //var work_id = $('#target_work_id').val();
+    //get_document_list(work_id);
+};
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scrool_document_master_div {
+  width: 240px;
+  height: 760px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">提出書類関係</h2>
+    </div>
+    <div style="float:left;size=5px">　</div>
+
+    <div style="float:left;size=10px">　</div>
+    <div style="float:left;"><h2 class="page-header">登録済提出書類リスト</h2>
+        <div id="document_list"></div>
+    </div>

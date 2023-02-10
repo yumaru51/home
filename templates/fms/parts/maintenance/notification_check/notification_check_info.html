@@ -1,0 +1,161 @@
+<script>
+//コメント登録
+function notification_check_comment_entry() {
+    var comment = $('#new_comment').val();
+    var notification_id = $('#notification_id').val();
+    var department = $('#user_department_cd').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/notification_check_comment_entry/",
+                type: "POST",
+                data : {
+                    'comment' : comment,
+                    'notification_id' : notification_id,
+                    'department' : department,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+function notification_check_display_open() {
+    //エラー回避のためダミー関数
+}
+</script>
+<style type="text/css">
+input[type="radio"][name="law_facility"]{
+    font-size: 100%;
+    height:35px;
+}
+input[type="radio"][name="notification"]{
+    font-size: 100%;
+    height:35px;
+}
+input[type="checkbox"][name="check_items"]{
+    font-size: 100%;
+    height:35px;
+    margin-left: 10px;
+}
+</style>
+<div>
+    <div>
+        <input type="hidden" id="notification_id" value="{{ notification_check_data.notification_id }}">
+    </div>
+
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header"><font size="6">小口届出チェック</font></h2>
+    </div>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div style="float:left;">
+        <div><font size="5">届出チェック項目</font></div>
+        <table>
+            <tr>
+                <td><div><font size="4">法令該当施設</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <!-- 選択されている項目以外をdisabledにすることで、見やすくする -->
+                    <label><input type="radio" class="radio" name="law_facility" value="1" {% if law_facility == 1 %} checked {% else %} disabled="disabled" {% endif %}><font size="4">　該当　　</font></label>
+                    <label><input type="radio" class="radio" name="law_facility" value="0" {% if law_facility == 0 %} checked {% else %} disabled="disabled" {% endif %}><font size="4">　非該当　　</font></label>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">届出要否</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <!-- 選択されている項目以外をdisabledにすることで、見やすくする -->
+                    <label><input type="radio" class="radio" name="notification" value="0" {% if notification == 0 %} checked {% else %} disabled="disabled"{% endif %}><font size="4">　不要　　　</font></label>
+                    <label><input type="radio" class="radio" name="notification" value="1" {% if notification == 1 %} checked {% else %} disabled="disabled"{% endif %}><font size="4">　必要（未）　</font></label>
+                    <label><input type="radio" class="radio" name="notification" value="2" {% if notification == 2 %} checked {% else %} disabled="disabled"{% endif %}><font size="4">　必要（済）　</font></label>
+                </font></div></td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="float:left;width: 115px;">
+        　　
+    </div>
+    <div style="border: 1px solid #000000;float:left;">
+        <div><font size="4">中止理由：</font></div>
+        <div>
+            <font size="4"><textarea  rows="3" cols="55" input_check="length" data-max_length="1000" style="margin: 0px 5px 5px 5px;" readonly
+            >{{ notification_check_data.cancel_comment | default_if_none:'' }}</textarea></font>
+        </div>
+    </div>
+
+    <div style="clear: both;height:5px;" >    </div>
+
+    <div style="border: 1px solid #000000;float:left;">
+        <br>
+        <table>
+            <!-- チェックされている項目をdisabledにせず、onclickイベントを無効にすることで状態を変えずに、見やすくする -->
+            {% for check_item in check_item_list %}
+            <tr>
+                {% for check_data in check_items_set %}
+                    {% if check_data.check_item_id == check_item.check_cd %}
+                        <td><div style="padding: 5px 0px;"><font size="4">
+                            <input type="checkbox" name="check_items" class="check" id="{{ check_item.check_cd }}" size="18"
+                                {% if check_data.check_status == 1 %}
+                                    checked="checked" onclick="return false;"
+                                {% else %}
+                                    disabled="disabled"
+                                {% endif %}>　{{ check_item.check_name }}</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">{% if check_item.text_input_flag %}<input type="text" id="{{ check_item.check_cd }}_text" value="{{ check_data.input_text | default_if_none:'' }}" disabled="disabled">{% endif %}</font></div></td>
+                    {% endif %}
+                {% empty %}
+                    <td><div style="padding: 5px 0px;"><label class="check_items_label"><font size="4">
+                        <input type="checkbox" name="check_items" class="check" id="{{ check_item.check_cd }}" input_check="check" size="18" disabled="disabled">　{{ check_item.check_name }}</font></label></div></td>
+                    <td><div><font size="4">{% if check_item.text_input_flag %}<input type="text" id="{{ check_item.check_cd }}_text" input_check="length" data-max_length="100" disabled="disabled" value="">{% endif %}</font></div></td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+        <div><font size="4">原課進捗：
+        {% for department_key, department_progress_data in department_progress_list.items %}
+        {% if department_key == 'BD' %}
+            {{ department_progress_data.step_name }}：{{ department_progress_data.user }}
+        {% endif %}
+        {% endfor %}
+        </font></div>
+        <div><font size="4">コメント：</font></div>
+        <div style="padding: 5px 0px;">
+            <font size="4"><textarea name="comment" rows="9" cols="55" style="margin: 0px 5px 5px 5px;" readonly>{{ comment | default_if_none:''}}</textarea></font>
+        </div>
+    </div>
+
+    <div style="float:left;">　　</div>
+
+    {% if check_comment_set.count > 0 %}
+    <div style="border: 1px solid #000000;float:left;">
+        {% for check_comment_item in check_comment_set %}
+
+            <div><font size="4">{{ check_comment_item.department.department_name }}進捗：
+            {% for department_key, department_progress_data in department_progress_list.items %}
+            {% if department_key == check_comment_item.department_id %}
+                {{ department_progress_data.step_name }}：{{ department_progress_data.user }}
+            {% endif %}
+            {% endfor %}
+            </font></div>
+
+            <div><font size="4">コメント：</font></div>
+            <div>
+                <font size="4"><textarea rows="9" cols="55" style="margin: 0px 5px 5px 5px;" readonly>{{ check_comment_item.comment | default_if_none:''  }}</textarea></font>
+            </div>
+
+            {% if not forloop.last %}
+            <p> </p>
+            {% endif %}
+        {% endfor %}
+    </div>
+    {% endif %}
+    <div style="clear: both;"></div>
+</div>

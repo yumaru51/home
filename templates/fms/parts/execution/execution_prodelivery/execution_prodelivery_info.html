@@ -1,0 +1,111 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+</script>
+<style type="text/css">
+div.scroll_work_info_div {
+  width: 1880px;
+  height: 780px;
+  overflow: scroll;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:100px;
+}
+div.scroll_div {
+  border: solid 1px;
+  width: 1000px;
+  height: 1700px;
+  overflow: scroll;
+}
+</style>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+<!--        <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">-->
+<!--        <input type="hidden" id="this_work_id" value="{{ work_lists.work_id }}">-->
+<!--        <input type="hidden" id="this_work_rev_no" value="{{ work_lists.work_rev_no }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_prodelivery_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="edit_page" value="false">
+
+        <div class="scroll_div" style="float: left;">
+            <table>
+                <font size="4">調整後</font>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">工事(納入)予定日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_prodelivery_data_num == 0 %}
+                            <font size="5" color="black">{{ scheduled_date }}</font>
+                        {% elif prodelivery_data.scheduled_date == old_prodelivery_data.scheduled_date %}
+                            <font size="5" color="black">{{ scheduled_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ scheduled_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">工事(納入)時刻</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_prodelivery_data_num == 0 %}
+                            <font size="5" color="black">{{ scheduled_datime }}</font>
+                        {% elif prodelivery_data.scheduled_datime == old_prodelivery_data.scheduled_datime %}
+                            <font size="5" color="black">{{ scheduled_datime }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ scheduled_datime }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">納入日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_prodelivery_data_num == 0 %}
+                            <font size="5" color="black">{{ delivery_date }}</font>
+                        {% elif prodelivery_data.delivery_date == old_prodelivery_data.delivery_date %}
+                            <font size="5" color="black">{{ delivery_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ delivery_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">保管場所</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_prodelivery_data_num == 0 %}
+                            <font size="5" color="black">{{ storage_loc }}</font>
+                        {% elif prodelivery_data.storage_loc == old_prodelivery_data.storage_loc %}
+                            <font size="5" color="black">{{ storage_loc }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ storage_loc }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+            </table>
+        <!--UploadFileList        -->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+{% endblock %}

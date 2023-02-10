@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+<script language="javascript" type="text/javascript" charset="UTF-8" xmlns="http://www.w3.org/1999/html">
+
+function order_filter_call() {
+    var from_page = 10001;
+    var status1 = 100201;
+    var status2 = 100211;
+    var status3 = 0;
+    $.ajax({
+        url: "/imsds/parts/order_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'status1': status1,
+                'status2': status2,
+                'status3': status3,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#order_filter').empty();
+            $('#order_filter').html(data);
+            getorderdata(10001);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#order_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+$(function() {
+    $("#orderimportbtn").click(function() {
+        $("#floatBox1Dialog").dialog({
+            modal:true,
+            width: 400,
+            height: 220,
+            title:"受注データインポート画面",
+        });
+    });
+});
+function order_entry_page_open(a,b) {
+        var order_id = a ;
+        var from_page = 10001 ;
+        var copy_mode = b ;
+        $.ajax({
+                url: "/imsds/parts/order_entry_page/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'copy_mode': copy_mode,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#order_entry').empty();
+                    $('#stock_list').empty();
+                    $('#order_entry').html(data);
+                    $("#floatBox3Dialog").dialog({
+                        modal:true,
+                        width: 1750,
+                        height: 900,
+                        title:"受注登録画面",
+                    });
+                    get_allocation_list(order_id);
+                    stock_filter_call();
+                    //getstockdata(10001);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_entry').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function get_allocation_list(a) {
+        $("#loading3").show();
+        var order_id = a ;
+        var from_page = 10001 ;
+        $.ajax({
+                url: "/imsds/parts/allocation_list/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#allocation_result_list').empty();
+                    $('#allocation_result_list').html(data);
+                    $("#loading3").fadeOut();
+                    $("#allocation_result_list").fadeIn();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#allocation_result_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function stock_filter_call() {
+    var from_page = 10001;
+    var item_code = $('#item_code_oe').val();
+    $.ajax({
+        url: "/imsds/parts/stock_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#stock_filter').empty();
+            $('#stock_filter').html(data);
+            $('#selectitemcode7').val(item_code);
+            incidental_work_select_check();
+            getstockdata(10001);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#stock_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+function copy_entry(a,b) {
+        var order_id = a ;
+        var from_page = 10001 ;
+        var copy_mode = b;
+        $.ajax({
+                url: "/imsds/parts/order_entry_page/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'copy_mode': copy_mode,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#order_entry').empty();
+                    $('#stock_list').empty();
+                    $('#order_entry').html(data);
+                    $("#floatBox3Dialog").dialog({
+                        modal:true,
+                        width: 1750,
+                        height: 900,
+                        title:"受注登録画面",
+                    });
+                    incidental_work_check();
+                    get_allocation_list(order_id);
+                    stock_filter_call();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_entry').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function getstockdetail(a) {
+        var stock_id = a.replace( 's', '' );
+        var from_page = 0;
+        //alert(order_id);
+        $.ajax({
+                url: "/imsds/parts/stock_detail/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#stock_detail').empty();
+                    $('#stock_detail').html(data);
+
+                    $("#floatBox2Dialog").dialog({
+                        modal:true,
+                        width: 1600,
+                        height: 500,
+                        title:"詳細在庫画面",
+                    });
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#stock_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function incidental_work_select_check() {
+
+    if (document.getElementById("incidental_work_order1_oe").checked == true){
+        document.getElementById("incidental_work_order1_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order2_oe").checked == true){
+        document.getElementById("incidental_work_order2_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order3_oe").checked == true){
+        document.getElementById("incidental_work_order3_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order4_oe").checked == true){
+        document.getElementById("incidental_work_order4_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order5_oe").checked == true){
+        document.getElementById("incidental_work_order5_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order6_oe").checked == true){
+        document.getElementById("incidental_work_order6_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order7_oe").checked == true){
+        document.getElementById("incidental_work_order7_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order8_oe").checked == true){
+        document.getElementById("incidental_work_order8_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order9_oe").checked == true){
+        document.getElementById("incidental_work_order9_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order10_oe").checked == true){
+        document.getElementById("incidental_work_order10_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order11_oe").checked == true){
+        document.getElementById("incidental_work_order11_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order12_oe").checked == true){
+        document.getElementById("incidental_work_order12_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order13_oe").checked == true){
+        document.getElementById("incidental_work_order13_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order14_oe").checked == true){
+        document.getElementById("incidental_work_order14_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order15_oe").checked == true){
+        document.getElementById("incidental_work_order15_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order16_oe").checked == true){
+        document.getElementById("incidental_work_order16_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order17_oe").checked == true){
+        document.getElementById("incidental_work_order17_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order18_oe").checked == true){
+        document.getElementById("incidental_work_order18_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order19_oe").checked == true){
+        document.getElementById("incidental_work_order19_s").checked = true;
+    }
+    if (document.getElementById("incidental_work_order20_oe").checked == true){
+        document.getElementById("incidental_work_order20_s").checked = true;
+    }
+}
+
+window.onload = function() {
+        order_filter_call();
+};
+</script>
+<style type="text/css">
+#order_list{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:150px;
+}
+#stock_list{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+#allocation_result_list{display:none;}
+#loading3{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">受注管理</h2>
+    </div>
+
+    <div class="pagetitle">
+        <input type="hidden" id="this_page" value="1">
+        <div>
+            <input type="button" name="getorderdata" value=" 受注データ更新 " onclick="getorderdata(10001);">　　
+            <input type="button" name="order_entry" value="　　　受注　　　" onclick="order_entry_page_open(0,0);">
+        </div>
+    </div>
+    <div id="order_filter"></div>
+    <div>
+            受注リスト
+    </div>
+
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+
+    <div id="order_list" style="width: 1680px;">
+    </div>
+
+    <div id="floatBox3Dialog" style="display:none;">
+        <div id="order_entry">
+        </div>
+        <div id="loading3">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="allocation_result_list">
+        </div>
+        <div>
+            <h2 class="page-header">候補在庫　<input type="button" name="getstockdata" style="margin: 0px 0px 0px 25px;" value="　絞込　" onclick="getstockdata(10001);"></h2>
+        </div>
+        <div id="stock_filter"></div>
+        <div id="loading2">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="stock_list"></div>
+    </div>
+    <div id="floatBox2Dialog" style="display:none;">
+        <div id="stock_detail">
+        </div>
+    </div>
+{% endblock %}

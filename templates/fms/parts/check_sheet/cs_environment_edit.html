@@ -1,0 +1,860 @@
+<script>
+//大気汚染防止法_大気汚染物質発生施設届_種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function air_pollution_equip_ntfc_category_value_change() {
+    var target_air_pollution_equip_ntfc_category = $('#air_pollution_equip_ntfc_category').val();
+    if (target_air_pollution_equip_ntfc_category != "") {
+        var pulldown_option = document.getElementById("sel_air_pollution_equip_ntfc_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_air_pollution_equip_ntfc_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//大気汚染防止法_大気汚染物質発生施設届_設置/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function air_pollution_equip_ntfc_motive_value_change() {
+    var target_air_pollution_equip_ntfc_motive = $('#air_pollution_equip_ntfc_motive').val();
+    if (target_air_pollution_equip_ntfc_motive != "") {
+        var pulldown_option = document.getElementById("sel_air_pollution_equip_ntfc_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_air_pollution_equip_ntfc_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//大気汚染防止法_大気汚染物質発生施設廃止届_種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function air_pollution_repeal_equip_ntfc_category_value_change() {
+    var target_air_pollution_repeal_equip_ntfc_category = $('#air_pollution_repeal_equip_ntfc_category').val();
+    if (target_air_pollution_repeal_equip_ntfc_category != "") {
+        var pulldown_option = document.getElementById("sel_air_pollution_repeal_equip_ntfc_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_air_pollution_repeal_equip_ntfc_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//大気汚染防止法_揮発性有機化合物発生施設届_扱いのコンボボックスの選択を呼び出した値(引数?)と同期
+function air_pollution_voc_ntfc_action_value_change() {
+    var target_air_pollution_voc_ntfc_action = $('#air_pollution_voc_ntfc_action').val();
+    if (target_air_pollution_voc_ntfc_action != "") {
+        var pulldown_option = document.getElementById("sel_air_pollution_voc_ntfc_action").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_air_pollution_voc_ntfc_action){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//水質汚濁防止法_特定施設届_扱いのコンボボックスの選択を呼び出した値(引数?)と同期
+function water_pollution_ntfc_action_value_change() {
+    var target_water_pollution_ntfc_action = $('#water_pollution_ntfc_action').val();
+    if (target_water_pollution_ntfc_action != "") {
+        var pulldown_option = document.getElementById("sel_water_pollution_ntfc_action").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_water_pollution_ntfc_action){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//廃棄物処理法_産業廃棄物処理施設申請_設置/変更のコンボボックスの選択を呼び出した値(引数?)と同期
+function waste_equip_app_motive_value_change() {
+    var target_waste_equip_app_motive = $('#waste_equip_app_motive').val();
+    if (target_waste_equip_app_motive != "") {
+        var pulldown_option = document.getElementById("sel_waste_equip_app_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_waste_equip_app_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//県生活環境保全条例_指定施設届_種類のコンボボックスの選択を呼び出した値(引数?)と同期
+function living_env_equip_ntfc_category_value_change() {
+    var target_living_env_equip_ntfc_category = $('#living_env_equip_ntfc_category').val();
+    if (target_living_env_equip_ntfc_category != "") {
+        var pulldown_option = document.getElementById("sel_living_env_equip_ntfc_category").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_living_env_equip_ntfc_category){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//県生活環境保全条例_指定施設届_扱いのコンボボックスの選択を呼び出した値(引数?)と同期
+function living_env_equip_ntfc_action_value_change() {
+    var target_living_env_equip_ntfc_action = $('#living_env_equip_ntfc_action').val();
+    if (target_living_env_equip_ntfc_action != "") {
+        var pulldown_option = document.getElementById("sel_living_env_equip_ntfc_action").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_living_env_equip_ntfc_action){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//浄化槽法_浄化槽届出_改廃のコンボボックスの選択を呼び出した値(引数?)と同期
+function water_purification_tanks_ntfc_amendment_value_change() {
+    var target_water_purification_tanks_ntfc_amendment = $('#water_purification_tanks_ntfc_amendment').val();
+    if (target_water_purification_tanks_ntfc_amendment != "") {
+        var pulldown_option = document.getElementById("sel_water_purification_tanks_ntfc_amendment").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_water_purification_tanks_ntfc_amendment){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//大気汚染防止法_大気汚染物質発生施設届_種類のコンボボックスを変更したときに選択値と格納値を同期
+function air_pollution_equip_ntfc_category_change(a) {
+    var value = a;
+    $('#air_pollution_equip_ntfc_category').val(value);
+}
+
+//大気汚染防止法_大気汚染物質発生施設届_設置/変更のコンボボックスを変更したときに選択値と格納値を同期
+function air_pollution_equip_ntfc_motive_change(a) {
+    var value = a;
+    $('#air_pollution_equip_ntfc_motive').val(value);
+}
+
+//大気汚染防止法_大気汚染物質発生施設廃止届_種類のコンボボックスを変更したときに選択値と格納値を同期
+function air_pollution_repeal_equip_ntfc_category_change(a) {
+    var value = a;
+    $('#air_pollution_repeal_equip_ntfc_category').val(value);
+}
+
+//大気汚染防止法_揮発性有機化合物発生施設届_扱いのコンボボックスを変更したときに選択値と格納値を同期
+function air_pollution_voc_ntfc_action_change(a) {
+    var value = a;
+    $('#air_pollution_voc_ntfc_action').val(value);
+}
+
+//水質汚濁防止法_特定施設届_扱いのコンボボックスを変更したときに選択値と格納値を同期
+function water_pollution_ntfc_action_change(a) {
+    var value = a;
+    $('#water_pollution_ntfc_action').val(value);
+}
+
+//廃棄物処理法_産業廃棄物処理施設申請_設置/変更のコンボボックスを変更したときに選択値と格納値を同期
+function waste_equip_app_motive_change(a) {
+    var value = a;
+    $('#waste_equip_app_motive').val(value);
+}
+
+//県生活環境保全条例_指定施設届_種類のコンボボックスを変更したときに選択値と格納値を同期
+function living_env_equip_ntfc_category_change(a) {
+    var value = a;
+    $('#living_env_equip_ntfc_category').val(value);
+}
+
+//県生活環境保全条例_指定施設届_扱いのコンボボックスを変更したときに選択値と格納値を同期
+function living_env_equip_ntfc_action_change(a) {
+    var value = a;
+    $('#living_env_equip_ntfc_action').val(value);
+}
+
+//浄化槽法_浄化槽届出_改廃のコンボボックスを変更したときに選択値と格納値を同期
+function water_purification_tanks_ntfc_amendment_change(a) {
+    var value = a;
+    $('#water_purification_tanks_ntfc_amendment').val(value);
+}
+
+// チェックボックスの状態同期
+function cs_env_check_box_change(){
+    if($('#air_pollution_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_air_pollution_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_air_pollution_equip_ntfc").checked = 0;
+    }
+    if($('#air_pollution_repeal_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_air_pollution_repeal_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_air_pollution_repeal_equip_ntfc").checked = 0;
+    }
+    if($('#air_pollution_voc_ntfc').val() == "True")
+    {
+        document.getElementById("sel_air_pollution_voc_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_air_pollution_voc_ntfc").checked = 0;
+    }
+    if($('#air_pollution_particulates_ntfc').val() == "True")
+    {
+        document.getElementById("sel_air_pollution_particulates_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_air_pollution_particulates_ntfc").checked = 0;
+    }
+    if($('#water_pollution_ntfc').val() == "True")
+    {
+        document.getElementById("sel_water_pollution_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_water_pollution_ntfc").checked = 0;
+    }
+    if($('#soil_contamination_ntfc').val() == "True")
+    {
+        document.getElementById("sel_soil_contamination_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_soil_contamination_ntfc").checked = 0;
+    }
+    if($('#waste_equip_app').val() == "True")
+    {
+        document.getElementById("sel_waste_equip_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_waste_equip_app").checked = 0;
+    }
+    if($('#waste_repeal_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_waste_repeal_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_waste_repeal_equip_ntfc").checked = 0;
+    }
+    if($('#management_freon_plan').val() == "True")
+    {
+        document.getElementById("sel_management_freon_plan").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_management_freon_plan").checked = 0;
+    }
+    if($('#living_env_equip_ntfc').val() == "True")
+    {
+        document.getElementById("sel_living_env_equip_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_living_env_equip_ntfc").checked = 0;
+    }
+    if($('#living_env_nox_emission_plan_ntfc').val() == "True")
+    {
+        document.getElementById("sel_living_env_nox_emission_plan_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_living_env_nox_emission_plan_ntfc").checked = 0;
+    }
+    if($('#living_env_soil_survey').val() == "True")
+    {
+        document.getElementById("sel_living_env_soil_survey").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_living_env_soil_survey").checked = 0;
+    }
+    if($('#living_env_water_pumping_app').val() == "True")
+    {
+        document.getElementById("sel_living_env_water_pumping_app").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_living_env_water_pumping_app").checked = 0;
+    }
+    if($('#pollution_agree_consultation').val() == "True")
+    {
+        document.getElementById("sel_pollution_agree_consultation").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_pollution_agree_consultation").checked = 0;
+    }
+    if($('#titanium_compatible_report').val() == "True")
+    {
+        document.getElementById("sel_titanium_compatible_report").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_titanium_compatible_report").checked = 0;
+    }
+    if($('#water_purification_tanks_ntfc').val() == "True")
+    {
+        document.getElementById("sel_water_purification_tanks_ntfc").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_water_purification_tanks_ntfc").checked = 0;
+    }
+}
+
+//入力項目の未入力、文字数オーバーをチェック
+function input_env_check(a,b,d) {  // a:自工程id, b:次工程id,  d:action_cd
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var ng_count = 0;
+    var msg = "";
+    var alert_ng_ch_msg_str = ""
+
+    //必須入力チェック
+
+    // 大気汚染防止法_大気汚染物質発生施設届
+    var air_pollution_equip_ntfc = $('#sel_air_pollution_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_air_pollution_equip_ntfc_category').val() == "" && air_pollution_equip_ntfc){
+        $('#sel_air_pollution_equip_ntfc_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_air_pollution_equip_ntfc_category').css('background-color','white');
+    }
+    if ($('#sel_air_pollution_equip_ntfc_motive').val() == "" && air_pollution_equip_ntfc){
+        $('#sel_air_pollution_equip_ntfc_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_air_pollution_equip_ntfc_motive').css('background-color','white');
+    }
+
+    // 大気汚染防止法_大気汚染物質発生施設廃止届
+    var air_pollution_repeal_equip_ntfc = $('#sel_air_pollution_repeal_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_air_pollution_repeal_equip_ntfc_category').val() == "" && air_pollution_repeal_equip_ntfc){
+        $('#sel_air_pollution_repeal_equip_ntfc_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_air_pollution_repeal_equip_ntfc_category').css('background-color','white');
+    }
+
+    // 大気汚染防止法_揮発性有機化合物発生施設届
+    var air_pollution_voc_ntfc = $('#sel_air_pollution_voc_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_air_pollution_voc_ntfc_action').val() == "" && air_pollution_voc_ntfc){
+        $('#sel_air_pollution_voc_ntfc_action').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_air_pollution_voc_ntfc_action').css('background-color','white');
+    }
+
+    // 水質汚濁防止法_特定施設届
+    var water_pollution_ntfc = $('#sel_water_pollution_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_water_pollution_ntfc_action').val() == "" && water_pollution_ntfc){
+        $('#sel_water_pollution_ntfc_action').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_water_pollution_ntfc_action').css('background-color','white');
+    }
+
+    // 廃棄物処理法_産業廃棄物処理施設申請
+    var waste_equip_app = $('#sel_waste_equip_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_waste_equip_app_motive').val() == "" && waste_equip_app){
+        $('#sel_waste_equip_app_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_waste_equip_app_motive').css('background-color','white');
+    }
+
+    // 県生活環境保全条例_指定施設届
+    var living_env_equip_ntfc = $('#sel_living_env_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_living_env_equip_ntfc_category').val() == "" && living_env_equip_ntfc){
+        $('#sel_living_env_equip_ntfc_category').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_living_env_equip_ntfc_category').css('background-color','white');
+    }
+    if ($('#sel_living_env_equip_ntfc_action').val() == "" && living_env_equip_ntfc){
+        $('#sel_living_env_equip_ntfc_action').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_living_env_equip_ntfc_action').css('background-color','white');
+    }
+
+    // 浄化槽法_浄化槽届出
+    var water_purification_tanks_ntfc = $('#sel_water_purification_tanks_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_water_purification_tanks_ntfc_amendment').val() == "" && water_purification_tanks_ntfc){
+        $('#sel_water_purification_tanks_ntfc_amendment').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_water_purification_tanks_ntfc_amendment').css('background-color','white');
+    }
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //警告表示
+    if ( ng_flag > 0 ) {
+        msg += '環境管轄タブに未入力項目があります！！\n';
+    }
+    if ( ng_str_count_flag > 0 ) {
+        msg += '環境管轄タブにて文字数オーバーの項目があります！！\n';
+    }
+    if ( alert_ng_ch_msg_str.length > 0 ) {
+        msg += '環境管轄タブにて' + alert_ng_ch_msg_str;
+    }
+    if ( msg.length > 0 ) {
+        alert(msg);
+    }
+    ng_count = ng_all_flag;
+    return ng_count;
+}
+
+//データ登録･更新処理
+function cs_env_edit(a,b) {  // a:自工程id, b:次工程id
+        //完了を通知するためのDeferredオブジェクトを作成
+        var deferred = new $.Deferred();
+        if ($('#env_edit_flag').val() != 1){
+            deferred.resolve();
+            //完了を知らせるためにpromiseオブジェクトを返す
+            return deferred.promise();
+        }
+
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var budget_id = $('#target_budget_id').val();
+        //var work_id = $('#work_id').val();
+        var cs_no = $('#cs_no').val();
+        var cs_rev_no = $('#cs_rev_no').val();
+        var air_pollution_equip_ntfc = $('#sel_air_pollution_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var air_pollution_equip_ntfc_category = $('#sel_air_pollution_equip_ntfc_category').val();
+        var air_pollution_equip_ntfc_motive = $('#sel_air_pollution_equip_ntfc_motive').val();
+        var air_pollution_repeal_equip_ntfc = $('#sel_air_pollution_repeal_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var air_pollution_repeal_equip_ntfc_category = $('#sel_air_pollution_repeal_equip_ntfc_category').val();
+        var air_pollution_voc_ntfc = $('#sel_air_pollution_voc_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var air_pollution_voc_ntfc_action = $('#sel_air_pollution_voc_ntfc_action').val();
+        var air_pollution_particulates_ntfc = $('#sel_air_pollution_particulates_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var water_pollution_ntfc = $('#sel_water_pollution_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var water_pollution_ntfc_action = $('#sel_water_pollution_ntfc_action').val();
+        var soil_contamination_ntfc = $('#sel_soil_contamination_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var waste_equip_app = $('#sel_waste_equip_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var waste_equip_app_motive = $('#sel_waste_equip_app_motive').val();
+        var waste_repeal_equip_ntfc = $('#sel_waste_repeal_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var management_freon_plan = $('#sel_management_freon_plan').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var living_env_equip_ntfc = $('#sel_living_env_equip_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var living_env_equip_ntfc_category = $('#sel_living_env_equip_ntfc_category').val();
+        var living_env_equip_ntfc_action = $('#sel_living_env_equip_ntfc_action').val();
+        var living_env_nox_emission_plan_ntfc = $('#sel_living_env_nox_emission_plan_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var living_env_soil_survey = $('#sel_living_env_soil_survey').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var living_env_water_pumping_app = $('#sel_living_env_water_pumping_app').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var pollution_agree_consultation = $('#sel_pollution_agree_consultation').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var titanium_compatible_report = $('#sel_titanium_compatible_report').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var water_purification_tanks_ntfc = $('#sel_water_purification_tanks_ntfc').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var water_purification_tanks_ntfc_amendment = $('#sel_water_purification_tanks_ntfc_amendment').val();
+        var comment = $('#comment').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if(document.getElementById("ga_edit_flag").value != 1
+           && document.getElementById("sh_edit_flag").value != 1){
+            var env_edit_flag = $('#env_edit_flag').val();
+        }
+        else{
+            var env_edit_flag = 0;
+        }
+        $.ajax({
+                url: "/isk_tools/fms/action/cs_environment_entry/",
+                type: "POST",
+                data : {
+                    'user_attribute_id' : user_attribute_id,
+                    'this_step' : this_step,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'next_step' : next_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'budget_id' : budget_id,
+                    //'work_id' : work_id,
+                    'env_edit_flag': env_edit_flag,
+                    'cs_no': cs_no,
+                    'cs_rev_no': cs_rev_no,
+                    'air_pollution_equip_ntfc': air_pollution_equip_ntfc,
+                    'air_pollution_equip_ntfc_category': air_pollution_equip_ntfc_category,
+                    'air_pollution_equip_ntfc_motive': air_pollution_equip_ntfc_motive,
+                    'air_pollution_repeal_equip_ntfc': air_pollution_repeal_equip_ntfc,
+                    'air_pollution_repeal_equip_ntfc_category': air_pollution_repeal_equip_ntfc_category,
+                    'air_pollution_voc_ntfc': air_pollution_voc_ntfc,
+                    'air_pollution_voc_ntfc_action': air_pollution_voc_ntfc_action,
+                    'air_pollution_particulates_ntfc': air_pollution_particulates_ntfc,
+                    'water_pollution_ntfc': water_pollution_ntfc,
+                    'water_pollution_ntfc_action': water_pollution_ntfc_action,
+                    'soil_contamination_ntfc': soil_contamination_ntfc,
+                    'waste_equip_app': waste_equip_app,
+                    'waste_equip_app_motive': waste_equip_app_motive,
+                    'waste_repeal_equip_ntfc': waste_repeal_equip_ntfc,
+                    'management_freon_plan': management_freon_plan,
+                    'living_env_equip_ntfc': living_env_equip_ntfc,
+                    'living_env_equip_ntfc_category': living_env_equip_ntfc_category,
+                    'living_env_equip_ntfc_action': living_env_equip_ntfc_action,
+                    'living_env_nox_emission_plan_ntfc': living_env_nox_emission_plan_ntfc,
+                    'living_env_soil_survey': living_env_soil_survey,
+                    'living_env_water_pumping_app': living_env_water_pumping_app,
+                    'pollution_agree_consultation': pollution_agree_consultation,
+                    'titanium_compatible_report': titanium_compatible_report,
+                    'water_purification_tanks_ntfc': water_purification_tanks_ntfc,
+                    'water_purification_tanks_ntfc_amendment': water_purification_tanks_ntfc_amendment,
+                    'comment' : comment,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                async: false,
+                cache : false,
+                })
+                .done(function(data){
+                    //新規登録、リビジョン変更時 画面のinputに反映
+                    var this_cs_id = data.cs_no
+                    $('#cs_no').val(this_cs_id);
+                    var this_cs_rev_no = data.cs_rev_no
+                    $('#cs_rev_no').val(this_cs_rev_no);
+                    var this_budget_id = data.budget_id;
+                    $('#target_budget_id').val(this_budget_id);
+
+                    //完了を通知
+                    deferred.resolve();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    //失敗を通知
+                    deferred.reject();
+                });
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+
+
+</script>
+
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+
+select {
+    font-size: 100%;
+    height:auto;
+}
+
+input[type=checkbox] {
+    width: 20px;
+    height: 20px;
+}
+
+table {
+    line-height: initial;
+    font-size: 100%;
+    height:100px;
+}
+
+
+/*
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+*/
+</style>
+
+<!--    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">-->
+    <div class="fms_col" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="cs_no" value="{{ cs_no }}">
+<!--    <input type="hidden" id="target_budget_id" value="{{ budget_id }}">-->
+<!--    <input type="hidden" id="work_id" value="{{ work_id }}">-->
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="cs_rev_no" value="{{cs_rev_no}}">
+    <input type="hidden" id="air_pollution_equip_ntfc" value="{{ air_pollution_equip_ntfc }}">
+    <input type="hidden" id="air_pollution_equip_ntfc_category" value="{{ air_pollution_equip_ntfc_category }}">
+    <input type="hidden" id="air_pollution_equip_ntfc_motive" value="{{ air_pollution_equip_ntfc_motive }}">
+    <input type="hidden" id="air_pollution_repeal_equip_ntfc" value="{{ air_pollution_repeal_equip_ntfc }}">
+    <input type="hidden" id="air_pollution_repeal_equip_ntfc_category" value="{{ air_pollution_repeal_equip_ntfc_category }}">
+    <input type="hidden" id="air_pollution_voc_ntfc" value="{{ air_pollution_voc_ntfc }}">
+    <input type="hidden" id="air_pollution_voc_ntfc_action" value="{{ air_pollution_voc_ntfc_action }}">
+    <input type="hidden" id="air_pollution_particulates_ntfc" value="{{ air_pollution_particulates_ntfc }}">
+    <input type="hidden" id="water_pollution_ntfc" value="{{ water_pollution_ntfc }}">
+    <input type="hidden" id="water_pollution_ntfc_action" value="{{ water_pollution_ntfc_action }}">
+    <input type="hidden" id="soil_contamination_ntfc" value="{{ soil_contamination_ntfc }}">
+    <input type="hidden" id="waste_equip_app" value="{{ waste_equip_app }}">
+    <input type="hidden" id="waste_equip_app_motive" value="{{ waste_equip_app_motive }}">
+    <input type="hidden" id="waste_repeal_equip_ntfc" value="{{ waste_repeal_equip_ntfc }}">
+    <input type="hidden" id="management_freon_plan" value="{{ management_freon_plan }}">
+    <input type="hidden" id="living_env_equip_ntfc" value="{{ living_env_equip_ntfc }}">
+    <input type="hidden" id="living_env_equip_ntfc_category" value="{{ living_env_equip_ntfc_category }}">
+    <input type="hidden" id="living_env_equip_ntfc_action" value="{{ living_env_equip_ntfc_action }}">
+    <input type="hidden" id="living_env_nox_emission_plan_ntfc" value="{{ living_env_nox_emission_plan_ntfc }}">
+    <input type="hidden" id="living_env_soil_survey" value="{{ living_env_soil_survey }}">
+    <input type="hidden" id="living_env_water_pumping_app" value="{{ living_env_water_pumping_app }}">
+    <input type="hidden" id="pollution_agree_consultation" value="{{ pollution_agree_consultation }}">
+    <input type="hidden" id="titanium_compatible_report" value="{{ titanium_compatible_report }}">
+    <input type="hidden" id="water_purification_tanks_ntfc" value="{{ water_purification_tanks_ntfc }}">
+    <input type="hidden" id="water_purification_tanks_ntfc_amendment" value="{{ water_purification_tanks_ntfc_amendment }}">
+    <input type="hidden" id="env_edit_flag" value="{{env_edit_flag}}">
+    </div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div style="float:left;">
+        <table class=cs_environment_edit_table">
+            <tr>
+                <th><div><font size="6" style="line-height:130%">大気汚染防止法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_air_pollution_equip_ntfc" value="1"></font>
+                <font size="4">
+                    <select id="sel_air_pollution_equip_ntfc_category" name="sel_air_pollution_equip_ntfc_category" onchange="air_pollution_equip_ntfc_category_change(value);">
+                    <option hidden value="">大気汚染物質種類</option>
+                        {% for air_pollution_equip_ntfc_category_list in air_pollution_equip_ntfc_category_list %}
+                            <option value="{{ air_pollution_equip_ntfc_category_list.category }}">{{ air_pollution_equip_ntfc_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="5"><label for="sel_air_pollution_equip_ntfc">発生施設</label></font>
+                <font size="4">
+                <select id="sel_air_pollution_equip_ntfc_motive" name="sel_air_pollution_equip_ntfc_motive" onchange="air_pollution_equip_ntfc_motive_change(value);">
+                <option hidden value="">設定/変更</option>
+                    {% for air_pollution_equip_ntfc_motive_list in air_pollution_equip_ntfc_motive_list %}
+                        <option value="{{ air_pollution_equip_ntfc_motive_list.motive }}">{{ air_pollution_equip_ntfc_motive_list.motive }}</option>
+                    {% endfor %}
+                </select>
+                </font>
+                <font size="5"><label for="sel_air_pollution_equip_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・60日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_air_pollution_repeal_equip_ntfc" value="1"></font>
+                <font size="4">
+                    <select id="sel_air_pollution_repeal_equip_ntfc_category" name="sel_air_pollution_repeal_equip_ntfc_category" onchange="air_pollution_repeal_equip_ntfc_category_change(value);">
+                    <option hidden value="">大気汚染物質種類</option>
+                        {% for air_pollution_repeal_equip_ntfc_category_list in air_pollution_repeal_equip_ntfc_category_list %}
+                            <option value="{{ air_pollution_repeal_equip_ntfc_category_list.category }}">{{ air_pollution_repeal_equip_ntfc_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_air_pollution_repeal_equip_ntfc">発生施設廃止届</label></font></div></td>
+                <td><div><font size="5">・・・廃止後30日</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_air_pollution_voc_ntfc" value="1">揮発性有機化合物発生施設</label></font>
+                <font size="4">
+                    <select id="sel_air_pollution_voc_ntfc_action" name="sel_air_pollution_voc_ntfc_action" onchange="air_pollution_voc_ntfc_action_change(value);">
+                    <option hidden value="">扱い</option>
+                        {% for air_pollution_voc_ntfc_action_list in air_pollution_voc_ntfc_action_list %}
+                            <option value="{{ air_pollution_voc_ntfc_action_list.action }}">{{ air_pollution_voc_ntfc_action_list.action }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_air_pollution_voc_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・60日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_air_pollution_particulates_ntfc" value="1">大気汚染防止法_特定粉じん排出等作業実施届出</label></font>
+                <td><div><font size="5">・・・14日前</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">水質汚濁防止法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_water_pollution_ntfc" value="1">特定施設</label></font>
+                <font size="4">
+                    <select id="sel_water_pollution_ntfc_action" name="sel_water_pollution_ntfc_action" onchange="water_pollution_ntfc_action_change(value);">
+                    <option hidden value="">扱い</option>
+                        {% for water_pollution_ntfc_action_list in water_pollution_ntfc_action_list %}
+                            <option value="{{ water_pollution_ntfc_action_list.action }}">{{ water_pollution_ntfc_action_list.action }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_water_pollution_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・60日前</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">土壌汚染対策法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_soil_contamination_ntfc" value="1">土地形質変更(900㎡以上)届</label></font></div></td>
+                <td><div><font size="5">・・・30日前</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">廃棄物処理法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_waste_equip_app" value="1">産業廃棄物処理施設</label></font>
+                <font size="4">
+                    <select id="sel_waste_equip_app_motive" name="sel_waste_equip_app_motive" onchange="waste_equip_app_motive_change(value);">
+                    <option hidden value="">設置/変更</option>
+                        {% for waste_equip_app_motive_list in waste_equip_app_motive_list %}
+                            <option value="{{ waste_equip_app_motive_list.motive }}">{{ waste_equip_app_motive_list.motive }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_waste_equip_app">申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_waste_repeal_equip_ntfc" value="1">産業廃棄物処理施設廃止届</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">フロン排出抑制法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_management_freon_plan" value="1">行程管理票</label></font></div></td>
+                <td><div><font size="5">・・・処分時</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">県生活環境保全条例</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_living_env_equip_ntfc" value="1"></font>
+                <font size="4">
+                    <select id="sel_living_env_equip_ntfc_category" name="sel_living_env_equip_ntfc_category" onchange="living_env_equip_ntfc_category_change(value);">
+                    <option hidden value="">大気汚染物質種類</option>
+                        {% for living_env_equip_ntfc_category_list in living_env_equip_ntfc_category_list %}
+                            <option value="{{ living_env_equip_ntfc_category_list.category }}">{{ living_env_equip_ntfc_category_list.category }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="5"><label for="sel_living_env_equip_ntfc">指定施設</label></font>
+                <font size="4">
+                    <select id="sel_living_env_equip_ntfc_action" name="sel_living_env_equip_ntfc_action" onchange="living_env_equip_ntfc_action_change(value);">
+                    <option hidden value="">扱い</option>
+                        {% for living_env_equip_ntfc_action_list in living_env_equip_ntfc_action_list %}
+                            <option value="{{ living_env_equip_ntfc_action_list.action }}">{{ living_env_equip_ntfc_action_list.action }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_living_env_equip_ntfc">届</label></font></div></td>
+                <td><div><font size="5">・・・60日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_living_env_nox_emission_plan_ntfc" value="1">窒素酸化物排出計画届</label></font></div></td>
+                <td><div><font size="5">・・・60日前</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_living_env_soil_survey" value="1">土地の形質変更時の土壌調査(300㎡以上)</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_living_env_water_pumping_app" value="1">揚水設備届出/申請</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">市公害防止協定</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_pollution_agree_consultation" value="1">協定に基づく事前協議</label></font></div></td>
+                <td><div><font size="5">・・・大気・水質届前</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">チタン鉱石問題対応方針</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_titanium_compatible_report" value="1"></font>
+                <font size="5"><label for="sel_titanium_compatible_report">旧処分場/旧沈殿池の跡地利用を</label></font><br/>
+                <font size="5"><label for="sel_titanium_compatible_report">　実施するときの報告</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">浄化槽法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_water_purification_tanks_ntfc" value="1">浄化槽</label></font>
+                <font size="4">
+                    <select id="sel_water_purification_tanks_ntfc_amendment" name="sel_water_purification_tanks_ntfc_amendment" onchange="water_purification_tanks_ntfc_amendment_change(value);">
+                    <option hidden value="">改廃</option>
+                        {% for water_purification_tanks_ntfc_amendment_list in water_purification_tanks_ntfc_amendment_list %}
+                            <option value="{{ water_purification_tanks_ntfc_amendment_list.amendment}}">{{ water_purification_tanks_ntfc_amendment_list.amendment}}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                    <font size="5"><label for="sel_water_purification_tanks_ntfc">届出</label></font></div></td>
+                <td><div><font size="5">・・・あらかじめ・事後</font></div></td>
+            </tr>
+        </table>
+    </div>
+<!--    <div style="float:left;width:30px;" >　　</div>-->
+<!--    <div style="float:left;" >-->
+<!--        <table>-->
+<!--            <tr>-->
+<!--                <th><div><font size="6" style="line-height:130%">労働安全衛生法</font></div></td>-->
+<!--            </tr>-->
+<!--        </table>-->
+<!--    </div>-->
+    <div style="clear: both;"></div>
+
+    </div><!--ng_character_checkここまで-->

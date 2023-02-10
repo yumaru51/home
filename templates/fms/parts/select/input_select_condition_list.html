@@ -1,0 +1,8 @@
+                            <option value=""></option>
+                    {% for condition_list in condition_list %}
+                        {% if condition_list.m_condition_cd_skey == phenomenon_data.m_condition_cd_skey %}
+                            <option value="{{ condition_list.m_condition_cd_skey }}" selected>{{ condition_list.condition_nm_1 }}</option>
+                        {% else %}
+                            <option value="{{ condition_list.m_condition_cd_skey }}">{{ condition_list.condition_nm_1 }}</option>
+                        {% endif %}
+                    {% endfor %}

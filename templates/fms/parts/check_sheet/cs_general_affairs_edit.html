@@ -1,0 +1,318 @@
+<script>
+//工場立地法のコンボボックスの選択を呼び出した値(引数?)と同期
+function factory_location_act_motive_value_change() {
+    var target_factory_location_act_motive = $('#factory_location_act_motive').val();
+    if (target_factory_location_act_motive != "") {
+        var pulldown_option = document.getElementById("sel_factory_location_act_motive").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_factory_location_act_motive){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }
+}
+
+//工場立地法のコンボボックスを変更したときに選択値と格納値を同期
+function factory_location_act_motive_change(a) {
+    var value = a;
+    $('#factory_location_act_motive').val(value);
+}
+
+// チェックボックスの状態を同期
+function cs_ga_check_box_change(){
+    if($('#factory_location_act').val() == "True")
+    {
+        document.getElementById("sel_factory_location_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_factory_location_act").checked = 0;
+    }
+    if($('#port_harbour_act').val() == "True")
+    {
+        document.getElementById("sel_port_harbour_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_port_harbour_act").checked = 0;
+    }
+    if($('#port_regulations').val() == "True")
+    {
+        document.getElementById("sel_port_regulations").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_port_regulations").checked = 0;
+    }
+    if($('#buildings_regulations').val() == "True")
+    {
+        document.getElementById("sel_buildings_regulations").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_buildings_regulations").checked = 0;
+    }
+    if($('#cityscape_regulations').val() == "True")
+    {
+        document.getElementById("sel_cityscape_regulations").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_cityscape_regulations").checked = 0;
+    }
+
+}
+
+//入力項目の未入力、文字数オーバーをチェック
+function input_ga_check(a,b,d) {  // a:自工程id, b:次工程id,  d:action_cd
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var ng_count = 0;
+    var msg = "";
+    var alert_ng_ch_msg_str = ""
+
+    //必須入力チェック
+
+    // 工事立地法
+    var factory_location_act = $('#sel_factory_location_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+    if ($('#sel_factory_location_act_motive').val() == "" && factory_location_act){
+        $('#sel_factory_location_act_motive').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_factory_location_act_motive').css('background-color','white');
+    }
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //警告表示
+    if ( ng_flag > 0 ) {
+        msg += '総務管轄タブにて未入力項目があります！！\n';
+    }
+    if ( ng_str_count_flag > 0 ) {
+        msg += '総務管轄タブにて文字数オーバーの項目があります！！\n';
+    }
+    if ( alert_ng_ch_msg_str.length > 0 ) {
+        msg += '総務管轄タブにて' + alert_ng_ch_msg_str;
+    }
+    if ( msg.length > 0 ) {
+        alert(msg);
+    }
+    ng_count = ng_all_flag;
+    return ng_count;
+}
+
+//データ登録･更新処理
+function cs_ga_edit(a,b) {  // a:自工程id, b:次工程id
+        //完了を通知するためのDeferredオブジェクトを作成
+        var deferred = new $.Deferred();
+        if ($('#ga_edit_flag').val() != 1){
+            deferred.resolve();
+            //完了を知らせるためにpromiseオブジェクトを返す
+            return deferred.promise();
+        }
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var budget_id = $('#target_budget_id').val();
+        //var work_id = $('#work_id').val();
+        var cs_no = $('#cs_no').val();
+        var cs_rev_no = $('#cs_rev_no').val();
+        var factory_location_act = $('#sel_factory_location_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var motive = $('#sel_factory_location_act_motive').val();
+        var port_harbour_act = $('#sel_port_harbour_act').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var port_regulations = $('#sel_port_regulations').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var buildings_regulations = $('#sel_buildings_regulations').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var cityscape_regulations = $('#sel_cityscape_regulations').prop('checked') - 0;//Booleanを数値に変換(True/Falseが文字列になってしまうため)
+        var comment = $('#comment').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/cs_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'budget_id' : budget_id,
+                    //'work_id' : work_id,
+                    'cs_no': cs_no,
+                    'cs_rev_no': cs_rev_no,
+                    'factory_location_act': factory_location_act,
+                    'motive': motive,
+                    'port_harbour_act': port_harbour_act,
+                    'port_regulations': port_regulations,
+                    'buildings_regulations': buildings_regulations,
+                    'cityscape_regulations': cityscape_regulations,
+                    'comment' : comment,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                async: false,
+                cache: false,
+                })
+                .done(function(data){
+                    //新規登録、リビジョン変更時 画面のinputに反映
+                    var this_cs_id = data.cs_no
+                    $('#cs_no').val(this_cs_id);
+                    $('#target_id').val(this_cs_id);
+                    var this_cs_rev_no = data.cs_rev_no
+                    $('#cs_rev_no').val(this_cs_rev_no);
+                    var this_budget_id = data.budget_id;
+                    $('#target_budget_id').val(this_budget_id);
+
+                    //完了を通知
+                    deferred.resolve();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    //失敗を通知
+                    deferred.reject();
+                });
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+
+
+
+</script>
+
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+
+select {
+    font-size: 100%;
+    height:auto;
+    background: #FDFDAD;
+}
+
+input[type=checkbox] {
+    width: 20px;
+    height: 20px;
+}
+
+table {
+    line-height: initial;
+    font-size: 100%;
+    height:100px;
+}
+
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+
+/*
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+*/
+</style>
+
+<!--    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">-->
+    <div class="fms_col" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="cs_no" value="{{ cs_no }}">
+<!--    <input type="hidden" id="target_budget_id" value="{{ budget_id }}">-->
+<!--    <input type="hidden" id="work_id" value="{{ work_id }}">-->
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="cs_rev_no" value="{{cs_rev_no}}">
+    <input type="hidden" id="factory_location_act" value="{{factory_location_act}}">
+    <input type="hidden" id="port_harbour_act" value="{{port_harbour_act}}">
+    <input type="hidden" id="port_regulations" value="{{port_regulations}}">
+    <input type="hidden" id="buildings_regulations" value="{{buildings_regulations}}">
+    <input type="hidden" id="cityscape_regulations" value="{{cityscape_regulations}}">
+    <input type="hidden" id="ga_edit_flag" value="{{ga_edit_flag}}">
+    </div>
+    <div id="cs_ga_action_button" style="width: auto;"></div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div style="float:left;">
+
+        <table class="cs_general_affairs_table">
+            <tr>
+                <th><div><font size="6" style="line-height:130%">工事立地法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_factory_location_act" value="1">特定工場</label></font>
+                <font size="4">
+                    <input type="hidden" id="factory_location_act_motive" value="{{ factory_location_act_motive }}">
+                    <select id="sel_factory_location_act_motive" name="sel_factory_location_act_motive" onchange="factory_location_act_motive_change(value);">
+                    <option hidden value="">設置/変更</option>
+                        {% for factory_location_act_motive_list in factory_location_act_motive_list %}
+                            <option value="{{ factory_location_act_motive_list.motive }}">{{ factory_location_act_motive_list.motive }}</option>
+                        {% endfor %}
+                    </select>
+                </font>
+                <font size="5"><label for="sel_factory_location_act">及び期間短縮</label></font></div></td>
+                <td><div><font size="5">・・・90日前(立)</font></div></td>
+            </tr>
+            <tr>
+                <th><div><font size="6" style="line-height:130%">港湾法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_port_harbour_act" value="2">水域占用内工作物占用・工事申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">港則法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_port_regulations" value="3">港内工事申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">市中高層建築物等に関する条例</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_buildings_regulations" value="4">標識設置届</label></font></div></td>
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">市都市景観条例</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><label><input type="checkbox" id="sel_cityscape_regulations" value="5">大規模建築物等行為届（高15m超、面積1000㎡超）</label></font></div></td>
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    </div><!--ng_character_checkここまで-->
+
+    <div style="clear: both;"></div>

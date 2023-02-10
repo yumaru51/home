@@ -1,0 +1,788 @@
+<script>
+//操作ボタン(次工程進捗時)処理
+function go_next(a,b,c,d,e,f,g,h,i,j,k,l) {
+    var next_person = document.getElementById("sel_next_person").value;
+    if ((next_person == ""　&& a != b) && (a != 134007001)  && ((a != 134001011 || c != 'permit') && (a != 135001011 || c != 'permit'))) {
+    //if ((next_person == ""　&& a != b) && ((a != 134001011 || c != 'permit') || (a != 134007001 || c != 'return'))) {
+        alert('次作業者を指定してください');
+    }else{
+        var this_step = a;
+        var next_step = b;
+        var action_cd = c;
+        var target_id = d;
+        var next_division = e;
+        var next_department = f;
+        if ((a == 134001011 || a == 135001011) && c == 'permit'){
+            var next_person_id = 0;
+        }else if (a == 134007001){
+            var next_person_id = 0;
+        }else{
+            var next_person_id = g;
+        }
+        var this_department = h;
+        var this_division = i;
+        var comment = j;
+        var target = k;
+        var target_budget_id = l;
+        // 工事系のstep移動は「target_id」に「budget_id」ではなく「work_id」を使用する
+        if (target == "work" || target == "prospecificationunit" || target == "stop_work") {
+            target_id = $('#target_work_id').val();
+        }
+            $.ajax({
+                url: "/isk_tools/fms/action/go_next_step/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'target_id' : target_id,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person_id' : next_person_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'action' : action_cd,
+                    'comment' : comment,
+                    'target' : target,
+                    'target_budget_id' : target_budget_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 1000000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    if(data.msg == '担当者を入力してください'){
+                        alert(data.msg);
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        // アクションボタン有効化
+                        $(".button").prop("disabled", false);
+                    } else {
+                        // 予算詳細画面以外にあるアクションボタンを非表示化
+                        if(133004001 <= this_step && 133005000 > this_step){
+                            budget_estimate_work_list_action_button_empty();
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+                        else if(132004001 <= this_step && 132005000 > this_step){
+                            budget_estimate_work_list_action_button_empty();
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+                        else if(133005001 <= this_step && this_step < 134000000 && this_step != 133006031 && this_step != 136006011){
+                            // 注意! 単年度予算No付与ステップからの完了処理は、予算完了側から処理を呼び出すため
+                            // ボタン非表示処理を行わない 今後、工程完了までのステップが追加される場合は要変更
+                            budget_risk_action_button_empty();//操作ボタン非表示処理
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+                        else if( ( 213000000 <= this_step && this_step < 213004000 ) || next_step == 213002001){
+                            if(next_step == 213003011){
+                                //予算完了最終処理
+                                budget_information_final_complete(a,b,c,d,e,f,g,h,i,j,k,l);
+                            }
+                            budget_information_action_button_empty();//操作ボタン非表示処理
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+                        else if(target == "probudgetunit" && next_step == 213008011){
+                            final_stop_final_complete(target_id, next_step)
+                            action_button_empty();//操作ボタン非表示処理
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+                        else if(target == "work" && data.target_id != 0){
+                            work_action_button_empty();
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+                        //else if(target == "cs" && this_step != next_step){ //･･･M_confirm時にボタンが消えないため、2重処理となっていたため変更
+                        else if(target == "cs"){
+                            cs_action_button_empty();
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+                        else{
+                            action_button_empty();//操作ボタン非表示処理
+                            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        }
+
+                        if(next_step != 133009905){
+                            //予算見積完了時は先にメッセージ表示されるため、抑止
+                            alert(data.msg);
+                        }
+                        log_change();//ログリストを表示するJSを起動(log.html内にプログラム有)
+
+                        // 予算見積作成ステップ移行メッセージ
+                        if(target == "work" && data.target_id != 0){
+                            if(data.check_result.complete_flag == 1){
+                                if(window.confirm(data.check_result.msg)){
+                                    new_work_entry_complete(data.check_result.budget_id);
+                                }
+                            }
+                        }
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+
+//CSV出力処理
+function print_csv() {
+    var  cancelFlag = false;
+    if (cancelFlag == false) {
+        $(".button").prop("disabled", true);
+        cancelFlag = true;
+
+        var current_tab = $('.pagetitle')[$('.present').index()].children[0].id;
+        $.ajax({
+            url: "/isk_tools/fms/action/print_csv/",
+            type: "POST",
+            data : {
+                'target_work_id' : $('#target_work_id').val(),
+                'target' : $('#target').val(),
+                'current_tab': current_tab,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+        })
+        .done(function(data){
+            // 画面リロード追加
+            upload_file_list(data.div_id_name);
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert(data.msg);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+        setTimeout(function () {
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            cancelFlag = false;
+        }, 2000);
+    }
+}
+
+// 台帳問い合わせexcel作成
+function execution_output_application(this_step){
+    var current_tab = $('.pagetitle')[$('.present').index()].children[0].id;
+    $("#loading").show();//呼び出し中に表示するgifを表示
+    $.ajax({
+        url: "/isk_tools/fms/action/execution_output_application/",
+        type: "POST",
+        data : {
+            'budget_id': $('#budget_id').val(),
+            'construction_id': $('#construction_id').val(),
+            'target': $('#target').val(),
+            'this_step': this_step,
+            'current_tab': current_tab,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 1000000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(data){
+        // 画面リロード追加
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        console.log('execution_output_application')
+        upload_file_list(data.div_id_name);
+        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert(data.msg);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+// 完了報告書excel作成
+function make_complete_report_file(this_step){
+    var current_tab = $('.pagetitle')[$('.present').index()].children[0].id;
+    $("#loading").show();//呼び出し中に表示するgifを表示
+
+    $.ajax({
+        url: "/isk_tools/fms/action/make_complete_report_file/",
+        type: "POST",
+        data : {
+            'target': $('#target').val(),
+            'budget_id': $('#budget_id').val(),
+            'this_step': this_step,
+            'current_tab': current_tab,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 1000000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(data){
+        // 画面リロード追加
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        upload_file_list(data.div_id_name);
+        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert(data.msg);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+//次作業者変更処理
+function push_task(action_cd){
+    var  cancelFlag = false;
+    if (cancelFlag == false) {
+        $(".button").prop("disabled", true);
+        cancelFlag = true;
+
+        //「detail_template.html」
+            var target = document.getElementById('target').value;
+            if ( target == 'prospecificationunit' || target == 'work'){
+                var target_id = document.getElementById('target_work_id').value;
+            }else{
+                var target_id = document.getElementById('target_id').value;
+            }
+            var this_step = document.getElementById('this_step').value;
+            var this_division = document.getElementById('this_division').value;
+            var this_department = document.getElementById('this_department').value;
+            var target_budget_id = document.getElementById('target_budget_id').value;
+        //「action_pb.html」
+            var next_person_department = document.getElementById('sel_next_person_department').value;
+            var next_person = document.getElementById('sel_next_person').value;
+            var comment = document.getElementById('comment').value;
+            if (next_person == '') {
+                alert('次作業者を指定してください');
+                exit;
+            }
+            $.ajax({
+                url: '/isk_tools/fms/action/push_task/',
+                type: 'POST',
+                data : {
+                    'target': target,
+                    'target_id': target_id,
+                    'action_cd': action_cd,
+                    'this_step': this_step,
+                    'this_division': this_division,
+                    'this_department': this_department,
+                    'target_budget_id': target_budget_id,
+                    'next_person_department': next_person_department,
+                    'next_person': next_person,
+                    'comment': comment,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+            })
+            .done(function(data){
+                $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                alert(data.msg);
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+        }
+        setTimeout(function () {
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            cancelFlag = false;
+        }, 2000);
+
+}
+
+//操作ボタン(差戻時)処理
+function send_back() {
+    var  cancelFlag = false;
+    if (cancelFlag == false) {
+        $(".button").prop("disabled", true);
+        cancelFlag = true;
+
+        var this_step = $('#this_step').val();
+        var last_operation_step = $('#last_operation_step').val();
+        var last_operator = $('#last_operator').val();
+        var this_department = $('#this_department').val();
+        var this_division = $('#this_division').val();
+        var last_operator_department = $('#last_operator_department').val();
+        var last_operator_division = $('#last_operator_division').val();
+        var this_progress_id = 0;
+
+        if(this_step == 133004001){ // step133004001:予算見積作成のtargetがbudgetであるため
+            var target = "work";
+        }else{
+            var target = $('#target').val();
+        }
+        if (target == "phenomenon"){
+            this_progress_id = $('#ph_nc_progress_id').val();
+        }
+        // 工事系のstep移動は「target_id」に「budget_id」ではなく「work_id」を使用する
+        if (target == "work" || target == "prospecificationunit" || target == "stop_work") {
+            var target_id = $('#target_work_id').val();
+        }else{
+            var target_id = $('#target_id').val();
+        }
+
+        // 予算繰越情報の差戻処理は、「target_budget_id」を引き渡す
+        if (target == "budget_carry_forward") {
+            var target_budget_id = $('#target_budget_id').val();
+        }else{
+            var target_budget_id = $('#target_id').val();
+        }
+        var comment = $('#comment').val();
+
+        if (comment !="") {
+            $.ajax({
+                url: "/isk_tools/fms/action/job_return/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'last_operation_step' : last_operation_step,
+                    'last_operator' : last_operator,
+                    'target' : target,
+                    'target_id' : target_id,
+                    'target_budget_id' : target_budget_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_progress_id' : this_progress_id,
+                    'comment' : comment,
+                    'last_operator_department' : last_operator_department,
+                    'last_operator_division' : last_operator_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    // 予算詳細画面以外にあるアクションボタンを非表示化
+                    if(133004001 <= this_step && 133005000 > this_step){
+                        budget_estimate_work_list_action_button_empty();
+                    }
+                    else if(132004001 <= this_step && 132005000 > this_step){
+                        budget_estimate_work_list_action_button_empty();
+                    }
+                    else if(133005001 <= this_step && 134000000 > this_step){
+                        budget_risk_action_button_empty();//操作ボタン非表示処理
+                    }
+                    else if( 213000000 <= this_step && this_step < 213004000 ){
+                        budget_information_action_button_empty();//操作ボタン非表示処理
+                    }
+                    else if(target == "work"){
+                        work_action_button_empty();
+                    }
+                    else if(target == "cs" && this_step != next_step){
+                        cs_action_button_empty();
+                    }
+                    else if(target == "stop_work"){
+                        stop_work_action_button_empty();
+                    }
+                    else if(target == "budget_carry_forward"){
+                        carry_forward_action_button_empty();
+                    }
+                    else{
+                        action_button_empty();//操作ボタン非表示処理
+                    }
+                    log_change();//ログリストを表示するJSを起動(log.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+        }else{
+            alert("コメントが未記入です！！");
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+        }
+
+        setTimeout(function () {
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            cancelFlag = false;
+        }, 10000);
+    }
+}
+
+// 保留ボタンクリック時の処理
+function hold_step(this_step, action_cd){
+    var  cancelFlag = false;
+    if (cancelFlag == false) {
+        $(".button").prop("disabled", true);
+        cancelFlag = true;
+
+        var target = document.getElementById('target').value;
+        var target_id = document.getElementById('target_id').value;
+        var this_step = document.getElementById('this_step').value;
+        var this_division = document.getElementById('this_division').value;
+        var this_department = document.getElementById('this_department').value;
+        var target_budget_id = document.getElementById('target_budget_id').value;
+        var comment = document.getElementById('comment').value;
+
+        $.ajax({
+            url: '/isk_tools/fms/action/hold_step/',
+            type: 'POST',
+            data : {
+                'target': target,
+                'target_id': target_id,
+                'action_cd': action_cd,
+                'this_step': this_step,
+                'this_division': this_division,
+                'this_department': this_department,
+                'target_budget_id': target_budget_id,
+                'comment': comment,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+        })
+        .done(function(data){
+            log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+            // 必要ならアクションボタン削除処理を追加
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert(data.msg);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+        setTimeout(function () {
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            cancelFlag = false;
+        }, 2000);
+    }
+}
+
+//アクションボタンの動作処理
+function action(this_step, next_step, action_class, action_cd) {
+    if($("#action_pb_loading") != null){
+        $("#action_pb_loading").show();
+    }
+    var cancelFlag = false;
+    var check_result = true;
+
+    if (cancelFlag == false) {
+        $(".button").prop("disabled", true);
+        cancelFlag = true;
+        var next_person = document.getElementById("sel_next_person").value;
+        var next_person_ng_flag = 1;
+        if (next_person != "") {
+            next_person_ng_flag = 0;
+        }
+        if ( action_cd == "temporarily_saved") {
+            next_person_ng_flag = 0;
+        }
+        if ( action_cd == "print") {
+            next_person_ng_flag = 0;
+        }
+        if (action_class == "check_entry" && action_class == "hold") {
+            next_person_ng_flag = 0;
+        }
+        if (this_step == 134001011 && action_cd == 'permit') {
+            next_person_ng_flag = 0;
+        }
+        if ( this_step == 134007001) {
+            next_person_ng_flag = 0;
+        }
+        if (this_step == 135001011 && action_cd == 'permit') {
+            next_person_ng_flag = 0;
+        }
+        if (this_step < 240000000 && action_cd == 'stop') {
+            next_person_ng_flag = 0;
+        }
+
+        if (next_person_ng_flag == 1 ){
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert('次作業者を指定してください');
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+        }else{
+            if (this_step != next_step) {
+                // 次工程の選択取得
+                var sel_next_step = $('#sel_next_step').val();
+
+                //環境安全衛生部長承認工程からの差戻だけ、差戻先の判定
+                if (this_step == 134007001 && action_cd == "return"){
+                    if($("input[name='sel_send_destination']:checked").length > 0){
+                        var checked = $("input[name='sel_send_destination']:checked");
+                        var arrs = [];
+                        checked.each(function(){
+                            arrs.push($(this).val());
+                        });
+                        var sel_next_step = arrs;
+                    }else{
+                        alert('差し戻し先を選択してください');
+                        //別関数にしたい//
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                        // アクションボタン有効化
+                        $(".button").prop("disabled", false);
+                        cancelFlag = false;
+                        //別関数にしたい//
+                        return;
+                    }
+                }
+            }else{
+                var sel_next_step = next_step;
+            }
+
+            // 予算見積の採用FLの確認用FL処理
+            if (document.getElementById("adoption_flag") != null) {
+                var adoption_flag = $('#adoption_flag').val();
+            }else{
+                var adoption_flag = 0 ;
+            }
+
+            // 追加：詳細仕様検討受付の予算担当者登録確認用処理
+            if (document.getElementById("budget_charge_person_hidden_value") != null) {
+                var budget_charge_person = $('#budget_charge_person_hidden_value').val();
+            }else{
+                var budget_charge_person = '' ;
+            }
+
+            // 追加：詳細仕様検討受付の計画担当者登録確認用処理
+            if (document.getElementById("main_charge_person_name") != null) {
+                var main_charge_person_name = $('#main_charge_person_name').val();
+            }else{
+                var main_charge_person_name = '' ;
+            }
+
+            // 仕様書予算見積完了工程に進む場合は、必ず見積採用数をチェック
+            if ( this_step != next_step && ( sel_next_step == 133009904 || sel_next_step == 132009911 ) ) {
+                if (adoption_flag < 1){
+                    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    alert('採用された見積が有りません');
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                    return;
+                }else if (adoption_flag > 1){
+                    $("#action_pb_loading").fadeOut();
+                    alert('採用状態となっている見積が多すぎます 採用状態の見積は1件だけにしてください');
+                    $(".button").prop("disabled", false);
+                    return;
+                }
+            }
+
+            //操作ボタン(次工程進捗時)処理をするJSを起動(このhtml内にプログラム有)
+            if (action_class == "check"){
+                var target_id = $('#target_id').val();
+                var next_division = $('#next_division').val();
+                var next_department = $('#next_department').val();
+                var next_person_id = $('#sel_next_person').val();
+                var this_department = $('#user_department_cd').val();
+                var this_division = $('#user_division_cd').val();
+                var comment = $('#comment').val();
+                var target = $('#target').val();
+                var target_budget_id = $('#target_budget_id').val();
+                if( 213000000 <= sel_next_step && this_step < 213004000 && action_cd == 'complete' && check_budget_complete_flag(this_step) == false){
+                    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    alert('完了可能な状態ではありません');
+                }else if (this_step == 136002001 && action_cd == 'accept' && ( budget_charge_person == '' || main_charge_person_name == '' ) ) {
+                    //追加：詳細仕様検討受付 登録確認処理
+                    if(budget_charge_person == ''){
+                        $("#action_pb_loading").fadeOut();
+                        alert('予算担当者を選択してください');
+                        $(".button").prop("disabled", false);
+                    }else{ // if(main_charge_person_name == '')
+                        $("#action_pb_loading").fadeOut();
+                        alert('計画担当者を選択してください');
+                        $(".button").prop("disabled", false);
+                    }
+                }else{
+                    go_next(this_step, sel_next_step, action_cd, target_id, next_division,next_department, next_person_id, this_department, this_division,comment, target, target_budget_id);
+                }
+
+            //入力項目をチェックするJSを起動(budget_edit.html、work_edit.html内にプログラム有)
+            }else if (action_class == "entry" || action_class == "check_entry"){
+                if(action_cd == "stop"){
+                    // 中止操作の場合は、次工程の画面選択とは無関係に、step_actionのnext_stepに従う
+                    check_result = stop_work_cause_input_check(this_step, next_step, action_cd);
+                }
+
+                if(check_result){
+                    if (this_step != 133002011 && action_cd == "stop"){
+                        stop_work_cause_entry(this_step,next_step);
+                    }else{
+                        input_check(this_step, sel_next_step, action_cd);
+                    }
+                }else{
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                }
+
+            //CSV出力するJSを起動(このファイル内にプログラム有)
+            }else if (action_class == "print"){
+                if(this_step == 241003003 || this_step == 212002001){
+                    execution_output_application(this_step);
+                }else if(this_step == 213002021 || this_step == 213007001){
+                    make_complete_report_file(this_step);
+                }else{
+                    print_csv();
+                }
+
+            //次作業者変更のJSを起動(このファイル内にプログラム有)
+            }else if (action_class == "push_task"){
+                push_task(action_cd);
+
+            //入力項目をチェックするJSを起動(phenomenon_edit.html内にプログラム有)
+            }else if (action_class == "multi-entry"){
+                multi_input_check(this_step,sel_next_step,action_cd);
+
+            }else if (action_class == "hold"){
+                hold_step(this_step, action_cd);
+            }
+        }
+        setTimeout(function () {
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            cancelFlag = false;
+        }, 10000);
+    }
+}
+//次部署選択時処理
+function select_department(department) {
+    var department = department;
+    $('#next_department').val(department);
+    var target = '';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_next_step_department/",
+                type: "POST",
+                data : {
+                    'department' : department,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(next_person_select).empty();
+                    $(next_person_select).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(next_person_select).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<script>
+//次工程選択時処理
+function select_next_step(next_step){
+    var next_step = next_step;
+    var this_step_division = $('#this_step_division').val();
+    var user_department_cd = $('#action_pb_user_department_cd').val();
+    var target = $('#target').val();
+    var target_id = $('#target_id').val();
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/select_next_step/",
+        type: "POST",
+        data : {
+            'next_step' : next_step,
+            'this_step_division' : this_step_division,
+            'user_department_cd' : user_department_cd,
+            'target' : target,
+            'target_id' : target_id,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $(next_step_department_select).empty();
+            $(next_step_department_select).html(data);
+            var department = $('#sel_next_person_department').val();
+            select_department(department);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $(next_step_department_select).empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+window.onload = function() {
+        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+};
+</script>
+<style type="text/css">
+.button {
+    margin: 2px 0;
+    padding: 2px 3px;
+    vertical-align: middle;
+    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    font-weight: normal;
+    font-size: 13px;
+    width: 100px
+}
+#action_pb_loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+	z-index: 10;
+}
+</style>
+        <div id="action_pb_loading" style="display: none">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <input type="hidden" id="this_step_division" value="{{ this_step_division }}">
+        <input type="hidden" id="action_pb_user_department_cd" value="{{ user_department_cd }}">
+        {% if action_num > 0 %}
+        <div>
+            {% for action_list in action_list %}
+                {% if action_list.status_after_action != 'previous' %}
+                    <input type="button" class="button" value="{{ action_list.action_name }}" onclick="action({{ this_step }},{{ action_list.next_step }},'{{ action_list.action_class }}','{{ action_list.action_cd }}');" >
+                {% else %}
+                    {% if this_step == 134007001 %}
+                        <input type="button" class="button" value="{{ action_list.action_name }}" onclick="action({{ this_step }},{{ action_list.next_step }},'check','{{ action_list.action_cd }}');" >
+                    {% else %}
+                        <input type="button" class="button" value="{{ action_list.action_name }}" onclick="send_back();" >
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div id="next_step_select" style="float:left;">
+            次工程：<select id="sel_next_step" name="sel_next_step" onchange="select_next_step(value);" style="font-size: 110%">
+                {% for next_step_list in next_step_list %}
+                        <option value="{{ next_step_list.next_step }}">{{ next_step_list.step_name }}</option>
+                {% endfor %}
+                </select>　
+            {% if this_step == 134007001 %}
+                    <label><input type="checkbox" id="sel_ga_send_back" name="sel_send_destination" value="1">総務差戻</label>
+                    <label><input type="checkbox" id="sel_sh_send_back" name="sel_send_destination" value="2">安全差戻</label>
+                    <label><input type="checkbox" id="sel_env_send_back" name="sel_send_destination" value="3">環境差戻</label>
+                    <label><input type="checkbox" id="sel_eng_send_back" name="sel_send_destination" value="4">設備差戻　　</label>
+            {% endif %}
+        </div>
+        <div id="next_step_department_select" style="float:left;">
+            次部署：<select id="sel_next_person_department" name="sel_next_person_department" onchange="select_department(value);" style="font-size: 110%">
+                {% if next_person_department_list|length != 1  %}
+                        <option value="" selected></option>
+                {% endif %}
+                {% for department in next_person_department_list %}
+                        <option value="{{ department.department_cd }}" {% if department.department_cd == next_department %} selected {% endif %}>{{ department.department_name }}</option>
+                {% endfor %}
+                </select>
+        </div>
+        <div id="next_person_select"  style="float:left;">
+            次作業者：<select id="sel_next_person" name="sel_next_person" style="font-size: 110%">
+                        <!-- action_pbの次作業者のみ、user_attribute_idをvalueとするので注意 -->
+                {% if next_person_list|length != 1 %}
+                        <option value="" selected></option>
+                {% endif %}
+                {% for next_person in next_person_list %}
+                        <option value="{{ next_person.id }}" {% if next_person.username == next_person_username %} selected {% endif %}>{{ next_department_name }}:{{ next_person.full_name }}</option>
+                {% endfor %}
+                </select>※差戻時は自動判定
+        </div>
+        <div  style="float:left;">
+            　　コメント：<textarea id ="comment" name="comment" rows="3" style="font-size: 110%"></textarea>
+                <input type="hidden" id="next_step" value="{{ next_step }}">※差戻時は必須
+        </div>
+        {% if this_step < 213000000 or 214000000 <= this_step %}
+        <div style="clear: both;"></div>
+        {% endif %}
+
+        {% endif %}

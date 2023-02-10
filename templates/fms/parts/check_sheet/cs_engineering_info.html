@@ -1,0 +1,107 @@
+<script>
+function cs_action_button_empty() {
+$('#cs_action_button').empty();
+}
+
+// チェックボックスの状態同期
+function cs_eng_check_box_change(){
+    if($('#building_standards_act').val() == "True")
+    {
+        document.getElementById("sel_building_standards_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_building_standards_act").checked = 0;
+    }
+    if($('#energy_rationalization_act').val() == "True")
+    {
+        document.getElementById("sel_energy_rationalization_act").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_energy_rationalization_act").checked = 0;
+    }
+    if($('#construction_recycling').val() == "True")
+    {
+        document.getElementById("sel_construction_recycling").checked = 1;
+    }
+    else
+    {
+        document.getElementById("sel_construction_recycling").checked = 0;
+    }
+}
+//データ登録･更新処理（edit側と同じ関数を用意するためのダミーで即完了する）
+function cs_eng_edit(a,b) {  // a:自工程id, b:次工程id
+    var deferred = new $.Deferred();
+    deferred.resolve();
+    //完了を知らせるためにpromiseオブジェクトを返す
+    return deferred.promise();
+}
+</script>
+
+<style type="text/css">
+
+    input[type=checkbox] {
+        width: 20px;
+        height: 20px;
+    }
+
+</style>
+
+    <div class="fms_col" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="cs_no" value="{{ cs_no }}">
+<!--    <input type="hidden" id="target_budget_id" value="{{ budget_id }}">-->
+<!--    <input type="hidden" id="work_id" value="{{ work_id }}">-->
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="cs_rev_no" value="{{cs_rev_no}}">
+    <input type="hidden" id="building_standards_act" value="{{ building_standards_act }}">
+    <input type="hidden" id="building_standards_act_category" value="{{ building_standards_act_category }}">
+    <input type="hidden" id="energy_rationalization_act" value="{{ energy_rationalization_act }}">
+    <input type="hidden" id="energy_rationalization_act_category" value="{{ energy_rationalization_act_category }}">
+    <input type="hidden" id="energy_rationalization_act_action" value="{{ energy_rationalization_act_action }}">
+    <input type="hidden" id="construction_recycling" value="{{ construction_recycling }}">
+    <input type="hidden" id="construction_recycling_category" value="{{ construction_recycling_category }}">
+    <input type="hidden" id="eng_edit_flag" value="{{eng_edit_flag}}">
+    </div>
+    <div style="float:left;">
+        <table class=cs_engineering_edit_table">
+            <tr>
+                <th><div><font size="6" style="line-height:130%">建築基準法</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_building_standards_act" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_building_standards_act">{{ building_standards_act_category }}</label></font>
+                    <font size="5"><label for="sel_building_standards_act">の確認申請</label></font></div></td>
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">省エネ法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_energy_rationalization_act" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_energy_rationalization_act">{{ energy_rationalization_act_category }}</label></font>
+                    <font size="5"><label for="sel_energy_rationalization_act">特定建築物</label></font>
+                    <font size="5"><label for="sel_energy_rationalization_act">{{ energy_rationalization_act_action }}</label></font>
+                    <font size="5"><label for="sel_energy_rationalization_act">届出</label></font></div></td>
+                <td><div><font size="5">・・・21日前</font></div></td>
+            </tr>
+
+            <tr>
+                <th><div><font size="6" style="line-height:130%">建設リサイクル法</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="5"><input type="checkbox" id="sel_construction_recycling" value="1" onclick='return false;'></font>
+                    <font size="5"><label for="sel_construction_recycling">{{ construction_recycling_category }}</label></font>
+                </div></td>
+                <td><div><font size="5">・・・工事着手7日前</font></div></td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="clear: both;"></div>

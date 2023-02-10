@@ -1,0 +1,123 @@
+<script>
+//対象の進捗工程の詳細の表示処理
+function step_detail(a) {
+    var step_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/step_detail/",
+                type: "POST",
+                data : {
+                    'step_id' : step_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#step_id').val(data.step_id);
+                    $('#step_name').val(data.step_name);
+                    $('#charge_department_class').val(data.charge_department_class);
+                    $('#step_level').val(data.step_level);
+                    $('#template_class').val(data.template_class);
+                    $('#new_entry_flag').val(data.new_entry_flag);
+                    $('#target').val(data.target);
+                    $('#lost_flag').val(data.lost_flag);
+                    get_step_action_list(step_id);
+                    get_step_relation_list(step_id);
+                    get_step_display_item_list(step_id);
+                    get_data_entry_step_list(step_id);
+                    step_management_info(step_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+table table-strriped {
+    height: 1400px;
+    width:1500px;
+}
+thead.scrollHead,tbody.scroll_list_Body{
+    display:block;
+}
+tbody.scroll_list_Body{
+    overflow-y:scroll;
+    height:520px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.step_id{
+    width:140px;
+}
+.step_name{
+    width:200px;
+}
+.charge_department_class{
+    width:100px;
+}
+.step_level{
+    width:70px;
+}
+.link_str{
+    width:100px;
+}
+.new_entry_flag{
+    width:60px;
+}
+.target{
+    width:200px;
+}
+.lost_flag{
+    width:50px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if step_master_lists_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="step_id">ステップID</th>
+                        <th class="step_name">ステップ名</th>
+                        <th class="charge_department_class">担当部署区分</th>
+                        <th class="step_level">ステップLv</th>
+                        <th class="link_str">テンプレート区分</th>
+                        <th class="new_entry_flag">新規作成FL</th>
+                        <th class="target">対象</th>
+                        <th class="lost_flag">無効FL</th>
+                    </tr>
+                </thead>
+                <tbody class="scroll_list_Body">
+                {% for step_master_lists in step_master_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" class="detailpb" onclick="step_detail({{ step_master_lists.step_id }});">詳細</a>
+                        </td>
+                        <td class="step_id">{{ step_master_lists.step_id }}</td>
+                        <td class="step_name">{{ step_master_lists.step_name }}</td>
+                        <td class="charge_department_class">{{ step_master_lists.charge_department_class }}</td>
+                        <td class="step_level">{{ step_master_lists.step_level }}</td>
+                        <td class="link_str">{{ step_master_lists.link_str }}</td>
+                        <td class="new_entry_flag">{{ step_master_lists.new_entry_flag }}</td>
+                        <td class="target">{{ step_master_lists.target }}</td>
+                        <td class="lost_flag">{{ step_master_lists.lost_flag }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

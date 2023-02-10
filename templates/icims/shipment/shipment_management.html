@@ -1,0 +1,420 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+<script language="javascript" type="text/javascript" charset="UTF-8" xmlns="http://www.w3.org/1999/html">
+
+function order_filter_call() {
+    var from_page = 16001;
+    var status1 = 100551;
+    var status2 = 100801;
+    var status3 = 0;
+    $.ajax({
+        url: "/imsds/parts/order_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'status1': status1,
+                'status2': status2,
+                'status3': status3,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#order_filter').empty();
+            $('#order_filter').html(data);
+            getorderdata(16001);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#order_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+function shipment_page_open(a) {
+        var order_id = a;
+        $("#floatBox4Dialog").dialog({
+            modal:true,
+            width: 1680,
+            height: 900,
+            title:"出荷処理画面",
+        });
+        order_detail_open(order_id);
+        change_allocation_result_pb(order_id);
+        get_allocation_list(order_id);
+        supplemental_task_list(order_id);
+        shipment_entry_pb(order_id);
+}
+function order_detail_open(a) {
+        var order_id = a ;
+        var from_page = 16001 ;
+        $.ajax({
+                url: "/imsds/parts/order_detail/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+
+                    $('#order_ditail').empty();
+                    $('#order_ditail').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_ditail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function change_allocation_result_pb(a) {
+        var order_id = a ;
+        var from_page = 16001 ;
+        $.ajax({
+                url: "/imsds/parts/change_allocation_result_pb/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#change_allocation_result_pb').empty();
+                    $('#change_allocation_result_pb').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#change_allocation_result_pb').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function get_allocation_list(a) {
+        $("#loading3").show();
+        var order_id = a ;
+        var from_page = 16001 ;
+        $.ajax({
+                url: "/imsds/parts/allocation_list/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#allocation_result_list').empty();
+                    $('#allocation_result_list').html(data);
+                    $("#loading3").fadeOut();
+                    $("#allocation_result_list").fadeIn();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#allocation_result_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function supplemental_task_list(a) {
+    var order_id = a;
+        $.ajax({
+            url: "/imsds/action/supplemental_task_list/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#supplemental_task_list').empty();
+                    $('#supplemental_task_list').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#supplemental_task_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function shipment_entry_pb(a) {
+        var order_id = a ;
+        var from_page = 16001 ;
+        $.ajax({
+                url: "/imsds/parts/shipment_entry_pb/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#shipment_entry').empty();
+                    $('#shipment_entry').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#shipment_entry').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+
+function allocation_result_change(a) {
+        var order_id = a;
+        $("#floatBox5Dialog").dialog({
+            modal:true,
+            width: 1680,
+            height: 900,
+            title:"引当変更画面",
+        });
+        order_detail_open2(order_id);
+        get_allocation_list2(order_id);
+        stock_filter_call();
+
+}
+function order_detail_open2(a) {
+        var order_id = a ;
+        var from_page = 16011 ;
+        $.ajax({
+                url: "/imsds/parts/order_detail/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#order_ditail2').empty();
+                    $('#order_ditail2').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_ditail2').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function get_allocation_list2(a) {
+        $("#loading4").show();
+        var order_id = a ;
+        var from_page = 16011 ;
+        $.ajax({
+                url: "/imsds/parts/allocation_list/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#allocation_result_list2').empty();
+                    $('#allocation_result_list2').html(data);
+                    $("#loading4").fadeOut();
+                    $("#allocation_result_list2").fadeIn();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#allocation_result_list2').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function stock_filter_call() {
+    var from_page = 16011;
+    var item_code = $('#item_code_oe').val();
+    $.ajax({
+        url: "/imsds/parts/stock_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#stock_filter').empty();
+            $('#stock_filter').html(data);
+            $('#selectitemcode7').val(item_code);
+            getstockdata(16011);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#stock_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+function shipment_complete_entry(a) {
+    var to_status = a;
+    var order_id = $('#order_detail_id').val();
+    var ship_date_before = $('#ship_date').val();
+    var ship_date_before = ship_date_before.replace( '年', '-' );
+    var ship_date_before = ship_date_before.replace( '月', '-' );
+    var ship_date = ship_date_before.replace( '日', '' );
+        $.ajax({
+            url: "/imsds/action/shipment_complete_entry/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'ship_date': ship_date,
+                    'to_status': to_status,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    shipment_entry_pb(order_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function allocationchange(a) {
+    var stock_allocation_id = a;
+    var target_amount_id = '#amount' + a;
+    var specified_quantity = $(target_amount_id).val();
+    var from_page = 16021;
+    $.ajax({
+                url: "/imsds/parts/allocate_change/",
+                type: "POST",
+                data : {
+                        'stock_allocation_id': stock_allocation_id,
+                        'specified_quantity': specified_quantity,
+                        'from_page': from_page,
+                        'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+        .done(function(data){
+            var order_id = data.order_id;
+            order_detail_open(order_id);
+            change_allocation_result_pb(order_id);
+            get_allocation_list(order_id);
+            supplemental_task_list(order_id);
+            order_detail_open2(order_id);
+            get_allocation_list2(order_id);
+            stock_filter_call();
+            alert(data.msg);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+window.onload = function() {
+        order_filter_call();
+};
+</script>
+<style type="text/css">
+#order_list{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:150px;
+}
+#stock_list{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+#allocation_result_list{display:none;}
+#loading3{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+#allocation_result_list2{display:none;}
+#loading4{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">出荷管理</h2>
+    </div>
+
+    <div class="pagetitle">
+        <input type="hidden" id="this_page" value="1">
+        <div>
+            <input type="button" name="getorderdata" value=" 受注データ更新 " onclick="getorderdata(16001);">　　
+        </div>
+    </div>
+    <div id="order_filter"></div>
+    <div>
+            受注リスト
+    </div>
+
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+
+    <div id="order_list" style="width: 1680px;">
+    </div>
+
+    <div id="floatBox4Dialog" style="display:none;">
+        <div id="order_ditail" style="width: 1680px;">
+        </div>
+        <div id="change_allocation_result_pb">
+        </div>
+        <div id="loading3">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="allocation_result_list">
+        </div>
+        <div id="supplemental_task_list" style="width: 1680px;">
+        </div>
+        <div id="shipment_entry" style="width: 1680px;">
+        </div>
+    </div>
+
+    <div id="floatBox5Dialog" style="display:none;">
+        <div id="order_ditail2" style="width: 1680px;">
+        </div>
+        <div id="loading4">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="allocation_result_list2">
+        </div>
+        <div>
+            <h2 class="page-header">候補在庫　<input type="button" name="getstockdata" style="margin: 0px 0px 0px 25px;" value="　絞込　" onclick="getstockdata(16011);"></h2>
+        </div>
+        <div id="stock_filter"></div>
+        <div id="loading2">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="stock_list"></div>
+
+    </div>
+{% endblock %}

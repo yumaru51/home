@@ -1,22 +1,134 @@
 {% load staticfiles %}
 
-<div class="container">
+<div class="container m-0">
     <div class="form-control">
         <div class="row">
+
+            <!--左半分-->
             <div class="col-6">
-                <table clase="table">
+
+                <!--標準入力フォーム-->
+                <table>
                     {{ request_form.as_table }}
                 </table>
+
+                <!--原課変更実施　専用フォーム-->
+                {% if present_step == 1401 %}
+                <div class="bg-info"><table>
+                    {{ request2_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step > 1401 %}
+                <table>
+                    {{ request2_form.as_table }}
+                </table>
+                {% endif %}
+
+                <!--評価確認　専用フォーム-->
+                {% if present_step == 1601 %}
+                <div class="bg-info"><table>
+                    {{ request3_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step > 1601 %}
+                <table>
+                    {{ request3_form.as_table }}
+                </table>
+                {% endif %}
+
             </div>
+
+            <!--右半分-->
             <div class="col-6">
-                コメント：{{ log_form.comment }}
+
+                <!--コメントフォーム-->
+                コメント：{{ log_form.comment }}<br>
+
+                <!--ファイル一覧-->
+                <div id="file_list">{{ file_list | safe }}</div>
+
+                <!--ファイルアップロード-->
+                {% if present_step >= 1102 and present_step < 1602 %}
+                    資料添付：<input type="file" id="file" name="file" multiple>
+                    <button class="btn btn-primary mt-2" type="submit" formaction="{% url 'quality_change_management:ajax_file_upload' %}" form="action">保存</button><br>
+<!--                    <button type="button" onclick="file_upload('action');" class="btn btn-primary mt-2">保存</button><br>-->
+                {% endif %}
+
+                <!--レベル判定表-->
+                <button type="button" onclick="location.href='http://yintrasrv/gyomukanri/変更管理レベル分表.xlsx';" class="btn btn-primary mt-2">レベル判定表を開く</button><br><br>
+
+                <!--所管承認　専用フォーム-->
+                {% if present_step == 1301 and target == 'quality' %}
+                <div class="bg-info"><h3>&lt;品質関係&gt;</h3><table>
+                    {{ quality_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step > 1301 and target == 'quality' %}
+                <div><h3>&lt;品質関係&gt;</h3><table>
+                    {{ quality_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step == 1301 and target == 'safety' %}
+                <div class="bg-info"><h3>&lt;安全関係&gt;</h3><table>
+                    {{ safety_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step > 1301 and target == 'safety' %}
+                <div><h3>&lt;安全関係&gt;</h3><table>
+                    {{ safety_form.as_table }}
+                </table></div>
+                {% endif %}
+
+                <!--所管確認評価　専用フォーム-->
+                {% if present_step == 1501 and target == 'quality' %}
+                <div class="bg-info"><table>
+                    {{ quality2_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step > 1501 and target == 'quality' %}
+                <div><table>
+                    {{ quality2_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step == 1501 and target == 'safety' %}
+                <div class="bg-info"><table>
+                    {{ safety2_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step > 1501 and target == 'safety' %}
+                <div><table>
+                    {{ safety2_form.as_table }}
+                </table></div>
+                {% endif %}
+
+                <!--原課変更実施、評価確認　専用フォーム-->
+                {% if present_step >= 1401 and target == 'request' %}
+                <div><h3>&lt;品質関係&gt;</h3><table>
+                    {{ quality_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step >= 1601 and target == 'request' %}
+                <div><table>
+                    {{ quality2_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step >= 1401 and target == 'request' %}
+                <div><h3>&lt;安全関係&gt;</h3><table>
+                    {{ safety_form.as_table }}
+                </table></div>
+                {% endif %}
+                {% if present_step >= 1601 and target == 'request' %}
+                <div><table>
+                    {{ safety2_form.as_table }}
+                </table></div>
+                {% endif %}
+
             </div>
         </div>
     </div>
 </div>
 
 <script>
-document.getElementById('id_division').onchange = function(){department();};
-document.getElementById('id_department').onclick = function(){user();};
-
+document.getElementById('id_division').onchange = function(){department('id_division', 'id_department', 'id_user');};
+document.getElementById('id_department').onclick = function(){user('id_department', 'id_user');};
 </script>

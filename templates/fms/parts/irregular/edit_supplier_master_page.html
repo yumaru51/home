@@ -1,0 +1,216 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    height: 35px;
+}
+div.scroll_supplier_master_list_div {
+  width: 600px;
+  height: 760px;
+  overflow: scroll;
+}
+.supplier_items{
+    list-style: none;
+    margin: 10px -100px 0px -40px;
+}
+td,th{
+    table-layout:fixed;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+    <input TYPE=hidden id="user_division_cd" VALUE="{{user_division_cd}}" NAME=user_division_cd />
+    <input TYPE=hidden id="user_department_cd" VALUE="{{user_department_cd}}" NAME=user_department_cd />
+    <input TYPE=hidden id="user_authority" VALUE="{{user_authority}}" NAME=user_authority />
+    <input TYPE=hidden id="confirm_user" VALUE="{{confirm_user}}" NAME=confirm_user />
+    <input TYPE=hidden id="permit_user" VALUE="{{permit_user}}" NAME=permit_user />
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">業者マスタ修正</h2>
+    </div>
+    <div style="float:right;">
+        <input TYPE=button VALUE=前の画面に戻る NAME=disp_return size=3 style="width:120px"
+               onclick="irregular_menu();"/>
+    </div>
+    <div style="float:left; border-style: ridge;">
+        <div style="border-style: ridge;">
+            <h2 class="page-header">登録済業者一覧</h2>
+            <div>
+                <font size="3">絞り込み</font>
+                <font size="4"><input type="text" id="supplier_filter_txt" size="23" value="" ></font>
+                <select id="supplier_filter_lost_flag" name="supplier_filter_lost_flag" >
+                    <option value="2">両方</option>
+                    <option value="0">有効のみ</option>
+                    <option value="1">無効のみ</option>
+                </select>
+                <input TYPE=button VALUE="リスト更新" NAME=update_list size=3 style="width:120px;"
+                       onclick="supplier_filter();"/>
+            </div>
+        </div>
+        <div class="scroll_supplier_master_list_div">
+            <ul id="supplier_list">
+            </ul>
+        </div>
+    </div>
+
+    <div style="float:left;size=5px">　</div>
+
+    <div style="float:left;">
+        <div><h2 class="page-header">修正内容</h2><div style="float:right;">※有効/無効のみ修正可能</div></div>
+        <div style="float:left;">
+            <input type="hidden" id="supplier_id" value="" size="4" >
+            <table>
+                <tr>
+                    <td><div><font size="4">仕入先コード</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="supplier_cd" size="16" value="" readonly="readonly"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">仕入先名</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="supplier_name" size="40" value="" readonly="readonly"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">有効/無効</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div>
+                    <select id="sel_lost_flag" name="sel_lost_flag">
+                        <option value="0">有効</option>
+                        <option value="1">無効</option>
+                    </select>
+                    </div></td>
+                </tr>
+            </table>
+            <br>
+            <div style="float:left;size=5px">　</div>
+            <div id="edit_button_div" style="float:left;" >
+                <input type="button" id="edit_button" value="　修正　" onclick="supplier_master_entry()" >　　　　　
+            </div>
+        </div>
+    </div>
+<script>
+//業者マスタ修正画面の表示
+function edit_supplier_master_page() {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/irregular/edit_supplier_master/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+// 業者マスタ登録処理
+function supplier_master_entry(){
+    // 未選択の場合は何も行わない
+    if($('#supplier_id').val() == ''){
+        return;
+    }
+    if($("#action_pb_loading") != null){
+        $("#action_pb_loading").fadeIn();
+    }
+    /// 仕入先コードと、仕入先名は変更不可とする（コメントアウトで残しておく）
+    $.ajax({
+        url: "/isk_tools/fms/action/edit_supplier_master_entry/",
+        type: "POST",
+        data: {
+            'supplier_id': $('#supplier_id').val(),
+            ///'supplier_cd': $('#supplier_cd').val(),
+            ///'supplier_name': $('#supplier_name').val(),
+            'sel_lost_flag': $('#sel_lost_flag').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache: false,
+    })
+    .done(function(data){
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        }
+        alert(data.msg);
+        //リスト更新(画面更新)
+        edit_supplier_master_page();
+
+    })
+    .fail(function(jqXHR,textStatus,errorThrown){
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        }
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+// 業者リスト選択時処理
+function select_supplier_master(id, supplier_cd, supplier_name, lost_flag){
+    // 選択された業者をinputに表示
+    //console.log(id, supplier_cd, supplier_name, lost_flag);
+    $('#supplier_id').val(id);
+    $('#supplier_cd').val(supplier_cd);
+    $('#supplier_name').val(supplier_name);
+    var select = document.getElementById("sel_lost_flag");
+    if(lost_flag == '0'){
+        select.options[0].selected = true;
+    }else{
+        select.options[1].selected = true;
+    }
+}
+
+// 仕入先業者絞り込み表示処理
+function supplier_filter(){
+    var filter_txt = $('#supplier_filter_txt').val();
+    var lost_flag = $('#supplier_filter_lost_flag').val();
+
+    //いったんリストをクリア
+    var supplier_list = document.getElementById('supplier_list');
+    var clone = supplier_list.cloneNode( false );
+    supplier_list.parentNode.replaceChild( clone , supplier_list );
+
+    //絞り込み処理
+    var child_data = "";
+    for( var i=0; i<supplier_master_dict.length; i++)
+    {
+        supplier = supplier_master_dict[i]
+        if(lost_flag != "2" && (supplier[3] != lost_flag)){
+            continue;
+        }
+        if(filter_txt != "" && ( ( supplier[1].indexOf(filter_txt) == -1 ) && ( supplier[2].indexOf(filter_txt) == -1 ) ) ){
+            continue;
+        }
+        let lost_flag_text = '有効';
+        if(supplier[3] == '1'){
+            lost_flag_text = '無効';
+        }
+        //子要素作成
+        let add_contents = '<li class="supplier_items"><font size="4">';
+            add_contents += '<a href="#" onclick="select_supplier_master(\''+supplier[0]+'\',\''+supplier[1]+'\',\''+supplier[2]+'\',\''+supplier[3]+'\');">';
+            add_contents += supplier[1]+'：'+supplier[2]+'：'+lost_flag_text;
+            add_contents += '</a></font></li>\n';
+
+        child_data += add_contents;
+    }
+    //子要素追加
+    $('#supplier_list').append(child_data);
+}
+
+// 絞り込み表示用辞書
+var supplier_master_dict = [
+{% for supplier in supplier_master_list %}['{{ supplier.id }}','{{ supplier.supplier_cd }}','{{ supplier.supplier_name }}','{{ supplier.lost_flag }}'],
+{% endfor %}
+];
+// リスト表示（初期状態)
+supplier_filter();
+</script>
+{% endblock %}

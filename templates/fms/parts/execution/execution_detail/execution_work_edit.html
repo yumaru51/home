@@ -1,0 +1,1022 @@
+<script>
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//仕様書担当者選択の値と呼び出した値との同期処理
+function specification_person_in_charge_value_change() {
+        var target_specification_person_in_charge = $('#specification_person_in_charge').val();
+        if (target_specification_person_in_charge != "") {
+            var pulldown_option = document.getElementById("sel_specification_person_in_charge").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_specification_person_in_charge){
+                    var value = pulldown_option[i].value;
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//調達担当者選択の値と呼び出した値との同期処理
+function procurement_person_in_charge_value_change() {
+        var target_procurement_person_in_charge = $('#procurement_person_in_charge').val();
+        if (target_procurement_person_in_charge != "") {
+            var pulldown_option = document.getElementById("sel_procurement_person_in_charge").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_procurement_person_in_charge){
+                    var value = pulldown_option[i].value;
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//管理区分選択の値と呼び出した値との同期処理
+function management_class_cd_value_change() {
+        var target_management_class_cd = $('#management_class_cd').val();
+        if (target_management_class_cd != "") {
+            var pulldown_option = document.getElementById("sel_management_class_cd").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_management_class_cd){
+                    var value = pulldown_option[i].value;
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//工事区分(物品/工事)選択の値と呼び出した値との同期処理
+function work_class_cd_value_change() {
+        var target_work_class_cd = $('#work_class_cd').val();
+        if (target_work_class_cd != "") {
+            var pulldown_option = document.getElementById("sel_work_class_cd").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_work_class_cd){
+                    pulldown_option[i].selected = true;
+                    var value = pulldown_option[i].value;
+                    break;
+                }
+            }
+        }
+}
+//仕様書担当者選択を変更したときの処理
+function specification_person_in_charge_change(a) {
+    var value = a;
+    $('#specification_person_in_charge').val(value);
+}
+//調達担当者選択を変更したときの処理
+function procurement_person_in_charge_change(a) {
+    var value = a;
+    $('#procurement_person_in_charge').val(value);
+}
+//管理区分選択を変更したときの処理
+function management_class_cd_change(a) {
+    var value = a;
+    $('#management_class_cd').val(value);
+}
+//工事区分選択(物品/工事)を変更したときの処理
+function work_class_cd_change(a) {
+    var value = a;
+    $('#work_class_cd').val(value);
+}
+//操作ボタンの非表示処理
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+
+//入力項目チェック
+function execution_work_ng_character_check() {
+    var alert_input_check_msg = "";
+
+    //禁止文字チェック
+    var alert_ng_ch_msg = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+    alert_input_check_msg += alert_ng_ch_msg;
+
+    return alert_input_check_msg;
+}
+
+//入力項目の未入力チェック
+function execution_work_input_check(action_cd) {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    //入力チェック対象リスト　val_id=該当id、set_id=背景色変更対象id、
+    //must_flg=必須項目フラグ(1で必須)、max_length=上限文字数(0はチェックしない)
+    let check_object_list =
+    { 0: { val_id:'#work_name',                      set_id:'work_name',         must_flg:1, max_length:40},
+      1: { val_id:'#probable_price',                 set_id:'probable_price',    must_flg:1, max_length:0},
+      2: { val_id:'#sel_format_kbn',                 set_id:'sel_format_kbn',    must_flg:1, max_length:0},
+      3: { val_id:'#work_class_cd',                  set_id:'sel_work_class_cd', must_flg:1, max_length:0},
+      4: { val_id:'#specification_person_in_charge', set_id:'sel_specification_person_in_charge', must_flg:1, max_length:0},
+      5: { val_id:'#procurement_person_in_charge',   set_id:'sel_procurement_person_in_charge',   must_flg:1, max_length:0},
+      6: { val_id:'#management_class_cd',            set_id:'sel_management_class_cd',            must_flg:1, max_length:0},
+    };
+
+    if(action_cd == "stop"){
+        //中止の場合は予想額は必須としない
+        check_object_list[1].must_flg = 0;
+    }
+
+    for (let check_index in check_object_list){
+        var check_object = check_object_list[check_index];
+        var check_val = $(check_object.val_id).val();
+        var set_element = document.getElementById(check_object.set_id);
+        var ng_element_flag = 0;
+
+        //必須項目チェック
+        if(check_object.must_flg == 0){
+           set_element.style.backgroundColor = 'white';
+        }else if(check_val == ""){
+            set_element.style.backgroundColor = 'orange';
+            ng_element_flag =  1;
+            ng_flag = ng_flag + ng_element_flag;
+        }
+
+        //文字数上限チェック
+        if ( check_object.max_length > 0 && count_char(check_val) > check_object.max_length){
+           if(ng_element_flag == 0){
+             set_element.style.backgroundColor = 'silver';
+           }
+           ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else if(ng_element_flag == 0){
+           set_element.style.backgroundColor = 'white';
+        }
+    }
+    return { 1:ng_flag , 2:ng_str_count_flag };
+}
+
+//入力項目チェック後、登録処理実行
+function input_check(this_step,next_step,action_cd) {
+    var msg = '';
+
+    //発注完了状態の場合、登録処理を抑止する
+    if( {{ order_complete_flag }} != 0){
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        alert('予算繰越処理により発注完了状態です！！！');
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+        return;
+    }
+
+    //入力項目チェック（共通処理）
+    var { 1:ng_flag , 2:ng_str_count_flag  } = execution_work_input_check(action_cd);
+
+    const elements = document.getElementsByName('special_vendor_check');
+    var special_vendor_check = elements[0].checked;
+    var special_vendor_comment = $('#special_vendor_comment').val();
+    var special_vendor_comment_chara_bytes = count_char(special_vendor_comment);
+    var ng_of_special_vendor_comment_flag = 0;
+
+    //特命チェック・特命コメントは特殊判定
+    if ( special_vendor_check ){
+        //特命チェックがONの場合は特命コメントが必須
+        if(special_vendor_comment_chara_bytes == 0){
+           $('#special_vendor_comment').css('background-color','orange');
+           ng_flag = ng_flag + 1 ;
+        }else if(special_vendor_comment_chara_bytes > 400){
+           $('#special_vendor_comment').css('background-color','silver');
+           ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else{
+           $('#special_vendor_comment').css('background-color','white');
+        }
+    }else{
+        //特命チェックがOFFの場合は特命コメント入力禁止
+        if (special_vendor_comment_chara_bytes != 0){
+           $('#special_vendor_comment').css('background-color','white');
+           ng_of_special_vendor_comment_flag = ng_of_special_vendor_comment_flag + 1;
+        }else{
+           $('#special_vendor_comment').css('background-color','white');
+        }
+    }
+
+    //内容詳細入力上限チェック
+    var contents_detail_alert_flg = 0;
+    var contents_detail_alert_msg = check_contents_detail_all((this_step != next_step));
+    if(contents_detail_alert_msg.length > 0){
+        contents_detail_alert_flg = 1;
+    }
+
+    // 全て正常時のみ禁止文字チェック 注意：本仕様書作成の一時保存は禁止文字チェック対象外(No.740)
+    var ng_all_flag = ng_flag + ng_str_count_flag + ng_of_special_vendor_comment_flag + contents_detail_alert_flg;
+    var alert_ng_ch_msg_str = ""
+    if ( ng_all_flag == 0 && this_step != next_step ) {
+        alert_ng_ch_msg_str = execution_work_ng_character_check();
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常処理時処理
+    if ( ng_all_flag == 0) {
+        var check_result = true;
+        // 中止ボタンクリック時
+        if(document.getElementById("stop_work_info") != null && action_cd == "stop") {
+            check_result = stop_work_cause_input_check(this_step, next_step, action_cd);
+        }
+        if(check_result){
+            work_edit(this_step,next_step,action_cd);
+        }
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        return;
+    }
+
+    //呼び出し中に表示するgifをフェードアウト
+    if($("#action_pb_loading") != null){
+        $("#action_pb_loading").fadeOut();
+    }
+
+    //警告表示
+    if ( ng_flag > 0 ) {
+        msg += '未入力項目があります！！\n';
+    }
+    if ( ng_str_count_flag > 0 ) {
+        msg += '文字数オーバーです！！\n';
+    }
+    if ( ng_of_special_vendor_comment_flag > 0 ) {
+        msg += '特命コメントは特命のチェック時のみ入力可能です！！\n';
+    }
+    if ( contents_detail_alert_flg > 0 ) {
+        msg += contents_detail_alert_msg;
+    }
+    if ( alert_ng_ch_msg_str.length > 0) {
+        msg += alert_ng_ch_msg_str;
+    }
+
+    alert(msg);
+
+    // アクションボタン有効化
+    $(".button").prop("disabled", false);
+}
+</script>
+<script id='exe_work_check_input'>
+//内容詳細入力上限値
+function contents_detail_max(){
+    return { col:100 , row:54　, length:((3600 - 54) * 2) };
+}
+
+//内容詳細文字列の上限文字数チェック
+function check_contents_detail_max(value)
+{
+    return check_text_area_max(value, contents_detail_max().row, contents_detail_max().col,  contents_detail_max().length);
+}
+
+//内容詳細チェックボタン処理
+function contents_detail_check_button(string){
+    var { 1:alert_msg_str , 2:msg_str } = check_contents_detail_max(string);
+
+    //禁止文字チェックし、警告文字列生成
+    var alert_ng_ch_msg_str = check_ng_character_msg(string);
+
+    //警告表示
+    if(alert_msg_str.length > 0 ){
+        alert(alert_msg_str);
+    }else if(alert_ng_ch_msg_str.length > 0 ){
+        alert(alert_ng_ch_msg_str);
+    }else{
+        alert(msg_str);
+    }
+}
+
+//内容詳細の上限文字数チェック＋背景色変更
+function check_contents_detail_input(id_str)
+{
+    //値を取得
+    var element_value = $(id_str).val();
+
+    //入力上限チェックし、警告文字列生成
+    var { 1:alert_msg_str } = check_contents_detail_max(element_value);
+
+    //禁止文字チェックし、警告文字列生成
+    var alert_ng_ch_msg_str = check_ng_character_msg(element_value);
+
+    //背景色変更
+    if(alert_msg_str.length > 0 || alert_ng_ch_msg_str.length > 0){
+        $(id_str).css('background-color','silver');
+    }else{
+        $(id_str).css('background-color','white');
+    }
+
+    return { 1:element_value.length , 2:alert_msg_str, 3:alert_ng_ch_msg_str};
+}
+</script>
+<script id='exe_work_print_csv'>
+
+//内容詳細の全チェック
+function check_contents_detail_all(check_ng_flag)
+{
+    var contents_detail_alert_msg = "";
+
+    let contents_detail_list =
+    { 1: { val_id:'#contents_detail1', alert_str:'内容詳細1'},
+      2: { val_id:'#contents_detail2', alert_str:'内容詳細2'},
+      3: { val_id:'#contents_detail3', alert_str:'内容詳細3'},
+      4: { val_id:'#contents_detail4', alert_str:'内容詳細4'},
+      5: { val_id:'#contents_detail5', alert_str:'内容詳細5'},
+    };
+
+    for (let contents_detail_index in contents_detail_list){
+        var contents_detail_object = contents_detail_list[contents_detail_index];
+        var { 1:length , 2:alert_msg_str, 3:alert_ng_ch_msg_str} = check_contents_detail_input(contents_detail_object.val_id);
+        if ( alert_msg_str!= "" ){
+            contents_detail_alert_msg += contents_detail_object.alert_str + 'が入力上限を超えています！！！\n';
+        }
+        if ( alert_ng_ch_msg_str!= "" && check_ng_flag ){
+            contents_detail_alert_msg += contents_detail_object.alert_str + 'に' + alert_ng_ch_msg_str;
+        }
+    }
+    return contents_detail_alert_msg;
+}
+
+</script>
+<script id='work_edit'>
+// 調達仕様書情報テーブル登録･更新処理
+function work_edit(a,b, action_cd) {
+//    alert('sub_id : ' + $('#sub_id').val() + '  storage_loc : ' + $('#storage_loc').val());
+        var this_step = a;
+        var next_step = b;
+        var action_cd = action_cd;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            if(action_cd == "stop"){
+                var user_attribute_id = 0
+            }else{
+                var user_attribute_id = $('#sel_next_person').val();
+            }
+
+        }
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var comment = $('#comment').val();
+
+        var budget_id = $('#budget_id').val();
+        var rev_no = $('#rev_no').val();
+        var budget_no = $('#budget_no').val();
+        var budget_name = $('#budget_name').val();
+        var construction_id = $('#construction_id').val();
+        var sub_id = $('#sub_id').val();
+        var work_name = $('#work_name').val();
+        var department = $('#department').val();
+        var division = $('#division').val();
+
+        var format_kbn =  $('#sel_format_kbn').val();
+        var work_class_cd =  $('#work_class_cd').val();
+        var work_charge_process =  $('#work_charge_process').val();
+        var specification_person_in_charge =  $('#specification_person_in_charge').val();
+        var procurement_person_in_charge =  $('#procurement_person_in_charge').val();
+        var management_class_cd =  $('#management_class_cd').val();
+        var scheduled_acceptance_date_from =  $('#scheduled_acceptance_date_from').val();
+        var scheduled_acceptance_date_to =  $('#scheduled_acceptance_date_to').val();
+        var preparation_delivery_date =  $('#preparation_delivery_date').val();
+        var delivery_location =  $('#delivery_location').val();
+        var desired_construct_period_from =  $('#desired_construct_period_from').val();
+        var desired_construct_period_to =  $('#desired_construct_period_to').val();
+        var desired_delivery_date =  $('#desired_delivery_date').val();
+        var estimate_submission_date =  $('#estimate_submission_date').val();
+        var order_limited_date =  $('#order_limited_date').val();
+        var scheduled_inspection_date_from =  $('#scheduled_inspection_date_from').val();
+        var scheduled_inspection_date_to =  $('#scheduled_inspection_date_to').val();
+        var specification_data =  $('#specification_data').val();
+        var construction_outline =  $('#construction_outline').val();
+
+        var contents_detail1 =  $('#contents_detail1').val();
+        var contents_detail2 =  $('#contents_detail2').val();
+        var contents_detail3 =  $('#contents_detail3').val();
+        var contents_detail4 =  $('#contents_detail4').val();
+        var contents_detail5 =  $('#contents_detail5').val();
+
+        var candidate_vendor1 = $('#candidate_vendor1').val();
+        var candidate_vendor2 = $('#candidate_vendor2').val();
+        var candidate_vendor3 = $('#candidate_vendor3').val();
+        var candidate_vendor4 = $('#candidate_vendor4').val();
+        var candidate_vendor5 = $('#candidate_vendor5').val();
+
+        var memo = $('#memo').val();
+
+        var probable_price_str = $('#probable_price').val();
+        var probable_price = remove_comma(probable_price_str);
+        const elements = document.getElementsByName('special_vendor_check');
+        var special_vendor_check = elements[0].checked;
+        var special_vendor_comment = $('#special_vendor_comment').val();
+
+        $.ajax({
+                url: "/isk_tools/fms/action/execution_work_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_person' : next_person,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'comment' : comment,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_division' : this_division,
+                    'this_department' : this_department,
+
+                    'budget_id' : budget_id,
+                    'rev_no' : rev_no,
+                    'budget_no' : budget_no,
+                    'budget_name' : budget_name,
+                    'construction_id' : construction_id,
+                    'sub_id' : sub_id,
+                    'work_name' : work_name,
+                    'division' : division,
+                    'department' : department,
+                    'format_kbn' : format_kbn,
+                    'goods_construct_kbn' : work_class_cd,
+                    'work_charge_process' : work_charge_process,
+                    'specification_person_in_charge' : specification_person_in_charge,
+                    'procurement_person_in_charge' : procurement_person_in_charge,
+                    'management_class_cd' : management_class_cd,
+                    'delivery_location' : delivery_location,
+                    'desired_construct_period_from': desired_construct_period_from,
+                    'desired_construct_period_to' : desired_construct_period_to,
+                    'desired_delivery_date' : desired_delivery_date,
+                    'estimate_submission_date' : estimate_submission_date,
+                    'order_limited_date' : order_limited_date,
+                    'scheduled_inspection_date_from' : scheduled_inspection_date_from,
+                    'scheduled_inspection_date_to' : scheduled_inspection_date_to,
+                    'scheduled_acceptance_date_from' : scheduled_acceptance_date_from,
+                    'scheduled_acceptance_date_to' : scheduled_acceptance_date_to,
+                    'preparation_delivery_date' : preparation_delivery_date,
+                    'specification_data' : specification_data,
+                    'construction_outline' : construction_outline,
+                    'contents_detail1' : contents_detail1,
+                    'contents_detail2' : contents_detail2,
+                    'contents_detail3' : contents_detail3,
+                    'contents_detail4' : contents_detail4,
+                    'contents_detail5' : contents_detail5,
+                    'candidate_vendor1': candidate_vendor1,
+                    'candidate_vendor2': candidate_vendor2,
+                    'candidate_vendor3': candidate_vendor3,
+                    'candidate_vendor4': candidate_vendor4,
+                    'candidate_vendor5': candidate_vendor5,
+                    'memo': memo,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}",
+                    'probable_price': probable_price,
+                    'special_vendor_check': special_vendor_check,
+                    'special_vendor_comment': special_vendor_comment
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    complete_msg = data.msg;
+                    // 工事IDを表示
+                    var rev_no = data.rev_no
+                    $('#rev_no').val(rev_no);
+                    var construction_id = data.construction_id
+                    $('#construction_id').val(construction_id);
+
+                    log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    if(action_cd == "stop"){
+                        // 中止処理呼び出し
+                        //level5_stop_page(construction_id, budget_id, this_step, data.before_stop_person);
+                        stop_work_cause_entry(this_step,next_step);
+                        complete_msg = "以下の工事を中止しました。\n" + "工事ID:" + String(construction_id) + "\n" + "工事名:" + work_name
+                    }
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                    }
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert(complete_msg);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+}
+</script>
+<script>
+
+function work_name_chara_count() {
+    var work_name = $('#work_name').val();
+    var stringCount = work_name.length;
+    var chara_bytes = 0;
+        for (var i = 0; i < stringCount; i++) {
+            var c = work_name.charCodeAt(i);
+            if ((c >= 0x0 && c < 0x81) || (c === 0xf8f0) || (c >= 0xff61 && c < 0xffa0) || (c >= 0xf8f1 && c < 0xf8f4)) {
+                chara_bytes += 1;
+            } else {
+                chara_bytes += 2;
+            }
+        }
+    var length = document.getElementById('work_name_chara_length');
+    length.innerHTML = chara_bytes + "バイト";
+    if(chara_bytes > 40){
+        length.style.color = 'red';
+    }else{
+        length.style.color = 'black';
+    }
+}
+
+//画面表示時に金額欄にカンマ追加
+function add_comma_value_at_open() {
+    var target_div_id_1 = '#probable_price';
+    add_comma_target_value_at_open(target_div_id_1);  // fms_base.htmlにて定義
+}
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:170px;
+}
+div.scroll_div {
+  border: solid 1px;
+  overflow: scroll;
+}
+.contents_detail_size {
+    /*max-width: 100%;*/
+    width: 100%;
+    resize: vertical;
+    box-sizing: border-box;
+}
+.w_body1 {
+    width: 950px;
+    height: 1600px;
+    border:1px solid rgb(0, 0, 0);
+}
+.w_body2 {
+    width: 950px;
+    height: 1600px;
+    border:1px solid rgb(0, 0, 0);
+}
+.w_body3 {
+    width: 950px;
+    height: 1600px;
+    border:1px solid rgb(0, 0, 0);
+}
+.w_body4 {
+    width: 950px;
+    height: 1600px;
+    border:1px solid rgb(0, 0, 0);
+}
+.w_body5 {
+    width: 950px;
+    height: 1600px;
+    border:1px solid rgb(0, 0, 0);
+}
+/* タブ実装 */
+.title1, .w_body1 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title2, .w_body2 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title3, .w_body3 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title4, .w_body4 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title5, .w_body5 {
+    border:1px solid rgb(0, 0, 0);
+}
+.tab-title {
+    border-bottom: none;
+    padding: .3em .5em;
+    border-radius: .3em .3em 0 0;
+    text-align: center;
+    display: table;
+}
+.tab-body > div {
+    /*border-radius: 0 .3em .3em .3em;*/
+    padding: 1em;
+}
+.tab-body {
+/*    width: 100%;
+    height: 200%;*/
+}
+/* radio non-display */
+.container .radio {
+    display: none;
+}
+/* tabs position */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+}
+.container::after {
+    content: "";
+    width: 100%;
+}
+.container .tab-title {
+    position: relative;
+    border-bottom: solid transparent;
+    top: 1px;
+    left: 1px;
+}
+.container .tab-title:hover {
+    cursor: pointer;
+}
+.container .tab-body {
+    order: 1;
+}
+/* tab's body init */
+.add-control .tab-body > div {
+    display: none;
+}
+
+/* selected tab's color change */
+.add-control .radio:checked + .tab-title {
+    color: #fff;
+    border-bottom-color: #fff;
+}
+.add-control #execution_work_edit_tab1:checked ~ .title1 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_work_edit_tab2:checked ~ .title2 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_work_edit_tab3:checked ~ .title3 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_work_edit_tab4:checked ~ .title4 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_work_edit_tab5:checked ~ .title5 {
+    background: rgba(0, 0, 0, .5);
+}
+
+/* tabs control */
+.add-control #execution_work_edit_tab1:checked ~ .tab-body > .w_body1 {
+    display: block;
+}
+.add-control #execution_work_edit_tab2:checked ~ .tab-body > .w_body2 {
+    display: block;
+}
+.add-control #execution_work_edit_tab3:checked ~ .tab-body > .w_body3 {
+    display: block;
+}
+.add-control #execution_work_edit_tab4:checked ~ .tab-body > .w_body4 {
+    display: block;
+}
+.add-control #execution_work_edit_tab5:checked ~ .tab-body > .w_body5 {
+    display: block;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+
+    <input type="hidden" id="action" value="{{ action }}">
+    <input type="hidden" id="execution_work_page" value="{{ this_page }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="execution_work_edit">
+    </div>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div style="float:left;">
+        <!--FileUploadForm        -->
+            <form id="file_upload_form_{{ div_id_name }}" name="file_upload_form_{{ div_id_name }}" action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td><div><font size="4">予算ＩＤ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_id" size="10" value="{{ work_common_data.budget_id }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">RevNO</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="rev_no" size="10" value="{{ work_common_data.rev_no }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算ＮＯ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_no" size="10" value="{{ work_common_data.budget_no }}" readonly="readonly" ></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">予算名</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="budget_name" size="40" value="{{ work_common_data.budget_name }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工事ＩＤ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="construction_id" size="10" value="{{ work_common_data.construction_id }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工事名</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div style="float:left;"><font size="4"><input type="text" id="work_name" size="34" value="{{ work_common_data.work_name }}" onchange="work_name_chara_count()"></font></div><font size="4"><div id="work_name_chara_length" style="float:left;">バイト</div></font></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">サブNO</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="sub_id" size="10" value="{{ work_common_data.sub_id }}" ></font></div></td>
+            </tr>
+            <tr>
+                <input type="hidden" id="division" value="{{ work_common_data.division }}">
+                <td><div><font size="4">部門</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="division_name" size="20" value="{{ work_common_data.division_name }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <input type="hidden" id="department" value="{{ work_common_data.department }}">
+                <td><div><font size="4">部署</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="department_name" size="20" value="{{ work_common_data.department_name }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">定型/非定型</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_format_kbn" name="sel_format_kbn">
+                        <option value=""></option>
+                        {% if work_common_data.format_kbn == "定型" %}
+                            <option value="定型" selected>定型</option>
+                            <option value="非定型">非定型</option>
+                        {% elif work_common_data.format_kbn == "非定型" %}
+                            <option value="定型">定型</option>
+                            <option value="非定型" selected>非定型</option>
+                        {% else %}
+                            <option value="定型">定型</option>
+                            <option value="非定型">非定型</option>
+                        {% endif %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">物品/工事区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    <input type="hidden" id="work_class_cd" size="10" value="{{ work_common_data.goods_construct_kbn }}">
+                    <select id="sel_work_class_cd" name="sel_work_class_cd" onchange="work_class_cd_change(value);">
+                        <option value=""></option>
+                        {% for work_class_item in work_common_data.work_class_lists %}
+                            <option value="{{ work_class_item.work_class_cd }}">{{ work_class_item.work_class_name }}</option>
+                        {% endfor %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <input type="hidden" id="work_charge_process" value="{{ work_common_data.work_charge_process }}">
+                <td><div><font size="4">設備工程</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="work_charge_process_name" size="35" value="{{ work_common_data.work_charge_process }}:{{ work_common_data.work_charge_process_name }}" readonly="readonly"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">計画担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                <font size="5" color="black">{{ work_common_data.planning_charge_person_name }}</font>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">仕様書担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <input type="hidden" id="specification_person_in_charge" value="{{ work_common_data.specification_person_in_charge }}">
+                    <select id="sel_specification_person_in_charge" name="sel_specification_person_in_charge" onchange="specification_person_in_charge_change(value);">
+                        <option value=""></option>
+                        {% for specification_person_in_charge_item in work_common_data.specification_person_in_charge_list %}
+                            <option value="{{ specification_person_in_charge_item.username }}">{{ specification_person_in_charge_item.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">調達担当者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <input type="hidden" id="procurement_person_in_charge" value="{{ work_common_data.procurement_person_in_charge }}">
+                    <select id="sel_procurement_person_in_charge" name="sel_procurement_person_in_charge" onchange="procurement_person_in_charge_change(value);">
+                        <option value=""></option>
+                        {% for procurement_person_in_charge_item in work_common_data.procurement_person_in_charge_list %}
+                            <option value="{{ procurement_person_in_charge_item.username }}">{{ procurement_person_in_charge_item.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">管理区分</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <input type="hidden" id="management_class_cd" value="{{ work_common_data.management_class_cd }}">
+                    <select id="sel_management_class_cd" name="sel_management_class_cd" onchange="management_class_cd_change(value);">
+                        <option value=""></option>
+                        {% for management_class_item in work_common_data.management_class_list %}
+                            <option value="{{ management_class_item.management_class_cd }}">{{ management_class_item.management_class_name }}</option>
+                        {% endfor %}
+                    </select>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">納入場所</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="delivery_location" size="20" value="{{ work_common_data.delivery_location }}"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望工期</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="desired_construct_period_from" class="datepicker" value="{{ work_common_data.desired_construct_period_from }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('desired_construct_period_from');"> ～ <input type="text" id="desired_construct_period_to" class="datepicker" value="{{ work_common_data.desired_construct_period_to }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('desired_construct_period_to');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望納期日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="desired_delivery_date" class="datepicker" value="{{ work_common_data.desired_delivery_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('desired_delivery_date');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">見積提出希望日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="estimate_submission_date" class="datepicker" value="{{ work_common_data.estimate_submission_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('estimate_submission_date');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">発注期日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="order_limited_date" class="datepicker" value="{{ work_common_data.order_limited_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('order_limited_date');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">品質/立会検査予定日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="scheduled_inspection_date_from" class="datepicker" value="{{ work_common_data.scheduled_inspection_date_from }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('scheduled_inspection_date_from');"> ～ <input type="text" id="scheduled_inspection_date_to" class="datepicker" value="{{ work_common_data.scheduled_inspection_date_to }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('scheduled_inspection_date_to');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">品質/受入検査予定日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="scheduled_acceptance_date_from" class="datepicker" value="{{ work_common_data.scheduled_acceptance_date_from }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('scheduled_acceptance_date_from');"> ～ <input type="text" id="scheduled_acceptance_date_to" class="datepicker" value="{{ work_common_data.scheduled_acceptance_date_to }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('scheduled_acceptance_date_to');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">引渡準備完了日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="preparation_delivery_date" class="datepicker" value="{{ work_common_data.preparation_delivery_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('preparation_delivery_date');"></font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">仕様書データ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><input type="file" id="specification_data" name="specification_data"></td>
+            </tr>
+        </table>
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            {% csrf_token %}
+            <input type="button" class="button" value=" 格納 " onclick="file_upload('{{ div_id_name }}');">
+            </form>
+        <!--FileUploadForm        -->
+        <!--UploadFileList        -->
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+    <br>
+    <br>
+    <table>
+        <tr>
+            <td><div><font size="4">予想額</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4">
+                    <input type="text" id="probable_price" name="probable_price"
+                                           onblur="add_comma_value(this)"
+                                           value="{{ work_common_data.probable_price | default_if_none:'' }}">
+            </font></div></td>
+        </tr>
+        <tr>
+            <td><div><font size="4">候補業者1</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4"><input type="text" id="candidate_vendor1" name="candidate_vendor1" value="{{ work_common_data.candidate_vendor1 }}"></font>
+                {% if work_common_data.prospecificationunit_data.special_vendor_check %}
+                    <font size="4"><input type="checkbox" name="special_vendor_check" value="特命" checked="checked"> 特命</font>
+                {% else %}
+                    <font size="4"><input type="checkbox" name="special_vendor_check" value="特命"  > 特命</font>
+                {% endif %}
+            </div></td>
+        </tr>
+        <tr>
+            <td><div><font size="4">候補業者2</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4"><input type="text" id="candidate_vendor2" name="candidate_vendor2" value="{{ work_common_data.candidate_vendor2 }}"></font></div></td>
+        </tr>
+        <tr>
+            <td><div><font size="4">候補業者3</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4"><input type="text" id="candidate_vendor3" name="candidate_vendor3" value="{{ work_common_data.candidate_vendor3 }}"></font></div></td>
+        </tr>
+        <tr>
+            <td><div><font size="4">候補業者4</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4"><input type="text" id="candidate_vendor4" name="candidate_vendor4" value="{{ work_common_data.candidate_vendor4 }}"></font></div></td>
+        </tr>
+        <tr>
+            <td><div><font size="4">候補業者5</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4"><input type="text" id="candidate_vendor5" name="candidate_vendor5" value="{{ work_common_data.candidate_vendor5 }}"></font></div></td>
+        </tr>
+        <tr>
+            <td><div><font size="4">備考</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4"><textarea id="memo" name="memo" maxlength="400" rows="10" cols="40" >{{ work_common_data.memo }}</textarea></font></div></td>
+        </tr>
+        <tr>
+            <td><div><font size="4">特命コメント</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4">
+                    <textarea id="special_vendor_comment" name="special_vendor_comment" maxlength="400" rows="10" cols="40" >{{ work_common_data.prospecificationunit_data.special_vendor_comment  | default_if_none:'' }}</textarea>
+            </font></div></td>
+        </tr>
+        <tr>
+            <td><div><font size="4">工事概要</font></div></td>
+            <td><div><font size="4">：　</font></div></td>
+            <td><div><font size="4"><textarea id="construction_outline" name="construction_outline" rows="10" cols="40" >{{ work_common_data.construction_outline }}</textarea></font></div></td>
+        </tr>
+    </table>
+        <!--UploadFileList        -->
+        <!--    <div id="upload_file_list_{{ div_id_name }}"></div> -->
+        <!--UploadFileList        -->
+    </div>
+    </div><!--ng_character_checkここまで-->
+
+    <div style="float:left;width:10px;" >　</div>
+    <div class="scroll_div" style="float: left;">
+
+        <div class="container add-control">
+            <input type="radio" id="execution_work_edit_tab1" class="radio" name="execution_work_edit_tab" checked="checked"><label class="tab-title title1" for="execution_work_edit_tab1">内容詳細1</label>
+            <input type="radio" id="execution_work_edit_tab2" class="radio" name="execution_work_edit_tab" ><label class="tab-title title2" for="execution_work_edit_tab2">内容詳細2</label>
+            <input type="radio" id="execution_work_edit_tab3" class="radio" name="execution_work_edit_tab" ><label class="tab-title title3" for="execution_work_edit_tab3">内容詳細3</label>
+            <input type="radio" id="execution_work_edit_tab4" class="radio" name="execution_work_edit_tab" ><label class="tab-title title4" for="execution_work_edit_tab4">内容詳細4</label>
+            <input type="radio" id="execution_work_edit_tab5" class="radio" name="execution_work_edit_tab" ><label class="tab-title title5" for="execution_work_edit_tab5">内容詳細5</label>
+            <div class="tab-body">
+                <div class="w_body1">
+                    <input type="button" id="contents_detail_check1" onclick="contents_detail_check_button(contents_detail1.value);" value="チェック">　ヨコ全角50文字,タテ54行までで入力してください。(合計上限文字数3600文字)
+                    <font size="4"><textarea id="contents_detail1" name="contents_detail" class="contents_detail_size" rows="54" cols="80" maxlength="3600" wrap="off" style="width: 920px; height: 1450px; resize: none;" onkeyup="check_contents_detail_input('#contents_detail1');">{{ work_common_data.contents_detail1 }}</textarea></font>
+                </div>
+                <div class="w_body2">
+                    <input type="button" id="contents_detail_check2" onclick="contents_detail_check_button(contents_detail2.value);" value="チェック">　ヨコ全角50文字,タテ54行までで入力してください。(合計上限文字数3600文字)
+                    <font size="4"><textarea id="contents_detail2" name="contents_detail" class="contents_detail_size" rows="54" cols="80" maxlength="3600" wrap="off" style="width: 920px; height: 1450px; resize: none;" onkeyup="check_contents_detail_input('#contents_detail2');">{{ work_common_data.contents_detail2 }}</textarea></font>
+                </div>
+                <div class="w_body3">
+                    <input type="button" id="contents_detail_check3" onclick="contents_detail_check_button(contents_detail3.value);" value="チェック">　ヨコ全角50文字,タテ54行までで入力してください。(合計上限文字数3600文字)
+                    <font size="4"><textarea id="contents_detail3" name="contents_detail" class="contents_detail_size" rows="54" cols="80" maxlength="3600" wrap="off" style="width: 920px; height: 1450px; resize: none;" onkeyup="check_contents_detail_input('#contents_detail3');">{{ work_common_data.contents_detail3 }}</textarea></font>
+                </div>
+                <div class="w_body4">
+                    <input type="button" id="contents_detail_check4" onclick="contents_detail_check_button(contents_detail4.value);" value="チェック">　ヨコ全角50文字,タテ54行までで入力してください。(合計上限文字数3600文字)
+                    <font size="4"><textarea id="contents_detail4" name="contents_detail" class="contents_detail_size" rows="54" cols="80" maxlength="3600" wrap="off" style="width: 920px; height: 1450px; resize: none;" onkeyup="check_contents_detail_input('#contents_detail4');">{{ work_common_data.contents_detail4 }}</textarea></font>
+                </div>
+                <div class="w_body5">
+                    <input type="button" id="contents_detail_check5" onclick="contents_detail_check_button(contents_detail5.value);" value="チェック">　ヨコ全角50文字,タテ54行までで入力してください。(合計上限文字数3600文字)
+                    <font size="4"><textarea id="contents_detail5" name="contents_detail" class="contents_detail_size" rows="54" cols="80" maxlength="3600" wrap="off" style="width: 920px; height: 1450px; resize: none;" onkeyup="check_contents_detail_input('#contents_detail5');">{{ work_common_data.contents_detail5 }}</textarea></font>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="clear: both;"></div>
+
+

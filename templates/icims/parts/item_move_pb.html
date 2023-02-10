@@ -1,0 +1,38 @@
+<style>
+
+.like_button{
+    height: 24px;
+    background: #79aec8;
+    padding: 5px 5px;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+
+}
+.like_button:hover {
+    background: #609ab6;
+}
+
+</style>
+
+    <div>
+       <font size="3">
+            {% if stock_status == 1 %}
+                <div style="float: left;width:170px;">
+                    <input type="button" value="　　移動(出庫)　　" onclick="itemout();">
+                </div>
+                <div style="float: left;width:170px;">
+                    <input type="button" value="移動(出庫同時入庫)" onclick="itemoutin();">
+                </div>
+            {% elif stock_status == 11 %}
+                <div style="float: left;width:180px;">
+                    <input type="button" value="　　移動(入庫)　　" onclick="itemin();">
+                </div>
+                <div class="like_button" style="float: left;width:160px;">
+                    <p><a href="/imsds/action/item_move_job_order?stock_id={{ stock_id }}" download="{{ stock_id }}_倉庫移動指示書.xlsx" style="color: #fff; padding: 5px 5px; text-decoration:none;">移動作業指示書作成</a></p>
+                </div>
+            {% endif %}
+       </font>
+
+    </div>

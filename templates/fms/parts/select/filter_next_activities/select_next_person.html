@@ -1,0 +1,9 @@
+<script>
+
+</script>
+            次作業者：<select id="sel_{{ target }}_next_parson" name="sel_next_person">
+                        <option value=""></option>
+                {% for next_person in next_person_list %}
+                        <option value="{{ next_person.username }}">{{ next_person.full_name }}</option>
+                {% endfor %}
+                </select>

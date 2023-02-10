@@ -1,0 +1,108 @@
+
+<script>
+
+function action_button_empty() {
+    if ( this_step != next_step ){
+        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+    }
+}
+
+</script>
+
+<style>
+.disable_color {
+    background: #DDDDDD;
+}
+</style>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+<!--        <input type="hidden" id="sub_id" value="{{ sub_id }}" >-->
+<!--        <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">-->
+<!--        <input type="hidden" id="this_work_id" value="{{ work_lists.work_id }}">-->
+<!--        <input type="hidden" id="this_work_rev_no" value="{{ work_lists.work_rev_no }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="present_step" value="{{ present_step }}">
+        <input type="hidden" id="present_operator" value="{{ present_operator }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="stop_work_cause_page" value="{{ this_page }}">
+        <input type="hidden" id="goods_construct_kbn" value="{{ goods_construct_kbn }}">
+
+        <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    </div>
+    <div>
+        <table>
+            <tr>
+                <td><div><font size="4">中止原因部署</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_stop_work_cause_data_num == 0 %}
+                        <font size="5" color="black">{{ stop_work_cause_name }}</font>
+                    {% elif stop_work_cause_name == old_stop_work_cause_data.stop_work_cause_name %}
+                        <font size="5" color="black">{{ stop_work_cause_name }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ stop_work_cause_name }}</font>
+                    {% endif %}
+                </div></td>
+            <tr>
+                <td><div><font size="4">中止理由</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_stop_work_cause_data_num == 0 %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40"
+                                                 style="color:black;" readonly>{{ stop_work_reason }}</textarea></font>
+                    {% elif stop_work_reason == old_stop_work_cause_data.stop_work_reason %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40"
+                                                 style="color:black;" readonly>{{ stop_work_reason }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40"
+                                                 style="color:red;" readonly>{{ stop_work_reason }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                {% if target == 'work' or target == 'prospecificationunit' %}
+                    <td><div><font size="4">リスク</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_stop_work_cause_data_num == 0 %}
+                            <font size="4"><textarea name="work_rem" rows="10" cols="40"
+                                                     style="color:black;" readonly>{{ stop_work_risk }}</textarea></font>
+                        {% elif stop_work_risk == old_stop_work_cause_data.stop_work_risk %}
+                            <font size="4"><textarea name="work_rem" rows="10" cols="40"
+                                                     style="color:black;" readonly>{{ stop_work_risk }}</textarea></font>
+                        {% else %}
+                            <font size="4"><textarea name="work_rem" rows="10" cols="40"
+                                                     style="color:red;" readonly>{{ stop_work_risk }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                {% else %}
+                    <input type="hidden" id="budget_no" value="{{ budget_no }}" >
+                    <input type="hidden" id="budget_name" value="{{ budget_name }}" >
+                    <td><div><font size="4">決裁No</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_stop_work_cause_data_num == 0 %}
+                            <font size="5" color="black">{{ approval_no }}</font>
+                        {% elif approval_no == old_stop_work_cause_data.approval_no %}
+                            <font size="5" color="black">{{ approval_no }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ approval_no }}</font>
+                        {% endif %}
+                    </div></td>
+                {% endif %}
+            </tr>
+        </table>
+    </div>
+<!--添付資料？-->
+    <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+    <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+    <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+    <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+    <div id="upload_file_list_{{ div_id_name }}"></div>

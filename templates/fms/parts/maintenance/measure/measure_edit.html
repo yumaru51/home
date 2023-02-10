@@ -1,0 +1,1192 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年mm月dd日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//機器リストソース取得
+function measure_equipment_list_change() {
+    mgt_cls = $('#mgt_class').val();
+    facility = $('#facility').val();
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/input_select_equipment_list/",
+        type: "POST",
+        data : {
+            'mgt_cls': mgt_cls,
+            'facility' : facility,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#equipment_no').empty();
+            $('#equipment_no').html(data);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('#equipment_no').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+
+}
+//案件区分選択のコンボボックスの選択を呼び出した値(引数?)と同期
+function item_class_value_change() {
+        var target_item_class = $('#item_class').val();
+        if (target_item_class != "") {
+            var pulldown_option = document.getElementById("sel_item_class").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_item_class){
+                    var value = pulldown_option[i].value;
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+
+//案件区分選択のコンボボックスを変更したときに選択値と格納値を同期
+function item_class_change(a) {
+    var value = a;
+    $('#item_class').val(value);
+    if　(value　!= 1){
+        $('#response_request_date').val('');
+        $('#maintenance_status').val(0);
+        maintenance_status_radio_value_set();
+    }
+    order_function_display();
+}
+
+//故障/作業種別選択のコンボボックスの選択を呼び出した値(引数?)と同期
+function malfunction_class_value_change() {
+        var target_malfunction_class = $('#malfunction_class').val();
+        if (target_malfunction_class != "") {
+            var pulldown_option = document.getElementById("sel_malfunction_class").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_malfunction_class){
+                    var value = pulldown_option[i].value;
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+
+//故障/作業種別選択のコンボボックスを変更したときに選択値と格納値を同期
+function malfunction_class_change(a) {
+    var value = a;
+    $('#malfunction_class').val(value);
+    change_next_step();
+}
+
+// 故障/作業種別が特定の値の場合、次工程を変更する
+function change_next_step() {
+    if ($('#malfunction_class').val() == "その他-調達G関連"){
+        $('#sel_next_step').val('232001001')
+        select_next_step(232001001)
+    }
+}
+
+//届出要否ラジオ値取得
+function notification_radio_change() {
+    var elements = document.getElementsByName( "notification" ) ;
+    // 選択状態の値を取得
+    for ( var a="", i=elements.length; i--; ) {
+        if ( elements[i].checked ) {
+            var a = elements[i].value ;
+            $('#notification').val(a);
+            break ;
+        }
+    }
+    //notification_radio_change2();
+}
+
+//届出要否ラジオ選択
+function notification_radio_value_set() {
+    // 要素を取得
+    var elements = document.getElementsByName( "notification" ) ;
+    //設定値を取得
+    var notification_value = $('#notification').val();
+    //for ( var a="", i=elements.length; i--; ) {
+    //    var a = elements[i].value ;
+    //    if(notification_value == a ) {
+    //        elements[i].checked = true ;
+    //    }else{
+    //        elements[i].checked = false ;
+    //    }
+    //}
+}
+
+// 届出チェックタブ表示/非表示処理・・・現在は不要
+//function notification_radio_change2() {
+/*
+    //var p3 = document.getElementById("a_3");
+    var notification = document.getElementsByName("notification");
+    for(var i = 0; i < notification.length; i++){
+      if(notification[i].checked) {
+        notification_value = notification[i].value;
+        //if (notification_value == '1' ) {
+        //    p3.style.visibility ="visible";
+        //    //notification_value();
+        //}else{
+        //    p3.style.visibility ="hidden";
+        //    //notification_value();
+        //}
+      }
+    }
+*/
+//}
+
+//整備診断区分ラジオ値取得
+function maintenance_diagnosis_radio_change() {
+    var elements = document.getElementsByName( "maintenance_diagnosis" ) ;
+    // 選択状態の値を取得
+    for ( var a="", i=elements.length; i--; ) {
+        if ( elements[i].checked ) {
+            var a = elements[i].value ;
+            $('#maintenance_diagnosis').val(a);
+            break ;
+        }
+    }
+}
+
+//整備診断区分ラジオ選択
+function maintenance_diagnosis_radio_value_set() {
+    // 要素を取得
+    var elements = document.getElementsByName( "maintenance_diagnosis" ) ;
+    //設定値を取得
+    var maintenance_diagnosis_value = $('#maintenance_diagnosis').val();
+    for ( var a="", i=elements.length; i--; ) {
+        var a = elements[i].value ;
+        if(maintenance_diagnosis_value == a ) {
+            elements[i].checked = true ;
+        }else{
+            elements[i].checked = false ;
+        }
+    }
+}
+//依頼状況ラジオ値取得
+function maintenance_status_radio_change() {
+    var elements = document.getElementsByName( "maintenance_status" ) ;
+    // 選択状態の値を取得
+    for ( var a="", i=elements.length; i--; ) {
+        if ( elements[i].checked ) {
+            var a = elements[i].value ;
+            $('#maintenance_status').val(a);
+            break ;
+        }
+    }
+    //notification_radio_change2();
+}
+//依頼状況ラジオ選択
+function maintenance_status_radio_value_set() {
+    // 要素を取得
+    var elements = document.getElementsByName( "maintenance_status" ) ;
+    //設定値を取得
+    var maintenance_status_value = $('#maintenance_status').val();
+    for ( var a="", i=elements.length; i--; ) {
+        var a = elements[i].value ;
+        if(maintenance_status_value == a ) {
+            elements[i].checked = true ;
+        }else{
+            elements[i].checked = false ;
+        }
+    }
+}
+
+// 依頼項目表示/非表示処理
+function order_function_display() {
+    var order_function_div = document.getElementById("order_function");
+    var emergency_order_div = document.getElementById("emergency_order");
+    var item_class_value = $('#sel_item_class').val();
+    if (item_class_value == '自主整備' ) {
+        emergency_order_div.style.visibility ="hidden";
+        //order_function_div.style.visibility ="hidden";
+    }else if(item_class_value == '定常'){
+        order_function_div.style.visibility ="visible";
+        emergency_order_div.style.visibility ="hidden";
+    }else{
+        order_function_div.style.visibility ="visible";
+        emergency_order_div.style.visibility ="visible";
+    }
+}
+// 緊急依頼項目表示/非表示処理
+function emergency_order_display() {
+    var emergency_order_div = document.getElementById("emergency_order");
+    var item_class_value = $('#sel_item_class').val();
+    if (item_class_value == '緊急' ) {
+        emergency_order_div.style.visibility ="visible";
+    }else{
+        emergency_order_div.style.visibility ="hidden";
+    }
+}
+
+// 初期画面届出チェックタブ非表示処理
+function notification_tab_hidden() {
+    var notification = $('#notification').val();
+    if (notification == 0) {
+        var p3 = document.getElementById("a_3");
+        p3.style.visibility ="hidden";
+    }
+}
+
+//ボタン抑止解除処理
+function measure_button_enable() {
+    if($("#action_pb_loading") != null){
+        $("#action_pb_loading").fadeOut();
+    }
+    // アクションボタン有効化
+    $(".button").prop("disabled", false);
+}
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+}
+
+//メール送信ボタン処理
+function measure_mail_send_button() {
+    //ボタン抑止
+    var unmatch_flag = 0;
+
+    $(".button").prop("disabled", true);
+    if($("#action_pb_loading") != null){
+        $("#action_pb_loading").show();
+    }
+    var { 1:ng_flag , 2:ng_str_count_flag , 3:alert_ng_ch_msg_str  } = measure_input_check();
+
+    var ans_array = check_malfunction_class(unmatch_flag);
+    unmatch_flag += ans_array[0]
+
+    //異常報告ステップでもメール送信ボタンは有効なので、編集可能な場合入力チェックする
+    if (document.getElementById("phenomenon_entry") != null) {
+        var { 1:phenomenon_ng_flag , 2:phenomenon_ng_str_count_flag  } = phenomenon_input_check();
+        ng_flag = ng_flag + phenomenon_ng_flag;
+        ng_str_count_flag = ng_str_count_flag + phenomenon_ng_str_count_flag;
+    }
+
+    var ng_all_flag = ng_flag + ng_str_count_flag + unmatch_flag + alert_ng_ch_msg_str.length;
+
+    //正常処理
+    if ( ng_all_flag == 0) {
+        if (document.getElementById("phenomenon_entry") != null) {
+            //異常報告タブの一時保存を実行
+            var deferred_phenomenon = phenomenon_edit({{ present_step }},{{ present_step }});
+            deferred_phenomenon.done(function(){
+                    measure_button_enable();
+                    measure_mail_send_check();
+                })
+                .fail(function(){
+                    measure_button_enable();
+                });
+        }else{
+            var deferred_measure = measure_edit({{ present_step }},{{ present_step }});
+            //一時保存成功時、メール送信(コールバック処理登録)
+            deferred_measure.done(function(){
+                    measure_button_enable();
+                    measure_mail_send_check();
+                })
+                .fail(function(){
+                    measure_button_enable();
+                });
+        }
+    }else{
+        //異常時はすぐにボタンを通常に戻す
+        measure_button_enable();
+
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( unmatch_flag > 0 ) {
+            msg += ans_array[1];
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+// メール送信 文字列長チェック版
+function measure_mail_send_check(){
+    // 本文情報をHTMLから取得
+    var address, ccAddress, subject, body;
+        address = '';
+        ccAddress = '';
+
+    var subject = $('#subject_str').val();
+    var body_data = $('#msg_body').val();
+
+    // mailto用文字列作成
+    var mail_str = 'mailto:' + address + '?subject=' + subject + '&body=' + body_data;
+
+    // URIエンコード後の文字列長さを確認（改行文字を変換せずにencodeURIを実行すると、実際の文字列長と一致する）
+    var encode_mail_str = encodeURI(mail_str);
+
+    // mailto文字列長判定
+    //エンコード後の文字列長が2046を超えるとメーラーが起動しない、安全範囲で2040文字以上でクリップボード使用する
+    if(encode_mail_str.length > 2040){
+        var result = copy_to_clipboard(body_data);
+        if(!result){
+            console.log('iep_mail_send_check():copy_to_clipboard失敗');
+            alert('クリップボードへのコピーに失敗しました。メール作成を中止します。');
+            return;
+        }
+        alert('文字列が長いため、メール本文はクリップボードにコピーします。メール画面でペースト（ctrl+V）してください。');
+
+         // subjectのみに変更
+        mail_str = 'mailto:' + address + '?subject=' + subject;
+        encode_mail_str = encodeURI(mail_str);
+    }
+
+    // メール画面表示
+    location.href = encode_mail_str;
+}
+
+//届出チェックタブ側の入力チェックが必要か判定
+function is_notification_need_check() {
+    var need_flag = 0;
+    if(document.getElementById("notification_check_entry") != null) {
+        need_flag = 1;
+    }
+    return need_flag;
+}
+
+//入力任意ページの場合、入力チェックが必要かの判定
+function measure_need_check_edit( next_step ) {
+    var need_flag = 0;
+    var this_step = Number($('#this_step').val());
+
+    //工事/依頼内容が入力済の場合、入力チェックも実行する
+    var measure_order_detail = $('#measure_order_detail').val();
+    if (measure_order_detail != "") {
+        need_flag = 1;
+    }
+
+    //次ステップが対応方針以外の場合、入力チェック必須(工程完了を除く)
+    if ( next_step != 231001011 && next_step != 232009901 && next_step != this_step) {
+        need_flag = 1;
+    }
+
+    return need_flag;
+}
+//入力項目の未入力、文字数オーバーのチェックだけを行う
+function measure_input_check() {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    //案件区分によって、必須チェックを分岐
+    var item_class_val = $('#item_class').val();
+
+    //届出チェックタブ側の入力チェックが必要であれば実行する
+    if (is_notification_need_check()) {
+        var { 1:notification_ng_flag , 2:notification_ng_str_count_flag , 3:notification_alert_ng_ch_msg_str } = notification_check_input_check();
+        ng_flag = ng_flag + notification_ng_flag;
+        ng_str_count_flag = ng_str_count_flag + notification_ng_str_count_flag;
+    }else{
+        var notification_alert_ng_ch_msg_str = '';
+    }
+
+    // チェック範囲の背景色を初期化
+    let target = document.querySelector("#{{ div_id_name }}_ng_character_check")
+    let elements = target.querySelectorAll('[input_check]');
+    elements.forEach(function(element,num){
+        element.style.backgroundColor = 'white';
+    });
+
+    // 禁止文字チェック
+    alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+    if (notification_alert_ng_ch_msg_str.length > 0 ) {
+        alert_ng_ch_msg_str += notification_alert_ng_ch_msg_str;
+    }
+
+    //入力チェック対象リスト　val_id=該当id、set_id=背景色変更対象id、
+    //must_flg=必須項目フラグ(1で必須)、max_length=上限文字数(0はチェックしない)
+    //may_item_class=必須チェックしないitem_classの値(配列)
+    let check_object_list =
+    { 0:  { val_id:'#sel_item_class',               set_id:'sel_item_class',               must_flg:1, max_length:0,    may_item_class:{}},
+      1:  { val_id:'#measure_order_detail',         set_id:'measure_order_detail',         must_flg:1, max_length:1000, may_item_class:{}},
+      2:  { val_id:'#desired_delivery_date_f',      set_id:'desired_delivery_date_f',      must_flg:1, max_length:0,    may_item_class:{}},
+      3:  { val_id:'#desired_delivery_date_t',      set_id:'desired_delivery_date_t',      must_flg:1, max_length:0,    may_item_class:{}},
+      4:  { val_id:'#sel_person',                   set_id:'sel_person',                   must_flg:1, max_length:25,   may_item_class:{}},
+      5:  { val_id:'#malfunction_class',            set_id:'sel_malfunction_class',        must_flg:1, max_length:30,   may_item_class:{}},
+      6:  { val_id:'#sel_instruction_no',           set_id:'sel_instruction_no',           must_flg:1, max_length:20,   may_item_class:{}},
+      7:  { val_id:'#sel_cost_center',              set_id:'sel_cost_center',              must_flg:1, max_length:10,   may_item_class:{}},
+      8:  { val_id:'#sel_account_code',             set_id:'sel_account_code',             must_flg:1, max_length:16,   may_item_class:{}},
+      9:  { val_id:'#maintenance_status',           set_id:'maintenance_status_title',     must_flg:1, max_length:0,    may_item_class:{0:'1',1:'4'}},
+      10: { val_id:'#response_request_date',        set_id:'response_request_date',        must_flg:1, max_length:0,    may_item_class:{0:'1',1:'4'}},
+      11: { val_id:'#desired_vendor',               set_id:'desired_vendor',               must_flg:1, max_length:30,   may_item_class:{0:'4'}},
+      12: { val_id:'#orders_received_person',       set_id:'orders_received_person',       must_flg:1, max_length:50,   may_item_class:{0:'1',1:'4'}},
+      13: { val_id:'#order_department',             set_id:'order_department',             must_flg:1, max_length:0,    may_item_class:{}},
+    };
+
+    for (let check_index in check_object_list){
+        var check_object = check_object_list[check_index];
+        var check_val = $(check_object.val_id).val();
+        var set_element = document.getElementById(check_object.set_id);
+        var must_flg = check_object.must_flg;
+
+        //文字数上限チェック
+        if ( check_object.max_length > 0 && count_char(check_val) > check_object.max_length){
+            set_element.style.backgroundColor = 'silver';
+            ng_str_count_flag = ng_str_count_flag + 1 ;
+        }
+
+        //必須項目チェック
+        if(must_flg == 1 && check_val == ""){
+            for (let item_index in check_object.may_item_class){
+                if(item_class_val == check_object.may_item_class[item_index]){
+                    must_flg = 0;
+                    break;
+                }
+            }
+            if(must_flg==1){
+                set_element.style.backgroundColor = 'orange';
+                ng_flag = ng_flag + 1;
+            }
+        }
+
+    }
+
+    return { 1:ng_flag , 2:ng_str_count_flag , 3:alert_ng_ch_msg_str};
+
+}
+
+// 故障/作業種別と次工程の関連性チェック
+function check_malfunction_class(unmatch_flag){
+    var selected_malfunction_class = $('#malfunction_class').val();
+    var sel_next_step = $('#sel_next_step').val();
+    var sel_next_person_department = $('#sel_next_person_department').val();
+    var ans_kind = 0;
+    var errmsg = ''
+
+    // 故障/作業種別が入力されていない場合は処理をおこなわない。(必須入力のため通常の入力チェックにて判定する)
+    if (selected_malfunction_class != ''){
+        if ((selected_malfunction_class == 'その他-調達G関連' && sel_next_step != '232001001')
+            || (selected_malfunction_class == 'その他-調達G関連' && sel_next_person_department != 'SI')){
+            unmatch_flag += 1;
+            errmsg = '故障/作業種別が「その他-調達G関連」の場合は、\n 　次工程:小口依頼 \n 　次部署:調達G \n としてください！！\n'
+            $('#sel_malfunction_class').css('background-color','orange');
+            $('#sel_next_step').css('background-color','orange');
+            $('#sel_next_person_department').css('background-color','orange');
+        }else if (selected_malfunction_class != 'その他-調達G関連' && sel_next_step == '232001001'){
+            unmatch_flag += 1;
+            errmsg = '故障/作業種別が「その他-調達G関連」以外の場合は、\n 　次工程:小口依頼 \n を選択できません！！\n'
+            $('#sel_malfunction_class').css('background-color','orange');
+            $('#sel_next_step').css('background-color','orange');
+            $('#sel_next_person_department').css('background-color','orange');
+        }else{
+            errmsg = ''
+            $('#sel_malfunction_class').css('background-color','white');
+            $('#sel_next_step').css('background-color','white');
+            $('#sel_next_person_department').css('background-color','white');
+        }
+    }
+
+    return [unmatch_flag, errmsg];
+}
+
+//入力項目チェック後に保存処理を実行
+function measure_check_edit(a,b,d) {
+    var msg = ""
+    var unmatch_flag = 0;
+    var { 1:ng_flag , 2:ng_str_count_flag , 3:alert_ng_ch_msg_str} = measure_input_check();
+
+    var ans_array = check_malfunction_class(unmatch_flag);
+    unmatch_flag += ans_array[0]
+
+    var ng_all_flag = ng_flag + ng_str_count_flag + unmatch_flag + alert_ng_ch_msg_str.length;
+
+    //正常処理を先に判定
+    if ( ng_all_flag == 0) {
+        measure_edit(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( unmatch_flag > 0 ) {
+            msg += ans_array[1];
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+//データ登録･更新処理
+function measure_edit(a,b) {
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = $('#sel_next_person').val();
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var measure_id = $('#measure_id').val();
+        var phenomenon_id = $('#target_phenomenon_id').val();
+        var measure_order_detail = $('#measure_order_detail').val();
+        var item_class = $('#item_class').val();
+        var desired_delivery_date_f = $('#desired_delivery_date_f').val();
+        var desired_delivery_date_t = $('#desired_delivery_date_t').val();
+        var order_department = $('#order_department').val();
+
+        var cost_center = $('#sel_cost_center').val();
+        var account_code = $('#sel_account_code').val();
+        var instruction_no = $('#sel_instruction_no').val();
+
+        var maintenance_diagnosis = $('#maintenance_diagnosis').val();
+        var maintenance_status = $('#maintenance_status').val();
+        var response_request_date = $('#response_request_date').val();
+        var order_person = $('#sel_person').val();
+        var desired_vendor = $('#desired_vendor').val();
+        var malfunction_class = $('#malfunction_class').val();
+        var orders_received_person = $('#orders_received_person').val();
+        if(document.getElementById("equipment_no") != null){
+            var equipment_no = $('#equipment_no').val();
+        }else{
+            var equipment_no = ''
+        }
+
+        //完了を通知するためのDeferredオブジェクトを作成
+        var deferred = new $.Deferred();
+
+        $.ajax({
+            url: "/isk_tools/fms/action/measure_entry/",
+            type: "POST",
+            data : {
+                'this_step' : this_step,
+                'next_step' : next_step,
+                'next_person' : next_person,
+                'next_division' : next_division,
+                'next_department' : next_department,
+                'user_attribute_id' : user_attribute_id,
+                'this_division' : this_division,
+                'this_department' : this_department,
+                'measure_id' : measure_id,
+                'phenomenon_id' : phenomenon_id,
+                'measure_order_detail' : measure_order_detail,
+                'item_class' : item_class,
+                'desired_delivery_date_f' : desired_delivery_date_f,
+                'desired_delivery_date_t' : desired_delivery_date_t,
+                'order_department' : order_department,
+                'instruction_no' : instruction_no,
+                'account_code' : account_code,
+                'cost_center' : cost_center,
+                'maintenance_diagnosis' : maintenance_diagnosis,
+                'maintenance_status' : maintenance_status,
+                'response_request_date' : response_request_date,
+                'order_person' : order_person,
+                'desired_vendor' : desired_vendor,
+                'malfunction_class' : malfunction_class,
+                'orders_received_person' : orders_received_person,
+                'equipment_no': equipment_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                $('#measure_id').val(data.measure_id);
+                $('#subject_str').val(data.subject_str);
+                $('#msg_body').val(data.msg_body);
+                if(document.getElementById("report_equipment_list") != null){
+                    $('#report_equipment_list').html(data.equipment_list);
+                }
+                if ( this_step != next_step ){
+                    $('#measure_send_mail_button').empty();
+                }
+
+                alert(data.msg);
+
+                //届出チェックタブの保存が必要であれば実行する
+                if (is_notification_need_check()) {
+                    var deferred_notification = notification_edit(this_step,next_step);
+                    deferred_notification.done(function(){
+                        // アクションボタン非表示以外の処理は、呼出し先で実行される
+                        if ( this_step != next_step ){
+                            $('#{{ action_button_id }}').empty();
+                        }
+                        deferred.resolve();
+                    }).fail(function(){
+                        deferred.reject();
+                    });
+                }else{
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                    }
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    $(".button").prop("disabled", false);
+                    //完了を通知
+                    deferred.resolve();
+                }
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+                if($("#action_pb_loading") != null){
+                    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                }
+                $(".button").prop("disabled", false);
+                //失敗を通知
+                deferred.reject();
+            });
+        //完了を知らせるためにpromiseオブジェクトを返す
+        return deferred.promise();
+}
+
+//工事関連機器削除処理
+function equipment_delete(id) {
+            $.ajax({
+                url: "/isk_tools/fms/action/phenomenon_equipment_delete/",
+                type: "POST",
+                data : {
+                    'id': id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#report_equipment_list').html(data.equipment_list);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                });
+}
+
+function get_attachment_file() {
+    var attachment_file_name_full_path = $('#attachment_file').prop('files')[0].name;
+    $('#attachment_file').val(attachment_file_name_full_path);
+}
+
+function file_upload(){
+    // フォームデータを取得
+    var formdata = new FormData($('#file_upload_form').get(0));
+
+    // POSTでアップロード
+        $.ajax({
+                url  : "/isk_tools/fms/parts/phenomenon/file_upload/",
+                type : "POST",
+                data : formdata,
+                cache       : false,
+                contentType : false,
+                processData : false,
+                dataType    : "json"
+                })
+                .done(function(data){
+                    alert(data.msg);
+
+                    //資料データリスト更新JS起動
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//画面表示時ラジオボタン同期処理
+function measure_display_open() {
+    item_class_value_change();
+
+    notification_radio_value_set();
+    maintenance_diagnosis_radio_value_set();
+    maintenance_status_radio_value_set();
+    malfunction_class_value_change();
+    var file_folder = $('#measure_file_folder').val();
+    var div_id_name = $('#measure_div_id_name').val();
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag_measure').val();
+    var file_class = $('#measure_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+    var budget_required_spec_detail_edit_flag = $('#budget_required_spec_detail_edit_flag').val();
+    if (budget_required_spec_detail_edit_flag == '0'){
+        measure_equipment_list_change();
+    }
+}
+
+//原課担当部署変更処理
+function maintenance_change_department(value) {
+    //あらかじめ原価センタフィルターをクリアしておく
+    $('#cost_center_filter').val('');
+    var order_department = value
+    $.ajax({
+        url: "/isk_tools/fms/action/maintenance_change_department/",
+        type: "POST",
+        data : {
+            'order_department' : order_department,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache : false,
+        })
+        .done(function(data){
+            $('[list=personlists]').empty();
+            $('[list=personlists]').html(data.person_lists);
+            $('[list=cost_center_option_list]').empty();
+            $('[list=cost_center_option_list]').html(data.cost_center_option_list);
+            $('[list=instruction_no_option_list]').empty();
+            $('[list=instruction_no_option_list]').html(data.instruction_no_option_list);
+            $('[list=account_code_option_list]').empty();
+            $('[list=account_code_option_list]').html(data.account_code_option_list);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('[list=personlists]').empty();
+            $('[list=cost_center_option_list]').empty();
+            $('[list=instruction_no_list]').empty();
+            $('[list=account_code_option_list]').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+//原価センター、指図書NO、勘定コード絞込
+function gc_list_filter(select_id,value) {
+    // optionリストから該当項目を絞込、それ以外は非表示化
+    var cost_center_options = $(select_id).children();
+
+    // 比較時に選択項目の前後の空白を削除
+    var filter_str = value.trim();
+
+    cost_center_options.each(function(num){
+        if(num == 0){
+            $(this).selected = true;
+        }else{
+            if($(this).data('filter_key').match(filter_str) || value == ''){
+                $(this).removeClass('hide');
+            }else{
+                $(this).addClass('hide');
+            }
+        }
+    });
+    //一旦非選択状態にする
+    $(select_id).val('');
+}
+
+//案件区分説明表示
+$(function(){
+    $("#sel_item_class").hover(
+      function() {
+        $("#sel_item_class_explanation").css("display", "block");
+      },
+      function() {
+        $("#sel_item_class_explanation").css("display", "none");
+      }
+    );
+    $("#sel_malfunction_class").hover(
+      function() {
+        $("#sel_malfunction_class_explanation").css("display", "block");
+      },
+      function() {
+        $("#sel_malfunction_class_explanation").css("display", "none");
+      }
+    );
+});
+$("#sel_item_class_explanation").css("display", "none");
+$("#sel_malfunction_class_explanation").css("display", "none");
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+.radio {
+    font-size: 100%;
+    height:35px;
+}
+
+div.scroll_measure_div {
+  width: 1800px;
+  height: 810px;
+  overflow: scroll;
+}
+
+option.hide {
+    /* 表示の切り替えに使用する */
+    display: none;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header"><font size="6">対応方針入力(作業長、副作業長、保全G入力)</font></h2>
+    </div>
+    <div>
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="measure_id" value="{{ measure_id }}">
+        <input type="hidden" id="budget_required_spec_detail_edit_flag" value="{{ budget_required_spec_detail_edit_flag }}">
+        <input type="hidden" id="mgt_class" value="{{ mgt_class.m_mgt_cls_skey }}">
+        <input type="hidden" id="facility" value="{{ facility.m_location_skey }}">
+    </div>
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+<div class="scroll_measure_div">
+    <div id="measure_entry"></div>
+    <div>
+        <input type="hidden" id="maintenance_diagnosis" value="{{ diagnosis_class }}">
+        <input type="hidden" id="maintenance_status" value="{{ maintenance_status }}">
+    </div>
+    <div style="float:left;">
+        <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+        <div>
+            <table>
+                <tr>
+                    <td><div><font size="4">工事/依頼内容</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><textarea id="measure_order_detail" input_check="ng_chara" name="measure_order_detail" rows="9" cols="55" >{{ measure_order_detail }}</textarea>　※必須</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">案件区分</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <input type="hidden" id="item_class" value="{{ item_class }}">
+                        <select id="sel_item_class" input_check="ng_chara" name="sel_item_class" onchange="item_class_change(value);">
+                            <option value="" hidden></option>
+                            <option value="{{ item_class }}" hidden selected>{{ item_class_name }}</option>
+                            <option value="9">緊急</option>
+                            <option value="1">定常</option>
+                            <option value="4">自主整備</option>
+                        </select>　※必須　<textarea id="sel_item_class_explanation" input_check="ng_chara" rows="4" cols="50" readonly>緊急：当日中に対応必要な工事（前日PM以降の依頼も含む）&NewLine;定常：事前に計画された工事&NewLine;自主保全：原課にて対応し完了する工事</textarea>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">故障/作業種別</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <input type="hidden" id="malfunction_class" value="{{ malfunction_class }}">
+                        <select id="sel_malfunction_class" input_check="ng_chara" name="sel_item_class" onchange="malfunction_class_change(value);">
+                            <option value="" hidden></option>
+                            <option value="重故障修理">重故障修理</option>
+                            <option value="軽故障修理">軽故障修理</option>
+                            <option value="整備点検">整備点検</option>
+                            <option value="点検検査">点検検査</option>
+                            <option value="土建工事">土建工事</option>
+                            <option value="その他-保全G関連">その他-保全G関連</option>
+                            <option value="その他-調達G関連">その他-調達G関連</option>
+                        </select>　※必須
+                    </font></div></td>
+                </tr>
+            </table>
+        </div>
+        <div id="order_function">
+            <table>
+                <tr>
+                <td><div><font size="4">希望納期</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="desired_delivery_date_f" input_check="ng_chara" class="datepicker" size="100" value="{{ desired_delivery_date_f }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('desired_delivery_date_f');"> ～ <input type="text" id="desired_delivery_date_t" input_check="ng_chara" class="datepicker" size="100" value="{{ desired_delivery_date_t }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('desired_delivery_date_t');">　※必須</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">原課担当部署</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <select id="order_department" input_check="ng_chara" name="order_department" list="work_order_charge_department_list" onchange="maintenance_change_department(value);">
+                            <option hidden></option>
+                            <datalist id="work_order_charge_department_list">
+                                {{ work_order_charge_department_list | safe }}
+                            </datalist>
+                        </select>　※必須
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">原課担当者</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <div id ="sel_order_person" >
+                            <select id="sel_person" input_check="ng_chara" name="sel_person" list="personlists">
+                                <option hidden></option>
+                                <datalist id="personlists">
+                                    {{ person_lists | safe }}
+                                </datalist>
+                            </select>　※必須
+                        </div>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">原価センター</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <input type="text" id="cost_center_filter" value="" size="10" onchange="gc_list_filter('#sel_cost_center',value);gc_list_filter('#sel_instruction_no','');gc_list_filter('#sel_account_code','');">原価センタ名orコード絞込(あいまい検索)
+                        <div id ="select_cost_center" >
+                        <select id="sel_cost_center" input_check="ng_chara" name="sel_cost_center" list="cost_center_option_list"  onchange="gc_list_filter('#sel_instruction_no',value);gc_list_filter('#sel_account_code','');">
+                            <datalist id="cost_center_option_list">
+                                {{ cost_center_option_list | safe }}
+                            </datalist>
+                        </select>　※必須
+                        </div>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">指図書ＮＯ</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <select id="sel_instruction_no" input_check="ng_chara" name="sel_instruction_no" list="instruction_no_option_list" onchange="gc_list_filter('#sel_account_code',value);">
+                            <datalist id="instruction_no_option_list">
+                                {{ instruction_no_option_list | safe }}
+                            </datalist>
+                        </select>　※必須
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">勘定コード</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <select id="sel_account_code" input_check="ng_chara" name="sel_instruction_no" list="account_code_option_list">
+                            <datalist id="account_code_option_list">
+                                {{ account_code_option_list | safe }}
+                            </datalist>
+                        </select>　※必須
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">整備診断区分</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <label><input type="radio" class="radio" name="maintenance_diagnosis" value="1" onchange="maintenance_diagnosis_radio_change()"><font size="4">　機械診断　　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_diagnosis" value="2" onchange="maintenance_diagnosis_radio_change()"><font size="4">　電気整備　　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_diagnosis" value="3" onchange="maintenance_diagnosis_radio_change()"><font size="4">　計装整備　　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_diagnosis" value="0" onchange="maintenance_diagnosis_radio_change()"><font size="4">　指定無し　　</font></label>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">想定依頼業者</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="desired_vendor" input_check="ng_chara" value="{{ desired_vendor }}">　※自主整備以外は必須</font></div></td>
+                </tr>
+            </table>
+        </div>
+        <div id="emergency_order" style="border: 1px solid #000000;">
+            <div><font size="4">緊急工事項目</font></div>
+            <br>
+            <table>
+                <tr>
+                    <td><div id="maintenance_status_title" input_check="ng_chara"><font size="4">依頼状況
+                        <br>
+                        ※緊急工事は必須</font></div>
+                    </td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <label><input type="radio" class="radio" name="maintenance_status" value="1" onchange="maintenance_status_radio_change()"><font size="4">　小口依頼済　　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_status" value="2" onchange="maintenance_status_radio_change()"><font size="4">　電気整備依頼済　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_status" value="3" onchange="maintenance_status_radio_change()"><font size="4">　計装整備依頼済　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_status" value="0" onchange="maintenance_status_radio_change()"><font size="4">　緊急対応無　　</font></label>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">対応依頼日</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="response_request_date" input_check="ng_chara" class="datepicker" value="{{ response_request_date }}" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('response_request_date');">　※緊急工事は必須</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">依頼受付者</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="orders_received_person" input_check="ng_chara" value="{{ orders_received_person }}">　※緊急工事は必須</font></div></td>
+                </tr>
+            </table>
+        </div>
+        </div><!--ng_character_checkここまで-->
+    </div>
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+        <div id="sel_malfunction_class_explanation" >
+            <font size="5">故障/作業種別説明：</font>
+            <table border="1" style="border-collapse: collapse; border-color: black">
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        重故障修理　
+                    </font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        ① 設備故障により生産ロスまたは品質低下・不良ロスに<br><br>　　至った故障<br><br>
+                        ② 安全面、環境面に問題を発生させた故障<br><br>
+                        ③ TBM、CBM対象設備の計画外の突発的な故障<br>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        軽故障修理　
+                    </font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        ① 故障停止してもバイパス系・予備機がスタンバイしてお<br><br>　　り、生産に影響がなかった故障<br><br>
+                        ② 機能低下による調整、調節で生産ロスまたは品質ロスに<br><br>　　至らなかった故障<br><br>
+                        ③ CBM対象設備の突発以外の故障（計画保全）、BDM対象設<br><br>　　備の故障<br>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        整備点検　
+                    </font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        故障修理以外の点検整備
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        点検検査　
+                    </font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        異常兆候の検査診断作業や調査確認作業
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        土建工事　
+                    </font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        土木建築物の修理作業
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        その他　
+                    </font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        上記以外の設備修理工事
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        調達G　
+                    </font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">
+                        校正等の設備修理に関係のない、保全Gを経由しない工事
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </table>
+        </div>
+        <br>
+    {% if budget_required_spec_detail_edit_flag == 0 %}
+        <table>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ mgt_class.mgt_cls_nm_1 }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工場名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ facility.location_nm_1 }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">機器番号</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><font size="3">
+                    <select id="equipment_no" name="equipment_no">
+                        <option value=""></option>
+                    </select>
+                </font></td>
+            </tr>
+        </table>
+        {% if equipment_add_button_display_flag == 1 %}
+            <input type="button" id="equipment_add_button" value="　追加　"
+                   onclick="action(231001011,231001011,'entry','temporarily_saved');" >
+        {% endif %}
+        機器一覧：
+        <div id="report_equipment_list" name="equipment_list">
+            {{ equipment_list | safe }}
+        </div>
+        <br>
+    {% endif %}
+        <form id="measure_file_upload_form" name="file_upload_form" action="/isk_tools/fms/action/file_upload_other_type/" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group"><font size="4">
+                    資料データ選択  ：<input type="file" id="attachment_file" name="file" onchange="get_attachment_file();" />
+                <input type="hidden" id="file_target" name="file_target" value="FailureCorrespondence">
+                <input type="hidden" id="measure_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+                <input type="hidden" id="measure_div_id_name" name="div_id_name" value="measure">
+                <input type="hidden" id="delete_pb_disp_flag_measure" name="delete_pb_disp_flag" value="1">
+                <input type="hidden" id="measure_check_item" name="check_item" value="{{ phenomenon_id }}">
+                <input type="hidden" id="measure_file_first_layer_id" name="file_first_layer_id" value="{{ phenomenon_id }}">
+                <input type="hidden" id="measure_file_second_layer_id" name="file_second_layer_id" value="">
+                <input type="hidden" id="measure_file_class" name="file_class" value="CorrespondencePolicyDecision">
+                <input type="button" class="button" value="　保存　" onclick="file_upload_other_type('measure');">
+            </font></div>
+        </form>
+        <div id="upload_file_list_measure">添付ファイル無し</div>
+        <br>
+    </div>
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+        <div>メール本文</div>
+        <div>
+            <div>
+                <font size="3"><textarea  id="msg_body" rows="18" cols="40" readonly>{{ msg_body }}</textarea></font>
+                <input type="hidden" id="subject_str" value="{{ subject_str }}">
+            </div>
+            <div id="measure_send_mail_button" >
+                <input type="button" class="button" value="メール作成" onclick="measure_mail_send_button()"><font size="3">※メール作成前に一時保存されます</font>
+            </div>
+        </div>
+    </div>
+
+    <div style="clear: both;"></div>
+</div>

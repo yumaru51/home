@@ -1,0 +1,682 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年mm月dd日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//検査診断結果選択のコンボボックスの選択を呼び出した値(引数?)と同期
+function inspection_result_value_change() {
+        var target_inspection_result = $('#inspection_result').val();
+        if (target_inspection_result != "") {
+            var pulldown_option = document.getElementById("sel_inspection_result").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_inspection_result){
+                    var value = pulldown_option[i].value;
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//検査診断結果選択のコンボボックスを変更したときに選択値と格納値を同期
+function inspection_result_change(a) {
+    var value = a;
+    $('#inspection_result').val(value);
+}
+
+//案件区分選択のコンボボックスを変更したときに選択値と格納値を同期
+function item_class_change(a) {
+    var value = a;
+    if　(value　!= 1){
+        $('#response_request_date').val('');
+        $('#maintenance_status').val(0);
+        maintenance_status_radio_value_set();
+    }
+    //order_function_display();
+}
+//案件区分説明表示
+$(function(){
+    $("#sel_item_class").hover(
+      function() {
+        $("#sel_item_class_explanation").css("display", "block");
+      },
+      function() {
+        $("#sel_item_class_explanation").css("display", "none");
+      }
+    );
+});
+$("#sel_item_class_explanation").css("display", "none");
+
+//依頼状況ラジオ値取得
+function maintenance_status_radio_change() {
+    var elements = document.getElementsByName( "maintenance_status" ) ;
+    // 選択状態の値を取得
+    for ( var a="", i=elements.length; i--; ) {
+        if ( elements[i].checked ) {
+            var a = elements[i].value ;
+            $('#maintenance_status').val(a);
+            break ;
+        }
+    }
+}
+//依頼状況ラジオ選択
+function maintenance_status_radio_value_set() {
+    // 要素を取得
+    var elements = document.getElementsByName( "maintenance_status" ) ;
+    //設定値を取得
+    var maintenance_status_value = $('#maintenance_status').val();
+    for ( var a="", i=elements.length; i--; ) {
+        var a = elements[i].value ;
+        if(maintenance_status_value == a ) {
+            elements[i].checked = true ;
+        }else{
+            elements[i].checked = false ;
+        }
+    }
+}
+
+//整備診断区分ラジオ値取得
+function charge_radio_change() {
+    var elements = document.getElementsByName( "charge" ) ;
+    // 選択状態の値を取得
+    for ( var a="", i=elements.length; i--; ) {
+        if ( elements[i].checked ) {
+            var a = elements[i].value ;
+            $('#charge').val(a);
+            break ;
+        }
+    }
+}
+//整備診断区分ラジオ選択
+function charge_radio_value_set() {
+    // 要素を取得
+    var elements = document.getElementsByName( "charge" ) ;
+    //設定値を取得
+    var charge_value = $('#charge').val();
+    for ( var a="", i=elements.length; i--; ) {
+        var a = elements[i].value ;
+        if(charge_value == a ) {
+            elements[i].checked = true ;
+        }else{
+            elements[i].checked = false ;
+        }
+    }
+}
+//対応方針ラジオ値取得
+function measure_radio_change() {
+
+    var elements = document.getElementsByName( "measure_radio" ) ;
+
+    var target_step_id = 0
+    // 選択状態の値を取得
+    for ( var a="", i=elements.length; i--; ) {
+        if ( elements[i].checked ) {
+            var a = elements[i].value ;
+            $('#measure_value').val(a);
+            target_step_id = a;
+            break ;
+        }
+    }
+    if (target_step_id != "" && {{equipment_add_button_display_flag}} != 0) {
+        var pulldown_option = document.getElementById("sel_next_step").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_step_id){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                select_next_step(target_step_id);
+                break;
+            }
+        }
+    }
+
+    //保全G対応ラジオボタン処理
+    if(target_step_id == "232004001"){
+        var elements = document.getElementsByName( "charge" ) ;
+        for (var i=0 ; i < elements.length ; i++) {
+            elements[i].checked = false ;
+            elements[i].disabled = false ;
+        }
+        elements[0].checked = true;
+    }else{
+        var elements = document.getElementsByName( "charge" ) ;
+        for (var i=0 ; i < elements.length ; i++) {
+            elements[i].checked = false ;
+            elements[i].disabled = true ;
+        }
+    }
+    charge_radio_change();
+}
+
+//対応方針ラジオ選択
+function measure_radio_value_set() {
+    // 要素を取得
+    var elements = document.getElementsByName( "measure_radio" ) ;
+    //設定値を取得
+    var measure_value = $('#measure_value').val();
+    for ( var a="", i=elements.length; i--; ) {
+        var a = elements[i].value ;
+        if(measure_value == a ) {
+            elements[i].checked = true ;
+        }else{
+            elements[i].checked = false ;
+        }
+    }
+}
+
+//機器リストソース取得
+function inspection_equipment_list_change() {
+    mgt_cls = $('#mgt_class').val();
+    facility = $('#facility').val();
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/input_select_equipment_list/",
+        type: "POST",
+        data : {
+            'mgt_cls': mgt_cls,
+            'facility' : facility,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#equipment_no').empty();
+            $('#equipment_no').html(data);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('#equipment_no').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+
+}
+
+//工事関連機器削除処理
+function equipment_delete(id) {
+            $.ajax({
+                url: "/isk_tools/fms/action/phenomenon_equipment_delete/",
+                type: "POST",
+                data : {
+                    'id': id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#report_equipment_list').html(data.equipment_list);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                });
+}
+
+//入力項目の未入力、文字数オーバーのチェックだけを行う
+function inspection_input_check() {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    //案件区分によって、必須チェックを分岐
+    var item_class_val = $('#sel_item_class').val();
+
+    //入力チェック対象リスト　val_id=該当id、set_id=背景色変更対象id、
+    //must_flg=必須項目フラグ(1で必須)、max_length=上限文字数(0はチェックしない)
+    //may_item_class=必須チェックしないitem_classの値(配列)
+    let check_object_list =
+    { 0:  { val_id:'#sel_item_class',               set_id:'sel_item_class',               must_flg:1, max_length:0,    may_item_class:{}},
+      1:  { val_id:'#maintenance_status',           set_id:'maintenance_status_title',     must_flg:1, max_length:0,    may_item_class:{0:'1',1:'4'}},
+      2:  { val_id:'#response_request_date',        set_id:'response_request_date',        must_flg:1, max_length:0,    may_item_class:{0:'1',1:'4'}},
+      3:  { val_id:'#orders_received_person',       set_id:'orders_received_person',       must_flg:1, max_length:50,   may_item_class:{0:'1',1:'4'}},
+      4:  { val_id:'#measure_value',                set_id:'measure_radio_title',          must_flg:1, max_length:0,    may_item_class:{}},
+      5:  { val_id:'#inspection_detail',            set_id:'inspection_detail',            must_flg:0, max_length:200,  may_item_class:{}},
+    };
+
+    for (let check_index in check_object_list){
+        var check_object = check_object_list[check_index];
+        var check_val = $(check_object.val_id).val();
+        var set_element = document.getElementById(check_object.set_id);
+        var ng_element_flag = 0;
+        var must_flg = check_object.must_flg;
+
+        //必須項目チェック
+        if(must_flg == 1 && check_val == ""){
+            for (let item_index in check_object.may_item_class){
+                if(item_class_val == check_object.may_item_class[item_index]){
+                    must_flg = 0;
+                    break;
+                }
+            }
+            if(must_flg==1){
+                set_element.style.backgroundColor = 'orange';
+                ng_element_flag =  1;
+                ng_flag = ng_flag + ng_element_flag;
+            }
+        }
+
+        //文字数上限チェック
+        if ( check_object.max_length > 0 && count_char(check_val) > check_object.max_length){
+           if(ng_element_flag == 0){
+             set_element.style.backgroundColor = 'silver';
+           }
+           ng_str_count_flag = ng_str_count_flag + 1 ;
+        }else if(ng_element_flag == 0){
+           set_element.style.backgroundColor = 'white';
+        }
+    }
+
+    return { 1:ng_flag , 2:ng_str_count_flag };
+
+}
+
+//入力項目の未入力、文字数オーバーをチェック
+function input_check(a,b,d) {
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+    var { 1:ng_flag , 2:ng_str_count_flag  } = inspection_input_check();
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常時処理
+    if( ng_all_flag == 0){
+        inspection_edit(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+//データ登録･更新処理
+function inspection_edit(a,b) {
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = $('#sel_next_person').val();
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var inspection_id = $('#inspection_id').val();
+        var phenomenon_id = $('#target_phenomenon_id').val();
+        var inspection_detail = $('#inspection_detail').val();
+        var inspection_result = $('#inspection_result').val();
+        var measure = $('#measure_value').val();
+        var charge_team = $('#charge').val();
+        var equipment_no = $('#equipment_no').val();
+        var sel_item_class = $('#sel_item_class').val();
+        var maintenance_status = $('#maintenance_status').val();
+        var response_request_date = $('#response_request_date').val();
+        var orders_received_person = $('#orders_received_person').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/inspection_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'next_step' : next_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'user_attribute_id' : user_attribute_id,
+                    'phenomenon_id' : phenomenon_id,
+                    'inspection_id' : inspection_id,
+                    'inspection_detail' : inspection_detail,
+                    'inspection_result' : inspection_result,
+                    'charge_team' : charge_team,
+                    'measure' : measure,
+                    'equipment_no': equipment_no,
+                    'sel_item_class': sel_item_class,
+                    'maintenance_status': maintenance_status,
+                    'response_request_date': response_request_date,
+                    'orders_received_person': orders_received_person,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#inspection_id').val(data.inspection_id);
+                    //var this_budget_id = data.budget_id
+                    //$('#budget_id').val(this_budget_id);
+                    //var this_budget_rev_no = data.budget_rev_no
+                    //$('#budget_rev_no').val(this_budget_rev_no);
+                    ////現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                        // 次工程が小口依頼の場合は専用ボタンを有効化
+                        if ( next_step == 232001001){
+                            $("#to_maintenance_order_button").prop("disabled", false);
+                        }
+                    }
+                    //log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                    $('#report_equipment_list').html(data.equipment_list);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+}
+//小口依頼画面への遷移処理
+function maintenance_order_detail(id,phenomenon_id,step_id) {
+    var budget_id = 0
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var level5_step_id = $('#level5_step_id').val();
+    var new_step = Number(level5_step_id) + 1
+    $('<form/>', {action: '/isk_tools/fms/parts/common/detail_template/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+    .append($('<input/>', {type: 'hidden', name: 'phenomenon_unique_id', value: id}))
+    .append($('<input/>', {type: 'hidden', name: 'phenomenon_id', value: phenomenon_id}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: 'phenomenon'}))
+    .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+    .append($('<input/>', {type: 'hidden', name: 'step_id', value: step_id}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'progress_id', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+//画面表示時ラジオボタン、コンボボックス同期処理
+function inspection_display_open() {
+    inspection_result_value_change();
+    charge_radio_value_set();
+    measure_radio_value_set();
+    inspection_equipment_list_change();
+
+    var file_folder = $('#inspection_file_folder').val();
+    var div_id_name = $('#inspection_div_id_name').val();
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag_inspection').val();
+    var file_class = $('#inspection_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+
+}
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+}
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_inspection_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+<div id="{{ action_button_id }}" style="width: auto;"></div>
+
+<div class="scroll_inspection_div">
+    <div>
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="inspection_id" value="{{ inspection_id }}">
+        <input type="hidden" id="charge" value="{{ charge_team }}">
+        <input type="hidden" id="measure_value" value="{{ measure }}">
+        <input type="hidden" id="user_division_cd" value="{{ user_division_cd }}">
+        <input type="hidden" id="user_department_cd" value="{{ user_department_cd }}">
+        <input type="hidden" id="user_authority" value="{{ user_authority }}">
+        <input type="hidden" id="confirm_user" value="{{ confirm_user }}">
+        <input type="hidden" id="permit_user" value="{{ permit_user }}">
+        <input type="hidden" id="level5_step_id" value="232001000">
+        <input type="hidden" id="mgt_class" value="{{ mgt_class.m_mgt_cls_skey }}">
+        <input type="hidden" id="facility" value="{{ facility.m_location_skey }}">
+        <input type="hidden" id="maintenance_status" value="{{ maintenance_status }}">
+
+    </div>
+    <div>
+        <div style="float:left;"><font size="5">検査診断</font></div>
+        <div style="float:right;">
+            <input type="button" id="to_maintenance_order_button" value="　小口依頼画面へ　" disabled onclick="maintenance_order_detail({{ phenomenon_unique_id }},{{ phenomenon_id }}, 232001001)">
+        </div>
+        <div style="clear: both;"></div>
+        <div>　</div>
+    </div>
+    <div style="float:left;">
+        <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+        <div>
+            <table>
+                <tr>
+                    <td><div><font size="4">案件区分</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+<!--                        <input type="hidden" id="item_class" value="{{ item_class }}">-->
+                        <select id="sel_item_class" name="sel_item_class" onchange="item_class_change(value);">
+                            <option value="" hidden></option>
+                            <option value="{{ item_class }}" hidden selected>{{ item_class_name }}</option>
+                            <option value="9">緊急</option>
+                            <option value="1">定常</option>
+                            <option value="4">自主整備</option>
+                        </select>　※必須　<textarea id="sel_item_class_explanation"  rows="4" cols="50" readonly>緊急：当日中に対応必要な工事（前日PM以降の依頼も含む）&NewLine;定常：事前に計画された工事&NewLine;自主保全：原課にて対応し完了する工事</textarea>
+                    </font></div></td>
+                </tr>
+            </table>
+        </div>
+        <div id="emergency_order" style="border: 1px solid #000000;">
+            <div><font size="4">緊急工事項目</font></div>
+            <br>
+            <table>
+                <tr>
+                    <td><div id="maintenance_status_title"><font size="4">依頼状況
+                        <br>
+                        ※緊急工事は必須</font></div>
+                    </td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <label><input type="radio" class="radio" name="maintenance_status" value="1" onchange="maintenance_status_radio_change()"><font size="4">　小口依頼済　　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_status" value="2" onchange="maintenance_status_radio_change()"><font size="4">　電気整備依頼済　　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_status" value="3" onchange="maintenance_status_radio_change()"><font size="4">　計装整備依頼済　　</font></label>
+                        <label><input type="radio" class="radio" name="maintenance_status" value="0" onchange="maintenance_status_radio_change()"><font size="4">　緊急対応無　　</font></label>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">対応依頼日</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="response_request_date" class="datepicker" value="{{ response_request_date }}" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('response_request_date');">　※緊急工事は必須</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">依頼受付者</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="orders_received_person" value="{{ orders_received_person }}">　※緊急工事は必須</font></div></td>
+                </tr>
+            </table>
+        </div>
+        <br>
+
+        <div><font size="4">検査診断内容：　</font></div>
+        <div><font size="4"><textarea id="inspection_detail" name="inspection_detail" rows="9" cols="45">{{ inspection_detail }}</textarea></font></div>
+        <br>
+        <div>
+            <table>
+                <tr>
+                    <td><div><font size="4">検査診断結果</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4">
+                        <input type="hidden" id="inspection_result" value="{{ inspection_result }}">
+                        <select id="sel_inspection_result" name="sel_inspection_result" onchange="inspection_result_change(value);">
+                            <option value=""></option>
+                            <option value="0">良好</option>
+                            <option value="1">様子見</option>
+                            <option value="2">要修理</option>
+                        </select>
+                    </font></div></td>
+                </tr>
+            </table>
+        </div>
+        </div><!--ng_character_checkここまで-->
+
+        <div><font size="5">方針決定</font></div>
+        <div style="border: 1px solid #000000;">
+        <table>
+                    <tr>
+                        <td><div id="measure_radio_title" style="padding: 5px 0px;"><font size="4">対応方針　※必須</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="measure_radio" value="232001001" onchange="measure_radio_change()">小口工事　　</font></label></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="measure_radio" value="232002001" onchange="measure_radio_change()">建設/改修工事　　</font></label></div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="measure_radio" value="232003001" onchange="measure_radio_change()">企画計画　　</font></label></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="measure_radio" value="1" onchange="measure_radio_change()">経過観察　　</font></label></div></td>
+
+                    </tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="measure_radio" value="232004001" onchange="measure_radio_change()">保全G対応　　</font></label></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="measure_radio" value="999999999" onchange="measure_radio_change()">不要　　</font></label></div></td>
+
+                    </tr>
+
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">保全G対応</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="charge" value="1" onchange="charge_radio_change()">計装メンテ　　</font></label></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="charge" value="2" onchange="charge_radio_change()">電気メンテ　　</font></label></div></td>
+                        <td><div style="padding: 5px 0px;"><label><font size="4"><input type="radio" name="charge" value="3" onchange="charge_radio_change()">機械メンテ　　</font></label></div></td>
+                    </tr>
+                </table>
+        </div>
+    </div>
+    <div style="float:left;;width:20px;">　　</div>
+    <div style="float:left;">
+        <table>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ mgt_class.mgt_cls_nm_1 }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工場名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5" color="black">{{ facility.location_nm_1 }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">機器番号</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><font size="3">
+                    <select id="equipment_no" name="equipment_no">
+                        <option value=""></option>
+                    </select>
+                </font></td>
+            </tr>
+        </table>
+        {% if equipment_add_button_display_flag == 1 %}
+            <input type="button" id="equipment_add_button" value="　追加　"
+                   onclick="action(231002001,231002001,'entry','temporarily_saved');" >
+        {% endif %}
+        <br><br>
+        機器一覧：
+        <div id="report_equipment_list" name="equipment_list">
+            {{ equipment_list | safe }}
+        </div>
+        <br>
+
+
+        <div>
+            <form id="inspection_file_upload_form" name="file_upload_form" action="/isk_tools/fms/action/file_upload_other_type/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group"><font size="4">
+                        資料データ選択　　　　　　　：　<input type="file" id="attachment_file" name="file" onchange="get_attachment_file();" />
+                    <input type="hidden" id="file_target" name="file_target" value="FailureCorrespondence">
+                    <input type="hidden" id="inspection_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+                    <input type="hidden" id="inspection_div_id_name" name="div_id_name" value="inspection">
+                    <input type="hidden" id="delete_pb_disp_flag_inspection" name="delete_pb_disp_flag" value="1">
+                    <input type="hidden" id="inspection_check_item" name="check_item" value="{{ phenomenon_id }}">
+                    <input type="hidden" id="file_first_layer_id" name="file_first_layer_id" value="{{ phenomenon_id }}">
+                    <input type="hidden" id="file_second_layer_id" name="file_second_layer_id" value="">
+                    <input type="hidden" id="inspection_file_class" name="file_class" value="LaboratoryDiagnosis">
+                    <input type="button" class="button" value="送信" onclick="file_upload_other_type('inspection');">
+                </font></div>
+            </form>
+        </div>
+
+        <div id="upload_file_list_inspection">添付ファイル無し</div>
+    </div>
+    <div style="clear: both;"></div>
+</div>

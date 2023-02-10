@@ -1,0 +1,50 @@
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:300px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:70px;
+    text-align: center;
+}
+.supplemental_task_name{
+    width:200px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        <div>
+            <h2 class="page-header">付帯作業候補一覧</h2>
+        </div>
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="supplemental_task_name">付帯作業名</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for supplemental_task_master_list in supplemental_task_master_list %}
+                    <tr class="{{ sell_color }}">
+                        {% if pb_disp == 1 %}
+                            <td class="detail_pb">
+                                <input type="button" id="supplemental_task_select_{{ supplemental_task_master_list.id }}" value="選択" onclick="supplemental_task_select({{ supplemental_task_master_list.incidental_id }});">
+                            </td>
+                        {% else %}
+                            <td class="detail_pb">
+
+                            </td>
+                        {% endif %}
+                        <td class="supplemental_task_name">{{ supplemental_task_master_list.incidental_name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>

@@ -1,0 +1,6 @@
+進捗状況：<select id="sel_copy_work_step" name="sel_copy_step">
+                    <option value=""></option>
+                        {% for copy_step_list in copy_step_list %}
+                            <option value="{{ copy_step_list.step_id }}">{{ copy_step_list.step_name }}</option>
+                        {% endfor %}
+                    </select>

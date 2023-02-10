@@ -1,0 +1,123 @@
+<script>
+//選択した取扱物質(マイマスタ内)の表示
+function handling_material_detail(a) {
+        var target_id = a;
+        equipment_history_report_info(target_id);//機器履歴詳細情報を表示するJS起動(？detail_template.html内にプログラム有)
+}
+
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.select_pb{
+    width:40px;
+    text-align: center;
+}
+.equipment_no{
+    width:180px;
+}
+.history_no{
+    width:40px;
+}
+.mgt_class{
+    width:40px;
+}
+.facility{
+    width:40px;
+}
+.phenomenon_class{
+    width:40px;
+}
+.cause_class{
+    width:40px;
+}
+.result{
+    width:40px;
+}
+.export_complete_flag{
+    width:80px;
+}
+tr:nth-child(2n+1) {
+    background: #EEFFFF;
+}
+</style>
+            <input type="hidden" value="{{ equipment_history_report_lists_num }}">
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="select_pb" ></th>
+                        <th class="equipment_no" style="text-align:center;">機器NO</th>
+                        <th class="history_no" style="text-align:center;">履歴NO</th>
+                        <th class="mgt_class" style="text-align:center;">管理区分</th>
+                        <th class="facility" style="text-align:center;">工場'</th>
+                        <th class="phenomenon_class" style="text-align:center;">現象区分</th>
+                        <th class="cause_class" style="text-align:center;">原因区分</th>
+                        <th class="result" style="text-align:center;">結果</th>
+                        <th class="export_complete_flag" style="text-align:center;">エクスポート</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% if equipment_history_report_lists_num > 0 %}
+                    {% for equipment_history_report_lists in equipment_history_report_lists %}
+                        <tr>
+                            <td class="select_pb">
+                                <a href="#" id="{{ equipment_history_report_lists.id }}" class="select_pb" onclick="equipment_history_report_detail(id);">選択</a>
+                            </td>
+                            <td class="equipment_no">
+                                {% if equipment_history_report_lists.equipment_no is　not None %}
+                                    {{ equipment_history_report_lists.equipment_no }}
+                                {% endif %}
+                            </td>
+
+                            <td class="history_no">
+                                {% if equipment_history_report_lists.history_no is　not None %}
+                                    {{ equipment_history_report_lists.history_no }}
+                                {% endif %}
+                            </td>
+                            <td class="mgt_class">
+                                {% if equipment_history_report_lists.mgt_class is　not None %}
+                                    {{ equipment_history_report_lists.mgt_class }}
+                                {% endif %}
+                            </td>
+                            <td class="facility">
+                                {% if equipment_history_report_lists.facility is　not None %}
+                                    {{ equipment_history_report_lists.facility }}
+                                {% endif %}
+                            </td>
+                            <td class="phenomenon_class">
+                                {% if equipment_history_report_lists.phenomenon_class is　not None %}
+                                    {{ equipment_history_report_lists.phenomenon_class }}
+                                {% endif %}
+                            </td>
+                            <td class="cause_class">
+                                {% if equipment_history_report_lists.cause_class is　not None %}
+                                    {{ equipment_history_report_lists.cause_class }}
+                                {% endif %}
+                            </td>
+                            <td class="result">
+                                {% if equipment_history_report_lists.result is　not None %}
+                                    {{ equipment_history_report_lists.result }}
+                                {% endif %}
+                            </td>
+                            <td class="export_complete_flag">
+                                {% if equipment_history_report_lists.export_complete_flag is　not None %}
+                                    {% if equipment_history_report_lists.export_complete_flag == "1" %}
+                                        完了
+                                    {% else %}
+                                        未完
+                                    {%　endif %}
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>

@@ -1,0 +1,91 @@
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">在庫詳細情報</h2>
+    </div>
+    <input type="hidden" id="stock_id" value="{{ stock_lists.id }}">
+
+    <div style="float:left;width:500px;">
+        <div id="stock_id_text">在庫ＩＤ　　　:　{{ stock_lists.id }}</div>
+        <div>包装日　　　　:　{{ stock_lists.packed_date }}</div>
+        <div>ロットＮＯ　　:　{{ stock_lists.lot_no }}</div>
+        <div>パレットＮＯ　:　{{ stock_lists.pallet_no }}</div>
+        <div>保管倉庫　　　:　{{ stock_lists.stock_ware_code }}:{{ stock_ware_name }}</div>
+        <div>製品型　　　　:　{{ item_data.item_grade_type }}</div>
+        <div>品目グループ　:　{{ item_data.item_group }}</div>
+        <div>品目コード　　:　{{ stock_lists.item_code }}</div>
+        <div>品目名　　　　:　{{ item_data.item_name }}</div>
+        <div>　　</div>
+        <div>備考１　　　　:　<textarea name="rem1" rows="4" cols="40">{{ stock_lists.rem1 }}</textarea></div>
+    </div>
+    <div style="float:left;width:500px;" >
+        <div>在庫袋数　　　:　{{ stock_lists.stock_packing_amount }}{{ item_data.packing_unit }}</div>
+        <div>引当袋数　　　:　{{ allocation_packing_amount }}{{ item_data.packing_unit }}</div>
+        <div>引当可能袋数　:　{{ stock_lists.temporary_stock_packing_amount }}{{ item_data.packing_unit }}</div>
+        <div>在庫数量　　　:　{{ stock_lists.stock_amount }}{{ item_data.basic_unit }}</div>
+        <div>引当数量　　　:　{{ allocation_amount }}{{ item_data.basic_unit }}</div>
+        <div>引当可能数量　:　{{ stock_lists.temporary_stock_amount }}{{ item_data.basic_unit }}</div>
+        <div>未出荷数量　　:　{{ stock_lists.undispatched_quantity }}{{ item_data.basic_unit }}</div>
+        <div>長期滞留品区分:　
+            {% if stock_lists.long_retention_grouping is not None %}
+                {{ stock_lists.long_retention_grouping }}
+            {% endif %}
+        </div>
+        <div>Ｓ品区分　　　:　
+            {% if stock_lists.s_item_grouping is not None %}
+                {{ stock_lists.s_item_grouping }}
+            {% endif %}
+        </div>
+        <div>不適区分　　　:　
+            {% if stock_lists.incompatible_grouping is not None %}
+                {{ stock_lists.incompatible_grouping }}
+            {% endif %}
+        </div>
+        <div>備考２　　　　:　<textarea name="rem2" rows="4" cols="40">{{ stock_lists.rem2 }}</textarea></div>
+    </div>
+    <div style="float:left;width:500px;" >
+        <div>予約先　　　　:　
+            {% if stock_lists.reserve_company1 is not None %}
+                {{ stock_lists.reserve_company1 }}:{{ reserve_company1_name }}
+            {% endif %}
+        </div>
+        <div>予約先　　　　:　
+            {% if stock_lists.reserve_company2 is not None %}
+                {{ stock_lists.reserve_company2 }}:{{ reserve_company2_name }}
+            {% endif %}
+        </div>
+        <div>予約先　　　　:　
+            {% if stock_lists.reserve_company3 is not None %}
+                {{ stock_lists.reserve_company3 }}:{{ reserve_company3_name }}
+            {% endif %}
+        </div>
+        <div>品質情報　　　:　
+            {% if stock_lists.quality_status1 is not '' %}
+                {{ stock_lists.quality_status1 }}:{{ quality1_name }}
+            {% endif %}
+        </div>
+        <div>品質情報　　　:　
+            {% if stock_lists.quality_status2 is not '' %}
+                {{ stock_lists.quality_status2 }}:{{ quality2_name }}
+            {% endif %}
+        </div>
+        <div>用途　　　　　:　
+            {% if use1 is not None %}
+                {{ use1 }}
+            {% endif %}
+        </div>
+        <div>用途　　　　　:　
+            {% if use2 is not None %}
+                {{ use2 }}
+            {% endif %}
+        </div>
+        <div>用途　　　　　:　
+            {% if use3 is not None %}
+                {{ use3 }}
+            {% endif %}
+        </div>
+        <div>　　</div>
+        <div>　　</div>
+        <div>備考３　　　　:　<textarea name="rem3" rows="4" cols="40">{{ stock_lists.rem3 }}</textarea></div>
+    </div>
+
+
+

@@ -1,0 +1,460 @@
+<script>
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//入力項目チェック
+function work_law_supplies_input_check() {
+    var alert_input_check_msg = "";
+
+    //禁止文字チェック
+    var alert_ng_ch_msg = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+    alert_input_check_msg += alert_ng_ch_msg;
+
+    return alert_input_check_msg;
+}
+
+//工事関係法令登録･更新処理
+function work_law_edit(a) {
+    var action_type = a;
+    var work_law_id = $('#work_law_id').val();
+    var work_id = $('#work_id').val();
+    if (work_id == 0){
+        alert("工事データを先に登録(一時保存)してください！！");
+    }else{
+        //入力項目チェック
+        var alert_input_check_msg = work_law_supplies_input_check();
+        if ( alert_input_check_msg.length > 0 ) {
+            alert(alert_input_check_msg);
+            return;
+        }
+
+        var rev_no = $('#work_rev_no').val();
+        var this_step = $('#this_step').val();
+        var this_budget_id = $('#target_budget_id').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var display_order = $('#display_order').val();
+        var work_law_name = $('#work_law_name').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/work_law_entry/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'work_id' : work_id,
+                    'rev_no' : rev_no,
+                    'work_law_id' : work_law_id,
+                    'work_law_name' : work_law_name,
+                    'display_order' : display_order,
+                    'this_step' : this_step,
+                    'this_budget_id' : this_budget_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    get_work_law_list(work_id);//登録済工事関係法令一覧を表示するJS起動(このhtml内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事関係法令削除処理
+function work_law_delete(a) {
+    var action_type = a;
+    var work_law_id = $('#work_law_id').val();
+    if (work_law_id != 0) {
+        var work_id = $('#target_work_id').val();
+        var rev_no = $('#work_rev_no').val();
+        var this_step = $('#this_step').val();
+        var this_budget_id = $('#target_budget_id').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var work_law_name = $('#work_law_name').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/work_law_delete/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'work_id' : work_id,
+                    'rev_no' : rev_no,
+                    'work_law_id' : work_law_id,
+                    'work_law_name' : work_law_name,
+                    'this_step' : this_step,
+                    'this_budget_id' : this_budget_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#work_law_id').val(0);
+                    $('#work_law_name').val("");
+                    get_work_law_list(work_id);//登録済工事関係法令一覧を表示するJS起動(このhtml内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事関係法令マスタから選択時の処理
+function select_master_work_law(a) {
+    var work_law_cd = a ;
+        $.ajax({
+                url: "/isk_tools/fms/action/select_work_law/",
+                type: "POST",
+                data : {
+                    'work_law_cd' : work_law_cd,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_law_name').val(data.regulation_name);
+                    $('#work_law_cd').val(data.regulation_cd);
+                    $('#display_order').val(data.display_order);
+                    $('#work_law_id').val(data.work_law_id);
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("work_law_add_button_div") != null){
+                        const p1 = document.getElementById("work_law_add_button_div");
+                        p1.style.display ="block";
+                    }
+                    if(document.getElementById("work_law_edit_button_div") != null){
+                        const p2 = document.getElementById("work_law_edit_button_div");
+                        p2.style.display ="none";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//工事支給品登録･更新処理
+function work_supplies_edit(a) {
+    var action_type = a;
+    var work_supplies_id = $('#work_supplies_id').val();
+    var work_id = $('#work_id').val();
+    if (work_id == 0){
+        alert("工事データを先に登録(一時保存)してください！！");
+    }else{
+        //入力項目チェック
+        var alert_input_check_msg = work_law_supplies_input_check();
+        if ( alert_input_check_msg.length > 0 ) {
+            alert(alert_input_check_msg);
+            return;
+        }
+
+        var rev_no = $('#work_rev_no').val();
+        var this_step = $('#this_step').val();
+        var this_budget_id = $('#target_budget_id').val();
+        //var this_department = $('#this_department').val();
+        //var this_division = $('#this_division').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var work_supplies_name = $('#supplies_name').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/work_supplies_entry/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'work_id' : work_id,
+                    'rev_no' : rev_no,
+                    'work_supplies_id' : work_supplies_id,
+                    'work_supplies_name' : work_supplies_name,
+                    'this_step' : this_step,
+                    'this_budget_id' : this_budget_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    get_work_supplies_list(work_id);//登録済工事支給品一覧を表示するJS起動(このhtml内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事支給品削除処理
+function work_supplies_delete(a) {
+    var action_type = a;
+    var work_supplies_id = $('#work_supplies_id').val();
+    if (work_supplies_id != 0) {
+        var work_id = $('#target_work_id').val();
+        var rev_no = $('#work_rev_no').val();
+        var this_step = $('#this_step').val();
+        var this_budget_id = $('#target_budget_id').val();
+        //var this_department = $('#this_department').val();
+        //var this_division = $('#this_division').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var work_supplies_name = $('#supplies_name').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/work_supplies_delete/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'work_id' : work_id,
+                    'rev_no' : rev_no,
+                    'work_supplies_id' : work_supplies_id,
+                    'work_supplies_name' : work_supplies_name,
+                    'this_step' : this_step,
+                    'this_budget_id' : this_budget_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#work_supplies_id').val(0);
+                    $('#supplies_name').val("");
+                    get_work_supplies_list(work_id);//登録済工事支給品一覧を表示するJS起動(このhtml内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事支給品マスタから選択時の処理
+function select_work_supplies(a) {
+    var work_supplies_id = a ;
+        $.ajax({
+                url: "/isk_tools/fms/action/select_work_supplies/",
+                type: "POST",
+                data : {
+                    'work_supplies_id' : work_supplies_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#supplies_name').val(data.supplies_name);
+                    $('#master_supplies_id').val(data.master_supplies_id);
+                    $('#work_supplies_display_order').val(data.display_order);
+                    $('#work_supplies_id').val(data.work_supplies_id);
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("work_supplies_add_button_div") != null){
+                        const p1 = document.getElementById("work_supplies_add_button_div");
+                        p1.style.display ="block";
+                    }
+                    if(document.getElementById("work_supplies_edit_button_div") != null){
+                        const p2 = document.getElementById("work_supplies_edit_button_div");
+                        p2.style.display ="none";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//登録済工事関係法令一覧表示処理
+function get_work_law_list(a) {
+        var work_id = a;
+        var select_pb_disp_flag = 1;
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_supplies/work_law_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step': document.getElementById('this_step').value,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_law_list').empty();
+                    $('#work_law_list').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_law_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+//登録済工事支給品一覧表示処理
+function get_work_supplies_list(a) {
+        var work_id = a;
+        var select_pb_disp_flag = 1;
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_supplies/work_supplies_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step': document.getElementById('this_step').value,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_supplies_list').empty();
+                    $('#work_supplies_list').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_supplies_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+window.onload = function() {
+    //var work_id = $('#target_work_id').val();
+    //get_document_list(work_id);
+};
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scrool_work_law_master_div {
+  width: 340px;
+  height: 300px;
+  overflow: scroll;
+}
+
+div.scrool_work_supplies_master_div {
+  width: 340px;
+  height: 300px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">適用法規/当社支給品関係</h2>
+    </div>
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+    <div style="border-style: ridge;"><h2 class="page-header">適用法規</h2>
+        <div style="float:left; border-style: ridge;">
+            <div style="border-style: ridge;"><h2 class="page-header">適用法規選択</h2></div>
+            <div class="scrool_work_law_master_div">
+                <ul>
+                {% for law_master_lists in law_master_lists %}
+                    <li class="fms_sidebar-list"><font size="4"><a href="#" onclick="select_master_work_law('{{ law_master_lists.regulation_cd }}');">{{ law_master_lists.regulation_name }}</a></font></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;"><h2 class="page-header">新規登録</h2>
+            <div style="float:left;size=5px">　</div>
+            <div style="float:left;">
+                <table>
+                    <tr>
+                        <td><div><font size="4">適用法規名</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="work_law_name" size="35" value="" ></font></div></td>
+                    </tr>
+                </table>
+                <input type="hidden" id="display_order" value="" size="4" >
+                <input type="hidden" id="work_law_id" value="" size="4" >
+                <input type="hidden" id="work_law_cd" value="" size="4" >
+                <br>
+                <div id="work_law_add_button_div" style="float:left;" >
+                    <input type="button" id="work_law_add_button" value="　追加　" onclick="work_law_edit('add')" >
+                </div>
+                <div id="work_law_edit_button_div" style="float:left;" >
+                    <input type="button" id="work_law_delete_button" value="　削除　" onclick="work_law_delete('delete')" >
+                </div>
+            </div>
+        </div>
+        <div style="float:left;size=10px">　</div>
+        <div style="float:left;"><h2 class="page-header">登録済適用法規リスト</h2>
+            <div id="work_law_list"></div>
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+    <br>
+    <div style="border-style: ridge;"><h2 class="page-header">当社支給品</h2>
+        <div style="float:left; border-style: ridge;">
+            <div style="border-style: ridge;"><h2 class="page-header">支給品選択</h2></div>
+            <div class="scrool_work_supplies_master_div">
+                <ul>
+                {% for supplies_master_lists in supplies_master_lists %}
+                    <li class="fms_sidebar-list"><font size="4"><a href="#" onclick="select_work_supplies({{ supplies_master_lists.id }});">{{ supplies_master_lists.supplies_name }}</a></font></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;"><h2 class="page-header">新規登録</h2>
+            <div style="float:left;size=5px">　</div>
+            <div style="float:left;">
+                <table>
+                    <tr>
+                        <td><div><font size="4">支給品名</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="supplies_name" size="35" value="" ></font></div></td>
+                    </tr>
+                </table>
+                <input type="hidden" id="work_supplies_display_order" value="" size="4" >
+                <input type="hidden" id="work_supplies_id" value="" size="4" >
+                <input type="hidden" id="master_supplies_id" value="" size="4" >
+                <br>
+                <div id="work_supplies_add_button_div" style="float:left;" >
+                    <input type="button" id="work_supplies_add_button" value="　追加　" onclick="work_supplies_edit('add')" >
+                </div>
+                <div id="work_supplies_edit_button_div" style="float:left;" >
+                    <input type="button" id="work_supplies_delete_button" value="　削除　" onclick="work_supplies_delete('delete')" >
+                </div>
+            </div>
+        </div>
+        <div style="float:left;size=10px">　</div>
+        <div style="float:left;"><h2 class="page-header">登録済支給品リスト</h2>
+            <div id="work_supplies_list"></div>
+        </div>
+
+
+    </div>
+    </div><!--ng_character_checkここまで-->

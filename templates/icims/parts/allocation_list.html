@@ -1,0 +1,200 @@
+{% load imsds_common %}
+
+<script language="javascript" type="text/javascript" charset="UTF-8" xmlns="http://www.w3.org/1999/html">
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+function allocationcancel(a) {
+    var stock_allocation_id = a;
+    //var select_item_code = $('#selectitemcode7').val();
+    //var select_warehouse = $('#selectwarehouse7').val();
+    //var select_start_lot_no = $('#selectstartlotno7').val();
+    //var select_end_lot_no = $('#selectendlotno7').val();
+    //var select_quality1 = $('#selectquality17').val();
+    //var select_quality2 = $('#selectquality27').val();
+    //var select_quality3 = $('#selectquality37').val();
+    var from_page = 10021;
+    //alert(stock_allocation_id);
+    //alert(select_item_code);
+    //alert(select_warehouse);
+    //alert(select_start_lot_no);
+    //alert(select_end_lot_no);
+    $.ajax({
+                url: "/imsds/allocate_cancel/",
+                type: "POST",
+                data : {
+                        'stock_allocation_id': stock_allocation_id,
+                        //'selectitemcode': selectitemcode,
+                        //'selectwarehouse': selectwarehouse,
+                        //'selectstartlotno': selectstartlotno,
+                        //'selectendlotno': selectendlotno,
+                        //'selectquality1': selectquality1,
+                        //'selectquality2': selectquality2,
+                        //'selectquality3': selectquality3,
+                        'from_page': from_page,
+                        'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    get_allocation_list(data.order_id);
+                    stock_filter_call()
+
+                    $('#non_stock_allocation_packed_amount').val(data.unallocated_amount);
+                    order_entry_pb_refresh();
+                    getstockdata(10001);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_entry').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+.G{
+    background: #DDDDDD;
+}
+}
+.W{
+    background: #FFFFFF;
+}
+</style>
+<div>〇受注データ件数：{{ order_lists_count }}　　☆引当データ件数：{{ stock_allocation_count }}　　※残件数：{{ remind_count }}</div>
+
+        {% if order_lists_count > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead>
+                    <tr>
+                        <th width="30">
+                        {% if pb_disp == 2 %}
+                            <th width="60"></th>
+                        {% endif %}
+                        <th width="70">状態</th>
+                        <th width="120">受注管理NO</th>
+                        <th width="110">受注経路</th>
+                        <th width="70">荷受先</th>
+                        <th width="90">出荷ポイント</th>
+                        <th width="70">品目GR</th>
+                        <th width="160">品目CODE</th>
+                        <th width="240">品目名</th>
+                        <th width="80">受注数量</th>
+                        <th width="80">未引当数</th>
+                        <th width="80">受払数量</th>
+                        <th width="340">備考</th>
+                        <th width="50">付帯作業</th>
+                    </tr>
+                    <tr>
+                        <th></th>
+                        {% if pb_disp == 2 %}
+                            <th width="60">出荷袋数</th>
+                        {% endif %}
+                        <th width="30">在庫ID</th>
+                        <th width="50" colspan="1">包装日</th>
+                        <th width="30" colspan="1">ロットNO</th>
+                        <th width="20" colspan="1">パレットNO</th>
+                        <th width="30" colspan="2">保管倉庫コード</th>
+                        <th width="20" colspan="1">引当数量</th>
+                        <th width="20" colspan="1">引当後数量</th>
+                        <th width="40" colspan="3">予約先</th>
+                        <th width="80" colspan="3">引当コメント</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% set order_id = 0 %}
+                {% set sell_color = "W" %}
+                {% for allocation_result_lists in allocation_result_lists %}
+                    {% if order_id == 0 or order_id != allocation_result_lists.order_id %}
+                        {% if sell_color == "W" %}
+                            {% set sell_color = "G" %}
+                        {% else %}
+                            {% set sell_color = "W" %}
+                        {% endif %}
+                    <tr class="{{ sell_color }}">
+                        {% set order_id  = allocation_result_lists.order_id %}
+                        <td width="30">
+                            <a href="#" id="{{ allocation_result_lists.order_id }}" class="detailpb" onclick="getallocationdetail(id);">詳細</a>
+                        </td>
+                        {% if pb_disp == 2 %}
+                            <td width="60"></td>
+                        {% endif %}
+                        <td width="70" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.stock_allocation_status_name }}</td>
+                        <td width="120" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.order_no }}</td>
+                        <td width="110" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.order_route }}</td>
+                        <td width="70" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.place_for_receipt_of_goods }}</td>
+                        <td width="90" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.delivery_point }}:{{ allocation_result_lists.delivery_point_name }}</td>
+                        <td width="70" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.item_group }}</td>
+                        <td width="160" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.item_code }}</td>
+                        <td width="240" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.item_name }}</td>
+                        <td width="80" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.order_packed_amount }} {{ allocation_result_lists.packing_unit }}</td>
+                        <td width="80" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.non_stock_allocation_amount }} {{ allocation_result_lists.packing_unit }}</td>
+                        <td width="80" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.order_amount }} {{ allocation_result_lists.basic_unit }}</td>
+                        <td width="340" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">{{ allocation_result_lists.rem1 }}　{{ allocation_result_lists.rem2 }}　{{ allocation_result_lists.rem3 }}</td>
+                        <td width="50" class="mode{{ allocation_result_lists.stock_allocation_status_cd }}">
+                            {% if allocation_result_lists.supplemental_task_flag == 1 %}
+                                有
+                            {% else %}
+                                無
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <tr class="{{ sell_color }}">
+                        {% if pb_disp == 1 %}
+                            <td>
+                                <input type="button" value="取消" onclick="allocationcancel({{ allocation_result_lists.allocation_id }});">
+                            </td>
+                        {% elif pb_disp == 2 %}
+                            <td>
+                                <input type="button" value="変更" onclick="allocationchange({{ allocation_result_lists.allocation_id }});">
+                            </td>
+                            <td width="60">
+                                <input type="text" id="amount{{ allocation_result_lists.id }}" value="{{ allocation_result_lists.stock_shipment_amount }}" size="1">{{ stock_lists.packing_amount_unit }}
+                            </td>
+                        {% else %}
+                            <td></td>
+                        {% endif %}
+                        <td width="30">{{ allocation_result_lists.stock_id }}</td>
+                        <td width="30" colspan="1">{{ allocation_result_lists.packed_date }}</td>
+                        <td width="30" colspan="1">{{ allocation_result_lists.lot_no }}</td>
+                        <td width="20" colspan="1">{{ allocation_result_lists.pallet_no }}</td>
+                        <td width="30" colspan="2">{{ allocation_result_lists.stock_ware_code }}:{{ allocation_result_lists.warehouse_name }}</td>
+                        <td width="20" colspan="1">{{ allocation_result_lists.stock_allocation_amount }} {{ allocation_result_lists.packing_unit }}</td>
+                        <td width="20" colspan="1">{{ allocation_result_lists.temporary_stock_amount }} {{ allocation_result_lists.basic_unit }}</td>
+                        <td width="40" colspan="3">{{ allocation_result_lists.reserve_company }}</td>
+                        <td width="80" colspan="3">{{ allocation_result_lists.result_comment }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

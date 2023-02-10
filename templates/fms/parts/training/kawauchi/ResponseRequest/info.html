@@ -1,0 +1,88 @@
+<script>
+function action_button_empty() {
+    $('#work_action_button').empty();
+}
+</script>
+
+    <div class="fms_col" style="width: auto;">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <div style="width: auto;">
+    <input type="hidden" id="cs_no" value="{{ cs_no }}">
+    <input type="hidden" id="budget_id" value="{{ budget_id }}">
+    <input type="hidden" id="work_id" value="{{ work_id }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="cs_rev_no" value="{{cs_rev_no}}">
+    <input type="hidden" id="factory_location_act" value="1">
+    <input type="hidden" id="port_harbour_act" value="2">
+    <input type="hidden" id="port_regulations" value="3">
+    <input type="hidden" id="buildings_regulations" value="4">
+    <input type="hidden" id="cityscape_regulations" value="5">
+    </div>
+    <div id="cs_action_button" style="width: auto;"></div>
+    <div style="float:left;">
+        <table class="cs_general_affairs_table">
+            <tr>
+                <td><div><font size="6">工事立地法</font></div></td>
+            </tr>
+            <tr>
+                {% if factory_location_act == True %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_factory_location_act_on" disabled='disabled' checked='checked' value="1">特定工場</font>
+                {% else %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_factory_location_act_off" disabled='disabled' value="1">特定工場</font>
+                {% endif %}
+                <font size="5">{{ factory_location_act_motive }}</font>
+                <font size="5">及び期間短縮</font></div></td>
+                <td><div><font size="5">・・・90日前(立)</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="6">湾港法</font></div></td>
+            </tr>
+            <tr>
+                {% if port_harbour_act == True %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_port_harbour_act_check_on" disabled='disabled' checked='checked' value="2">水域占用内工作物占用・工事申請</font></div></td>
+                {% else %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_port_harbour_act_check_off" disabled='disabled' value="2">水域占用内工作物占用・工事申請</font></div></td>
+                {% endif %}
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="6">港則法</font></div></td>
+            </tr>
+            <tr>
+                {% if port_regulations == True %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_port_regulations_check_on" disabled='disabled' checked='checked' value="3">港内工事申請</font></div></td>
+                {% else %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_port_regulations_check_off" disabled='disabled' value="3">港内工事申請</font></div></td>
+                {% endif %}
+                <td><div><font size="5">・・・30日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="6">市中高層建築物等に関する条例</font></div></td>
+            </tr>
+            <tr>
+                {% if buildings_regulations == True %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_buildings_regulations_check_on" disabled='disabled' checked='checked' value="4">標識設置届</font></div></td>
+                {% else %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_buildings_regulations_off" disabled='disabled' value="4">標識設置届</font></div></td>
+                {% endif %}
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+            <tr>
+                <td><div><font size="6">市都市景観条例</font></div></td>
+            </tr>
+            <tr>
+                {% if cityscape_regulations == True %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_cityscape_regulations_check_on" disabled='disabled' checked='checked' value="5">大規模建築物等行為届（高15m超、面積1000㎡超）</font></div></td>
+                {% else %}
+                    <td><div><font size="5"><input type="checkbox" id="sel_cityscape_regulations_off" disabled='disabled' value="5">大規模建築物等行為届（高15m超、面積1000㎡超）</font></div></td>
+                {% endif %}
+                <td><div><font size="5">・・・60日前(立)</font></div></td>
+            </tr>
+
+        </table>
+    </div>
+    <div style="clear: both;"></div>

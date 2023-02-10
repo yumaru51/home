@@ -1,0 +1,558 @@
+<script>
+//Lv4トップページの表示処理
+function level4_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: 'level4_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level4_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+</script>
+
+<style type="text/css">
+.square_big1 {
+   width: 848px;
+   height: 456px;
+   background: skyblue;
+}
+.triangle_right_big1 {
+  width: 0;
+  height: 0;
+  border-left: 40px solid skyblue;
+  border-top: 228px solid transparent;
+  border-bottom: 228px solid transparent;
+}
+.square_big2 {
+   width: 797px;
+   height:704px;
+   background: skyblue;
+}
+.square_big3 {
+   width: 800px;
+   height: 160px;
+   background: skyblue;
+}
+.square_middle1 {
+   width: 750px;
+   height: 144px;
+   background: darkseagreen;
+}
+.triangle_right_middle1{
+  width: 0;
+  height: 0;
+  border-left: 30px solid darkseagreen;
+  border-top: 72px solid transparent;
+  border-bottom: 72px solid transparent;
+}
+.square_middle2 {
+   width: 340px;
+   height: 160px;
+   background: darkseagreen;
+}
+.triangle_right_middle2 {
+  width: 0;
+  height: 0;
+  border-left: 30px solid darkseagreen;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+.triangle_left_middle2 {
+  width: 0;
+  height: 0;
+  border-right: 30px solid darkseagreen;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+.square_middle3 {
+   width: 460px;
+   height: 240px;
+   background: darkseagreen;
+}
+.triangle_right_middle3 {
+  width: 0;
+  height: 0;
+  border-left: 30px solid darkseagreen;
+  border-top: 120px solid transparent;
+  border-bottom: 120px solid transparent;
+}
+.square_middle4 {
+   width: 235px;
+   height: 358px;
+   background: darkseagreen;
+}
+.square_middle5 {
+   width: 220px;
+   height: 286px;
+   background: darkseagreen;
+}
+.triangle_right_middle4 {
+  width: 0;
+  height: 0;
+  border-left: 30px solid darkseagreen;
+  border-top: 179px solid transparent;
+  border-bottom: 179px solid transparent;
+}
+.square_middle6 {
+   width: 720px;
+   height: 140px;
+   background: darkseagreen;
+}
+.square_middle7 {
+   width: 220px;
+   height: 250px;
+   background: darkseagreen;
+}
+.square_middle8 {
+   width: 500px;
+   height: 146px;
+   background: darkseagreen;
+}
+.square_middle9 {
+   width: 460px;
+   height: 160px;
+   background: darkseagreen;
+}
+.square_middle10 {
+   width: 530px;
+   height: 250px;
+   background: darkseagreen;
+}
+.square_middle11 {
+   width: 250px;
+   height: 250px;
+   background: darkseagreen;
+}
+.square_middle12 {
+   width: 810px;
+   height: 144px;
+   background: darkseagreen;
+}
+
+
+.square_small1 {
+   width: 720px;
+   height: 90px;
+   background: white;
+}
+.square_small2 {
+   width: 200px;
+   height: 100px;
+   background: white;
+}
+.square_small3 {
+   width: 140px;
+   height: 100px;
+   background: white;
+}
+.square_small4 {
+   width: 160px;
+   height: 102px;
+   background: white;
+}
+.square_small5 {
+   width: 400px;
+   height: 90px;
+   background: white;
+}
+.square_small6 {
+   width: 180px;
+   height: 90px;
+   background: white;
+}
+.triangle_bottom_part {
+  width: 0;
+  height: 0;
+  border-left: 60px solid transparent;
+  border-right: 60px solid transparent;
+  border-top: 25px solid darkseagreen;
+}
+.triangle_top_part {
+  width: 0;
+  height: 0;
+  border-left: 60px solid transparent;
+  border-right: 60px solid transparent;
+  border-bottom: 25px solid darkseagreen;
+}
+.triangle_right_part {
+  width: 0;
+  height: 0;
+  border-left: 30px solid darkseagreen;
+  border-top: 60px solid transparent;
+  border-bottom: 60px solid transparent;
+}
+a:focus, a:hover {
+    color: #E83015;
+}
+.num {
+    text-align: right;
+}
+</style>
+<div style="float:left;">
+    <div class="square_big1" style="float:left;">
+        <div style="height: 10px">　　
+        </div>
+        <div style="float:left; width: 5px;">　　</div>
+        <div class="square_middle12" style="float:left;">
+            <div><font size="5">マネジメント推進</font></div>
+            <div style="float:left; width: 10px;">　</div>
+                <div style="float:left; width: 250px;">
+                    <div class="square_small4" ><font size="4">{{ step_num_list.111000000.0 }}</font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.111000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.111000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="float:left; width: 5px;">　　</div>
+                <div style="float:left; width: 250px;">
+                    <div class="square_small4" ><font size="4">{{ step_num_list.112000000.0 }}</font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.112000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.112000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+        </div>
+        <div class="triangle_right_middle1" style="float:left;"></div>
+        <div style="clear: both;" ></div>
+        <div style="float:left; width: 5px;">　　</div>
+        <div class="triangle_bottom_part" style="float:left;"></div>
+        <div style="float:left; width: 10px;">　　</div>
+        <div class="triangle_top_part" style="float:left;"></div>
+        <div style="float:left; width: 150px;">　　</div>
+        <div class="triangle_bottom_part" style="float:left;"></div>
+        <div style="float:left; width: 10px;">　　</div>
+        <div class="triangle_top_part" style="float:left;"></div>
+        <div style="clear: both;" ></div>
+        <div style="float:left; width: 5px;">　　</div>
+        <div class="square_middle11" style="float:left;">
+            <div><font size="5">戦略策定</font>
+            </div>
+            <div style="float:left; width: 10px;">　</div>
+                <div style="float:left; width: 150px;">
+                    <div class="square_small4" ><font size="4">{{ step_num_list.121000000.0 }}</font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.121000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.121000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="clear: both;" ></div>
+                <div style="height: 5px">　</div>
+                <div style="float:left; width: 10px;">　</div>
+                <div style="float:left; width: 150px;">
+                    <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(131000000);">{{ step_num_list.131000000.0 }}</a></font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.131000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.131000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+        </div>
+        <div class="triangle_right_middle2" style="float:left;"></div>
+        <div class="square_middle10" style="float:left;">
+            <div><font size="5">計画策定</font></div>
+            <div style="float:left; width: 10px;">　</div>
+                <div style="float:left; width: 175px;">
+                    <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(132000000);">{{ step_num_list.132000000.0 }}</a></font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.132000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.132000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="float:left; width: 175px;">
+                    <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(133000000);">{{ step_num_list.133000000.0 }}</a></font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.133000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.133000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="float:left; width: 150px;">
+                    <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(136000000);">{{ step_num_list.136000000.0 }}</a></font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.136000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.136000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="clear: both;" ></div>
+
+                <div style="height: 5px">　</div>
+                <div style="float:left; width: 10px;">　</div>
+                <div style="float:left; width: 175px;">
+                    <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(134000000);">{{ step_num_list.134000000.0 }}</a></font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.134000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.134000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="float:left; width: 175px;">
+                    <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(135000000);">{{ step_num_list.135000000.0 }}</a></font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.135000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.135000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="float:left; width: 150px;">
+                    <div class="square_small4" ><font size="4"><a href="#" onclick="display_cs_laws_progress();">届出進捗状況</a></font>
+                    </div>
+                </div>
+        </div>
+        <div class="triangle_right_middle2" style="float:left;"></div>
+        <div style="clear: both;" ></div>
+        <div style="float:left; width: 5px;">　</div>
+        <div class="triangle_bottom_part" style="float:left;"></div>
+        <div style="float:left; width: 250px;">　　</div>
+        <div class="triangle_bottom_part" style="float:left;"></div>
+        <div style="clear: both;" ></div>
+    </div>
+    <div>
+        <div style="float:left; width: 100px;">　　</div>
+        <div class="triangle_top_part" style="float:left;"></div>
+        <div style="float:left; width: 100px;">　　</div>
+        <div class="triangle_top_part" style="float:left;"></div>
+        <div style="clear: both;" ></div>
+        <div style="float:left; width: 10px;">　</div>
+        <div class="square_middle9" style="float:left;">
+            <div><font size="5">高度化</font></div>
+            <div style="float:left; width: 10px;">　</div>
+            <div style="float:left; width: 180px;">
+                <div class="square_small4" ><font size="4">{{ step_num_list.141000000.0 }}</font>
+                    <div>　部門：<input type="text" class="num" value="{{ step_num_list.141000000.1 }}" size="2">件</div>
+                    <div>　自分：<input type="text" class="num" value="{{ step_num_list.141000000.3 }}" size="2">件</div>
+                </div>
+            </div>
+
+            <div style="float:left; width: 180px;">
+                <div class="square_small4" ><font size="4">{{ step_num_list.142000000.0 }}</font>
+                    <div>　部門：<input type="text" class="num" value="{{ step_num_list.142000000.1 }}" size="2">件</div>
+                    <div>　自分：<input type="text" class="num" value="{{ step_num_list.142000000.3 }}" size="2">件</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="triangle_left_middle2" style="float:left;"></div>
+    <div>
+
+        <div class="square_middle2" style="float:left;">
+            <div><font size="5">方式・基準</font></div>
+            <div style="float:left; width: 5px;">　</div>
+            <div style="float:left; width: 165px;">
+                <div class="square_small4" ><font size="4">{{ step_num_list.151000000.0 }}</font>
+                    <div>　部門：<input type="text" class="num" value="{{ step_num_list.151000000.1 }}" size="2">件</div>
+                    <div>　自分：<input type="text" class="num" value="{{ step_num_list.151000000.3 }}" size="2">件</div>
+                </div>
+            </div>
+            <div style="float:left; width: 165px;">
+                <div class="square_small4" ><font size="4">{{ step_num_list.152000000.0 }}</font>
+                    <div>　部門：<input type="text" class="num" value="{{ step_num_list.152000000.1 }}" size="2">件</div>
+                    <div>　自分：<input type="text" class="num" value="{{ step_num_list.152000000.3 }}" size="2">件</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="clear: both;" ></div>
+    <div style="height: 20px">　</div>
+    <div id="fms_img" class="tool_box" >
+        <div >
+            <font size="6">----PLANTIA----</font>
+        </div>
+        <div style="float:left; width: 20px;">　</div>
+        <div style="float:left; width: 700px;">
+            <a href="http://yplantiav05:8280/plantia/#/plantia_nextgen" target="_blank"><img src="/static/img/fms/PLANTIA.jpg" style="float:center;" width="300" height="150"></a><font size="5">全ての機器情報はここにある！！</font>
+        </div>
+    </div>
+
+</div>
+<div class="triangle_right_big1" style="float:left;"></div>
+
+<div style="float:left;">
+
+    <div class="square_big2" style="float:left;">
+        <div style="height: 10px">　　</div>
+        <div style="float:left; width: 5px;">　</div>
+        <div class="square_middle1" style="float:left;">
+            <div><font size="5">管理運営</font></div>
+            <div style="float:left; width: 5px;">　</div>
+            <div style="float:left; width: 250px;">
+                <div class="square_small4" ><font size="4">計画実行調整</font>
+                    <div>　部門：<input type="text" class="num" value="0" size="2">件</div>
+                    <div>　自分：<input type="text" class="num" value="0" size="2">件</div>
+                </div>
+            </div>
+            <div style="float:left; width: 5px;">　</div>
+            <div style="float:left; width: 250px;">
+                <div class="square_small4" ><font size="4">法令順守</font>
+                    <div>　部門：<input type="text" class="num" value="0" size="2">件</div>
+                    <div>　自分：<input type="text" class="num" value="0" size="2">件</div>
+                </div>
+            </div>
+            <div style="float:left; width: 5px;">　</div>
+            <div style="float:left; width: 200px;">
+                <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(213000000);">{{ step_num_list.213000000.0 }}</a></font>
+                    <div>　部門：<input type="text" class="num" value="{{ step_num_list.213000000.1 }}" size="2">件</div>
+                    <div>　自分：<input type="text" class="num" value="{{ step_num_list.213000000.3 }}" size="2">件</div>
+                </div>
+            </div>
+        </div>
+        <div style="clear: both;" ></div>
+        <div style="height: 5px">　</div>
+        <div style="float:left; width: 5px;">　</div>
+        <div style="float:left; width: 250px;">
+            <div class="square_middle7" style="float:left;">
+                <div><font size="5">計画工事</font></div>
+                <div style="float:left; width: 5px;">　</div>
+                    <div style="float:left; width: 200px;">
+                        <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(211000000);">{{ step_num_list.211000000.0 }}</a></font>
+                            <div>　部門：<input type="text" class="num" value="{{ step_num_list.211000000.1 }}" size="2">件</div>
+                            <div>　自分：<input type="text" class="num" value="{{ step_num_list.211000000.3 }}" size="2">件</div>
+                        </div>
+                        <div style="height: 5px">　</div>
+                        <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(212000000);">{{ step_num_list.212000000.0 }}</a></font>
+                            <div>　部門：<input type="text" class="num" value="{{ step_num_list.212000000.1 }}" size="2">件</div>
+                            <div>　自分：<input type="text" class="num" value="{{ step_num_list.212000000.3 }}" size="2">件</div>
+                        </div>
+                    </div>
+            </div>
+            <div class="triangle_right_middle2" style="float:left;"></div>
+            <div style="clear: both;" ></div>
+            <div style="height: 5px">　</div>
+            <div style="float:left;">
+                <div class="square_middle5" style="float:left;">
+                    <div><font size="5">劣化防止・リスク早期発見/対応</font></div>
+                    <div style="float:left; width: 5px;">　</div>
+                    <div style="float:left; width: 200px;">
+                        <div class="square_small4" ><font size="4">{{ step_num_list.221000000.0 }}</font>
+                            <div>　部門：<input type="text" class="num" value="{{ step_num_list.221000000.1 }}" size="2">件</div>
+                            <div>　自分：<input type="text" class="num" value="{{ step_num_list.221000000.3 }}" size="2">件</div>
+                        </div>
+                        <div style="height: 5px">　</div>
+                        <div class="square_small4" ><font size="4">{{ step_num_list.222000000.0 }}</font>
+                            <div>　部門：<input type="text" class="num" value="{{ step_num_list.222000000.1 }}" size="2">件</div>
+                            <div>　自分：<input type="text" class="num" value="{{ step_num_list.222000000.3 }}" size="2">件</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="float:left;">
+                <div style="height: 1px">　</div>
+                <div class="triangle_right_part" ></div>
+                <div style="height: 29px">　</div>
+                <div class="triangle_right_part" ></div>
+            </div>
+        </div>
+        <div style="float:left; width: 540px;">
+            <div>
+                <div class="square_middle4" style="float:left;">
+                    <div><font size="5">調達</font></div>
+                    <div style="float:left; width: 5px;">　</div>
+                        <div style="float:left; width: 210px;">
+<!--                            <div class="square_small4" ><font size="4">発注</font>-->
+                            <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(241000000);">{{ step_num_list.241000000.0 }}</a></font>
+                                <div>　部門：<input type="text" class="num" value="{{ step_num_list.241000000.1 }}" size="2">件</div>
+                                <div>　自分：<input type="text" class="num" value="{{ step_num_list.241000000.3 }}" size="2">件</div>
+                            </div>
+                            <div style="height: 5px">　</div>
+<!--                            <div class="square_small4" ><font size="4">検査・検収</font>-->
+                            <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(242000000);">{{ step_num_list.242000000.0 }}</a></font>
+                                <div>　部門：<input type="text" class="num" value="{{ step_num_list.242000000.1 }}" size="2">件</div>
+                                <div>　自分：<input type="text" class="num" value="{{ step_num_list.242000000.3 }}" size="2">件</div>
+                            </div>
+                            <div style="height: 5px">　</div>
+                            <div class="square_small4" ><font size="4">{{ step_num_list.243000000.0 }}</font>
+                                <div>　部門：<input type="text" class="num" value="{{ step_num_list.243000000.1 }}" size="2">件</div>
+                                <div>　自分：<input type="text" class="num" value="{{ step_num_list.243000000.3 }}" size="2">件</div>
+                            </div>
+                        </div>
+                </div>
+                <div class="triangle_right_middle4" style="float:left;"></div>
+                <div class="square_middle4" style="float:left;">
+                    <div><font size="5">工事・検査実行</font></div>
+                    <div style="float:left; width: 5px;">　</div>
+                        <div style="float:left; width: 200px;">
+<!--                            <div class="square_small4" ><font size="4">工事・検査準備</font>-->
+                            <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(251000000);">{{ step_num_list.251000000.0 }}</a></font>
+                                <div>　部門：<input type="text" class="num" value="{{ step_num_list.251000000.1 }}" size="2">件</div>
+                                <div>　自分：<input type="text" class="num" value="{{ step_num_list.251000000.3 }}" size="2">件</div>
+                            </div>
+                            <div style="height: 5px">　</div>
+<!--                            <div class="square_small4" ><font size="4">工事・検査実行</font>-->
+                            <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(252000000);">{{ step_num_list.252000000.0 }}</a></font>
+                                <div>　部門：<input type="text" class="num" value="{{ step_num_list.252000000.1 }}" size="2">件</div>
+                                <div>　自分：<input type="text" class="num" value="{{ step_num_list.252000000.3 }}" size="2">件</div>
+                            </div>
+                            <div style="height: 5px">　</div>
+                            <div class="square_small4" ><font size="4">{{ step_num_list.253000000.0 }}</font>
+                                <div>　部門：<input type="text" class="num" value="{{ step_num_list.253000000.1 }}" size="2">件</div>
+                                <div>　自分：<input type="text" class="num" value="{{ step_num_list.253000000.3 }}" size="2">件</div>
+                            </div>
+                        </div>
+                </div>
+            </div>
+            <div>
+                <div style="float:left; width: 20px;">　　</div>
+                <div class="triangle_top_part" style="float:left;"></div>
+                <div style="float:left; width: 160px;">　　</div>
+                <div class="triangle_top_part" style="float:left;"></div>
+            </div>
+            <div>
+                <div class="square_middle8" style="float:left;">
+                    <div><font size="5">故障対応(小口)</font></div>
+                    <div style="float:left; width: 5px;">　</div>
+                    <div style="float:left; width: 165px;">
+<!--                        <div class="square_small4" ><font size="4">評価・判断</font>-->
+                        <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(231000000);">{{ step_num_list.231000000.0 }}</a></font>
+                            <div>　部門：<input type="text" class="num" value="{{ step_num_list.231000000.1 }}" size="2">件</div>
+                            <div>　自分：<input type="text" class="num" value="{{ step_num_list.231000000.3 }}" size="2">件</div>
+                        </div>
+                    </div>
+                    <div style="float:left; width: 5px;"></div>
+                    <div style="float:left; width: 165px;">
+                        <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(233000000);">{{ step_num_list.233000000.0 }}</a></font>
+                            <div>　部門：<input type="text" class="num" value="{{ step_num_list.233000000.1 }}" size="2">件</div>
+                            <div>　自分：<input type="text" class="num" value="{{ step_num_list.233000000.3 }}" size="2">件</div>
+                        </div>
+                    </div>
+                    <div style="float:left; width: 5px;"></div>
+                    <div style="float:left; width: 165px;">
+                        <div class="square_small4" ><font size="4"><a href="#" onclick="level4_toppage(232000000);">{{ step_num_list.232000000.0 }}</a></font>
+                            <div>　部門：<input type="text" class="num" value="{{ step_num_list.232000000.1 }}" size="2">件</div>
+                            <div>　自分：<input type="text" class="num" value="{{ step_num_list.232000000.3 }}" size="2">件</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="clear: both;" ></div>
+    <div style="height: 10px">　</div>
+
+        <div style="float:left; width: 5px;">　　</div>
+        <div class="square_middle1" style="float:left;">
+            <div><font size="5">実行機能の強化改善</font></div>
+            <div style="float:left; width: 10px;">　　</div>
+                <div style="float:left; width: 170px;">
+                    <div class="square_small4" ><font size="4">{{ step_num_list.311000000.0 }}</font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.311000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.311000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="float:left; width: 170px;">
+                    <div class="square_small4" ><font size="4">{{ step_num_list.312000000.0 }}</font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.312000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.312000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="float:left; width: 170px;">
+                    <div class="square_small4" ><font size="4">{{ step_num_list.313000000.0 }}</font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.313000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.313000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+                <div style="float:left; width: 170px;">
+                    <div class="square_small4" ><font size="4">{{ step_num_list.314000000.0 }}</font>
+                        <div>　部門：<input type="text" class="num" value="{{ step_num_list.314000000.1 }}" size="2">件</div>
+                        <div>　自分：<input type="text" class="num" value="{{ step_num_list.314000000.3 }}" size="2">件</div>
+                    </div>
+                </div>
+        </div>
+
+</div>
+

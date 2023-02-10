@@ -1,0 +1,23 @@
+<style type="text/css">
+div.scroll_x_function_div {
+  width: 1550px;
+  height: 830px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+</style>
+        <div><h2 class="page-header">詳細仕様(自由)</h2></div>
+        <div class="scroll_x_function_div">
+        <div style="float:left;size=5px">　</div>
+            {% for free_spec_list in free_spec_list %}
+                <div style="float:left;size=5px">　</div>
+                <div style="float:left;">
+                    <div><font size="4">詳細　ページ{{ free_spec_list.0 }} : </font></div>
+                    {% if free_spec_list.2 != 1 %}
+                        <div><font size="4" color="black"><textarea name="{{ free_spec_list.0 }}_free_text" rows="40" cols="100" readonly>{{free_spec_list.1 }}</textarea></font></div>
+                    {% else %}
+                        <div><font size="4" color="red"><textarea name="{{ free_spec_list.0 }}_free_text" rows="40" cols="100" readonly>{{ free_spec_list.1 }}</textarea></font></div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>

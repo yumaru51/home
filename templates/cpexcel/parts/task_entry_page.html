@@ -1,0 +1,73 @@
+<script>
+function task_entry(a) {
+    var task_id = a;
+    var program_id = $('#program_entry_program_id').val();
+    var source_sheet_name = $('#source_sheet_name').val();
+    var post_to_sheet_name = $('#post_to_sheet_name').val();
+    var source_cell_name = $('#source_cell_name').val();
+    var post_to_cell_name = $('#post_to_cell_name').val();
+        $.ajax({
+                url: "/isk_tools/cpexcel/action/task_entry/",
+                type: "POST",
+                data : {
+                    'program_id': program_id,
+                    'task_id': task_id,
+                    'source_sheet_name': source_sheet_name,
+                    'post_to_sheet_name': post_to_sheet_name,
+                    'source_cell_name': source_cell_name,
+                    'post_to_cell_name': post_to_cell_name,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    task_list_refresh(program_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+}
+function task_delete(a) {
+    var task_id = a;
+    var program_id = $('#program_entry_program_id').val();
+        $.ajax({
+                url: "/isk_tools/cpexcel/action/task_delete/",
+                type: "POST",
+                data : {
+                    'task_id': task_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    task_list_refresh(program_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+
+    <div>
+        <input type="button" value="新規登録" onclick="task_entry(0,{{ program_id }});">　　
+        {% if task_id != 0 %}
+            <input type="button" value="　更新　" onclick="task_entry({{ task_id }});">　　
+            <input type="button" value="　削除　" onclick="task_delete({{ task_id }});">　　
+        {% endif %}
+    </div>
+    <div>
+        <div>　タスクID　　　　：　{{ task_id_str }}</div>
+            <div>　コピー元シート　：　<input type="text" id="source_sheet_name" value="{{ source_sheet_name }}" style="width:150px;">　⇒　
+                    コピー先シート　：　<input type="text" id="post_to_sheet_name" value="{{ post_to_sheet_name }}" style="width:150px;">
+            </div>
+            <div>　コピー元セル　　：　<input type="text" id="source_cell_name" value="{{ source_cell_name }}" style="width:150px;">　⇒　
+                    コピー先セル　　：　<input type="text" id="post_to_cell_name" value="{{ post_to_cell_name }}" style="width:150px;">
+            </div>
+    </div>

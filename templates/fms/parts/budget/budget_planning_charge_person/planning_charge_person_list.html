@@ -1,0 +1,105 @@
+<script>
+//
+function charge_person_detail(a) {
+    var charge_person_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/planning_charge_person_detail/",
+                type: "POST",
+                data : {
+                    'charge_person_id' : charge_person_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#planning_person').val(data.planning_person);
+                    $('#planning_person_full_name').val(data.planning_person_full_name);
+                    $('#planning_person_id').val(data.planning_person_id);
+                    $('#main_person_flag').val(data.main_person_flag);
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("add_button_div") != null){
+                        const p5 = document.getElementById("add_button_div");
+                        p5.style.display ="none";
+                    }
+                    if(document.getElementById("edit_button_div") != null){
+                        const p6 = document.getElementById("edit_button_div");
+                        p6.style.display ="block";
+                    }
+                    main_person_flag_value_change();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.charge_person{
+    width:200px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+.main_charge_flag{
+    width:100px;
+    font-size: 130%;
+    padding: 5px 5px 5px 5px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+        <input type="hidden" id="main_charge_person_name" value="{{ main_charge_person_name }}">
+        {% if planning_charge_person_lists_num > 0 %}
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        {% if charge_person_list_edit_flag == 'true' %}
+                            <th class="detail_pb"></th>
+                        {% endif %}
+                        <th class="charge_person">担当者</th>
+                        <th class="main_charge_flag">主担当</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for planning_charge_person_lists in planning_charge_person_lists %}
+                    <tr>
+                        {% if charge_person_list_edit_flag == 'true' %}
+                            <td class="detail_pb">
+                                <a href="#" id="{{ planning_charge_person_lists.id }}" class="detailpb"
+                                   onclick="charge_person_detail(id);">選択</a>
+                            </td>
+                        {% endif %}
+                        <td class="charge_person">{{ planning_charge_person_lists.last_name }}　{{ planning_charge_person_lists.first_name }}</td>
+                        <td class="main_charge_flag">
+                            {% if planning_charge_person_lists.main_charge_flag == 1 %}
+                                〇
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

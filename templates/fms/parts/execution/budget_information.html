@@ -1,0 +1,394 @@
+{% load humanize %}
+
+<script>
+function budget_information_action_button_empty() {
+    $('#{{ action_button_id }}').empty();
+}
+
+//予算完了最終処理
+function budget_information_final_complete(
+    this_step,
+    sel_next_step,
+    action_cd,
+    target_id,
+    next_division,next_department,
+    next_person_id,
+    this_department,
+    this_division,
+    comment,
+    target,
+    target_budget_id) {
+
+    //予算側を関連予算も含めて「完了」状態に設定する
+    {% for budget_item in budget_lists %}
+
+    target_budget_id = {{ budget_item.budget_id }};
+    //予算状態を「完了」に設定
+    set_budget_condition(target_budget_id, 51);
+
+    {% endfor %}
+
+}
+
+//予算状態を設定
+function set_budget_condition(budget_id , condition) {
+    $("#loading").show();//呼び出し中に表示するgifを表示
+    $.ajax({
+        url: "/isk_tools/fms/action/set_budget_condition/",
+        type: "POST",
+        data : {
+            'budget_id': budget_id,
+            'condition': condition,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 100000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(data){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        //複数回のメッセージ表示は抑止
+        //alert(data.msg);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+// 完了状態フラグが完了不可能であればfalseを返す
+function check_budget_complete_flag(this_step) {
+  {% if budget_complete_flag == 2 %}
+        return false;
+  {% else %}
+        return true;
+  {% endif %}
+}
+
+{% if start_carry_forward_flg == 1 %}
+//予算繰越開始処理
+function budget_carry_forward_start() {
+    $("#loading").show();//呼び出し中に表示するgifを表示
+    var target_budget_id = $('#target_budget_id').val();
+    var this_step = $('#this_step').val();
+    var this_department = $('#this_department').val();
+    var this_division = $('#this_division').val();
+    $.ajax({
+        url: "/isk_tools/fms/action/budget_carry_forward_start/",
+        type: "POST",
+        data : {
+            'budget_id': target_budget_id,
+            'this_step': this_step,
+            'this_division': this_division,
+            'this_department': this_department,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 100000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(data){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert(data.msg);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+{% endif %}
+
+</script>
+<style type="text/css">
+{% if budget_complete_flag != 0 %}
+div.budget_complete_info_div {
+  width: 1880px;
+  height: 75px;
+}
+{% else %}
+div.budget_complete_info_div {
+  width: 1880px;
+  height: 50px;
+}
+{% endif %}
+div.scroll_budget_base_info_div {
+  width: 1880px;
+  height: 100px;
+  overflow: scroll;
+}
+div.scroll_budget_relation_info_div {
+  width: 1880px;
+  height: 200px;
+  overflow: scroll;
+}
+div.scroll_budget_work_list_div {
+  width: 1880px;
+  height: 600px;
+  overflow-y: scroll;
+}
+td, th {
+    font-size: 12px;
+    line-height: 16px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+    padding: 0px 0px 0px 2px;
+    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+}
+.budget_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.budget_no{
+    width:120px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.budget_name{
+    width:280px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.style_class_price{
+    width:180px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.progress{
+    width:180px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.construction_id{
+    width:90px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.construction_name{
+    width:400px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.source_prospect_price{
+    width:180px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.probudgetunit_detail_pb{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+td[class*="price"] {
+    text-align: right;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+    <input type="hidden" id="budget_information_page" value="{{ this_page }}">
+    <input type="hidden" id="budget_id" value="{{ budget_id }}">
+    <input type="hidden" id="file_target" name="file_target" value="probudgetunit">
+    <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ budget_id }}">
+    <input type="hidden" id="file_work_id" name="file_work_id" value="0">
+
+    <div class="budget_complete_info_div">
+    <font size="5">
+        <div style="float:left;">予算総合情報</div>
+    </font>
+
+   {% if budget_complete_flag != 0 %}
+    <div style="float:left;  margin: 0px 0px 0px 100px;">
+        <table>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="2">{{ prospecunit_complete_label }}</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="2">：　</font></div></td>
+                <td><div style="padding: 5px 5px;">
+                    {% if prospecunit_count == 0 %}
+                    <font size="2" color="red">{{ prospecunit_complete_count }} / {{ prospecunit_count }}</font>
+                    {% elif prospecunit_count == prospecunit_complete_count %}
+                    <font size="2" color="black">{{ prospecunit_complete_count }} / {{ prospecunit_count }}</font>
+                    {% else %}
+                    <font size="2" color="red">{{ prospecunit_complete_count }} / {{ prospecunit_count }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            {% if 0 < cs_count %}
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="2">届出CS状態（完了/総数）</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="2">：　</font></div></td>
+                <td><div style="padding: 5px 5px;">
+                    {% if cs_count == cs_complete_count %}
+                    <font size="2" color="black">{{ cs_complete_count }} / {{ cs_count }}</font>
+                    {% else %}
+                    <font size="2" color="red">{{ cs_complete_count }} / {{ cs_count }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+    {% endif %}
+    </div><!--<div class="budget_complete_info_div">-->
+
+   {% if start_carry_forward_flg == 1 %}
+    <div id="carry_forward_button_start_div" style="float:left;" >
+        <input type="button" id="carry_forward_button_start" value="　予算繰越開始　" onclick="budget_carry_forward_start()">
+    </div>
+   {% endif %}
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+<!--UploadFileList        -->
+    <div id="upload_file_list_budget_information" style="float:left; width:auto; margin-left:50px;" ></div>
+    <div style="clear: both;"></div>
+<!--UploadFileList        -->
+    <font size="4">
+        <div>予算基礎情報</div>
+    </font>
+    <div class="scroll_budget_base_info_div">
+        <table border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+            <thead class="scrollHead">
+                <tr>
+                    <th class="budget_id">予算ID</th>
+                    <th class="budget_no">予算NO</th>
+                    <th class="budget_name">予算名</th>
+                    <th class="style_class_price">予算合計額</th>
+                    <th class="style_class_price">予算見込額合計</th>
+                    <th class="style_class_price">見込額基準残額</th>
+                    <th class="style_class_price">実行額合計</th>
+                    <th class="style_class_price">実行基準残額</th>
+                </tr>
+            </thead>
+            <tbody class="scrollBody">
+                <tr>
+                    <td class="budget_id">{{ original_budget_data.budget_id| default_if_none:'' }}</td>
+                    <td class="budget_no">{{ original_budget_data.budget_no|default_if_none:'' }}</td>
+                    <td class="budget_name">{{ original_budget_data.budget_name|default_if_none:''  }}</td>
+                    <td class="style_class_price">{{ budget_total_price| default_if_none:''|intcomma }}</td>
+                    <td class="style_class_price">{{ budget_prospect_price| default_if_none:''|intcomma }}</td>
+                    <td class="style_class_price">{{ balance_budget_price_prospect| default_if_none:''|intcomma }}</td>
+                    <td class="style_class_price">{{ budget_execution_price| default_if_none:''|intcomma  }}</td>
+                    <td class="style_class_price">{{ balance_budget_price_execution| default_if_none:''|intcomma }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <font size="4">
+        <div>関連予算情報</div>
+    </font>
+    <div class="scroll_budget_relation_info_div">
+        <table border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+            <thead class="scrollHead">
+                <tr>
+                    <th class="budget_id">予算ID</th>
+                    <th class="budget_no">予算NO</th>
+                    <th class="budget_name">予算名</th>
+                    <th class="style_class_price">予算額</th>
+                </tr>
+            </thead>
+            <tbody class="scrollBody">
+            {% for budget_lists in budget_lists %}
+                <tr>
+                    <td class="budget_id">{{ budget_lists.budget_id| default_if_none:'' }}</td>
+                    <td class="budget_no">{{ budget_lists.budget_no | default_if_none:'' }}</td>
+                    <td class="budget_name">{{ budget_lists.budget_name| default_if_none:'' }}</td>
+                    <td class="style_class_price">{{ budget_lists.budget_price| default_if_none:''|intcomma }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+
+    <div>
+    <font size="4">予算内工事一覧</font>
+    </div>
+
+    <div class="scroll_budget_work_list_div">
+        <table border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+            <thead>
+                <tr>
+                    <th class="probudgetunit_detail_pb"></th>
+                    <th class="progress">進捗状況</th>
+                    <th class="construction_id">工事ID</th>
+                    <th class="construction_name">工事名</th>
+                    <th class="style_class_price">見込額</th>
+                    <th class="source_prospect_price">見込額ソース</th>
+                </tr>
+            </thead>
+            <tbody >
+            {% for construction in construction_lists %}
+                <tr>
+                    <td class="probudgetunit_detail_pb">
+                    <a href="#" class="detailpb" onclick="work_information_detail({{ construction.id }},{{ construction.construction_id }},{{ construction.budget_id }},'{{ t_username }}');">
+                        詳細
+                    </a></td>
+                    <td class="progress">{{ construction.step_name| default_if_none:'' }}</td>
+                    <td class="construction_id">{{ construction.construction_id| default_if_none:'' }}</td>
+                    <td class="construction_name">{{ construction.work_name| default_if_none:'' }}</td>
+                    {% if construction.cancel_complete_flag == 1 %}
+                        <td class="style_class_price">0</td>
+                        <td class="source_prospect_price">無し</td>
+                    {% elif construction.execution_price > 0 %}
+                        <td class="style_class_price">{{ construction.execution_price| default_if_none:''|intcomma }}</td>
+                        <td class="source_prospect_price">実行額</td>
+                    {% elif construction.prospect_price > 0 %}
+                        <td class="style_class_price">{{ construction.prospect_price| default_if_none:''|intcomma }}</td>
+                        <td class="source_prospect_price">見積金額</td>
+                    {% else %}
+                        <td class="style_class_price">0</td>
+                        <td class="source_prospect_price">無し</td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+<script>
+//工事一覧から選択された工事データの詳細を別タブでの表示処理（実行側専用）
+function work_information_detail(work_unique_id, work_id, budget_id, present_operator) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var level5_step_id = $('#level5_step_id').val();
+    var new_step = Number(level5_step_id) + 1;
+    var target_url ='';
+    var start_work_stop_flag = 0;
+    target_url = '/isk_tools/fms/parts/execution/execution_detail_template/';
+    target_val = 'prospecificationunit';
+    window.open('', 'work_copy_source');
+    if(target_url !=""){
+        $('<form/>', {action: target_url, target: 'work_copy_source', method: 'post'})
+        .append($('<input/>', {type: 'hidden', name: 'id', value: work_unique_id}))
+        .append($('<input/>', {type: 'hidden', name: 'work_id', value: work_id}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: '0'}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+        .append($('<input/>', {type: 'hidden', name: 'target', value: target_val}))
+        .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+        .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+        .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+        .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+        .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: '920000000'}))
+        .append($('<input/>', {type: 'hidden', name: 'present_operator', value: present_operator}))
+        .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+        .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 1}))
+        .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+        .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+        .appendTo(document.body)
+        .submit();
+    }
+}
+</script>

@@ -1,0 +1,263 @@
+{% load humanize %}
+
+<style type="text/css">
+.estimate_data_div{
+    overflow-x: scroll;
+    width: 1600px;
+    padding: 5px 5px;
+    margin: 0;
+}
+.estimate_data_div table{
+    margin: 0;
+    border: 1px solid #999;
+    border-spacing: 1;
+    padding: 5px 5px;
+}
+.estimate_data_div td{
+    height: 2em;
+    width: 100px;
+    white-space: nowrap;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-spacing: 1;
+    background: #FFF;
+    padding: auto;
+    vertical-align: middle;
+}
+.estimate_data_div th{
+    height: 2em;
+    width: 120px;
+    white-space: nowrap;
+    border-right: 1px solid #999;
+    border-bottom: 1px solid #999;
+    border-spacing: 1;
+    color: #000;
+    background: #f2f2f2;
+    position: sticky;
+    top: 0;
+    left: 0;
+    padding: auto;
+    vertical-align: middle;
+}
+.estimate_data_div tr:first-child{
+    border-top: 1px solid #999;
+    top: 10;
+    left: 10;
+}
+.estimate_data_div th:first-child{
+    border-left: 1px solid #999;
+    z-index: 1;
+    top: 0;
+    left: 0;
+}
+.estimate_data_div input[type=checkbox] {
+	transform: scale(2);
+	z-index: -10;
+    margin: 10px;
+}
+
+</style>
+
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <input type="hidden" id="phenomenon_unique_id" value="{{ phenomenon_unique_id }}">
+        <input type="hidden" id="div_id_name" value="{{ div_id_name }}">
+        <input type="hidden" id="vendor_count" value="{{ vendor_count }}">
+        <h2 class="page-header"></h2>
+    </div>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+    <div id="{{ div_id_name }}_must_check" ><!--must_check ここから-->
+        <table style="float:left;">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">依頼ＩＤ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ phenomenon_id }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">依頼工事名称</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ erp_construction_data.item_text | default_if_none:'' }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事/依頼内容</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4"><textarea id="order_detail_for_vendor" name="order_detail_for_vendor" rows="5" cols="45" readonly>{{ order_data.order_detail_for_vendor | default_if_none:''  }}</textarea></font></div></td>
+            </tr>
+        </table>
+        <table style="float:left;">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事実施場所/担当</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ storage_space_rem }}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">決定見積提出期日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ estimates_data.estimate_deadline | default_if_none:'' }}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">決定工期</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ construction_from | default_if_none:'' }}～{{ construction_to | default_if_none:'' }}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">決定納期</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ estimates_data.delivery_date | default_if_none:'' }}
+                </font></div></td>
+            </tr>
+        </table>
+    </div><!--must_check ここまで-->
+
+    <div class="estimate_data_div">
+        <font size="4">
+        <table class = estimate_data_table">
+            <thead>
+            <tr>
+                <th><font size="4">候補業者一覧</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <th><font size="4">候補業者{{ vendor.vendor_no }}</font></th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th><font size="4">決定</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td><div style="padding: 5px 0px;"><font size="4">
+                    <input type="checkbox"  name="decision" value="{{ vendor.vendor_no }}" class="estimate_table_cell" disabled
+                    {% if vendor.vendor_no == estimates_data.confirmed_vendor_no %} checked="checked" {% endif %}>
+                </font></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">候補業者名</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ vendor.vendor_name | default_if_none:'' }}
+                </font></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">進捗状態</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ vendor.status.status_text }}
+                </font></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">見積依頼日</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ vendor.req_date | default_if_none:'' }}
+                </font></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">見積回答期日</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ vendor.reply_date | default_if_none:'' }}
+                </font></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">本見積額</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td><div style="padding: 5px 0px;"><font size="5">
+                        {{ vendor.estimate_price |default_if_none:''|intcomma }}
+                </font></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">交渉後見積額</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td><div style="padding: 5px 0px;"><font size="5">
+                    {{ vendor.price_after_discount |default_if_none:''|intcomma }}
+                </font></div></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">工期/納期評価</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td>
+                    <div><font size="4"><textarea id="eva_delivery_{{ vendor.vendor_no }}" class="estimate_table_cell" rows="1" cols="18" readonly>{{ vendor.eva_delivery | default_if_none:'' }}</textarea></font></div>
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">見積査定額</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td>
+                    <div><font size="4"><input type="text" id="eva_price_{{ vendor.vendor_no }}" class="estimate_table_cell price_input" size="18"
+                                               value="{{ vendor.eva_price |default_if_none:''|intcomma }}" readonly></font></div>
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">見積査定</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td>
+                    <div><font size="4"><textarea id="eva_estimate_{{ vendor.vendor_no }}" class="estimate_table_cell" rows="8" cols="18" readonly>{{ vendor.eva_estimate | default_if_none:'' }}</textarea></font></div>
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">最終金額評価</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td>
+                    <div><font size="4"><textarea id="eva_last_price_{{ vendor.vendor_no }}" class="estimate_table_cell" rows="1" cols="18" readonly>{{ vendor.eva_last_price | default_if_none:'' }}</textarea></font></div>
+                </td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <th><font size="4">その他</font></th>
+                {% for vendor in estimates_vendor_list %}
+                <td>
+                    <div><font size="4"><textarea id="eva_other_{{ vendor.vendor_no }}" class="estimate_table_cell" rows="1" cols="18" readonly>{{ vendor.eva_other | default_if_none:'' }}</textarea></font></div>
+                </td>
+                {% endfor %}
+            </tr>
+            </tbody>
+        </table>
+        </font>
+    </div><!--estimate_data_div-->
+
+    </div><!--ng_character_checkここまで-->
+
+    <div>
+        <input type="hidden" id="{{ div_id_name }}_delete_pb_disp_flag" value="0">
+        <input type="hidden" id="{{ div_id_name }}_file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+        <input type="hidden" id="{{ div_id_name }}_div_id_name" value="{{ div_id_name }}">
+        <input type="hidden" id="{{ div_id_name }}_file_class" name="file_class" value="MaintenanceEstimate">
+        <div id="upload_file_list_{{ div_id_name }}">添付ファイル無し</div>
+    </div>
+
+<script>
+
+//操作PBを非表示にする
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();
+}
+
+//添付ファイルリストを表示する
+function upload_file_list_{{ div_id_name }}() {
+    var file_folder = $('#{{ div_id_name }}_file_folder').val();
+    var div_id_name = $('#{{ div_id_name }}_div_id_name').val();
+    var delete_pb_disp_flag = $('#{{ div_id_name }}_delete_pb_disp_flag').val();
+    var file_class = $('#{{ div_id_name }}_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+}
+
+</script>

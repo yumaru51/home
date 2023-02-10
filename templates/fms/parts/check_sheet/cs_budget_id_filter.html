@@ -1,0 +1,7 @@
+<div id="cs_sel_budget_id" class="item" style="float:left;margin-left:15px;">予算ID：<select id="sel_budget_id" name="sel_budget_id" onchange="budget_id_change(value, budget_id_list);">
+        <option hidden value="">対象となる予算を選択してください</option>
+            {% for budget_id_list in budget_id_list %}
+                <option id="{{ budget_id_list.id }}" value="{{ budget_id_list.budget_id }}">予算ID:{{ budget_id_list.budget_id }}　予算名:{{ budget_id_list.budget_name }}</option>
+            {% endfor %}
+    </select>
+</div>

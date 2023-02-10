@@ -1,0 +1,50 @@
+<style type="text/css">
+
+</style>
+            <div><h2 class="page-header">関連機器</h2></div>
+            <div style="float: left;">
+                <table>
+                    <tr>
+                        <td><div><font size="4" style="padding: 5px 0px;">関連機器NO</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="width:40px; padding: 5px 0px;">
+                            <font size="5" color="black">{{ equipment_no }}</font>
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4" style="padding: 5px 0px;">関連機器名</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            <font size="5" color="black">{{ equipment_name }}</font>
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4" style="padding: 5px 0px;">工事/機器判別</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            <font size="5" color="black">{{ purchase }}</font>
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4" style="padding: 5px 0px;">機器ファミリ</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            <font size="5" color="black">{{ equip_family }}</font>
+                        </div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4" style="padding: 5px 0px;">機器タイプ</font></div></td>
+                        <td><div><font size="4" style="padding: 5px 0px;">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            <font size="5" color="black">{{ equip_type }}</font>
+                        </div></td>
+                    </tr>
+                </table>
+
+                <input type="hidden" id="edit_flag" value="1"  >
+            </div>
+            <div style="float: left;">
+                <div id="work_equipment_list" style="width: auto;">
+                        登録済関連機器リスト
+                </div>
+            </div>

@@ -1,0 +1,291 @@
+<script>
+
+//詳細仕様(自由記入)登録処理
+function spec_free_entry_sub(work_id, next_step, this_department, this_division, budget_id, work_rev_no, val_id, sub_no) {
+    var wsf_detail = $(val_id).val();
+    var ok_flag = 0;
+    var ng_flag = 0;
+    var delete_flag = 0;
+    var this_step = $('#this_step').val();
+
+    if(wsf_detail.length == 0 && sub_no == 0){
+        //追加ページは入力がなければ登録しない
+        return { 1:ok_flag , 2:ng_flag , 3:delete_flag};
+    }
+
+    $.ajax({
+            url: "/isk_tools/fms/action/spec_free_entry/",
+            type: "POST",
+            data : {
+                'work_id' : work_id,
+                'sub_no' : sub_no,
+                'detail' : wsf_detail,
+                'this_step' : this_step,
+                'next_step' : next_step,
+                'this_department' : this_department,
+                'this_division' : this_division,
+                'budget_id' : budget_id,
+                'work_rev_no' : work_rev_no,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            async : false,
+            })
+            .done(function(data){
+                var delete_flag_ret = data.delete_flag;
+                if(delete_flag_ret == 0){
+                    ok_flag = ok_flag + 1;
+                }else{
+                    delete_flag = delete_flag + 1;
+                }
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+                ng_flag = ng_flag +1;
+            });
+    return { 1:ok_flag , 2:ng_flag , 3:delete_flag};
+}
+
+//詳細仕様(自由記入)情報登録･更新処理
+function spec_free_entry(a,b,c,d,e,f) {
+    var work_id = a;
+    var next_step = b;
+    var this_department = c;
+    var this_division = d;
+    var budget_id = e;
+    var work_rev_no = f;
+
+    var n = $('#page_num').val();
+    var ng_flag = 0;
+    var ok_flag = 0;
+    var ok_flag_1 = 0;
+    var ok_flag_2 = 0;
+    var delete_flag = 0;
+    var this_step = $('#this_step').val();
+
+    let free_text_list =
+    {
+        {% if free_spec_list_num != 0 %}
+            {% for free_spec_list in free_spec_list %}
+                {{ free_spec_list.0 }} : { val_id:'#{{ free_spec_list.0 }}_free_text', sub_no:{{ free_spec_list.0 }}, check_page_num:1, },
+            {% endfor %}
+        {% endif %}
+        101 : { val_id:'#add_free_text_0', sub_no:0, check_page_num:0, },
+        102 : { val_id:'#add_free_text_1', sub_no:0, check_page_num:0, },
+        103 : { val_id:'#add_free_text_2', sub_no:0, check_page_num:0, },
+        104 : { val_id:'#add_free_text_3', sub_no:0, check_page_num:0, },
+    };
+
+    for (let free_text_index in free_text_list){
+        var free_text_object = free_text_list[free_text_index];
+        if (n > 0 || free_text_object.check_page_num == 0) {
+            var { 1:ok_flag_sub , 2:ng_flag_sub , 3:delete_flag_sub} = spec_free_entry_sub(work_id, next_step, this_department, this_division,
+                budget_id, work_rev_no, free_text_object.val_id, free_text_object.sub_no);
+                ok_flag += ok_flag_sub;
+                ng_flag += ng_flag_sub;
+                delete_flag += delete_flag_sub;
+
+                if(ok_flag_sub > 0){
+                    if(free_text_object.check_page_num == 1){
+                        ok_flag_1 += 1;
+                    }else{
+                        ok_flag_2 += 1;
+                    }
+                }
+        }
+    }
+
+    if (ng_flag == 0 && (ok_flag > 0 || delete_flag > 0 )) {
+        var msg_str = ok_flag_1 + 'ページ更新、' +  ok_flag_2 + 'ページ追加、' +  delete_flag + 'ページ削除!!';
+        alert(msg_str);
+
+        $('#wsf_work_id').val(work_id);
+        work_free_spec_info(work_id);//2021/04/09追加
+    }
+}
+
+//テンプレート選択時処理
+function select_free_spec_template(a) {
+    var template_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/select_free_spec_template/",
+                type: "POST",
+                data : {
+                    'template_id' : template_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    var page_num = data.page_num;
+                    var detail_lists = data.detail_lists;
+                    for (let i = 0; i < detail_lists.length; i++){
+                        let page = i + 1;
+                        let div_name = '#add_free_text_' + i;
+                        let page_detail = detail_lists[i];
+                        $(div_name).val(page_detail);
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<script id='free_text_input_check'>
+//自由入力上限値
+function free_text_max(){
+    return { col:100 , row:54　, length:((3600 - 54) * 2) };
+}
+
+//内容詳細文字列の上限文字数チェック
+function check_free_text_max(value)
+{
+    return check_text_area_max(value, free_text_max().row, free_text_max().col,  free_text_max().length);
+}
+
+//仕様詳細の上限文字数チェック＋背景色変更
+function check_free_text_input(id_str)
+{
+    //値を取得
+    var element_value = $(id_str).val();
+
+    //入力上限チェックし、警告文字列生成
+    var { 1:alert_msg_str } = check_free_text_max(element_value);
+
+    //禁止文字チェックし、警告文字列生成
+    var alert_ng_ch_msg_str= check_ng_character_msg(element_value);
+
+    //背景色変更
+    if(alert_msg_str.length > 0 || alert_ng_ch_msg_str.length > 0){
+        $(id_str).css('background-color','silver');
+    }else{
+        $(id_str).css('background-color','white');
+    }
+
+    return { 1:element_value.length , 2:alert_msg_str, 3:alert_ng_ch_msg_str};
+}
+
+//内容詳細の全チェック
+function check_free_text_all(check_ng_flag)
+{
+    var free_text_alert_msg = "";
+    var free_text_alert_msg_detail = "";
+
+    let free_text_list =
+    {
+        {% if free_spec_list_num != 0 %}
+            {% for free_spec_list in free_spec_list %}
+                {{ free_spec_list.0 }} : { val_id:'#{{ free_spec_list.0 }}_free_text', alert_str:'詳細　ページ{{ free_spec_list.0 }}'},
+            {% endfor %}
+        {% endif %}
+        101 : { val_id:'#add_free_text_0', alert_str:'詳細　追加ページ1'},
+        102 : { val_id:'#add_free_text_1', alert_str:'詳細　追加ページ2'},
+        103 : { val_id:'#add_free_text_2', alert_str:'詳細　追加ページ3'},
+        104 : { val_id:'#add_free_text_3', alert_str:'詳細　追加ページ4'},
+    };
+
+    for (let free_text_index in free_text_list){
+        var free_text_object = free_text_list[free_text_index];
+        var { 1:length , 2:alert_msg_str, 3:alert_ng_ch_msg_str} = check_free_text_input(free_text_object.val_id);
+        if ( alert_msg_str != ""  || (alert_ng_ch_msg_str != "" && check_ng_flag)){
+            if(free_text_alert_msg.length == 0){
+                free_text_alert_msg = '仕様詳細タブ入力警告\n';
+            }
+            if(alert_msg_str != ""){
+                free_text_alert_msg += free_text_object.alert_str + 'が入力上限を超えています！！！\n';
+                free_text_alert_msg_detail += free_text_object.alert_str + ' 入力上限警告\n';
+                free_text_alert_msg_detail += alert_msg_str;
+            }
+            if(alert_ng_ch_msg_str != "" && check_ng_flag){
+                free_text_alert_msg += free_text_object.alert_str + 'に' + alert_ng_ch_msg_str;
+                free_text_alert_msg_detail += free_text_object.alert_str + ' 禁止文字警告\n';
+                free_text_alert_msg_detail += alert_ng_ch_msg_str;
+            }
+        }
+    }
+    return { 1:free_text_alert_msg , 2:free_text_alert_msg_detail};
+}
+
+//内容詳細チェックボタン処理
+function text_area_check_button(){
+    var { 1:free_text_alert_msg , 2:free_text_alert_msg_detail} = check_free_text_all( true );
+
+    //警告表示
+    if(free_text_alert_msg_detail.length > 0 ){
+        alert(free_text_alert_msg_detail);
+    }else{
+        alert('全ての詳細は入力上限以内です\n');
+    }
+}
+</script>
+
+<style type="text/css">
+div.scroll_x_function_div {
+  width: 1550px;
+  height: 830px;
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+div.scrool_free_spec_template_div {
+  width: 240px;
+  height: 760px;
+  overflow: scroll;
+}
+</style>
+
+    <div>
+        <div><h2 class="page-header">機能詳細(自由記入)</h2><input type="button" id="text_area_check1" onclick="text_area_check_button();" value="チェック" style="float:right;"><font size="4" style="float:right; margin-left: 1em; padding-left: 0;">ヨコ全角50文字,タテ54行までで入力してください。(合計上限文字数3600文字)</font></div>
+        <div >
+            <input type="hidden" id="wsf_work_id" value="{{ work_id }}" size="4">
+            <input type="hidden" id="page_num" value="{{ free_spec_list_num }}" size="4">
+        </div>
+        <div style="float:left; border-style: ridge;">
+            <div style="border-style: ridge;"><h2 class="page-header">テンプレート選択</h2></div>
+            <div class="scrool_free_spec_template_div">
+                <ul>
+                {% for free_spec_template_lists in free_spec_template_lists %}
+                    <li class="fms_sidebar-list"><font size="4"><a href="#" onclick="select_free_spec_template({{ free_spec_template_lists.template_id }});">{{ free_spec_template_lists.template_name }}</a></font></li>
+                {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div style="float: left;width:10px;">　</div>
+        <div style="float: left;">
+            <div class="scroll_x_function_div">
+            {% if free_spec_list_num != 0 %}
+                {% for free_spec_list in free_spec_list %}
+                    <div style="float:left;size=5px">　</div>
+                    <div style="float:left;">
+                        <div><font size="4">詳細　ページ{{ free_spec_list.3 }} : </font><input type="hidden" id="sub_no_{{ free_spec_list.0 }}" value="{{ free_spec_list.0 }}"></div>
+                        <div><font size="3"><textarea id="{{ free_spec_list.0 }}_free_text" name="{{ free_spec_list.0 }}_free_text" rows="62" cols="80" maxlength="3600" onkeyup="check_free_text_input('#{{ free_spec_list.0 }}_free_text');">{{ free_spec_list.1 }}</textarea></font></div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+                <div style="float:left;size=5px">　</div>
+                <div style="float:left;">
+                    <div><font size="4">詳細　追加ページ1 : </font></div>
+                    <div><font size="3"><textarea id="add_free_text_0" name="add_free_text_0" rows="62" cols="80" maxlength="3600" onkeyup="check_free_text_input('#add_free_text_0');"></textarea></font></div>
+                </div>
+                <div style="float:left;size=5px">　</div>
+                <div style="float:left;">
+                    <div><font size="4">詳細　追加ページ2 : </font></div>
+                    <div><font size="3"><textarea id="add_free_text_1" name="add_free_text_1" rows="62" cols="80" maxlength="3600" onkeyup="check_free_text_input('#add_free_text_1');"></textarea></font></div>
+                </div>
+                <div style="float:left;size=5px">　</div>
+                <div style="float:left;">
+                    <div><font size="4">詳細　追加ページ3 : </font></div>
+                    <div><font size="3"><textarea id="add_free_text_2" name="add_free_text_2" rows="62" cols="80" maxlength="3600" onkeyup="check_free_text_input('#add_free_text_2');"></textarea></font></div>
+                </div>
+                <div style="float:left;size=5px">　</div>
+                <div style="float:left;">
+                    <div><font size="4">詳細　追加ページ4 : </font></div>
+                    <div><font size="3"><textarea id="add_free_text_3" name="add_free_text_3" rows="62" cols="80" maxlength="3600" onkeyup="check_free_text_input('#add_free_text_3');"></textarea></font></div>
+                </div>
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+    </div>

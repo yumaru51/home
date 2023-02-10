@@ -1,0 +1,669 @@
+<script>
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//業者リスト絞込
+function vendor_list_filter(value) {
+    var filter_chara = value
+        $.ajax({
+                url: "/isk_tools/fms/parts/select_vendor/",
+                type: "POST",
+                data : {
+                    'filter_chara' : filter_chara,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(sel_vendor).empty();
+                    $(sel_vendor).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(sel_vendor).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//業者選択のコンボボックスの選択を呼び出した値(引数?)と同期
+function vendor_code_value_change() {
+    var target_vendor_code = $('#vendor_code').val();
+    if (target_vendor_code != "") {
+        var pulldown_option = document.getElementById("sel_vendor_code").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].value == target_vendor_code){
+                var value = pulldown_option[i].value;
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+    }else{
+        vendor_list_filter('{{ vendor_name }}');
+    }
+}
+//業者選択のコンボボックスを変更したときに選択値と格納値を同期
+function vendor_code_change(a) {
+    var value = a;
+    $('#vendor_code').val(value);
+    //equipment_list_change();
+}
+//消費税コード選択のコンボボックスの選択を呼び出した値(引数?)と同期
+function consumption_tax_code_value_change() {
+        var target_consumption_tax_code = $('#consumption_tax_code').val();
+        if (target_consumption_tax_code != "") {
+            var pulldown_option = document.getElementById("sel_consumption_tax_code").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_consumption_tax_code){
+                    var value = pulldown_option[i].value;
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//消費税コード選択のコンボボックスを変更したときに選択値と格納値を同期
+function consumption_tax_code_change(a) {
+    var value = a;
+    $('#consumption_tax_code').val(value);
+}
+
+//入力項目の未入力、文字数オーバーのチェックだけを行う
+function maintenance_order_vendor_input_check() {
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var chara_ng_flag = 0;
+
+    var vendor_code = $('#vendor_code').val();
+    var total_price = $('#total_price').val();
+    var discount_price = $('#discount_price').val();
+    var storage_space_rem = $('#storage_space_rem').val();
+    var consumption_tax_code = $('#consumption_tax_code').val();  //select
+
+    var cost_center = $('#sel_cost_center').val();
+    var account_code = $('#sel_account_code').val();
+    var instruction_no = $('#sel_instruction_no').val();
+    var start_date = $('#start_date').val();
+    var end_date = $('#end_date').val();
+    var order_name = $('#order_name').val();
+    var order_detail = $('#order_detail').val();
+    var order_date = $('#order_date').val();
+
+    if (vendor_code == "" ){
+        $('#sel_vendor_code').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_vendor_code').css('background-color','white');
+    }
+
+    if (total_price == "" ){
+        $('#total_price').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+
+    }else{
+        if (isNaN(Number(total_price.replace(/,/g, ""))) == true){
+            $('#total_price').css('background-color','yellow');
+            chara_ng_flag = 1 ;
+        }else{
+            if( total_price.indexOf('.') > 0 ){
+                $('#total_price').css('background-color','yellow');
+                chara_ng_flag = 1 ;
+            }else{
+                $('#total_price').css('background-color','white');
+            }
+        }
+    }
+    if (discount_price == "" ){
+        $('#discount_price').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        if (isNaN(Number(discount_price.replace(/,/g, ""))) == true){
+            $('#discount_price').css('background-color','yellow');
+            chara_ng_flag = 1 ;
+        }else{
+            if( discount_price.indexOf('.') > 0 ){
+                $('#discount_price').css('background-color','yellow');
+                chara_ng_flag = 1 ;
+            }else{
+                $('#discount_price').css('background-color','white');
+            }
+        }
+    }
+    if (storage_space_rem == "" ){
+        $('#storage_space_rem').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#storage_space_rem').css('background-color','white');
+    }
+    if (consumption_tax_code == "" ){
+        $('#sel_consumption_tax_code').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_consumption_tax_code').css('background-color','white');
+    }
+    if (cost_center == "" ){
+        $('#sel_cost_center').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_cost_center').css('background-color','white');
+    }
+    if (account_code == "" ){
+        $('#sel_account_code').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_account_code').css('background-color','white');
+    }
+    if (instruction_no == "" ){
+        $('#sel_instruction_no').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#sel_instruction_no').css('background-color','white');
+    }
+    if (start_date == "" ){
+        $('#start_date').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#start_date').css('background-color','white');
+    }
+    if (end_date == "" ){
+        $('#end_date').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#end_date').css('background-color','white');
+    }
+    if (order_name == "" ){
+        $('#order_name').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#order_name').css('background-color','white');
+    }
+    if (order_detail == "" ){
+        $('#order_detail').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#order_detail').css('background-color','white');
+    }
+    if (order_date == "" ){
+        $('#order_date').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#order_date').css('background-color','white');
+    }
+
+    return { 1:ng_flag , 2:ng_str_count_flag , 3:chara_ng_flag };
+}
+
+//入力チェックを行うJSを選択
+function input_check(a,b,d) {
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+    var alert_ng_next_department_msg_str = ""
+
+    //共通チェック処理
+    var { 1:ng_flag , 2:ng_str_count_flag , 3:chara_ng_flag } = maintenance_order_vendor_input_check();
+
+    var ng_all_flag = ng_flag + ng_str_count_flag + chara_ng_flag;
+
+    //特殊条件処理
+    if ( ng_all_flag == 0) {
+        if ('{{ malfunction_class }}' == 'その他-調達G関連' && $('#sel_next_person_department').val() != '{{ measure_work_order_charge_department | safe }}'){
+            $('#contact_request').css('background-color','orange');
+            alert_ng_next_department_msg_str = '次部署を復旧完了確認の担当部署に変更してください！！\n';
+            ng_all_flag += 1;
+        }else{
+            $('#contact_request').css('contact_request-color','white');
+        }
+    }
+
+    // 全て正常時のみ禁止文字チェック
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常処理を先に判定
+    if ( ng_all_flag == 0) {
+        maintenance_order_vendor_entry(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( chara_ng_flag > 0 ) {
+            msg += '不適切な入力項目があります！！\n';
+        }
+        if ( alert_ng_next_department_msg_str.length > 0 ) {
+            msg += alert_ng_next_department_msg_str;
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+// 発注データ登録処理
+function maintenance_order_vendor_entry(a,b) {
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+            var action_type = "save";
+        }else{
+            var next_person = $('#sel_next_person').val();
+            var user_attribute_id = $('#sel_next_person').val();
+            var action_type = "comp";
+        }
+        var order_id = $('#order_id').val();
+        var phenomenon_id = $('#target_phenomenon_id').val();
+        //var purchase_group_code = $('#purchase_group_code').val();
+        //var purchase_person = $('#purchase_person').val();
+        var vendor_code = $('#vendor_code').val();
+        var total_price = $('#total_price').val();
+        var discount_price = $('#discount_price').val();
+        var storage_space_rem = $('#storage_space_rem').val();
+        var consumption_tax_code = $('#consumption_tax_code').val();
+        var cost_center = $('#sel_cost_center').val();
+        var account_code = $('#sel_account_code').val();
+        var instruction_no = $('#sel_instruction_no').val();
+        var start_date = $('#start_date').val();
+        var end_date = $('#end_date').val();
+        var order_name = $('#order_name').val();
+        var order_detail = $('#order_detail').val();
+        var order_date = $('#order_date').val();
+                $.ajax({
+                url: "/isk_tools/fms/action/maintenance_order_vendor_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_person' : next_person,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_division' : this_division,
+                    'this_department' : this_department,
+                    'order_id' : order_id,
+                    'phenomenon_id' : phenomenon_id,
+                    //'purchase_group_code' : purchase_group_code,
+                    //'purchase_person' : purchase_person,
+                    'vendor_code' : vendor_code,
+                    'total_price' : total_price,
+                    'discount_price' : discount_price,
+                    'storage_space_rem' : storage_space_rem,
+                    'consumption_tax_code' : consumption_tax_code,
+                    'cost_center' : cost_center,
+                    'account_code' : account_code,
+                    'instruction_no' : instruction_no,
+                    'start_date' : start_date,
+                    'end_date' : end_date,
+                    'order_name' : order_name,
+                    'order_detail' : order_detail,
+                    'order_date' : order_date,
+                    'action_type' : action_type,
+                    'order_no': $('#order_no').val(),
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#print_check').val('1');
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                    }
+                    //log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert(data.msg);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+}
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+}
+//最終金額計算
+function real_price_calculation() {
+    var total_price = $('#total_price').val();
+    var discount_price = $('#discount_price').val();
+    if(total_price != '' && total_price != '0' && discount_price != ''){
+        var real_price = Number(total_price.replace(/,/g, "")) - Number(discount_price.replace(/,/g, ""));
+        real_price_with_comma = real_price.toLocaleString();
+        if(real_price_with_comma == "NaN"){
+            real_price_with_comma = 0;
+        }
+        $('#real_price').val(real_price_with_comma);
+    }
+}
+
+//画面表示時に金額欄にカンマ追加
+function add_comma_value_at_open() {
+    var target_div_id_1 = "#total_price";
+    var target_div_id_2 = "#discount_price";
+    add_comma_target_value_at_open(target_div_id_1);  // fms_base.htmlにて定義
+    add_comma_target_value_at_open(target_div_id_2);  // fms_base.htmlにて定義
+}
+
+//原価センター、指図書NO、勘定コード絞込
+function gc_list_filter(select_id,value) {
+    //optionリストから該当項目を絞込、それ以外は非表示化
+    var cost_center_options = $(select_id).children();
+
+    // 比較時に選択項目の前後の空白を削除
+    var filter_str = value.trim();
+
+    cost_center_options.each(function(num){
+        if(num == 0){
+            $(this).selected = true;
+        }else{
+            if($(this).data('filter_key').match(filter_str) || value == ''){
+                $(this).removeClass('hide');
+            }else{
+                $(this).addClass('hide');
+            }
+        }
+    });
+    //一旦非選択状態にする
+    $(select_id).val('');
+}
+
+//見積依頼書excelファイル作成・・・2021/01/21 追加 ueda
+function make_request_for_quotation(){
+    var print_check = $('#print_check').val();
+    if (print_check == "0") {
+        alert('先に一時保存を実施してください！！');
+    }else{
+        var phenomenon_id = $('#target_phenomenon_id').val();
+        var file_name = "SW" + phenomenon_id + "request_for_quotation.xlsx";
+        var link_str = "/isk_tools/fms/action/make_request_for_quotation/" + phenomenon_id + "/";
+        var downLoadLink = document.createElement("a");
+        downLoadLink.download = file_name;
+        downLoadLink.href = link_str ;
+        downLoadLink.click();
+    }
+}
+
+//登録済提出書類一覧の表示処理
+function get_document_list(a) {
+        var work_id = a;
+        var select_pb_disp_flag = 0;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+            $.ajax({
+                url: "/isk_tools/fms/parts/document/document_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step' : this_step,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#document_list').empty();
+                    $('#document_list').html(data);
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#document_list').empty();
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+
+}
+
+//画面表示時コンボボックス同期処理
+function maintenance_order_vendor_display_open() {
+    consumption_tax_code_value_change();
+    vendor_code_value_change();
+}
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_maintenance_order_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+option.hide {
+    /* 表示の切り替えに使用する */
+    display: none;
+}
+</style>
+<div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+    <h2 class="page-header">直発注</h2>
+</div>
+    <div>
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="order_id" value="{{ order_data.phenomenon_id }}">
+<!--        外部業者発注editモード判定用フラグ-->
+        <input type="hidden" id="maintenance_order_vendor_edit_mode_flag" value=1>
+    </div>
+<div id="{{ action_button_id }}" style="width: auto;"></div>
+<div class="scroll_maintenance_order_div">
+    <div style="float:left;">
+        <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+        <table>
+            <tr>
+                <td><div><font size="4">発注日</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="order_date" class="datepicker" value="{{ order_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('order_date');">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">依頼ＩＤ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="5">{{ order_data.phenomenon_id }}</font>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">依頼工事名称</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="order_name" size="25" value="{{ order_name_for_vendor }}{{ order_name_extension_name }}">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">希望工期</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="start_date" class="datepicker" value="{{ start_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('start_date');"> ～ <input type="text" id="end_date" class="datepicker" value="{{ end_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('end_date');">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工事/依頼内容</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><textarea id="order_detail" name="order_detail" rows="5" cols="70" >{{ order_detail }}</textarea></font></div></td>
+            </tr>
+                <td><div><font size="4">依頼者希望業者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">{{ order_data.order_vendor }}</font></div></td>
+            <tr>
+                <td><div><font size="4">業者</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    <input type="text" id="vendor_filter" value="{{ vendor_name }}" size="10" onchange="vendor_list_filter(value);">業者名絞込(あいまい検索)
+                    <input type="hidden" id="vendor_code" value="{{ vendor_code }}">
+                    <div id ="sel_vendor" >
+                    <select id="sel_vendor_code" name="sel_vendor_code" onchange="vendor_code_change(value);">
+                        <option value=""></option>
+                        {% for vendor_lists in vendor_lists %}
+                            <option value="{{ vendor_lists.supplier_cd }}">{{ vendor_lists.supplier_cd }}：{{ vendor_lists.supplier_name }}</option>
+                        {% endfor %}
+                    </select>　※必須
+                    </div>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">見積額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+<!--                        add_comma_value()はfms_base.htmlにて定義-->
+                <td><div><font size="4"><input type="text" id="total_price" size="10"
+                                               onblur="add_comma_value(this)"
+                                               value="{{ total_price }}"
+                                               onchange="real_price_calculation()">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">値引額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+<!--                        add_comma_value()はfms_base.htmlにて定義-->
+                <td><div><font size="4"><input type="text" id="discount_price" size="10"
+                                               onblur="add_comma_value(this)"
+                                               value="{{ discount_price }}"
+                                               onchange="real_price_calculation()">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">最終決定額</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="real_price" size="10"
+                                               value="{{ real_price }}" readonly>　自動計算</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">消費税コード</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    <input type="hidden" id="consumption_tax_code" value="V4">
+                    <select id="sel_consumption_tax_code" name="sel_consumption_tax_code"
+                            onchange="consumption_tax_code_change(value);">
+                        <option value=""></option>
+                        {% for consumption_tax_lists in consumption_tax_lists %}
+                            <option value="{{ consumption_tax_lists.tax_cd }}">{{ consumption_tax_lists.text }}</option>
+                        {% endfor %}
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">工事実施場所</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="storage_space_rem" size="38" value="{{ storage_space_rem }}">　※必須</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">原価センター</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <input type="text" id="cost_center_filter" value="" size="10" onchange="gc_list_filter('#sel_cost_center',value);gc_list_filter('#sel_instruction_no','');gc_list_filter('#sel_account_code','');">原価センタ名orコード絞込(あいまい検索)
+                    <div id ="select_cost_center" >
+                    <select id="sel_cost_center" name="sel_cost_center" list="cost_center_option_list"  onchange="gc_list_filter('#sel_instruction_no',value);gc_list_filter('#sel_account_code','');">
+                        <datalist id="cost_center_option_list">
+                            {{ cost_center_option_list | safe }}
+                        </datalist>
+                    </select>　※必須
+                    </div>
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">指図書ＮＯ</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_instruction_no" name="sel_instruction_no" list="instruction_no_option_list" onchange="gc_list_filter('#sel_account_code',value);">
+                        <datalist id="instruction_no_option_list">
+                            {{ instruction_no_option_list | safe }}
+                        </datalist>
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">勘定コード</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3">
+                    <select id="sel_account_code" name="sel_instruction_no" list="account_code_option_list">
+                        <datalist id="account_code_option_list">
+                            {{ account_code_option_list | safe }}
+                        </datalist>
+                    </select>　※必須
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">注文番号</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4"><input type="text" id="order_no" value="{{ order_no }}"></font></div></td>
+            </tr>
+        </table>
+        </div><!--ng_character_checkここまで-->
+    </div>
+    <div style="float:left;"><h2 class="page-header">登録済提出書類リスト</h2>
+        <div id="document_list"></div>
+    </div>
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+        <input type="hidden" id="print_check" value="{{ print_check }}">
+        <input type="button" value=" 見積依頼書作成 " onclick="make_request_for_quotation()">
+        <br>
+        <br>
+        <br>
+        <br>
+        {% if erp_errormsg != "" %}
+            <div>
+                <div><font size="4">ERP接続エラー：</font></div>
+                <div><font size="4"><textarea id="erp_errormsg" name="order_detail" rows="10" cols="50" >{{ erp_errormsg }}</textarea></font></div>
+            </div>
+        {% endif %}
+    </div>
+    <div style="clear: both;"></div>
+</div>

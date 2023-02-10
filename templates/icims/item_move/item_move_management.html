@@ -1,0 +1,758 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+<script language="javascript" type="text/javascript"  charset="UTF-8">
+function stock_filter_call() {
+    var from_page = 15001;
+    $.ajax({
+        url: "/imsds/parts/stock_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#stock_filter').empty();
+            $('#stock_filter').html(data);
+            getstockdata_item_move(15001);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#stock_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+function getstockdata_item_move(a) {
+    var from_page = a;
+        get_normal_stockdata();
+        get_backordered_stockdata();
+}
+function get_normal_stockdata() {
+        var target_start_packed_date_before = $('#datepicker5').val();
+        var target_start_packed_date_before = target_start_packed_date_before.replace( '年', '-' );
+        var target_start_packed_date_before = target_start_packed_date_before.replace( '月', '-' );
+        var target_start_packed_date = target_start_packed_date_before.replace( '日', '' );
+        var target_end_packed_date_before = $('#datepicker6').val();
+        var target_end_packed_date_before = target_end_packed_date_before.replace( '年', '-' );
+        var target_end_packed_date_before = target_end_packed_date_before.replace( '月', '-' );
+        var target_end_packed_date = target_end_packed_date_before.replace( '日', '' );
+        var target_start_lot_no = $('#selectstartlotno7').val();
+        var target_end_lot_no = $('#selectendlotno7').val();
+        var target_warehouse_code = $('#selectwarehouse7').val();
+        var target_grade_type = $('#selectgradetype7').val();
+        var target_item_group = $('#selectitemgroup7').val();
+        var target_item_code = $('#selectitemcode7').val();
+        var target_item_name  = $('#selectitemname7').val();
+        var target_start_packed_amount = $('#selectstartpackedamount7').val();
+        var target_end_packed_amount = $('#selectendpackedamount7').val();
+        var target_start_stock_amount = $('#selectstartamount7').val();
+        var target_end_stock_amount = $('#selectendamount7').val();
+        var target_reserve_company = $('#selectreservecompany7').val();
+        var target_q_status1 = $('#selectquality17').val();
+        var target_q_status2 = $('#selectquality27').val();
+        var target_q_status3 = $('#selectquality37').val();
+        if (document.getElementById("incidental_work_order1_s").checked == true) {
+            var incidental_work1 = 1;
+        } else {
+            var incidental_work1 = 0;
+        }
+        if (document.getElementById("incidental_work_order2_s").checked == true) {
+            var incidental_work2 = 2;
+        } else {
+            var incidental_work2 = 0;
+        }
+        if (document.getElementById("incidental_work_order3_s").checked == true) {
+            var incidental_work3 = 3;
+        } else {
+            var incidental_work3 = 0;
+        }
+        if (document.getElementById("incidental_work_order4_s").checked == true) {
+            var incidental_work4 = 4;
+        } else {
+            var incidental_work4 = 0;
+        }
+        if (document.getElementById("incidental_work_order5_s").checked == true) {
+            var incidental_work5 = 5;
+        } else {
+            var incidental_work5 = 0;
+        }
+        if (document.getElementById("incidental_work_order6_s").checked == true) {
+            var incidental_work6 = 6;
+        } else {
+            var incidental_work6 = 0;
+        }
+        if (document.getElementById("incidental_work_order7_s").checked == true) {
+            var incidental_work7 = 7;
+        } else {
+            var incidental_work7 = 0;
+        }
+        if (document.getElementById("incidental_work_order8_s").checked == true) {
+            var incidental_work8 = 8;
+        } else {
+            var incidental_work8 = 0;
+        }
+        if (document.getElementById("incidental_work_order9_s").checked == true) {
+            var incidental_work9 = 9;
+        } else {
+            var incidental_work9 = 0;
+        }
+        if (document.getElementById("incidental_work_order10_s").checked == true) {
+            var incidental_work10 = 10;
+        } else {
+            var incidental_work10 = 0;
+        }
+        if (document.getElementById("incidental_work_order11_s").checked == true) {
+            var incidental_work11 = 11;
+        } else {
+            var incidental_work11 = 0;
+        }
+        if (document.getElementById("incidental_work_order12_s").checked == true) {
+            var incidental_work12 = 12;
+        } else {
+            var incidental_work12 = 0;
+        }
+        if (document.getElementById("incidental_work_order13_s").checked == true) {
+            var incidental_work13 = 13;
+        } else {
+            var incidental_work13 = 0;
+        }
+        if (document.getElementById("incidental_work_order14_s").checked == true) {
+            var incidental_work14 = 14;
+        } else {
+            var incidental_work14 = 0;
+        }
+        if (document.getElementById("incidental_work_order15_s").checked == true) {
+            var incidental_work15 = 15;
+        } else {
+            var incidental_work15 = 0;
+        }
+        if (document.getElementById("incidental_work_order16_s").checked == true) {
+            var incidental_work16 = 16;
+        } else {
+            var incidental_work16 = 0;
+        }
+        if (document.getElementById("incidental_work_order17_s").checked == true) {
+            var incidental_work17 = 17;
+        } else {
+            var incidental_work17 = 0;
+        }
+        if (document.getElementById("incidental_work_order18_s").checked == true) {
+            var incidental_work18 = 18;
+        } else {
+            var incidental_work18 = 0;
+        }
+        if (document.getElementById("incidental_work_order19_s").checked == true) {
+            var incidental_work19 = 19;
+        } else {
+            var incidental_work19 = 0;
+        }
+        if (document.getElementById("incidental_work_order20_s").checked == true) {
+            var incidental_work20 = 20;
+        } else {
+            var incidental_work20 = 0;
+        }
+        var from_page = 15002;
+        var target_start_move_date = "";
+        var target_end_move_date = "";
+        $("#loading1").show();
+        $.ajax({
+                url: "/imsds/parts/stock_list/",
+                type: "POST",
+                data : {
+                    'target_start_packed_date': target_start_packed_date,
+                    'target_end_packed_date': target_end_packed_date,
+                    'target_start_move_date': target_start_move_date,
+                    'target_end_move_date': target_end_move_date,
+                    'selectstartlotno': target_start_lot_no,
+                    'selectendlotno': target_end_lot_no,
+                    'selectwarehouse': target_warehouse_code,
+                    'target_grade_type': target_grade_type,
+                    'target_item_group': target_item_group,
+                    'selectitemcode': target_item_code,
+                    'target_item_name': target_item_name,
+                    'target_start_packed_amount': target_start_packed_amount,
+                    'target_end_packed_amount': target_end_packed_amount,
+                    'target_start_stock_amount': target_start_stock_amount,
+                    'target_end_stock_amount': target_end_stock_amount,
+                    'target_reserve_company': target_reserve_company,
+                    'selectquality1': target_q_status1,
+                    'selectquality2': target_q_status2,
+                    'selectquality3': target_q_status3,
+                    'incidental_work1': incidental_work1,
+                    'incidental_work2': incidental_work2,
+                    'incidental_work3': incidental_work3,
+                    'incidental_work4': incidental_work4,
+                    'incidental_work5': incidental_work5,
+                    'incidental_work6': incidental_work6,
+                    'incidental_work7': incidental_work7,
+                    'incidental_work8': incidental_work8,
+                    'incidental_work9': incidental_work9,
+                    'incidental_work10': incidental_work10,
+                    'incidental_work11': incidental_work11,
+                    'incidental_work12': incidental_work12,
+                    'incidental_work13': incidental_work13,
+                    'incidental_work14': incidental_work14,
+                    'incidental_work15': incidental_work15,
+                    'incidental_work16': incidental_work16,
+                    'incidental_work17': incidental_work17,
+                    'incidental_work18': incidental_work18,
+                    'incidental_work19': incidental_work19,
+                    'incidental_work20': incidental_work20,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 1000000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#stocklist').empty();
+                    $('#stocklist').html(data);
+                    $("#loading1").fadeOut();
+                    $("#stocklist").fadeIn();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#stocklist').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function get_backordered_stockdata() {
+        var target_start_packed_date_before = $('#datepicker5').val();
+        var target_start_packed_date_before = target_start_packed_date_before.replace( '年', '-' );
+        var target_start_packed_date_before = target_start_packed_date_before.replace( '月', '-' );
+        var target_start_packed_date = target_start_packed_date_before.replace( '日', '' );
+        var target_end_packed_date_before = $('#datepicker6').val();
+        var target_end_packed_date_before = target_end_packed_date_before.replace( '年', '-' );
+        var target_end_packed_date_before = target_end_packed_date_before.replace( '月', '-' );
+        var target_end_packed_date = target_end_packed_date_before.replace( '日', '' );
+        var target_start_lot_no = $('#selectstartlotno7').val();
+        var target_end_lot_no = $('#selectendlotno7').val();
+        var target_warehouse_code = $('#selectwarehouse7').val();
+        var target_grade_type = $('#selectgradetype7').val();
+        var target_item_group = $('#selectitemgroup7').val();
+        var target_item_code = $('#selectitemcode7').val();
+        var target_item_name  = $('#selectitemname7').val();
+        var target_start_packed_amount = $('#selectstartpackedamount7').val();
+        var target_end_packed_amount = $('#selectendpackedamount7').val();
+        var target_start_stock_amount = $('#selectstartamount7').val();
+        var target_end_stock_amount = $('#selectendamount7').val();
+        var target_reserve_company = $('#selectreservecompany7').val();
+        var target_q_status1 = $('#selectquality17').val();
+        var target_q_status2 = $('#selectquality27').val();
+        var target_q_status3 = $('#selectquality37').val();
+        if (document.getElementById("incidental_work_order1_s").checked == true) {
+            var incidental_work1 = 1;
+        } else {
+            var incidental_work1 = 0;
+        }
+        if (document.getElementById("incidental_work_order2_s").checked == true) {
+            var incidental_work2 = 2;
+        } else {
+            var incidental_work2 = 0;
+        }
+        if (document.getElementById("incidental_work_order3_s").checked == true) {
+            var incidental_work3 = 3;
+        } else {
+            var incidental_work3 = 0;
+        }
+        if (document.getElementById("incidental_work_order4_s").checked == true) {
+            var incidental_work4 = 4;
+        } else {
+            var incidental_work4 = 0;
+        }
+        if (document.getElementById("incidental_work_order5_s").checked == true) {
+            var incidental_work5 = 5;
+        } else {
+            var incidental_work5 = 0;
+        }
+        if (document.getElementById("incidental_work_order6_s").checked == true) {
+            var incidental_work6 = 6;
+        } else {
+            var incidental_work6 = 0;
+        }
+        if (document.getElementById("incidental_work_order7_s").checked == true) {
+            var incidental_work7 = 7;
+        } else {
+            var incidental_work7 = 0;
+        }
+        if (document.getElementById("incidental_work_order8_s").checked == true) {
+            var incidental_work8 = 8;
+        } else {
+            var incidental_work8 = 0;
+        }
+        if (document.getElementById("incidental_work_order9_s").checked == true) {
+            var incidental_work9 = 9;
+        } else {
+            var incidental_work9 = 0;
+        }
+        if (document.getElementById("incidental_work_order10_s").checked == true) {
+            var incidental_work10 = 10;
+        } else {
+            var incidental_work10 = 0;
+        }
+        if (document.getElementById("incidental_work_order11_s").checked == true) {
+            var incidental_work11 = 11;
+        } else {
+            var incidental_work11 = 0;
+        }
+        if (document.getElementById("incidental_work_order12_s").checked == true) {
+            var incidental_work12 = 12;
+        } else {
+            var incidental_work12 = 0;
+        }
+        if (document.getElementById("incidental_work_order13_s").checked == true) {
+            var incidental_work13 = 13;
+        } else {
+            var incidental_work13 = 0;
+        }
+        if (document.getElementById("incidental_work_order14_s").checked == true) {
+            var incidental_work14 = 14;
+        } else {
+            var incidental_work14 = 0;
+        }
+        if (document.getElementById("incidental_work_order15_s").checked == true) {
+            var incidental_work15 = 15;
+        } else {
+            var incidental_work15 = 0;
+        }
+        if (document.getElementById("incidental_work_order16_s").checked == true) {
+            var incidental_work16 = 16;
+        } else {
+            var incidental_work16 = 0;
+        }
+        if (document.getElementById("incidental_work_order17_s").checked == true) {
+            var incidental_work17 = 17;
+        } else {
+            var incidental_work17 = 0;
+        }
+        if (document.getElementById("incidental_work_order18_s").checked == true) {
+            var incidental_work18 = 18;
+        } else {
+            var incidental_work18 = 0;
+        }
+        if (document.getElementById("incidental_work_order19_s").checked == true) {
+            var incidental_work19 = 19;
+        } else {
+            var incidental_work19 = 0;
+        }
+        if (document.getElementById("incidental_work_order20_s").checked == true) {
+            var incidental_work20 = 20;
+        } else {
+            var incidental_work20 = 0;
+        }
+        var from_page = 15003;
+        var target_start_move_date = "";
+        var target_end_move_date = "";
+        $("#loading2").show();
+        $.ajax({
+                url: "/imsds/parts/stock_list/",
+                type: "POST",
+                data : {
+                    'target_start_packed_date': target_start_packed_date,
+                    'target_end_packed_date': target_end_packed_date,
+                    'target_start_move_date': target_start_move_date,
+                    'target_end_move_date': target_end_move_date,
+                    'selectstartlotno': target_start_lot_no,
+                    'selectendlotno': target_end_lot_no,
+                    'selectwarehouse': target_warehouse_code,
+                    'target_grade_type': target_grade_type,
+                    'target_item_group': target_item_group,
+                    'selectitemcode': target_item_code,
+                    'target_item_name': target_item_name,
+                    'target_start_packed_amount': target_start_packed_amount,
+                    'target_end_packed_amount': target_end_packed_amount,
+                    'target_start_stock_amount': target_start_stock_amount,
+                    'target_end_stock_amount': target_end_stock_amount,
+                    'target_reserve_company': target_reserve_company,
+                    'selectquality1': target_q_status1,
+                    'selectquality2': target_q_status2,
+                    'selectquality3': target_q_status3,
+                    'incidental_work1': incidental_work1,
+                    'incidental_work2': incidental_work2,
+                    'incidental_work3': incidental_work3,
+                    'incidental_work4': incidental_work4,
+                    'incidental_work5': incidental_work5,
+                    'incidental_work6': incidental_work6,
+                    'incidental_work7': incidental_work7,
+                    'incidental_work8': incidental_work8,
+                    'incidental_work9': incidental_work9,
+                    'incidental_work10': incidental_work10,
+                    'incidental_work11': incidental_work11,
+                    'incidental_work12': incidental_work12,
+                    'incidental_work13': incidental_work13,
+                    'incidental_work14': incidental_work14,
+                    'incidental_work15': incidental_work15,
+                    'incidental_work16': incidental_work16,
+                    'incidental_work17': incidental_work17,
+                    'incidental_work18': incidental_work18,
+                    'incidental_work19': incidental_work19,
+                    'incidental_work20': incidental_work20,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 1000000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#backorderedstocklist').empty();
+                    $('#backorderedstocklist').html(data);
+                    $("#loading2").fadeOut();
+                    $("#backorderedstocklist").fadeIn();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#backorderedstocklist').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function item_move(a) {
+    var stock_id = a;
+    var from_page = 15001;
+        $.ajax({
+                url: "/imsds/parts/stock_detail/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 1000000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $("#floatBox4Dialog").dialog({
+                        modal:true,
+                        width: 1700,
+                        height: 900,
+                        title:"倉庫移動画面",
+                    });
+                    $('#stock_detail').empty();
+                    $('#stock_detail').html(data);
+                    item_move_input(stock_id);
+                    item_move_pb(stock_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#stock_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function item_movein(a) {
+    var stock_id = a;
+    var from_page = 15001;
+        $.ajax({
+                url: "/imsds/parts/stock_detail/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 1000000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $("#floatBox4Dialog").dialog({
+                        modal:true,
+                        width: 1700,
+                        height: 700,
+                        title:"倉庫移動画面",
+                    });
+                    $('#stock_detail').empty();
+                    $('#stock_detail').html(data);
+                    item_move_input(stock_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#stock_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function item_move_input(a) {
+    var stock_id = a;
+    var from_page = 15001;
+        $.ajax({
+                url: "/imsds/parts/item_move_input/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 1000000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#item_move').empty();
+                    $('#item_move').html(data);
+                    item_move_pb(stock_id);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#item_move').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function item_move_pb(a) {
+    var stock_id = a;
+    var from_page = 15001;
+        $.ajax({
+                url: "/imsds/parts/item_move_pb/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 1000000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#item_move_pb').empty();
+                    $('#item_move_pb').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#item_move_pb').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+var tab = {
+	init: function(a){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		for(i=0; i<pages.length; i++) {
+			if(i == a) {
+                            pages[a].style.display = 'block';
+                            tabs[a].className = 'present';
+                            tabs[a].onclick = function(){ tab.showpage(this); return false; };
+                        }
+                        else{
+                            pages[i].style.display = 'none';
+                            tabs[i].className = null;
+                            tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                        }
+		}
+	},
+	showpage: function(obj){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var num;
+		for(num=0; num<tabs.length; num++) {
+			if(tabs[num] === obj) break;
+		}
+		for(var i=0; i<pages.length; i++) {
+			if(i == num) {
+				pages[num].style.display = 'block';
+				tabs[num].className = 'present';
+			}
+			else{
+				pages[i].style.display = 'none';
+				tabs[i].className = null;
+			}
+		}
+	}
+}
+
+function itemout() {
+    if ($('#datepicker3').val() == ""){
+        alert('移動予定日は必須項目です！！');
+    }
+    else{
+        var stock_id = $('#stock_id').val();
+        var move_amount = $('#move_packed_amount').val();
+        var to_warehouse = $('#warecodeinput').val();
+        var move_date_before = $('#datepicker3').val();
+        var move_date_before = move_date_before.replace( '年', '-' );
+        var move_date_before = move_date_before.replace( '月', '-' );
+        var move_date = move_date_before.replace( '日', '' );
+        var from_page = 2;
+
+        $.ajax({
+                url: "/imsds/action/item_move_out/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'move_amount': move_amount,
+                    'to_warehouse': to_warehouse,
+                    'move_date': move_date,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    item_movein(data.stock_id);
+                    //item_move_pb(data.stock_id);
+                    getstockdata_item_move(15001);
+                    alert(data.msg);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+function itemin() {
+    //var item_move_id = $('#item_move_id').val();
+    var stock_id = $('#stock_id').val();
+    var move_amount = $('#move_packed_amount').val();
+    var to_warehouse = $('#warecodeinput').val();
+    var from_page = 2;
+    //alert(stock_id);
+    //alert(move_amount);
+    //alert(to_warehouse);
+    $.ajax({
+                url: "/imsds/action/item_move_in/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'move_amount': move_amount,
+                    'to_warehouse': to_warehouse,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    item_movein(data.stock_id);
+                    //item_move_pb(data.stock_id);
+                    getstockdata_item_move(15001);
+                    alert(data.msg);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function itemoutin() {
+    var stock_id = $('#stock_id').val();
+    var moveamount = $('#move_packed_amount').val();
+    var to_warehouse = $('#warecodeinput').val();
+    //var move_date_before = $('#datepicker3').val();
+    //var move_date_before = move_date_before.replace( '年', '-' );
+    //var move_date_before = move_date_before.replace( '月', '-' );
+    //var move_date = move_date_before.replace( '日', '' );
+    var from_page = 2;
+    //alert(stock_id);
+    //alert(move_amount);
+    //alert(to_warehouse);
+    $.ajax({
+                url: "/imsds/action/item_move_outin/",
+                type: "POST",
+                data : {
+                    'stock_id': stock_id,
+                    'move_amount': move_amount,
+                    'to_warehouse': to_warehouse,
+                    //'move_date': move_date,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    item_move(data.stock_id);
+                    //item_move_pb(data.stock_id);
+                    getstockdata_item_move(15001);
+                    alert(data.msg);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+window.onload = function() {
+        stock_filter_call();
+};
+
+</script>
+<style type="text/css">
+#stocklist{display:none;}
+#loading1{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:250px;
+}
+#backorderedstocklist{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:250px;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">倉庫移動管理</h2>
+    </div>
+
+    <div class="pagetitle">
+        <input type="hidden" id="this_page" value="2">
+        <div>
+            <input type="button" name="getstockdata" value="在庫データ更新" onclick="getstockdata_item_move(15001);">
+        </div>
+    </div>
+    <div id="stock_filter"></div>
+    <ul id="tab">
+        <li class="present"><a href="#page1">移動出庫対象</a></li>
+        <li><a href="#page2">移動入庫対象</a></li>
+    </ul>
+    <div id="page1" class="pagetitle">
+        <div>
+            移動出庫対象在庫リスト　
+        </div>
+        <div id="loading1">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="stocklist">
+
+        </div>
+    </div>
+    <div id="page2" class="pagetitle">
+        <div>
+            移動入庫対象在庫リスト　
+        </div>
+        <div id="loading2">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="backorderedstocklist">
+
+        </div>
+    </div>
+    <div id="floatBox4Dialog" style="display:none;">
+        <div id="stock_detail">
+        </div>
+        <div id="item_move">
+        </div>
+        <div id="item_move_pb">
+        </div>
+    </div>
+
+<script type="text/javascript">
+// <![CDATA[
+
+tab.setup = {
+	tabs: document.getElementById('tab').getElementsByTagName('li'),
+
+	pages: [
+		document.getElementById('page1'),
+		document.getElementById('page2')
+	]
+}
+
+tab.init(0);
+
+
+// ]]>
+</script>
+
+{% endblock %}

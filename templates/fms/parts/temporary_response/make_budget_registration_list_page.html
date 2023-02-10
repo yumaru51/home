@@ -1,0 +1,294 @@
+{% extends 'fms/parts/common/level5_step_top_page.html' %}
+
+{% block sub_contents %}
+
+<script>
+
+// 予算絞込条件リセット
+function reset_budget_filter() {
+    //セッション情報の削除
+    session_value_budget_clear();
+    //予算フィルター再表示
+    budget_filter_call();
+}
+
+//予算一覧絞込パーツ表示処理
+function budget_filter_call() {
+    var level5_step_id = {{ level5_step_id }};
+    var user = $('#user').val();
+    var user_department_cd = $('#user_department_cd').val();
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/budget/budget_filter/",
+        type: "POST",
+        data : {
+                'level5_step_id' : level5_step_id,
+                'user' : user,
+                'user_department_cd' : user_department_cd,
+                'next_division' : "no_data",
+                'next_department' : "no_data",
+                'next_parson' : "no_data",
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#budget_filter').empty();
+            $('#budget_filter').html(data);
+            get_budget_lists_search();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#budget_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+// チェックボックス全選択
+function select_check_all(is_check) {
+
+    var cb_list = document.getElementsByName('sel_output_cb');
+
+    if(is_check == 'true'){
+        for (var i = 0; i < cb_list.length; i++) {
+            cb_list[i].checked = true;
+        }
+    }else{
+        for (var i = 0; i < cb_list.length; i++) {
+            cb_list[i].checked = false;
+        }
+    }
+}
+
+//予算No登録リスト出力
+function make_budget_registration_list_button() {
+
+    //選択予算リスト取得
+    var sel_budget_list = [];
+    var cb_list = document.getElementsByName('sel_output_cb');
+
+    for (var i = 0; i < cb_list.length; i++) {
+        if (cb_list[i].checked == true) {
+            sel_budget_list.push(cb_list[i].value);
+        }
+    }
+    if(sel_budget_list.length == 0){
+        alert('予算が選択されていません');
+        return;
+    }
+
+    //出力処理 + ダウンロード処理
+    make_budget_registration_list(sel_budget_list);
+}
+
+// 予算No登録リスト出力処理 + ダウンロード処理
+function make_budget_registration_list(budget_id_list) {
+    $("#loading").show();//呼び出し中に表示するgifを表示
+    $.ajax({
+        url: "/isk_tools/fms/action/make_budget_registration_list/",
+        type: "POST",
+        data : {
+            'budget_id_list': budget_id_list,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 1000000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(data){
+        if(data.file_name == ''){
+            //出力対象無し
+            $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert(data.msg);
+        }else{
+            //ファイルダウンロード
+            budget_registration_list_download(data.target_folder, data.file_name);
+            $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert(data.msg);
+        }
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+// ファイルダウンロード処理
+function budget_registration_list_download(target_folder,file_name){
+    var link_str = "/isk_tools/fms/action/output_file_download/" + target_folder + "/"+ file_name;
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = file_name;
+    downLoadLink.href = link_str ;
+    downLoadLink.click();
+}
+
+window.onload = function() {
+        budget_filter_call();//予算一覧絞込パーツを表示するJSを起動(このhtml内にプログラム有)
+};
+
+//予算No登録リストファイル入力
+function import_budget_registration_file() {
+    //ファイル未選択（キャンセル）の場合は何もしない
+    if( $('#budget_registration_list_file').prop('files').length < 1){
+        return;
+    }
+    //ファイルアップロード(＋インポート実行)
+    upload_budget_registration_file();
+}
+
+//予算No登録リストファイルアップロード
+function upload_budget_registration_file(){
+    $("#loading").show();
+    $(".button").prop("disabled", true);
+    // フォームデータを取得
+    var form_data = new FormData($('#budget_registration_file_upload_form').get(0));
+    // POSTでアップロード
+    $.ajax({
+            url  : "/isk_tools/fms/action/input_file_upload/",
+            type : "POST",
+            data : form_data,
+            timeout: 100000,
+            cache       : false,
+            contentType : false,
+            processData : false,
+            dataType    : "json"
+            })
+            .done(function(data){
+                //インポート実行
+                import_budget_registration_list();
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+                $("#loading").fadeOut();
+                $(".button").prop("disabled", true);
+            });
+}
+//予算No登録リストインポート
+function import_budget_registration_list(){
+    $("#loading").show();
+    $(".button").prop("disabled", true);
+    // フォームデータを取得
+    var form_data = new FormData($('#budget_registration_file_upload_form').get(0));
+    $.ajax({
+            url  : "/isk_tools/fms/action/import_budget_registration_list/",
+            type : "POST",
+            data : form_data,
+            timeout: 100000,
+            cache       : false,
+            contentType : false,
+            processData : false,
+            dataType    : "json"
+            })
+            .done(function(data){
+                alert(data.msg);
+                $("#loading").fadeOut();
+                $(".button").prop("disabled", false);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+                $("#loading").fadeOut();
+                $(".button").prop("disabled", true);
+            });
+}
+
+
+</script>
+<style type="text/css">
+
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 490px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+.square_small {
+   width: 160px;
+   height: 140px;
+   background: khaki;
+}
+.triangle_right_small {
+  width: 0;
+  height: 0;
+  border-left: 25px solid khaki;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+#budget_lists{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+#work_lists{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+.button{
+    width:100px;
+}
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+
+</style>
+    <input type="hidden" id="level5_step_id" value="{{level5_step_id}}" name=level5_step_id >
+    <input type="hidden" id="select_tab" value="page1" name=select_tab >
+    <input type="hidden" id="default_tab" value="page1">
+    <input type="hidden" id="step_name" value="{{step_name}}" name=step_name >
+    <ul id="tab" style="width:auto;">
+        <li><a href="#page1">予算リスト</a></li>
+    </ul>
+    <div id="page1" class="pagetitle" >
+        <div>
+            <input type="button" name="get_budget_list" value=" 　リスト更新　 " onclick="get_budget_lists_search();">
+            <input type="button" name="reset_budget_filter_button" value=" 　条件リセット　 " onclick="reset_budget_filter();">
+            <input type="button" name="get_budget_list" value=" 　　全選択　　 " onclick="select_check_all('true');">
+            <input type="button" name="get_budget_list" value=" 　　全解除　　 " onclick="select_check_all('false');">
+
+            <input type="button" name="get_budget_list" value=" 　　 予算登録リスト出力 　　 " onclick="make_budget_registration_list_button();">
+            <input type="button" name="get_budget_list" value=" 　　 予算登録リスト入力 　　 " onclick="$('#budget_registration_list_file').click();">
+            <form id="budget_registration_file_upload_form" name="budget_registration_file_upload_form" enctype="multipart/form-data"  action="/isk_tools/fms/action/input_file_upload/" method="POST">
+                {% csrf_token %}
+                <input type="file" id="budget_registration_list_file" name="file" style="display:none;" onchange="import_budget_registration_file();" />
+                <input type=hidden id="target_folder" name="target_folder"  value="budget_registration_list"/>
+                <input type=hidden id="user_division_cd" value="{{user_division_cd}}" name=user_division_cd />
+                <input type=hidden id="user_department_cd" value="{{user_department_cd}}" name=user_department_cd />
+                <input type=hidden id="user_authority" value="{{user_authority}}" name=user_authority />
+                <input type=hidden id="confirm_user" value="{{confirm_user}}" name=confirm_user size=3 />
+                <input type=hidden id="permit_user" value="{{permit_user}}" name=permit_user size=3 />
+                <input type=hidden id="budget_type" value="{{budget_type}}" name=budget_type >
+            </form>
+        </div>
+
+        <div id="budget_filter"></div>
+
+        <div>
+                予算リスト
+        </div>
+        <div id="loading">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="budget_lists" style="width: 1880px;">
+        </div>
+    </div>
+
+{% endblock %}

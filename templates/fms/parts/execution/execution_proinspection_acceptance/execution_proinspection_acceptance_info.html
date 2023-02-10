@@ -1,0 +1,113 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+</script>
+<style type="text/css">
+
+/*20201205y-kawauchi フォームレイアウト*/
+dl {
+    height: auto;
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+dt{
+    width: 200px;
+    height: auto;
+    float:left;
+    clear:both;
+    font-weight: normal;
+    font-size: 24px;
+}
+dd{
+    height: 30px;
+    padding: 5px 0px;
+    font-size: 24px;
+}
+dd:nth-child(4n+2) {
+background-color:#dddddd
+}
+
+</style>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+<!--        <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">-->
+<!--        <input type="hidden" id="this_work_id" value="{{ work_lists.work_id }}">-->
+<!--        <input type="hidden" id="this_work_rev_no" value="{{ work_lists.work_rev_no }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_proinspection_acceptance_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+
+<!--        <div id="{{ action_button_id }}" style="width: auto;"></div>-->
+
+        <div class="scroll_div" style="float: left;">
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">品質/受入検査実施日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proinspectionacceptance_data_num == 0 %}
+                            <font size="5" color="black">{{ order_classification_from }}　～　{{ order_classification_to }}</font>
+                        {% elif proinspectionacceptance_data.order_classification_from == old_proinspectionacceptance_data.order_classification_from and proinspectionacceptance_data.order_classification_to == old_proinspectionacceptance_data.order_classification_to %}
+                            <font size="5" color="black">{{ order_classification_from }}　～　{{ order_classification_to }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ order_classification_from }}　～　{{ order_classification_to }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">検査結果</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proinspectionacceptance_data_num == 0 %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ inspection_results }}</textarea></font>
+                        {% elif proinspectionacceptance_data.inspection_results == old_proinspectionacceptance_data.inspection_results %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:black;" readonly>{{ inspection_results }}</textarea></font>
+                        {% else %}
+                            <font size="4"><textarea name="work_rem" rows="4" cols="40" style="color:red;" readonly>{{ inspection_results }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">判定区分</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_proinspectionacceptance_data_num == 0 %}
+                            <font size="5" color="black">{{ judge_kbn }}</font>
+                        {% elif proinspectionacceptance_data.judge_kbn == old_proinspectionacceptance_data.judge_kbn %}
+                            <font size="5" color="black">{{ judge_kbn }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ judge_kbn }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+            </table>
+        <!--UploadFileList        -->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+{% endblock %}

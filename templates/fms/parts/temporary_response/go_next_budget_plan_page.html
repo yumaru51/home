@@ -1,0 +1,247 @@
+{% extends 'fms/parts/common/level5_step_top_page.html' %}
+
+{% block sub_contents %}
+
+<script>
+
+// 予算絞込条件リセット
+function reset_budget_filter() {
+    //セッション情報の削除
+    session_value_budget_clear();
+    //予算フィルター再表示
+    budget_filter_call();
+}
+
+//予算一覧絞込パーツ表示処理
+function budget_filter_call() {
+    var level5_step_id = {{ level5_step_id }};
+    var user = $('#user').val();
+    var user_department_cd = $('#user_department_cd').val();
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/budget/budget_filter/",
+        type: "POST",
+        data : {
+                'level5_step_id' : level5_step_id,
+                'user' : user,
+                'user_department_cd' : user_department_cd,
+                'next_division' : "no_data",
+                'next_department' : "no_data",
+                'next_parson' : "no_data",
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#budget_filter').empty();
+            $('#budget_filter').html(data);
+            get_budget_lists_search();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#budget_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+//タブ表示のためのJS
+var tab = {
+	init: function(a){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		a = $('#default_tab').val();
+		for(i=0; i<pages.length; i++) {
+			if(i == a) {
+                            pages[a].style.display = 'block';
+                            tabs[a].className = 'present';
+                            tabs[a].onclick = function(){ tab.showpage(this); return false; };
+                        }
+                        else{
+                            pages[i].style.display = 'none';
+                            tabs[i].className = null;
+                            tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                        }
+		}
+	},
+	showpage: function(obj){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var num;
+		for(num=0; num<tabs.length; num++) {
+			if(tabs[num] === obj) break;
+		}
+		for(var i=0; i<pages.length; i++) {
+			if(i == num) {
+				pages[num].style.display = 'block';
+				tabs[num].className = 'present';
+			}
+			else{
+				pages[i].style.display = 'none';
+				tabs[i].className = null;
+			}
+		}
+	}
+}
+
+// チェックボックス全選択
+function select_check_all(is_check) {
+
+    var cb_list = document.getElementsByName('sel_output_cb');
+
+    if(is_check == 'true'){
+        for (var i = 0; i < cb_list.length; i++) {
+            cb_list[i].checked = true;
+        }
+    }else{
+        for (var i = 0; i < cb_list.length; i++) {
+            cb_list[i].checked = false;
+        }
+    }
+}
+
+// 予算計画移行ボタン
+function go_next_budget_plan_button() {
+
+    //選択予算リスト取得
+    var sel_budget_list = [];
+    var cb_list = document.getElementsByName('sel_output_cb');
+
+    for (var i = 0; i < cb_list.length; i++) {
+        if (cb_list[i].checked == true) {
+            sel_budget_list.push(cb_list[i].value);
+        }
+    }
+    if(sel_budget_list.length == 0){
+        alert('予算が選択されていません');
+        return;
+    }
+
+    //予算計画移行処理
+    go_next_budget_plan(sel_budget_list);
+}
+
+// 予算計画移行処理
+function go_next_budget_plan(budget_id_list) {
+    $("#loading").show();//呼び出し中に表示するgifを表示
+    $.ajax({
+        url: "/isk_tools/fms/action/go_next_budget_plan_list/",
+        type: "POST",
+        data : {
+            'budget_id_list': budget_id_list,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 1000000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(data){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert(data.msg);
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+window.onload = function() {
+        budget_filter_call();//予算一覧絞込パーツを表示するJSを起動(このhtml内にプログラム有)
+};
+
+</script>
+<style type="text/css">
+
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 490px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+.square_small {
+   width: 160px;
+   height: 140px;
+   background: khaki;
+}
+.triangle_right_small {
+  width: 0;
+  height: 0;
+  border-left: 25px solid khaki;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+#budget_lists{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+#work_lists{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+.button{
+    width:100px;
+}
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+
+</style>
+    <input type="hidden" id="level5_step_id" value="{{level5_step_id}}" name=level5_step_id >
+    <input type="hidden" id="select_tab" value="page1" name=select_tab >
+    <input type="hidden" id="default_tab" value="page1">
+    <input type="hidden" id="step_name" value="{{step_name}}" name=step_name >
+    <ul id="tab" style="width:auto;">
+        <li><a href="#page1">予算リスト</a></li>
+    </ul>
+    <div id="page1" class="pagetitle" >
+        <div>
+            <input type="button" name="get_budget_list" value=" 　リスト更新　 " onclick="get_budget_lists_search();">
+            <input type="button" name="reset_budget_filter_button" value=" 　条件リセット　 " onclick="reset_budget_filter();">
+            <input type="button" name="get_budget_list" value=" 　　全選択　　 " onclick="select_check_all('true');">
+            <input type="button" name="get_budget_list" value=" 　　全解除　　 " onclick="select_check_all('false');">
+
+            <input type="button" name="get_budget_list" value=" 　　 単年度計画移行 　　 " onclick="go_next_budget_plan_button();">
+        </div>
+
+        <div id="budget_filter"></div>
+
+        <div>
+                予算リスト
+        </div>
+        <div id="loading">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="budget_lists" style="width: 1880px;">
+        </div>
+    </div>
+
+<script type="text/javascript">
+tab.setup = {
+	tabs: document.getElementById('tab').getElementsByTagName('li'),
+	pages: [
+		document.getElementById('page1'),
+	]
+}
+
+</script>
+
+{% endblock %}

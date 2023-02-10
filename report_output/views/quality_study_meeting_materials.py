@@ -13,12 +13,22 @@ from django.views.decorators.http import require_POST
 import openpyxl
 # SQLSERVER接続
 import pyodbc
+from socket import gethostname
 
 
 # 酸化チタン_CL法_品質検討会資料
 def quality_study_meeting_materials(request):
     # DB接続
-    server = 'YSQLSERV4'
+    host_name = gethostname()
+    if host_name == 'YWEBSERV1':
+        print('本番環境起動')
+        server = 'YSQLSERV4'
+    elif host_name == 'I7161DD6':
+        print('テスト環境起動')
+        server = 'Y0033OUT,1434'
+    else:
+        print('開発環境起動')
+        server = 'Y0033OUT,1434'
     database = 'OP_ENTRY_INORG'
     username = 'cmd_user'
     password = 'cmd_user'
@@ -46,7 +56,16 @@ def __select__brand(request):
     value = request.POST['value']
 
     # DB接続
-    server = 'YSQLSERV4'
+    host_name = gethostname()
+    if host_name == 'YWEBSERV1':
+        print('本番環境起動')
+        server = 'YSQLSERV4'
+    elif host_name == 'I7161DD6':
+        print('テスト環境起動')
+        server = 'Y0033OUT,1434'
+    else:
+        print('開発環境起動')
+        server = 'Y0033OUT,1434'
     database = 'OP_ENTRY_INORG'
     username = 'cmd_user'
     password = 'cmd_user'
@@ -75,331 +94,22 @@ def trace_report(request, brand, run_no1, run_no2, run_no3):
         os.remove(file)
 
     # DB接続
-    server = 'YSQLSERV4'
+    host_name = gethostname()
+    if host_name == 'YWEBSERV1':
+        print('本番環境起動')
+        server = 'YSQLSERV4'
+    elif host_name == 'I7161DD6':
+        print('テスト環境起動')
+        server = 'Y0033OUT,1434'
+    else:
+        print('開発環境起動')
+        server = 'Y0033OUT,1434'
     database = 'OP_ENTRY_INORG'
     username = 'cmd_user'
     password = 'cmd_user'
     cnxn = pyodbc.connect('DRIVER={ODBC Driver 13 for SQL Server};SERVER=' + server + ';DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
     cursor = cnxn.cursor()
 
-    # 操業データ_最大・最小・平均取得クエリ---------------------------------------------------------------------------------------------------------------------------
-#     cursor.execute(" \
-# SELECT \
-#     REPLACE(項目, '_最大', '') AS 項目, \
-#     MAX(CAST([MAX] AS NUMERIC(13,4))) AS [MAX], \
-#     MIN(CAST([MIN] AS NUMERIC(13,4))) AS [MIN] \
-# FROM ( \
-#     SELECT \
-#         日付, \
-#         工程名, \
-#         CASE p.seq \
-#             WHEN 1 THEN 工程名 + '＿' + q.フィールド3 \
-#             WHEN 5 THEN 工程名 + '＿' + q.フィールド7 \
-#             WHEN 9 THEN 工程名 + '＿' + q.フィールド11 \
-#             WHEN 17 THEN 工程名 + '＿' + q.フィールド19 \
-#             WHEN 21 THEN 工程名 + '＿' + q.フィールド23 \
-#             WHEN 25 THEN 工程名 + '＿' + q.フィールド27 \
-#             WHEN 13 THEN 工程名 + '＿' + q.フィールド15 \
-#             WHEN 29 THEN 工程名 + '＿' + q.フィールド31 \
-#             WHEN 33 THEN 工程名 + '＿' + q.フィールド35 \
-#             WHEN 37 THEN 工程名 + '＿' + q.フィールド39 \
-#             WHEN 41 THEN 工程名 + '＿' + q.フィールド43 \
-#             WHEN 45 THEN 工程名 + '＿' + q.フィールド47 \
-#             WHEN 49 THEN 工程名 + '＿' + q.フィールド51 \
-#             WHEN 53 THEN 工程名 + '＿' + q.フィールド55 \
-#             WHEN 57 THEN 工程名 + '＿' + q.フィールド59 \
-#             WHEN 61 THEN 工程名 + '＿' + q.フィールド63 \
-#             WHEN 65 THEN 工程名 + '＿' + q.フィールド67 \
-#             WHEN 69 THEN 工程名 + '＿' + q.フィールド71 \
-#             WHEN 73 THEN 工程名 + '＿' + q.フィールド75 \
-#             WHEN 77 THEN 工程名 + '＿' + q.フィールド79 \
-#             WHEN 81 THEN 工程名 + '＿' + q.フィールド83 \
-#             WHEN 85 THEN 工程名 + '＿' + q.フィールド87 \
-#             WHEN 89 THEN 工程名 + '＿' + q.フィールド91 \
-#             WHEN 93 THEN 工程名 + '＿' + q.フィールド95 \
-#             WHEN 97 THEN 工程名 + '＿' + q.フィールド99 \
-#             WHEN 101 THEN 工程名 + '＿' + q.フィールド103 \
-#             WHEN 105 THEN 工程名 + '＿' + q.フィールド107 \
-#             WHEN 109 THEN 工程名 + '＿' + q.フィールド111 \
-#             WHEN 113 THEN 工程名 + '＿' + q.フィールド115 \
-#             WHEN 117 THEN 工程名 + '＿' + q.フィールド119 \
-#             WHEN 121 THEN 工程名 + '＿' + q.フィールド123 \
-#             WHEN 125 THEN 工程名 + '＿' + q.フィールド127 \
-#             WHEN 129 THEN 工程名 + '＿' + q.フィールド131 \
-#             WHEN 133 THEN 工程名 + '＿' + q.フィールド135 \
-#             WHEN 137 THEN 工程名 + '＿' + q.フィールド139 \
-#             WHEN 141 THEN 工程名 + '＿' + q.フィールド143 \
-#             WHEN 145 THEN 工程名 + '＿' + q.フィールド147 \
-#         END AS 項目, \
-#         CASE p.seq \
-#             WHEN 1 THEN 3 \
-#             WHEN 5 THEN 7 \
-#             WHEN 9 THEN 11 \
-#             WHEN 13 THEN 15 \
-#             WHEN 17 THEN 19 \
-#             WHEN 21 THEN 23 \
-#             WHEN 25 THEN 27 \
-#             WHEN 29 THEN 31 \
-#             WHEN 33 THEN 35 \
-#             WHEN 37 THEN 39 \
-#             WHEN 41 THEN 43 \
-#             WHEN 45 THEN 47 \
-#             WHEN 49 THEN 51 \
-#             WHEN 53 THEN 55 \
-#             WHEN 57 THEN 59 \
-#             WHEN 61 THEN 63 \
-#             WHEN 65 THEN 67 \
-#             WHEN 69 THEN 71 \
-#             WHEN 73 THEN 75 \
-#             WHEN 77 THEN 79 \
-#             WHEN 81 THEN 83 \
-#             WHEN 85 THEN 87 \
-#             WHEN 89 THEN 91 \
-#             WHEN 93 THEN 95 \
-#             WHEN 97 THEN 99 \
-#             WHEN 101 THEN 103 \
-#             WHEN 105 THEN 107 \
-#             WHEN 109 THEN 111 \
-#             WHEN 113 THEN 115 \
-#             WHEN 117 THEN 119 \
-#             WHEN 121 THEN 123 \
-#             WHEN 125 THEN 127 \
-#             WHEN 129 THEN 131 \
-#             WHEN 133 THEN 135 \
-#             WHEN 137 THEN 139 \
-#             WHEN 141 THEN 143 \
-#             WHEN 145 THEN 147 \
-#         END AS [フィールドindex(MAX)], \
-#         CASE p.seq \
-#             WHEN 1 THEN 4 \
-#             WHEN 5 THEN 8 \
-#             WHEN 9 THEN 12 \
-#             WHEN 13 THEN 16 \
-#             WHEN 17 THEN 20 \
-#             WHEN 21 THEN 24 \
-#             WHEN 25 THEN 28 \
-#             WHEN 29 THEN 32 \
-#             WHEN 33 THEN 36 \
-#             WHEN 37 THEN 40 \
-#             WHEN 41 THEN 44 \
-#             WHEN 45 THEN 48 \
-#             WHEN 49 THEN 52 \
-#             WHEN 53 THEN 56 \
-#             WHEN 57 THEN 60 \
-#             WHEN 61 THEN 64 \
-#             WHEN 65 THEN 68 \
-#             WHEN 69 THEN 72 \
-#             WHEN 73 THEN 76 \
-#             WHEN 77 THEN 80 \
-#             WHEN 81 THEN 84 \
-#             WHEN 85 THEN 88 \
-#             WHEN 89 THEN 92 \
-#             WHEN 93 THEN 96 \
-#             WHEN 97 THEN 100 \
-#             WHEN 101 THEN 104 \
-#             WHEN 105 THEN 108 \
-#             WHEN 109 THEN 112 \
-#             WHEN 113 THEN 116 \
-#             WHEN 117 THEN 120 \
-#             WHEN 121 THEN 124 \
-#             WHEN 125 THEN 128 \
-#             WHEN 129 THEN 132 \
-#             WHEN 133 THEN 136 \
-#             WHEN 137 THEN 140 \
-#             WHEN 141 THEN 144 \
-#             WHEN 145 THEN 148 \
-#         END AS [フィールドindex(MIN)] \
-#     FROM ( \
-#         SELECT * \
-#         FROM [OP_ENTRY_INORG].[dbo].[T_TRACE_REPORT_履歴] \
-#         WHERE (ランNO IN (?)) \
-#             AND (item_value_flag = 1 OR item_value_flag = 3 OR item_value_flag = 6 OR item_value_flag = 9) \
-#         ) AS q \
-#     CROSS JOIN T_TRACE_REPORT_pivot AS p \
-#     ) NAME \
-# INNER JOIN ( \
-#     SELECT * \
-#     FROM ( \
-#         SELECT \
-#             日付, \
-#             工程名, \
-#             銘柄, \
-#             トレースNO, \
-#             CASE p.seq \
-#                 WHEN 1 THEN q.フィールド3 \
-#                 WHEN 5 THEN q.フィールド7 \
-#                 WHEN 9 THEN q.フィールド11 \
-#                 WHEN 13 THEN q.フィールド15 \
-#                 WHEN 17 THEN q.フィールド19 \
-#                 WHEN 21 THEN q.フィールド23 \
-#                 WHEN 25 THEN q.フィールド27 \
-#                 WHEN 29 THEN q.フィールド31 \
-#                 WHEN 33 THEN q.フィールド35 \
-#                 WHEN 37 THEN q.フィールド39 \
-#                 WHEN 41 THEN q.フィールド43 \
-#                 WHEN 45 THEN q.フィールド47 \
-#                 WHEN 49 THEN q.フィールド51 \
-#                 WHEN 53 THEN q.フィールド55 \
-#                 WHEN 57 THEN q.フィールド59 \
-#                 WHEN 61 THEN q.フィールド63 \
-#                 WHEN 65 THEN q.フィールド67 \
-#                 WHEN 69 THEN q.フィールド71 \
-#                 WHEN 73 THEN q.フィールド75 \
-#                 WHEN 77 THEN q.フィールド79 \
-#                 WHEN 81 THEN q.フィールド83 \
-#                 WHEN 85 THEN q.フィールド87 \
-#                 WHEN 89 THEN q.フィールド91 \
-#                 WHEN 93 THEN q.フィールド95 \
-#                 WHEN 97 THEN q.フィールド99 \
-#                 WHEN 101 THEN q.フィールド103 \
-#                 WHEN 105 THEN q.フィールド107 \
-#                 WHEN 109 THEN q.フィールド111 \
-#                 WHEN 113 THEN q.フィールド115 \
-#                 WHEN 117 THEN q.フィールド119 \
-#                 WHEN 121 THEN q.フィールド123 \
-#                 WHEN 125 THEN q.フィールド127 \
-#                 WHEN 129 THEN q.フィールド131 \
-#                 WHEN 133 THEN q.フィールド135 \
-#                 WHEN 137 THEN q.フィールド139 \
-#                 WHEN 141 THEN q.フィールド143 \
-#                 WHEN 145 THEN q.フィールド147 \
-#             END AS [MAX], \
-#             CASE p.seq \
-#                 WHEN 1 THEN q.フィールド4 \
-#                 WHEN 5 THEN q.フィールド8 \
-#                 WHEN 9 THEN q.フィールド12 \
-#                 WHEN 13 THEN q.フィールド16 \
-#                 WHEN 17 THEN q.フィールド20 \
-#                 WHEN 21 THEN q.フィールド24 \
-#                 WHEN 25 THEN q.フィールド28 \
-#                 WHEN 29 THEN q.フィールド32 \
-#                 WHEN 33 THEN q.フィールド36 \
-#                 WHEN 37 THEN q.フィールド40 \
-#                 WHEN 41 THEN q.フィールド44 \
-#                 WHEN 45 THEN q.フィールド48 \
-#                 WHEN 49 THEN q.フィールド52 \
-#                 WHEN 53 THEN q.フィールド56 \
-#                 WHEN 57 THEN q.フィールド60 \
-#                 WHEN 61 THEN q.フィールド64 \
-#                 WHEN 65 THEN q.フィールド68 \
-#                 WHEN 69 THEN q.フィールド72 \
-#                 WHEN 73 THEN q.フィールド76 \
-#                 WHEN 77 THEN q.フィールド80 \
-#                 WHEN 81 THEN q.フィールド84 \
-#                 WHEN 85 THEN q.フィールド88 \
-#                 WHEN 89 THEN q.フィールド92 \
-#                 WHEN 93 THEN q.フィールド96 \
-#                 WHEN 97 THEN q.フィールド100 \
-#                 WHEN 101 THEN q.フィールド104 \
-#                 WHEN 105 THEN q.フィールド108 \
-#                 WHEN 109 THEN q.フィールド112 \
-#                 WHEN 113 THEN q.フィールド116 \
-#                 WHEN 117 THEN q.フィールド120 \
-#                 WHEN 121 THEN q.フィールド124 \
-#                 WHEN 125 THEN q.フィールド128 \
-#                 WHEN 129 THEN q.フィールド132 \
-#                 WHEN 133 THEN q.フィールド136 \
-#                 WHEN 137 THEN q.フィールド140 \
-#                 WHEN 141 THEN q.フィールド144 \
-#                 WHEN 145 THEN q.フィールド148 \
-#             END AS [MIN], \
-#             CASE p.seq \
-#                 WHEN 1 THEN 3 \
-#                 WHEN 5 THEN 7 \
-#                 WHEN 9 THEN 11 \
-#                 WHEN 13 THEN 15 \
-#                 WHEN 17 THEN 19 \
-#                 WHEN 21 THEN 23 \
-#                 WHEN 25 THEN 27 \
-#                 WHEN 29 THEN 31 \
-#                 WHEN 33 THEN 35 \
-#                 WHEN 37 THEN 39 \
-#                 WHEN 41 THEN 43 \
-#                 WHEN 45 THEN 47 \
-#                 WHEN 49 THEN 51 \
-#                 WHEN 53 THEN 55 \
-#                 WHEN 57 THEN 59 \
-#                 WHEN 61 THEN 63 \
-#                 WHEN 65 THEN 67 \
-#                 WHEN 69 THEN 71 \
-#                 WHEN 73 THEN 75 \
-#                 WHEN 77 THEN 79 \
-#                 WHEN 81 THEN 83 \
-#                 WHEN 85 THEN 87 \
-#                 WHEN 89 THEN 91 \
-#                 WHEN 93 THEN 95 \
-#                 WHEN 97 THEN 99 \
-#                 WHEN 101 THEN 103 \
-#                 WHEN 105 THEN 107 \
-#                 WHEN 109 THEN 111 \
-#                 WHEN 113 THEN 115 \
-#                 WHEN 117 THEN 119 \
-#                 WHEN 121 THEN 123 \
-#                 WHEN 125 THEN 127 \
-#                 WHEN 129 THEN 131 \
-#                 WHEN 133 THEN 135 \
-#                 WHEN 137 THEN 139 \
-#                 WHEN 141 THEN 143 \
-#                 WHEN 145 THEN 147 \
-#             END AS [フィールドindex(MAX)], \
-#             CASE p.seq \
-#                 WHEN 1 THEN 4 \
-#                 WHEN 5 THEN 8 \
-#                 WHEN 9 THEN 12 \
-#                 WHEN 13 THEN 16 \
-#                 WHEN 17 THEN 20 \
-#                 WHEN 21 THEN 24 \
-#                 WHEN 25 THEN 28 \
-#                 WHEN 29 THEN 32 \
-#                 WHEN 33 THEN 36 \
-#                 WHEN 37 THEN 40 \
-#                 WHEN 41 THEN 44 \
-#                 WHEN 45 THEN 48 \
-#                 WHEN 49 THEN 52 \
-#                 WHEN 53 THEN 56 \
-#                 WHEN 57 THEN 60 \
-#                 WHEN 61 THEN 64 \
-#                 WHEN 65 THEN 68 \
-#                 WHEN 69 THEN 72 \
-#                 WHEN 73 THEN 76 \
-#                 WHEN 77 THEN 80 \
-#                 WHEN 81 THEN 84 \
-#                 WHEN 85 THEN 88 \
-#                 WHEN 89 THEN 92 \
-#                 WHEN 93 THEN 96 \
-#                 WHEN 97 THEN 100 \
-#                 WHEN 101 THEN 104 \
-#                 WHEN 105 THEN 108 \
-#                 WHEN 109 THEN 112 \
-#                 WHEN 113 THEN 116 \
-#                 WHEN 117 THEN 120 \
-#                 WHEN 121 THEN 124 \
-#                 WHEN 125 THEN 128 \
-#                 WHEN 129 THEN 132 \
-#                 WHEN 133 THEN 136 \
-#                 WHEN 137 THEN 140 \
-#                 WHEN 141 THEN 144 \
-#                 WHEN 145 THEN 148 \
-#             END AS [フィールドindex(MIN)], \
-#             [sort], \
-#             [sort2] \
-#         FROM ( \
-#             SELECT * \
-#             FROM [OP_ENTRY_INORG].[dbo].[T_TRACE_REPORT_履歴] \
-#             WHERE (ランNO IN (?)) \
-#                 AND (item_value_flag = 2 OR item_value_flag = 4 OR item_value_flag = 7 OR item_value_flag = 10) \
-#             ) AS q \
-#         CROSS JOIN T_TRACE_REPORT_pivot AS p \
-#         ) sub \
-#     )DATA \
-# ON NAME.日付 = DATA.日付 \
-#     AND NAME.工程名 = DATA.工程名 \
-#     AND NAME.[フィールドindex(MAX)] = DATA.[フィールドindex(MAX)] \
-#     AND NAME.[フィールドindex(MIN)] = DATA.[フィールドindex(MIN)] \
-# WHERE [項目] IS NOT NULL \
-#     AND [銘柄] = ? \
-# GROUP BY [項目], DATA.[sort], DATA.[sort2], DATA.[フィールドindex(MAX)] \
-# ORDER BY DATA.[sort], DATA.[sort2], DATA.[フィールドindex(MAX)]", run_no1, run_no1, brand, )
     cursor.execute(" \
     SELECT \
                     CONCAT(IIF([M_QC-One_品検項目].[表記名] = '', '', CONCAT([M_QC-One_品検項目].[表記名], '_') ), [M_QC-One_品検項目].[出力項目] ) AS 出力項目 \
@@ -429,412 +139,6 @@ def trace_report(request, brand, run_no1, run_no2, run_no3):
     ORDER BY        [M_QC-One_品検項目].[出力順序]", brand, run_no1, )
     tracereport = cursor.fetchall()
     aggregate_list = tracereport
-
-    # 操業データ_前回平均取得クエリ-----------------------------------------------------------------------------------------------------------------------------
-#     cursor.execute(" \
-# SELECT \
-#     REPLACE(項目, '_最大', '') AS 項目, \
-#     AVG(CAST([AVG] AS NUMERIC(13,4))) AS [AVG] \
-# FROM ( \
-#     SELECT \
-#         日付, \
-#         工程名, \
-#     CASE p.seq \
-#         WHEN 1 THEN 工程名 + '＿' + q.フィールド3 \
-#         WHEN 5 THEN 工程名 + '＿' + q.フィールド7 \
-#         WHEN 9 THEN 工程名 + '＿' + q.フィールド11 \
-#         WHEN 13 THEN 工程名 + '＿' + q.フィールド15 \
-#         WHEN 17 THEN 工程名 + '＿' + q.フィールド19 \
-#         WHEN 21 THEN 工程名 + '＿' + q.フィールド23 \
-#         WHEN 25 THEN 工程名 + '＿' + q.フィールド27 \
-#         WHEN 29 THEN 工程名 + '＿' + q.フィールド31 \
-#         WHEN 33 THEN 工程名 + '＿' + q.フィールド35 \
-#         WHEN 37 THEN 工程名 + '＿' + q.フィールド39 \
-#         WHEN 41 THEN 工程名 + '＿' + q.フィールド43 \
-#         WHEN 45 THEN 工程名 + '＿' + q.フィールド47 \
-#         WHEN 49 THEN 工程名 + '＿' + q.フィールド51 \
-#         WHEN 53 THEN 工程名 + '＿' + q.フィールド55 \
-#         WHEN 57 THEN 工程名 + '＿' + q.フィールド59 \
-#         WHEN 61 THEN 工程名 + '＿' + q.フィールド63 \
-#         WHEN 65 THEN 工程名 + '＿' + q.フィールド67 \
-#         WHEN 69 THEN 工程名 + '＿' + q.フィールド71 \
-#         WHEN 73 THEN 工程名 + '＿' + q.フィールド75 \
-#         WHEN 77 THEN 工程名 + '＿' + q.フィールド79 \
-#         WHEN 81 THEN 工程名 + '＿' + q.フィールド83 \
-#         WHEN 85 THEN 工程名 + '＿' + q.フィールド87 \
-#         WHEN 89 THEN 工程名 + '＿' + q.フィールド91 \
-#         WHEN 93 THEN 工程名 + '＿' + q.フィールド95 \
-#         WHEN 97 THEN 工程名 + '＿' + q.フィールド99 \
-#         WHEN 101 THEN 工程名 + '＿' + q.フィールド103 \
-#         WHEN 105 THEN 工程名 + '＿' + q.フィールド107 \
-#         WHEN 109 THEN 工程名 + '＿' + q.フィールド111 \
-#         WHEN 113 THEN 工程名 + '＿' + q.フィールド115 \
-#         WHEN 117 THEN 工程名 + '＿' + q.フィールド119 \
-#         WHEN 121 THEN 工程名 + '＿' + q.フィールド123 \
-#         WHEN 125 THEN 工程名 + '＿' + q.フィールド127 \
-#         WHEN 129 THEN 工程名 + '＿' + q.フィールド131 \
-#         WHEN 133 THEN 工程名 + '＿' + q.フィールド135 \
-#         WHEN 137 THEN 工程名 + '＿' + q.フィールド139 \
-#         WHEN 141 THEN 工程名 + '＿' + q.フィールド143 \
-#         WHEN 145 THEN 工程名 + '＿' + q.フィールド147 \
-#     END AS 項目, \
-#     CASE p.seq \
-#         WHEN 1 THEN 5 \
-#         WHEN 5 THEN 9 \
-#         WHEN 9 THEN 13 \
-#         WHEN 13 THEN 17 \
-#         WHEN 17 THEN 21 \
-#         WHEN 21 THEN 25 \
-#         WHEN 25 THEN 29 \
-#         WHEN 29 THEN 33 \
-#         WHEN 33 THEN 37 \
-#         WHEN 37 THEN 41 \
-#         WHEN 41 THEN 45 \
-#         WHEN 45 THEN 49 \
-#         WHEN 49 THEN 53 \
-#         WHEN 53 THEN 57 \
-#         WHEN 57 THEN 61 \
-#         WHEN 61 THEN 65 \
-#         WHEN 65 THEN 69 \
-#         WHEN 69 THEN 73 \
-#         WHEN 73 THEN 77 \
-#         WHEN 77 THEN 81 \
-#         WHEN 81 THEN 85 \
-#         WHEN 85 THEN 89 \
-#         WHEN 89 THEN 93 \
-#         WHEN 93 THEN 97 \
-#         WHEN 97 THEN 101 \
-#         WHEN 101 THEN 105 \
-#         WHEN 105 THEN 109 \
-#         WHEN 109 THEN 113 \
-#         WHEN 113 THEN 117 \
-#         WHEN 117 THEN 121 \
-#         WHEN 121 THEN 125 \
-#         WHEN 125 THEN 129 \
-#         WHEN 129 THEN 133 \
-#         WHEN 133 THEN 137 \
-#         WHEN 137 THEN 141 \
-#         WHEN 141 THEN 145 \
-#         WHEN 145 THEN 149 \
-#         WHEN 149 THEN 153 \
-#     END AS [フィールドindex(AVG)] \
-#     FROM ( \
-#         SELECT * \
-#         FROM [OP_ENTRY_INORG].[dbo].[T_TRACE_REPORT_履歴] \
-#         WHERE (ランNO IN (?)) \
-#             AND (item_value_flag = 1 OR item_value_flag = 3 OR item_value_flag = 6 OR item_value_flag = 9) \
-#         ) AS q \
-#     CROSS JOIN T_TRACE_REPORT_pivot AS p \
-#     ) NAME \
-# INNER JOIN ( \
-#     SELECT * \
-#     FROM ( \
-#         SELECT \
-#             日付, \
-#             工程名, \
-#             銘柄, \
-#             トレースNO, \
-#         CASE p.seq \
-#             WHEN 1 THEN q.フィールド5 \
-#             WHEN 5 THEN q.フィールド9 \
-#             WHEN 9 THEN q.フィールド13 \
-#             WHEN 13 THEN q.フィールド17 \
-#             WHEN 17 THEN q.フィールド21 \
-#             WHEN 21 THEN q.フィールド25 \
-#             WHEN 25 THEN q.フィールド29 \
-#             WHEN 29 THEN q.フィールド33 \
-#             WHEN 33 THEN q.フィールド37 \
-#             WHEN 37 THEN q.フィールド41 \
-#             WHEN 41 THEN q.フィールド45 \
-#             WHEN 45 THEN q.フィールド49 \
-#             WHEN 49 THEN q.フィールド53 \
-#             WHEN 53 THEN q.フィールド57 \
-#             WHEN 57 THEN q.フィールド61 \
-#             WHEN 61 THEN q.フィールド65 \
-#             WHEN 65 THEN q.フィールド69 \
-#             WHEN 69 THEN q.フィールド73 \
-#             WHEN 73 THEN q.フィールド77 \
-#             WHEN 77 THEN q.フィールド81 \
-#             WHEN 81 THEN q.フィールド85 \
-#             WHEN 85 THEN q.フィールド89 \
-#             WHEN 89 THEN q.フィールド93 \
-#             WHEN 93 THEN q.フィールド97 \
-#             WHEN 97 THEN q.フィールド101 \
-#             WHEN 101 THEN q.フィールド105 \
-#             WHEN 105 THEN q.フィールド109 \
-#             WHEN 109 THEN q.フィールド113 \
-#             WHEN 113 THEN q.フィールド117 \
-#             WHEN 117 THEN q.フィールド121 \
-#             WHEN 121 THEN q.フィールド125 \
-#             WHEN 125 THEN q.フィールド129 \
-#             WHEN 129 THEN q.フィールド133 \
-#             WHEN 133 THEN q.フィールド137 \
-#             WHEN 137 THEN q.フィールド141 \
-#             WHEN 141 THEN q.フィールド145 \
-#             WHEN 145 THEN q.フィールド149 \
-#         END AS [AVG], \
-#         CASE p.seq \
-#             WHEN 1 THEN 5 \
-#             WHEN 5 THEN 9 \
-#             WHEN 9 THEN 13 \
-#             WHEN 13 THEN 17 \
-#             WHEN 17 THEN 21 \
-#             WHEN 21 THEN 25 \
-#             WHEN 25 THEN 29 \
-#             WHEN 29 THEN 33 \
-#             WHEN 33 THEN 37 \
-#             WHEN 37 THEN 41 \
-#             WHEN 41 THEN 45 \
-#             WHEN 45 THEN 49 \
-#             WHEN 49 THEN 53 \
-#             WHEN 53 THEN 57 \
-#             WHEN 57 THEN 61 \
-#             WHEN 61 THEN 65 \
-#             WHEN 65 THEN 69 \
-#             WHEN 69 THEN 73 \
-#             WHEN 73 THEN 77 \
-#             WHEN 77 THEN 81 \
-#             WHEN 81 THEN 85 \
-#             WHEN 85 THEN 89 \
-#             WHEN 89 THEN 93 \
-#             WHEN 93 THEN 97 \
-#             WHEN 97 THEN 101 \
-#             WHEN 101 THEN 105 \
-#             WHEN 105 THEN 109 \
-#             WHEN 109 THEN 113 \
-#             WHEN 113 THEN 117 \
-#             WHEN 117 THEN 121 \
-#             WHEN 121 THEN 125 \
-#             WHEN 125 THEN 129 \
-#             WHEN 129 THEN 133 \
-#             WHEN 133 THEN 137 \
-#             WHEN 137 THEN 141 \
-#             WHEN 141 THEN 145 \
-#             WHEN 145 THEN 149 \
-#             WHEN 149 THEN 153 \
-#         END AS [フィールドindex(AVG)], \
-#         [sort], \
-#         [sort2] \
-#         FROM ( \
-#             SELECT * \
-#             FROM [OP_ENTRY_INORG].[dbo].[T_TRACE_REPORT_履歴] \
-#             WHERE (ランNO IN (?)) \
-#                 AND (item_value_flag = 2 OR item_value_flag = 4 OR item_value_flag = 7 OR item_value_flag = 10) \
-#             ) AS q \
-#         CROSS JOIN T_TRACE_REPORT_pivot AS p \
-#         ) sub \
-#     )DATA \
-# ON NAME.日付 = DATA.日付 \
-#     AND NAME.工程名 = DATA.工程名 \
-#     AND NAME.[フィールドindex(AVG)] = DATA.[フィールドindex(AVG)] \
-# WHERE [項目] IS NOT NULL \
-#     AND [銘柄] = ? \
-# GROUP BY [項目], DATA.[sort], DATA.[sort2], DATA.[フィールドindex(AVG)] \
-# ORDER BY DATA.[sort], DATA.[sort2], DATA.[フィールドindex(AVG)]", run_no1, run_no1, brand, )
-#     tracereport = cursor.fetchall()
-#     avg1s_list = tracereport
-
-    # 操業データ_前々回平均取得クエリ---------------------------------------------------------------------------------------------------------------------------
-#     cursor.execute(" \
-# SELECT \
-#     REPLACE(項目, '_最大', '') AS 項目, \
-#     AVG(CAST([AVG] AS NUMERIC(13,4))) AS [AVG] \
-# FROM ( \
-#     SELECT \
-#         日付, \
-#         工程名, \
-#     CASE p.seq \
-#         WHEN 1 THEN 工程名 + '＿' + q.フィールド3 \
-#         WHEN 5 THEN 工程名 + '＿' + q.フィールド7 \
-#         WHEN 9 THEN 工程名 + '＿' + q.フィールド11 \
-#         WHEN 13 THEN 工程名 + '＿' + q.フィールド15 \
-#         WHEN 17 THEN 工程名 + '＿' + q.フィールド19 \
-#         WHEN 21 THEN 工程名 + '＿' + q.フィールド23 \
-#         WHEN 25 THEN 工程名 + '＿' + q.フィールド27 \
-#         WHEN 29 THEN 工程名 + '＿' + q.フィールド31 \
-#         WHEN 33 THEN 工程名 + '＿' + q.フィールド35 \
-#         WHEN 37 THEN 工程名 + '＿' + q.フィールド39 \
-#         WHEN 41 THEN 工程名 + '＿' + q.フィールド43 \
-#         WHEN 45 THEN 工程名 + '＿' + q.フィールド47 \
-#         WHEN 49 THEN 工程名 + '＿' + q.フィールド51 \
-#         WHEN 53 THEN 工程名 + '＿' + q.フィールド55 \
-#         WHEN 57 THEN 工程名 + '＿' + q.フィールド59 \
-#         WHEN 61 THEN 工程名 + '＿' + q.フィールド63 \
-#         WHEN 65 THEN 工程名 + '＿' + q.フィールド67 \
-#         WHEN 69 THEN 工程名 + '＿' + q.フィールド71 \
-#         WHEN 73 THEN 工程名 + '＿' + q.フィールド75 \
-#         WHEN 77 THEN 工程名 + '＿' + q.フィールド79 \
-#         WHEN 81 THEN 工程名 + '＿' + q.フィールド83 \
-#         WHEN 85 THEN 工程名 + '＿' + q.フィールド87 \
-#         WHEN 89 THEN 工程名 + '＿' + q.フィールド91 \
-#         WHEN 93 THEN 工程名 + '＿' + q.フィールド95 \
-#         WHEN 97 THEN 工程名 + '＿' + q.フィールド99 \
-#         WHEN 101 THEN 工程名 + '＿' + q.フィールド103 \
-#         WHEN 105 THEN 工程名 + '＿' + q.フィールド107 \
-#         WHEN 109 THEN 工程名 + '＿' + q.フィールド111 \
-#         WHEN 113 THEN 工程名 + '＿' + q.フィールド115 \
-#         WHEN 117 THEN 工程名 + '＿' + q.フィールド119 \
-#         WHEN 121 THEN 工程名 + '＿' + q.フィールド123 \
-#         WHEN 125 THEN 工程名 + '＿' + q.フィールド127 \
-#         WHEN 129 THEN 工程名 + '＿' + q.フィールド131 \
-#         WHEN 133 THEN 工程名 + '＿' + q.フィールド135 \
-#         WHEN 137 THEN 工程名 + '＿' + q.フィールド139 \
-#         WHEN 141 THEN 工程名 + '＿' + q.フィールド143 \
-#         WHEN 145 THEN 工程名 + '＿' + q.フィールド147 \
-#     END AS 項目, \
-#     CASE p.seq \
-#         WHEN 1 THEN 5 \
-#         WHEN 5 THEN 9 \
-#         WHEN 9 THEN 13 \
-#         WHEN 13 THEN 17 \
-#         WHEN 17 THEN 21 \
-#         WHEN 21 THEN 25 \
-#         WHEN 25 THEN 29 \
-#         WHEN 29 THEN 33 \
-#         WHEN 33 THEN 37 \
-#         WHEN 37 THEN 41 \
-#         WHEN 41 THEN 45 \
-#         WHEN 45 THEN 49 \
-#         WHEN 49 THEN 53 \
-#         WHEN 53 THEN 57 \
-#         WHEN 57 THEN 61 \
-#         WHEN 61 THEN 65 \
-#         WHEN 65 THEN 69 \
-#         WHEN 69 THEN 73 \
-#         WHEN 73 THEN 77 \
-#         WHEN 77 THEN 81 \
-#         WHEN 81 THEN 85 \
-#         WHEN 85 THEN 89 \
-#         WHEN 89 THEN 93 \
-#         WHEN 93 THEN 97 \
-#         WHEN 97 THEN 101 \
-#         WHEN 101 THEN 105 \
-#         WHEN 105 THEN 109 \
-#         WHEN 109 THEN 113 \
-#         WHEN 113 THEN 117 \
-#         WHEN 117 THEN 121 \
-#         WHEN 121 THEN 125 \
-#         WHEN 125 THEN 129 \
-#         WHEN 129 THEN 133 \
-#         WHEN 133 THEN 137 \
-#         WHEN 137 THEN 141 \
-#         WHEN 141 THEN 145 \
-#         WHEN 145 THEN 149 \
-#         WHEN 149 THEN 153 \
-#     END AS [フィールドindex(AVG)] \
-#     FROM ( \
-#         SELECT * \
-#         FROM [OP_ENTRY_INORG].[dbo].[T_TRACE_REPORT_履歴] \
-#         WHERE (ランNO IN (?)) \
-#             AND (item_value_flag = 1 OR item_value_flag = 3 OR item_value_flag = 6 OR item_value_flag = 9) \
-#         ) AS q \
-#     CROSS JOIN T_TRACE_REPORT_pivot as p \
-#     ) NAME \
-# INNER JOIN ( \
-#     SELECT * \
-#     FROM ( \
-#         SELECT \
-#             日付, \
-#             工程名, \
-#             銘柄, \
-#             トレースNO, \
-#         CASE p.seq \
-#             WHEN 1 THEN q.フィールド5 \
-#             WHEN 5 THEN q.フィールド9 \
-#             WHEN 9 THEN q.フィールド13 \
-#             WHEN 13 THEN q.フィールド17 \
-#             WHEN 17 THEN q.フィールド21 \
-#             WHEN 21 THEN q.フィールド25 \
-#             WHEN 25 THEN q.フィールド29 \
-#             WHEN 29 THEN q.フィールド33 \
-#             WHEN 33 THEN q.フィールド37 \
-#             WHEN 37 THEN q.フィールド41 \
-#             WHEN 41 THEN q.フィールド45 \
-#             WHEN 45 THEN q.フィールド49 \
-#             WHEN 49 THEN q.フィールド53 \
-#             WHEN 53 THEN q.フィールド57 \
-#             WHEN 57 THEN q.フィールド61 \
-#             WHEN 61 THEN q.フィールド65 \
-#             WHEN 65 THEN q.フィールド69 \
-#             WHEN 69 THEN q.フィールド73 \
-#             WHEN 73 THEN q.フィールド77 \
-#             WHEN 77 THEN q.フィールド81 \
-#             WHEN 81 THEN q.フィールド85 \
-#             WHEN 85 THEN q.フィールド89 \
-#             WHEN 89 THEN q.フィールド93 \
-#             WHEN 93 THEN q.フィールド97 \
-#             WHEN 97 THEN q.フィールド101 \
-#             WHEN 101 THEN q.フィールド105 \
-#             WHEN 105 THEN q.フィールド109 \
-#             WHEN 109 THEN q.フィールド113 \
-#             WHEN 113 THEN q.フィールド117 \
-#             WHEN 117 THEN q.フィールド121 \
-#             WHEN 121 THEN q.フィールド125 \
-#             WHEN 125 THEN q.フィールド129 \
-#             WHEN 129 THEN q.フィールド133 \
-#             WHEN 133 THEN q.フィールド137 \
-#             WHEN 137 THEN q.フィールド141 \
-#             WHEN 141 THEN q.フィールド145 \
-#             WHEN 145 THEN q.フィールド149 \
-#         END AS [AVG], \
-#         CASE p.seq \
-#             WHEN 1 THEN 5 \
-#             WHEN 5 THEN 9 \
-#             WHEN 9 THEN 13 \
-#             WHEN 13 THEN 17 \
-#             WHEN 17 THEN 21 \
-#             WHEN 21 THEN 25 \
-#             WHEN 25 THEN 29 \
-#             WHEN 29 THEN 33 \
-#             WHEN 33 THEN 37 \
-#             WHEN 37 THEN 41 \
-#             WHEN 41 THEN 45 \
-#             WHEN 45 THEN 49 \
-#             WHEN 49 THEN 53 \
-#             WHEN 53 THEN 57 \
-#             WHEN 57 THEN 61 \
-#             WHEN 61 THEN 65 \
-#             WHEN 65 THEN 69 \
-#             WHEN 69 THEN 73 \
-#             WHEN 73 THEN 77 \
-#             WHEN 77 THEN 81 \
-#             WHEN 81 THEN 85 \
-#             WHEN 85 THEN 89 \
-#             WHEN 89 THEN 93 \
-#             WHEN 93 THEN 97 \
-#             WHEN 97 THEN 101 \
-#             WHEN 101 THEN 105 \
-#             WHEN 105 THEN 109 \
-#             WHEN 109 THEN 113 \
-#             WHEN 113 THEN 117 \
-#             WHEN 117 THEN 121 \
-#             WHEN 121 THEN 125 \
-#             WHEN 125 THEN 129 \
-#             WHEN 129 THEN 133 \
-#             WHEN 133 THEN 137 \
-#             WHEN 137 THEN 141 \
-#             WHEN 141 THEN 145 \
-#             WHEN 145 THEN 149 \
-#             WHEN 149 THEN 153 \
-#         END AS [フィールドindex(AVG)], \
-#         [sort], \
-#         [sort2] \
-#         FROM ( \
-#             SELECT * \
-#             FROM [OP_ENTRY_INORG].[dbo].[T_TRACE_REPORT_履歴] \
-#             WHERE (ランNO IN (?)) \
-#                 AND (item_value_flag = 2 OR item_value_flag = 4 OR item_value_flag = 7 OR item_value_flag = 10) \
-#             ) AS q \
-#         CROSS JOIN T_TRACE_REPORT_pivot AS p \
-#     ) sub \
-#     )DATA \
-# ON NAME.日付 = DATA.日付 \
-#     AND NAME.工程名 = DATA.工程名 \
-#     AND NAME.[フィールドindex(AVG)] = DATA.[フィールドindex(AVG)] \
-# WHERE [項目] IS NOT NULL \
-#     AND [銘柄] = ? \
-# GROUP BY [項目], DATA.[sort], DATA.[sort2], DATA.[フィールドindex(AVG)] \
-# ORDER BY DATA.[sort], DATA.[sort2], DATA.[フィールドindex(AVG)]", run_no2, brand, )
     cursor.execute(" \
     SELECT \
                     CONCAT(IIF([M_QC-One_品検項目].[表記名] = '', '', CONCAT([M_QC-One_品検項目].[表記名], '_') ), [M_QC-One_品検項目].[出力項目] ) AS 出力項目 \
@@ -862,208 +166,6 @@ def trace_report(request, brand, run_no1, run_no2, run_no3):
     ORDER BY	    [M_QC-One_品検項目].[出力順序]", brand, run_no2, )
     tracereport = cursor.fetchall()
     avg2s_list = tracereport
-
-    # 操業データ_前々々回平均取得クエリ-------------------------------------------------------------------------------------------------------------------------
-#     cursor.execute(" \
-# SELECT \
-#     REPLACE(項目, '_最大', '') AS 項目, \
-#     AVG(CAST([AVG] AS NUMERIC(13,4))) AS [AVG] \
-#     FROM ( \
-#         SELECT \
-#             日付, \
-#             工程名, \
-#         CASE p.seq \
-#             WHEN 1 THEN 工程名 + '＿' + q.フィールド3 \
-#             WHEN 5 THEN 工程名 + '＿' + q.フィールド7 \
-#             WHEN 9 THEN 工程名 + '＿' + q.フィールド11 \
-#             WHEN 13 THEN 工程名 + '＿' + q.フィールド15 \
-#             WHEN 17 THEN 工程名 + '＿' + q.フィールド19 \
-#             WHEN 21 THEN 工程名 + '＿' + q.フィールド23 \
-#             WHEN 25 THEN 工程名 + '＿' + q.フィールド27 \
-#             WHEN 29 THEN 工程名 + '＿' + q.フィールド31 \
-#             WHEN 33 THEN 工程名 + '＿' + q.フィールド35 \
-#             WHEN 37 THEN 工程名 + '＿' + q.フィールド39 \
-#             WHEN 41 THEN 工程名 + '＿' + q.フィールド43 \
-#             WHEN 45 THEN 工程名 + '＿' + q.フィールド47 \
-#             WHEN 49 THEN 工程名 + '＿' + q.フィールド51 \
-#             WHEN 53 THEN 工程名 + '＿' + q.フィールド55 \
-#             WHEN 57 THEN 工程名 + '＿' + q.フィールド59 \
-#             WHEN 61 THEN 工程名 + '＿' + q.フィールド63 \
-#             WHEN 65 THEN 工程名 + '＿' + q.フィールド67 \
-#             WHEN 69 THEN 工程名 + '＿' + q.フィールド71 \
-#             WHEN 73 THEN 工程名 + '＿' + q.フィールド75 \
-#             WHEN 77 THEN 工程名 + '＿' + q.フィールド79 \
-#             WHEN 81 THEN 工程名 + '＿' + q.フィールド83 \
-#             WHEN 85 THEN 工程名 + '＿' + q.フィールド87 \
-#             WHEN 89 THEN 工程名 + '＿' + q.フィールド91 \
-#             WHEN 93 THEN 工程名 + '＿' + q.フィールド95 \
-#             WHEN 97 THEN 工程名 + '＿' + q.フィールド99 \
-#             WHEN 101 THEN 工程名 + '＿' + q.フィールド103 \
-#             WHEN 105 THEN 工程名 + '＿' + q.フィールド107 \
-#             WHEN 109 THEN 工程名 + '＿' + q.フィールド111 \
-#             WHEN 113 THEN 工程名 + '＿' + q.フィールド115 \
-#             WHEN 117 THEN 工程名 + '＿' + q.フィールド119 \
-#             WHEN 121 THEN 工程名 + '＿' + q.フィールド123 \
-#             WHEN 125 THEN 工程名 + '＿' + q.フィールド127 \
-#             WHEN 129 THEN 工程名 + '＿' + q.フィールド131 \
-#             WHEN 133 THEN 工程名 + '＿' + q.フィールド135 \
-#             WHEN 137 THEN 工程名 + '＿' + q.フィールド139 \
-#             WHEN 141 THEN 工程名 + '＿' + q.フィールド143 \
-#             WHEN 145 THEN 工程名 + '＿' + q.フィールド147 \
-#         END AS 項目, \
-#         CASE p.seq \
-#             WHEN 1 THEN 5 \
-#             WHEN 5 THEN 9 \
-#             WHEN 9 THEN 13 \
-#             WHEN 13 THEN 17 \
-#             WHEN 17 THEN 21 \
-#             WHEN 21 THEN 25 \
-#             WHEN 25 THEN 29 \
-#             WHEN 29 THEN 33 \
-#             WHEN 33 THEN 37 \
-#             WHEN 37 THEN 41 \
-#             WHEN 41 THEN 45 \
-#             WHEN 45 THEN 49 \
-#             WHEN 49 THEN 53 \
-#             WHEN 53 THEN 57 \
-#             WHEN 57 THEN 61 \
-#             WHEN 61 THEN 65 \
-#             WHEN 65 THEN 69 \
-#             WHEN 69 THEN 73 \
-#             WHEN 73 THEN 77 \
-#             WHEN 77 THEN 81 \
-#             WHEN 81 THEN 85 \
-#             WHEN 85 THEN 89 \
-#             WHEN 89 THEN 93 \
-#             WHEN 93 THEN 97 \
-#             WHEN 97 THEN 101 \
-#             WHEN 101 THEN 105 \
-#             WHEN 105 THEN 109 \
-#             WHEN 109 THEN 113 \
-#             WHEN 113 THEN 117 \
-#             WHEN 117 THEN 121 \
-#             WHEN 121 THEN 125 \
-#             WHEN 125 THEN 129 \
-#             WHEN 129 THEN 133 \
-#             WHEN 133 THEN 137 \
-#             WHEN 137 THEN 141 \
-#             WHEN 141 THEN 145 \
-#             WHEN 145 THEN 149 \
-#             WHEN 149 THEN 153 \
-#         END AS [フィールドindex(AVG)] \
-#         FROM ( \
-#             SELECT * \
-#             FROM [OP_ENTRY_INORG].[dbo].[T_TRACE_REPORT_履歴] \
-#             WHERE (ランNO IN (?)) \
-#                 AND (item_value_flag = 1 OR item_value_flag = 3 OR item_value_flag = 6 OR item_value_flag = 9) \
-#             ) AS q \
-#         CROSS JOIN T_TRACE_REPORT_pivot as p \
-#     ) NAME \
-# INNER JOIN ( \
-#     SELECT * \
-#     FROM ( \
-#         SELECT \
-#             日付, \
-#             工程名, \
-#             銘柄, \
-#             トレースNO, \
-#         CASE p.seq \
-#             WHEN 1 THEN q.フィールド5 \
-#             WHEN 5 THEN q.フィールド9 \
-#             WHEN 9 THEN q.フィールド13 \
-#             WHEN 13 THEN q.フィールド17 \
-#             WHEN 17 THEN q.フィールド21 \
-#             WHEN 21 THEN q.フィールド25 \
-#             WHEN 25 THEN q.フィールド29 \
-#             WHEN 29 THEN q.フィールド33 \
-#             WHEN 33 THEN q.フィールド37 \
-#             WHEN 37 THEN q.フィールド41 \
-#             WHEN 41 THEN q.フィールド45 \
-#             WHEN 45 THEN q.フィールド49 \
-#             WHEN 49 THEN q.フィールド53 \
-#             WHEN 53 THEN q.フィールド57 \
-#             WHEN 57 THEN q.フィールド61 \
-#             WHEN 61 THEN q.フィールド65 \
-#             WHEN 65 THEN q.フィールド69 \
-#             WHEN 69 THEN q.フィールド73 \
-#             WHEN 73 THEN q.フィールド77 \
-#             WHEN 77 THEN q.フィールド81 \
-#             WHEN 81 THEN q.フィールド85 \
-#             WHEN 85 THEN q.フィールド89 \
-#             WHEN 89 THEN q.フィールド93 \
-#             WHEN 93 THEN q.フィールド97 \
-#             WHEN 97 THEN q.フィールド101 \
-#             WHEN 101 THEN q.フィールド105 \
-#             WHEN 105 THEN q.フィールド109 \
-#             WHEN 109 THEN q.フィールド113 \
-#             WHEN 113 THEN q.フィールド117 \
-#             WHEN 117 THEN q.フィールド121 \
-#             WHEN 121 THEN q.フィールド125 \
-#             WHEN 125 THEN q.フィールド129 \
-#             WHEN 129 THEN q.フィールド133 \
-#             WHEN 133 THEN q.フィールド137 \
-#             WHEN 137 THEN q.フィールド141 \
-#             WHEN 141 THEN q.フィールド145 \
-#             WHEN 145 THEN q.フィールド149 \
-#         END AS [AVG], \
-#         CASE p.seq \
-#             WHEN 1 THEN 5 \
-#             WHEN 5 THEN 9 \
-#             WHEN 9 THEN 13 \
-#             WHEN 13 THEN 17 \
-#             WHEN 17 THEN 21 \
-#             WHEN 21 THEN 25 \
-#             WHEN 25 THEN 29 \
-#             WHEN 29 THEN 33 \
-#             WHEN 33 THEN 37 \
-#             WHEN 37 THEN 41 \
-#             WHEN 41 THEN 45 \
-#             WHEN 45 THEN 49 \
-#             WHEN 49 THEN 53 \
-#             WHEN 53 THEN 57 \
-#             WHEN 57 THEN 61 \
-#             WHEN 61 THEN 65 \
-#             WHEN 65 THEN 69 \
-#             WHEN 69 THEN 73 \
-#             WHEN 73 THEN 77 \
-#             WHEN 77 THEN 81 \
-#             WHEN 81 THEN 85 \
-#             WHEN 85 THEN 89 \
-#             WHEN 89 THEN 93 \
-#             WHEN 93 THEN 97 \
-#             WHEN 97 THEN 101 \
-#             WHEN 101 THEN 105 \
-#             WHEN 105 THEN 109 \
-#             WHEN 109 THEN 113 \
-#             WHEN 113 THEN 117 \
-#             WHEN 117 THEN 121 \
-#             WHEN 121 THEN 125 \
-#             WHEN 125 THEN 129 \
-#             WHEN 129 THEN 133 \
-#             WHEN 133 THEN 137 \
-#             WHEN 137 THEN 141 \
-#             WHEN 141 THEN 145 \
-#             WHEN 145 THEN 149 \
-#             WHEN 149 THEN 153 \
-#         END AS [フィールドindex(AVG)], \
-#         [sort], \
-#         [sort2] \
-#         FROM ( \
-#             SELECT * \
-#             FROM [OP_ENTRY_INORG].[dbo].[T_TRACE_REPORT_履歴] \
-#             WHERE (ランNO IN (?)) \
-#                 AND (item_value_flag = 2 OR item_value_flag = 4 OR item_value_flag = 7 OR item_value_flag = 10) \
-#             ) AS q \
-#         CROSS JOIN T_TRACE_REPORT_pivot AS p \
-#         ) sub \
-#     )DATA \
-# ON NAME.日付 = DATA.日付 \
-#     AND NAME.工程名 = DATA.工程名 \
-#     AND NAME.[フィールドindex(AVG)] = DATA.[フィールドindex(AVG)] \
-# WHERE [項目] IS NOT NULL \
-#     AND [銘柄] = ? \
-# GROUP BY [項目], DATA.[sort], DATA.[sort2], DATA.[フィールドindex(AVG)] \
-# ORDER BY DATA.[sort], DATA.[sort2], DATA.[フィールドindex(AVG)]", run_no3, brand, )
     cursor.execute(" \
     SELECT \
                     CONCAT(IIF([M_QC-One_品検項目].[表記名] = '', '', CONCAT([M_QC-One_品検項目].[表記名], '_') ), [M_QC-One_品検項目].[出力項目] ) AS 出力項目 \
@@ -1248,7 +350,16 @@ def trace_report(request, brand, run_no1, run_no2, run_no3):
 # 酸化チタン_S法_品質検討会資料
 def s_quality_study_meeting_materials(request):
     # DB接続
-    server = 'YSQLSERV4'
+    host_name = gethostname()
+    if host_name == 'YWEBSERV1':
+        print('本番環境起動')
+        server = 'YSQLSERV4'
+    elif host_name == 'I7161DD6':
+        print('テスト環境起動')
+        server = 'Y0033OUT,1434'
+    else:
+        print('開発環境起動')
+        server = 'Y0033OUT,1434'
     database = 'OP_ENTRY_INORG'
     username = 'cmd_user'
     password = 'cmd_user'
@@ -1276,7 +387,16 @@ def s___select__brand(request):
     value = request.POST['value']
 
     # DB接続
-    server = 'YSQLSERV4'
+    host_name = gethostname()
+    if host_name == 'YWEBSERV1':
+        print('本番環境起動')
+        server = 'YSQLSERV4'
+    elif host_name == 'I7161DD6':
+        print('テスト環境起動')
+        server = 'Y0033OUT,1434'
+    else:
+        print('開発環境起動')
+        server = 'Y0033OUT,1434'
     database = 'OP_ENTRY_INORG'
     username = 'cmd_user'
     password = 'cmd_user'
@@ -1306,7 +426,16 @@ def s_trace_report(request, brand, run_no1, run_no2, run_no3):
         os.remove(file)
 
     # DB接続
-    server = 'YSQLSERV4'
+    host_name = gethostname()
+    if host_name == 'YWEBSERV1':
+        print('本番環境起動')
+        server = 'YSQLSERV4'
+    elif host_name == 'I7161DD6':
+        print('テスト環境起動')
+        server = 'Y0033OUT,1434'
+    else:
+        print('開発環境起動')
+        server = 'Y0033OUT,1434'
     database = 'OP_ENTRY_INORG'
     username = 'cmd_user'
     password = 'cmd_user'
@@ -1551,3 +680,42 @@ def s_trace_report(request, brand, run_no1, run_no2, run_no3):
         response = HttpResponse(fh.read(), content_type=mimetypes.guess_type(file_name)[0] or 'application/octet-stream')
     return response
 
+
+# /***トレースNO採番処理***/
+# 「酸化チタン_CL法_トレース採番MAIN処理」「酸化チタン_S法_トレースレポートMAIN処理」
+def trace_no_numbering(request):
+    group = request.POST['group']
+    from_date = request.POST['from_date'] + ' 00:00:00'
+    to_date = request.POST['to_date'] + ' 23:59:00'
+    # from_date = '2022-04-11 00:00:00'
+    # to_date = '2022-04-11 23:59:00'
+    print('開始')
+
+    # DB接続
+    host_name = gethostname()
+    if host_name == 'YWEBSERV1':
+        print('本番環境起動')
+        server = 'YSQLSERV4'
+    elif host_name == 'I7161DD6':
+        print('テスト環境起動')
+        server = 'Y0033OUT,1434'
+    else:
+        print('開発環境起動')
+        server = 'Y0033OUT,1434'
+    database = 'OP_ENTRY_INORG'
+    username = 'cmd_user'
+    password = 'cmd_user'
+    cnxn = pyodbc.connect('DRIVER={ODBC Driver 13 for SQL Server};SERVER=' + server + ';DATABASE=' + database + ';UID=' + username + ';PWD=' + password)
+    cursor = cnxn.cursor()
+
+    # ストアド実行
+    cursor.execute(" \
+    EXEC [酸化チタン_" + group + "_トレース採番MAIN処理] N'" + from_date + "', N'" + to_date + "' \
+    COMMIT")
+
+    print("完了")
+
+    data = {
+        'massage': "処理が完了しました！",
+    }
+    return JsonResponse(data)

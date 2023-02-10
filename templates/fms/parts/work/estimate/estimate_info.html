@@ -1,0 +1,101 @@
+<script>
+//対象の見積に対してのネゴ実績一覧表示の処理
+function get_this_discount_list(a) {
+            var target_discount_display_id_name = "#discount_list_" + a;
+            var target_estimate_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/parts/estimate/discount_list/",
+                type: "POST",
+                data : {
+                    'target_estimate_id' : target_estimate_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(target_discount_display_id_name).empty();
+                    $(target_discount_display_id_name).html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(target_discount_display_id_name).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+</script>
+<style type="text/css">
+div.scroll_estimate_info_div {
+  width: 1680px;
+  height: 780px;
+  overflow: scroll;
+}
+</style>
+    <div id="work_work_estimate_detail_action_button" style="width: auto;"></div>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">見積関係</h2>
+    </div>
+    <div class="scroll_budget_info_div">
+        <div style="float:left;size=5px">　</div>
+        {% for estimate_list in estimate_list %}
+            <div style="float:left">
+                <table>
+                    <tr>
+                        <td><div><font size="4">見積ID</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{{ estimate_list.id }}</font></div></td>
+                    </tr>
+<!--                    <tr>-->
+<!--                        <td><div><font size="4">工事区分</font></div></td>-->
+<!--                        <td><div><font size="4">：　</font></div></td>-->
+<!--                        <td><div style="padding: 5px 0px;"><font size="5">{{ estimate_list.management_class }}</font></div></td>-->
+<!--                    </tr>-->
+                    <tr>
+                        <td><div><font size="4">業者</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{% if estimate_list.vendor == None %} {% else %} {{ estimate_list.vendor }} {% endif %}</font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">個別予算見積額</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{% if estimate_list.estimate_price == None %} {% else %} {{ estimate_list.estimate_price }} {% endif %}</font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">個別予算見積調整額</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{% if estimate_list.prospect_price == None %} {% else %} {{ estimate_list.prospect_price }} {% endif %}</font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">工事納入予定</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{% if estimate_list.start_date == None %} {% else %} {{ estimate_list.start_date}} {% endif %} ～ {% if estimate_list.end_date == None %} {% else %} {{ estimate_list.end_date}} {% endif %}</font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">備考</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><textarea id="estimate_rem_{{ estimate_list.id }}" readonly
+                                                          rows="5" cols="45">{% if estimate_list.rem == None %}{% else %}{{estimate_list.rem}}{% endif %}</textarea></font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">採用可否</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        {% if estimate_list.adoption_flag == 1 %}
+                            <td><div style="padding: 5px 0px;"><font size="5">採用</font></div></td>
+                        {% else %}
+                            <td><div style="padding: 5px 0px;"><font size="5"></font></div></td>
+                        {% endif %}
+                    </tr>
+                </table>
+<!--                <div style="float:right;"><input type="button" value="リスト表示" onclick="get_this_discount_list({{ estimate_list.id }})" ></div>-->
+<!--                <div id="discount_list_{{ estimate_list.id }}" style="width: auto; float:right;"></div>-->
+            </div>
+            <div style="float:left;size=5px">　</div>
+        {% endfor %}
+    </div>
+        <!--UploadFileList        -->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->

@@ -1,0 +1,279 @@
+<script>
+
+//対象の届出チェックシート一覧の検索処理
+function get_cs_laws_progress_search() {
+    $("#loading_cs_related_laws_progress_list").show();//呼び出し中に表示するgifを表示
+    // 検索条件を保持する
+    session_value_cs_write();
+    // 検索
+    get_cs_laws_progress_list();
+}
+
+//対象の届出チェックシート一覧の表示処理
+function get_cs_laws_progress_list() {
+    var sel_cs_jurisdiction_department = $('#sel_cs_jurisdiction_department').val();
+    var sel_business_year = $('#sel_cs_business_year').val();
+    var sel_budget_id = $('#sel_cs_budget_id').val();
+    var sel_budget_no = $('#sel_cs_budget_no').val();
+    var sel_budget_name = $('#sel_cs_budget_name').val();
+    var sel_division = $('#sel_cs_division').val();
+    var sel_department = $('#sel_cs_department').val();
+    var sel_cs_related_laws_progress = $('#sel_cs_related_laws_progress').val();
+    var sel_on_work = $('#sel_cs_on_work').prop('checked');
+    $.ajax({
+            url: "/isk_tools/fms/parts/check_sheet/get_cs_laws_progress_list/",
+            type: "POST",
+            data : {
+                'sel_cs_jurisdiction_department': sel_cs_jurisdiction_department,
+                'sel_business_year': sel_business_year,
+                'sel_budget_id': sel_budget_id,
+                'sel_budget_no': sel_budget_no,
+                'sel_budget_name': sel_budget_name,
+                'sel_division': sel_division,
+                'sel_department': sel_department,
+                'sel_cs_related_laws_progress': sel_cs_related_laws_progress,
+                'sel_on_work': sel_on_work,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#cs_laws_list_parts').empty();
+                $('#cs_laws_list_parts').html(data);
+                $("#loading_cs_related_laws_progress_list").fadeOut();
+                $("#cs_laws_list_parts").fadeIn();//対象の一覧をフェードイン
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                $('#cs_laws_list_parts').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+};
+
+// セッション情報削除
+function session_value_cs_clear() {
+    sessionStorage.removeItem("sel_cs_step");
+    sessionStorage.removeItem("sel_cs_business_year");
+    sessionStorage.removeItem("sel_cs_budget_id");
+    sessionStorage.removeItem("sel_cs_budget_no");
+    sessionStorage.removeItem("sel_cs_budget_name");
+    sessionStorage.removeItem("sel_cs_division");
+    sessionStorage.removeItem("sel_cs_department");
+    sessionStorage.removeItem("sel_cs_next_division");
+    sessionStorage.removeItem("sel_cs_next_department");
+    sessionStorage.removeItem("sel_cs_next_parson");
+    sessionStorage.removeItem("sel_cs_on_work");
+    sessionStorage.removeItem("sel_cs_non_hold");
+    sessionStorage.removeItem("sel_cs_display_order");
+    sessionStorage.removeItem("sel_cs_related_laws_progress");
+    sessionStorage.removeItem("sel_cs_jurisdiction_department");
+}
+
+// セッション情報読込
+function session_value_cs_read() {
+    // 所管部署
+    if (sessionStorage.getItem('sel_cs_jurisdiction_department'))
+    {
+        set_combo_value('sel_cs_jurisdiction_department', sessionStorage.getItem('sel_cs_jurisdiction_department'));
+    }
+    // 年度
+    if (sessionStorage.getItem('sel_cs_business_year'))
+    {
+        set_combo_value('sel_cs_business_year', sessionStorage.getItem('sel_cs_business_year'));
+    }
+    // 予算ID
+    if (sessionStorage.getItem('sel_cs_budget_id'))
+    {
+        $('#sel_cs_budget_id').val(sessionStorage.getItem('sel_cs_budget_id'));
+    }
+    // 予算NO
+    if (sessionStorage.getItem('sel_cs_budget_no'))
+    {
+        $('#sel_cs_budget_no').val(sessionStorage.getItem('sel_cs_budget_no'));
+    }
+    // 予算名
+    if (sessionStorage.getItem('sel_cs_budget_name'))
+    {
+        $('#sel_cs_budget_name').val(sessionStorage.getItem('sel_cs_budget_name'));
+    }
+
+    // 部門
+    if (sessionStorage.getItem('sel_cs_division'))
+    {
+        set_combo_value('sel_cs_division', sessionStorage.getItem('sel_cs_division'));
+    }
+    // 部署
+    if (sessionStorage.getItem('sel_cs_department'))
+    {
+        set_combo_value('sel_cs_department', sessionStorage.getItem('sel_cs_department'));
+    }
+
+    // 部門部署のセッション情報が両方空の場合、ログイン情報から設定する
+    if(!sessionStorage.getItem('sel_cs_division') && !sessionStorage.getItem('sel_cs_department'))
+    {
+        var user_division_cd = $('#user_division_cd').val();
+        set_combo_value('sel_cs_division', user_division_cd);
+        var user_department_cd = $('#user_department_cd').val();
+        set_combo_value('sel_cs_department', user_department_cd);
+    }
+
+    // 進捗状況
+    if (sessionStorage.getItem('sel_cs_related_laws_progress'))
+    {
+        set_combo_value('sel_cs_related_laws_progress', sessionStorage.getItem('sel_cs_related_laws_progress'));
+    }
+    // 未処理のみ
+    if(sessionStorage.getItem('sel_cs_on_work'))
+    {
+        if(sessionStorage.getItem('sel_cs_on_work') == 'true')
+        {
+            $('#sel_cs_on_work').prop('checked', true);
+        }
+        else
+        {
+            $('#sel_cs_on_work').prop('checked', false);
+        }
+    }
+}
+
+// セッション情報書込み
+function session_value_cs_write() {
+    // 所管部署
+    value = $('#sel_cs_jurisdiction_department').val();
+    sessionStorage.setItem('sel_cs_jurisdiction_department', value);
+    // 年度
+    value = $('#sel_cs_business_year').val();
+    sessionStorage.setItem('sel_cs_business_year', value);
+    // 予算ID
+    value = $('#sel_cs_budget_id').val();
+    sessionStorage.setItem('sel_cs_budget_id', value);
+    // 予算NO
+    value = $('#sel_cs_budget_no').val();
+    sessionStorage.setItem('sel_cs_budget_no', value);
+    // 予算名
+    value = $('#sel_cs_budget_name').val();
+    sessionStorage.setItem('sel_cs_budget_name', value);
+    // 部門
+    value = $('#sel_cs_division').val();
+    sessionStorage.setItem('sel_cs_division', value);
+    // 部署
+    value = $('#sel_cs_department').val();
+    sessionStorage.setItem('sel_cs_department', value);
+    // 進捗状況
+    value = $('#sel_cs_related_laws_progress').val();
+    sessionStorage.setItem('sel_cs_related_laws_progress', value);
+    // 未処理のみ
+    value = $('#sel_cs_on_work').prop('checked');
+    sessionStorage.setItem('sel_cs_on_work', value);
+}
+
+//部門選択時処理
+function cs_select_filter_division(division){
+    var division = division;
+    var target = 'cs';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_filter_division/",
+                type: "POST",
+                data : {
+                    'division' : division,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(cs_filter_department).empty();
+                    $(cs_filter_department).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(cs_filter_department).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//部署選択時処理
+function cs_select_filter_department(division){
+    //select_filter_departments.htmlから呼び出されるが、このページでは何もしない
+    return;
+}
+
+//コンボボックスを選択する
+function set_combo_value(id, val) {
+    if (val != "") {
+        document.getElementById(id).value = val;
+    }
+}
+</script>
+<style type="text/css">
+    .button{
+        width:100px;
+    }
+</style>
+    <div style="width: auto;height:130px;background:#ffcccc; border-style:double none;">
+        絞込条件<br>
+        <div class="filter_item" style="float:left;">
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">所管部署：<select id="sel_cs_jurisdiction_department"
+                                                                                    name="sel_cs_jurisdiction_department">
+                    <option value=""></option>
+                        {% for jurisdiction_department_list in jurisdiction_department_list %}
+                            <option value="{{ jurisdiction_department_list.department }}">{{ jurisdiction_department_list.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">年度：<select id="sel_cs_business_year" name="sel_cs_business_year">
+                    <option value=""></option>
+                        {% for business_year_list in business_year_list %}
+                            <option value="{{ business_year_list.business_year }}">{{ business_year_list.business_year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">予算ID：<input type="text" id="sel_cs_budget_id" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">予算NO：<input type="text" id="sel_cs_budget_no" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">予算名：<input type="text" id="sel_cs_budget_name" value="" size="36">※あいまい</div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">部門：<select id="sel_cs_division" name="sel_cs_division" onchange="cs_select_filter_division(value)">
+                    <option value=""></option>
+                        {% for division_list in division_list %}
+                            <option value="{{ division_list.division_cd }}">{{ division_list.division_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="cs_filter_department" class="item" style="float:left;margin-left:15px;">部署：<select id="sel_cs_department" name="sel_cs_department">
+                    <option value=""></option>
+                        {% for departments_list in departments_list %}
+                            <option value="{{ departments_list.department_cd }}">{{ departments_list.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">進捗状況：<select id="sel_cs_related_laws_progress"
+                                                                                    name="sel_cs_related_laws_progress">
+                    <option value=""></option>
+                    <option value="null_submission_date">提出待ち</option>
+                    <option value="null_notification_date">届出待ち</option>
+                    <option value="null_permit_date">許可待ち</option>
+                    </select>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <!--チェック時に許可日または許可番号の両方が未入力の項目を表示する-->
+                <div class="item" style="float:left;margin-left:15px;"><input type="checkbox" id="sel_cs_on_work" value="1" size="18" checked="checked">未処理のみ</div>
+            </div>
+            <div>
+                <input type="button" name="get_cs_related_laws_list" value=" 　リスト更新　 " onclick="get_cs_laws_progress_search();">
+                <input type="button" name="reset_cs_filter_button" value=" 　条件リセット　 " onclick="reset_cs_filter();">
+            </div>
+        </div>
+    </div>
+
+<script>
+    session_value_cs_read();
+</script>

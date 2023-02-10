@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+{% load staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+        <script type="text/javascript" src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+
+</head>
+<script>
+function construction_detail(id) {
+        $.ajax({
+            url: "/isk_tools/fms/action/construction_entry_data_get/",
+            type: "POST",
+            data : {
+                'id': id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+        })
+        .done(function(data){
+            $('#construction_entry').empty();
+            $('#construction_entry').html(data);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#construction_entry').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+function page_refresh() {
+    var start_date = $('#start_date').val();
+    var end_date = $('#end_date').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/daily_construction/daily_construction_entry_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'start_date', value: start_date}))
+    .append($('<input/>', {type: 'hidden', name: 'end_date', value: end_date}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+function top_page() {
+    var start_date = '';
+    var end_date = '';
+    $('<form/>', {action: '/isk_tools/fms/parts/daily_construction/daily_construction_display/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'start_date', value: start_date}))
+    .append($('<input/>', {type: 'hidden', name: 'end_date', value: end_date}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_fire_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_high_place_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_entering_the_tank_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_heavy_equipment_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_brake_off_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_contamination_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_blockage_flag', value: '0'}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+function file_upload(){
+    $("#loading").show();//呼び出し中に表示するgifを表示
+    // フォームデータを取得
+    var formdata = new FormData($('#file_upload_form').get(0));
+    // POSTでアップロード
+        $.ajax({
+                url  : "/isk_tools/fms/action/file_import/",
+                type : "POST",
+                data : formdata,
+                cache       : false,
+                contentType : false,
+                processData : false,
+                dataType    : "json"
+                })
+                .done(function(data){
+                    $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    alert(data.msg);
+                    page_refresh();
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+
+<style type="text/css">
+.img {
+    position: relative;
+}
+{% for construction_list in construction_list %}
+.pin_{{ construction_list.id}} {
+    width: 30px;
+    height: 20px;
+    color: #ffffff;
+    {% if construction_list.construction_class != 3 %}
+        background-color: #FF0000;
+    {% else %}
+        background-color: #0000FF;
+    {% endif %}
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+
+    position: absolute;
+    top: {{ construction_list.position_y }}px;
+    left: {{ construction_list.position_x }}px;
+}
+{% endfor %}
+{% for blocking_construction_list in blocking_construction_list %}
+.pin_blocking_{{ blocking_construction_list.id}} {
+    width: 30px;
+    height: 20px;
+    color: #ffffff;
+    {% if blocking_construction_list.construction_class != 3 %}
+        background-color: #FF0000;
+    {% else %}
+        background-color: #0000FF;
+    {% endif %}
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.5rem;
+    border-radius: 0%;
+    cursor: pointer;
+
+    position: absolute;
+    top: {{ blocking_construction_list.blockage_position_y }}px;
+    left: {{ blocking_construction_list.blockage_position_x }}px;
+}
+{% endfor %}
+div.scroll_list_div {
+  width: 455px;
+  height: 860px;
+  overflow: scroll;
+}
+#loading{
+    display:none;
+	position:absolute;
+	left:35%;
+	top:10%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+</style>
+<body>
+<h2 class="page-header">登録画面</h2>
+<div style="float:left">
+    対象期間 : <input type="date" id="start_date" value="{{start_date | date:'Y-m-d' }}">　～　<input type="date" id="end_date" value="{{end_date | date:'Y-m-d' }}">
+    <input type="button" value="　更新　" onclick="page_refresh();">
+</div>
+<div style="float:right">
+    <a href="#" onclick="top_page();">表示画面へ</a>
+</div>
+<div style="float:right">　　</div>
+<div style="float:right">
+    <a href="/isk_tools/fms">設備管理トップ画面へ</a>
+</div>
+<div style="clear: both;"></div>
+<div id="data_info" style="height:100px;background-color: #e6e6fa;" >
+    <div id="construction_entry"></div>
+
+</div>
+<div id="js-target" class="img" style="float:left; width:1600px; height:880px;">
+    <img src="/static/img/fms/MainImage.JPG" width="100%" height="100%">
+    {% for construction_list in construction_list %}
+    <div id="{{ construction_list.id }}" class="pin_{{ construction_list.id }}">
+        <i class="fa fa-thumbs-o-up" aria-hidden="true">{{ construction_list.display_number }}</i>
+    </div>
+    {% endfor %}
+    {% for blocking_construction_list in blocking_construction_list %}
+    <div id="{{ blocking_construction_list.id }}" class="pin_blocking_{{ blocking_construction_list.id }}">
+        <i class="fa fa-thumbs-o-up" aria-hidden="true">{{ blocking_construction_list.display_number }}</i>
+    </div>
+    {% endfor %}
+</div>
+<div class="scroll_list_div" style="float:left;">
+
+    <table>
+        <thead class="scrollHead">
+            <tr>
+                <th class="display_no">NO</th>
+                <th class="id">工事/依頼ID</th>
+                <th class="name">工事名</th>
+                <th class="position">場所</th>
+                <th class="blockage_position">交通遮断</th>
+            </tr>
+        </thead>
+        <tbody class="scrollBody">
+                {% for construction_list in construction_list %}
+                    <tr>
+                        <td class="display_no">
+                            <a href="#" class="select_pb" onclick="construction_detail({{ construction_list.id }});">{{ construction_list.display_number }}</a>
+                        </td>
+                        <td class="id">
+                            {% if construction_list.scheduled_construction_id is not None %}
+                                {{ construction_list.scheduled_construction_id }}
+                            {% else %}
+                                {{ construction_list.small_construction_id }}
+                            {% endif %}
+                        </td>
+                        <td class="name">{{ construction_list.construction_name }}</td>
+                        <td class="position">
+                            {% if construction_list.position_x > 0 and construction_list.position_y > 0 %}
+                                済
+                            {% else %}
+                                未
+                            {% endif %}
+                        </td>
+                        <td class="blockage_position">
+                            {% if construction_list.blockage_flag == 0  %}
+                                不要
+                            {% else %}
+                                {% if construction_list.blockage_position_x > 0 and construction_list.blockage_position_y > 0 %}
+                                    済
+                                {% else %}
+                                    未
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div style="clear: both;"></div>
+<div id="loading">
+    <img src="/static/img/loading/earth.gif">
+</div>
+<div>
+    <form id="file_upload_form" name="file_upload_form" action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            取込ファイル選択　　　　　：　<input type="file" id="file" name="file" />
+            <input type="button" id="upload_pb2" value="送信" onclick="file_upload();">
+        </div>
+    </form>
+</div>
+<script>
+(function(){
+
+let target = document.getElementById('js-target');
+
+target.addEventListener('click', getPosition);
+
+function getPosition(e) {
+    let offsetX = e.offsetX; // =>要素左上からのx座標
+    let offsetY = e.offsetY; // =>要素左上からのy座標
+    let pageX = e.pageX; // =>ウィンドウ左上からのx座標
+    let pageY = e.pageY; // =>ウィンドウ左上からのy座標
+    let clientX = e.clientX; // =>ページ左上からのx座標
+    let clientY = e.clientY; // =>ページ左上からのy座標
+
+    var position_target = $('#position_target').val();
+    var target_id = $('#target_id').val();
+
+
+    if (position_target == 1) {
+        $('#position_x').val(offsetX-15);
+        $('#position_y').val(offsetY-10);
+
+        var newElement = document.createElement("div"); // div要素作成
+        var class_name = "pin_" + target_id;
+        var new_id = "new_" + target_id;
+        newElement.setAttribute("id",new_id); // p要素にidを設定
+        newElement.setAttribute("class",class_name); // p要素にclassを設定
+        var parentDiv = document.getElementById("js-target");
+        parentDiv.appendChild(newElement);
+
+        var id_name = "#" + new_id
+
+        var top_position = offsetY-10 + "px"
+        var left_position = offsetX-15 + "px"
+
+        $(id_name).css({
+            'width': '30px',
+            'height': '20px',
+            'color': '#ffffff',
+            'background-color': '#FF00FF',
+            'display': 'flex',
+            'justify-content': 'center',
+            'align-items': 'center',
+            'font-size': '0.5rem',
+            'border-radius': '50%',
+            'cursor': 'pointer',
+
+            'position': 'absolute',
+            'top': top_position,
+            'left': left_position,
+        } );
+
+        setInterval(function(){
+
+            $(id_name).fadeOut(500,function(){$(this).fadeIn(500)});
+
+        },1000);
+
+    }else if (position_target == 2) {
+        $('#blockage_position_x').val(offsetX-15);
+        $('#blockage_position_y').val(offsetY-10);
+
+        var newElement = document.createElement("div"); // div要素作成
+        var class_name = "pin_blocking_" + target_id;
+        var new_id = "new_blocking_" + target_id;
+        newElement.setAttribute("id",new_id); // p要素にidを設定
+        newElement.setAttribute("class",class_name); // p要素にclassを設定
+        var parentDiv = document.getElementById("js-target");
+        parentDiv.appendChild(newElement);
+
+        var id_name = "#" + new_id
+
+        var top_position = offsetY-10 + "px"
+        var left_position = offsetX-15 + "px"
+
+        $(id_name).css({
+            'width': '30px',
+            'height': '20px',
+            'color': '#ffffff',
+            'background-color': '#FF00FF',
+            'display': 'flex',
+            'justify-content': 'center',
+            'align-items': 'center',
+            'font-size': '0.5rem',
+            'border-radius': '0%',
+            'cursor': 'pointer',
+
+            'position': 'absolute',
+            'top': top_position,
+            'left': left_position,
+        } );
+        $("input[name='blockage_flag']").val(1);
+        document.getElementsByName("blockage_flag").item(0).checked = 1
+
+        setInterval(function(){
+
+            $(id_name).fadeOut(500,function(){$(this).fadeIn(500)});
+
+        },1000);
+    }
+}
+}());
+
+</script>
+</body>
+</html>

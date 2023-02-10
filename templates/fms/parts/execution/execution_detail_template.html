@@ -1,0 +1,2013 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+//レベル5のトップページの表示処理
+function level5_toppage(level5_step_id) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var select_tab = $('#select_tab').val();
+    var target = $('#target').val();
+    var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+    if(isNaN(start_work_stop_flag) || start_work_stop_flag == 0 || start_work_stop_flag == 2){
+        url = '../../../level5_step_top/'
+        start_work_stop_flag = 0
+    }else if(start_work_stop_flag == 1){
+        url = '../../irregular/level5_step_stop/'
+    }else{
+        url = ''
+    }
+    $('<form/>', {action: url, method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: select_tab}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: target}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+//タブ表示のためのJS
+var tab = {
+	init: function(a){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var show_page_id = 'page' + a;
+		for(i=0; i<pages.length; i++) {
+			if(pages[i] != null) {
+			    if( pages[i].id == show_page_id ) {
+                    pages[i].style.display = 'block';
+                    tabs[i].className = 'present';
+                    tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                }
+                else{
+                    pages[i].style.display = 'none';
+                    tabs[i].className = null;
+                    tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                }
+            }
+		}
+	},
+	showpage: function(obj){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var num;
+		for(num=0; num<tabs.length; num++) {
+			if(tabs[num] === obj) break;
+		}
+		for(var i=0; i<pages.length; i++) {
+			if(pages[i] != null) {
+				if(i == num) {
+					pages[num].style.display = 'block';
+					tabs[num].className = 'present';
+				}
+				else{
+					pages[i].style.display = 'none';
+					tabs[i].className = null;
+				}
+			}
+		}
+	}
+}
+//予算詳細情報を表示するためのJS
+function budget_detail_info() {
+    if (document.getElementById("budget_detail") != null) {
+        var id = $('#org_unique_budget_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var target = $('#target').val();
+        var target_step_id = $('#target_step_id').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "budget_detail";
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/budget_detail/budget_data_info/",
+                type: "POST",
+                data : {
+                    'id': id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'target': target,
+                    'target_step_id': target_step_id,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_detail').empty();
+                    $('#budget_detail').html(data);
+
+                    //if (document.getElementById("work_common_detail") == null) {//工事詳細情報を表示するためのdivがないか判定
+                    //    action_button_display();//操作ボタン表示のためのJS起動(このhtml内にプログラム有)
+                    //    log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(このhtml内にプログラム有)
+                    //}
+                    //budget_equipment_info();//予算関係法令、機器の情報表示のためのJS起動(このhtml内にプログラム有)
+
+                    get_budget_law_list_in_info();//予算関係法令一覧を表示するJS起動(このhtml内にプログラム有)
+                    get_budget_equipment_list_in_info();//予算関係機器の一覧を表示するJS起動(このhtml内にプログラム有)
+
+                    //予算のrev_no = div「id=target_work_rev_no」のvalueにdiv「id=budget_rev_no」のvalueを代入
+                    //var target_budget_rev_no = $('#budget_rev_no').val();
+                    //$('#target_budget_rev_no').val(budget_rev_no);
+
+                    upload_file_list(div_id_name, 'probudgetunit', 0);
+
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//予算詳細情報を表示するためのJS
+function budget_detail_info2() {
+    if (document.getElementById("execution_basicinfo") != null) {
+        //var id = $('#target_budget_unique_id').val();
+        var target_id = $('#target_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var work_id = $('#work_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_detail/execution_budget_data_info/",
+                type: "POST",
+                data : {
+                    //'id': id,
+                    'target_id': target_id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'this_step' : this_step,
+                    'work_id' : work_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_basicinfo').empty();
+                    $('#execution_basicinfo').html(data);
+
+//                  if (document.getElementById("work_common_detail") == null) {//工事詳細情報を表示するためのdivがないか判定
+                        var this_page = $('#execution_budget_page').val();
+                        action_button_display(this_page);//操作ボタン表示のためのJS起動(このhtml内にプログラム有)
+                        log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(このhtml内にプログラム有)
+//                    }
+//
+//                  //予算のrev_no = div「id=target_work_rev_no」のvalueにdiv「id=budget_rev_no」のvalueを代入
+//                  var target_budget_rev_no = $('#budget_rev_no').val();
+//                  $('#target_budget_rev_no').val(budget_rev_no);
+//
+//                  business_year_value_change();//年度選択の値を呼び出した値と同期するJS起動(budget_edit.html内にプログラム有)
+//                  budget_condition_value_change();//予算状態選択の値を呼び出した値と同期するJS起動(budget_edit.html内にプログラム有)
+//                  application_class_value_change();//申請区分選択の値を呼び出した値と同期するJS起動(budget_edit.html内にプログラム有)
+//                  budget_class_value_change();//予算区分選択の値を呼び出した値と同期するJS起動(budget_edit.html内にプログラム有)
+//                  period_class_value_change();//期区分選択の値を呼び出した値と同期するJS起動(budget_edit.html内にプログラム有)
+//
+//                    if (document.getElementById("execution_budget_edit") != null) {
+//                        area_person_in_charge_value_change();//エリア管理者選択のコンボボックスの選択を呼び出した値と同期するJS起動
+//                        original_sec_person_in_charge_value_change();//原課担当者選択のコンボボックスの選択を呼び出した値と同期するJS起動
+//                    }
+//
+//                  process_value_change();//工程選択の値を呼び出した値と同期するJS起動(budget_edit.html内にプログラム有)
+//                  purpose_class_value_change();//目的区分選択の値を呼び出した値と同期するJS起動(budget_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_basicinfo').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//予算関係機器一覧の表示処理(予算情報表示時にbudget_info.htmlを使用したとき用)
+function get_budget_equipment_list_in_info() {
+    if (document.getElementById("budget_equipment_list_in_info") != null) {
+        var budget_id = $('#target_budget_id').val();
+        var select_pb_disp_flag = 0;
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_equipment/budget_equipment_list/",
+                type: "POST",
+                data : {
+                    'budget_id' : budget_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_equipment_list_in_info').empty();
+                    $('#budget_equipment_list_in_info').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_equipment_list_in_info').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+    }
+}
+//予算関係法令一覧の表示処理(予算情報表示時にbudget_info.htmlを使用したとき用)
+function get_budget_law_list_in_info() {
+    if (document.getElementById("budget_law_list_in_info") != null) {
+
+        var budget_id = $('#target_budget_id').val();
+        var select_pb_disp_flag = 0;
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_equipment/budget_law_list/",
+                type: "POST",
+                data : {
+                    'budget_id' : budget_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_law_list_in_info').empty();
+                    $('#budget_law_list_in_info').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_law_list_in_info').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+    }
+}
+//工事詳細情報を表示するためのJS
+function work_detail_info() {
+    if (document.getElementById("execution_specification") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var budget_unique_id = $('#target_budget_unique_id').val();
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "prospecificationunit";
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_detail/execution_work_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'this_step' : this_step,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_specification').empty();
+                    $('#execution_specification').html(data);
+
+                    var this_page = $('#execution_work_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動(このhtml内にプログラム有)
+                    console.log('work_detail_info')
+                    upload_file_list(div_id_name);
+
+                    if (document.getElementById("execution_work_edit") != null) {
+                        specification_person_in_charge_value_change();//仕様書担当者選択の値と呼び出した値との同期するJS起動
+                        procurement_person_in_charge_value_change();//調達担当者選択の値と呼び出した値との同期処理
+                        management_class_cd_value_change();//管理区分選択の値と呼び出した値との同期処理
+                        work_class_cd_value_change();//工事区分(物品/工事)選択の値と呼び出した値との同期処理するJS起動
+                        work_name_chara_count();//工事名の文字数をカウントするJS起動(execution_work_edit.html内にある)
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_specification').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//見積情報を表示するためのJS
+function proestimates_detail_info() {
+    if (document.getElementById("execution_estimates") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "proestimates";
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_proestimates/execution_proestimates_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_estimates').empty();
+                    $('#execution_estimates').html(data);
+
+                    var this_page = $('#execution_proestimates_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+                    console.log('proestimates_detail_info')
+                    upload_file_list(div_id_name);
+                    default_data_input();
+                    calc_discount_rate_at_open();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_estimates').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+function default_data_input(){
+    if(document.getElementById('estimated_deadline_date') != null){
+        estimated_deadline_date = $('#estimated_deadline_date').val();
+        if(estimated_deadline_date == ""){
+            $('#estimated_deadline_date').val($('#estimate_submission_date').val());
+        }
+    }
+    if(document.getElementById('fixed_delivery_location') != null){
+        fixed_delivery_location = $('#fixed_delivery_location').val();
+        if(fixed_delivery_location == ""){
+            $('#fixed_delivery_location').val($('#delivery_location').val());
+        }
+    }
+    /*
+    if(document.getElementById('fixed_delivery_date_from') != null){
+        fixed_delivery_date_from = $('#fixed_delivery_date_from').val();
+        if(fixed_delivery_date_from == ""){
+            $('#fixed_delivery_date_from').val($('#desired_construct_period_from').val());
+        }
+    }
+    if(document.getElementById('fixed_delivery_date_to') != null){
+        fixed_delivery_date_to = $('#fixed_delivery_date_to').val();
+        if(fixed_delivery_date_to == ""){
+            $('#fixed_delivery_date_to').val($('#desired_construct_period_to').val());
+        }
+    }
+    if(document.getElementById('fixed_delivery_date') != null){
+        fixed_delivery_date = $('#fixed_delivery_date').val();
+        if(fixed_delivery_date == ""){
+            $('#fixed_delivery_date').val($('#desired_delivery_date').val());
+        }
+    }
+    */
+}
+
+//業者評価を表示するためのJS
+function provendorevaluation_detail_info() {
+    if (document.getElementById("execution_vendorevaluation") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "provendorevaluation";
+
+        var target_id =$('#target_id').val();
+        var target_step_id = $('#target_step_id').val();
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_provendorevaluation/execution_provendorevaluation_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+
+                    'target_id': target_id,
+                    'target_step_id': target_step_id,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_vendorevaluation').empty();
+                    $('#execution_vendorevaluation').html(data);
+                    var this_page = $('#execution_provendorevaluation_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+//                    upload_file_list(div_id_name);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_vendorevaluation').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//個別契約書類を表示するためのJS
+function proindividualcontractdoc_detail_info() {
+    if (document.getElementById("execution_individualcontract") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var work_rev_no = $('#target_work_rev_no').val();
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "proindividualcontractdoc";
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_proindividualcontractdoc/execution_proindividualcontractdoc_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'work_rev_no': work_rev_no,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 40000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_individualcontract').empty();
+                    $('#execution_individualcontract').html(data);
+                    var this_page = $('#execution_proindividualcontractdoc_page').val();
+                    $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+                    console.log('proindividualcontractdoc_detail_info')
+                    upload_file_list(div_id_name);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_individualcontract').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//検査(立会)を表示するためのJS
+function proinspectionresults_detail_info() {
+    if (document.getElementById("execution_inspectionresults") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "proinspectionresults";
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_proinspectionresults/execution_proinspectionresults_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_inspectionresults').empty();
+                    $('#execution_inspectionresults').html(data);
+                    var this_page = $('#execution_proinspectionresults_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+                    console.log('proinspectionresults_detail_info')
+                    upload_file_list(div_id_name);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_inspectionresults').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//納入詳細情報を表示するためのJS
+function prodelivery_detail_info() {
+    if (document.getElementById("execution_delivery") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "prodelivery";
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_prodelivery/execution_prodelivery_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_delivery').empty();
+                    $('#execution_delivery').html(data);
+                    var this_page = $('#execution_prodelivery_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+                    console.log('prodelivery_detail_info')
+                    upload_file_list(div_id_name);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_delivery').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//検査(受入)を表示するためのJS
+function proinspection_acceptance_detail_info() {
+    if (document.getElementById("execution_inspection_acceptance") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "proinspection_acceptance";
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_proinspection_acceptance/execution_proinspection_acceptance_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_inspection_acceptance').empty();
+                    $('#execution_inspection_acceptance').html(data);
+                    var this_page = $('#execution_proinspection_acceptance_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+                    console.log('proinspection_acceptance_detail_info')
+                    upload_file_list(div_id_name);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_inspection_acceptance').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事準備を表示するためのJS
+function proconstructionprep_detail_info() {
+    if (document.getElementById("execution_constructionprep") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "proconstructionprep";
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_proconstructionprep/execution_proconstructionprep_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_constructionprep').empty();
+                    $('#execution_constructionprep').html(data);
+                    var this_page = $('#execution_proconstructionprep_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_constructionprep').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事品質結果を表示するためのJS
+function proconstructionqualityresults_detail_info() {
+    if (document.getElementById("execution_constructionqualityresults") != null) {
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        // 20201215y-kawauchi Fileupload必要情報追加
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = "proconstructionqualityresults";
+        var copy_check  = $('#copy_check').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_proconstructionqualityresults/execution_proconstructionqualityresults_data_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    // 20201215y-kawauchi Fileupload必要情報追加
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'div_id_name': div_id_name,
+                    'copy_check' : copy_check,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_constructionqualityresults').empty();
+                    $('#execution_constructionqualityresults').html(data);
+                    var this_page = $('#execution_proconstructionqualityresults_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+                    // 20201215y-kawauchi FileList取得 infoの時にerrorになる
+                    console.log('proconstructionqualityresults_detail_info')
+                    upload_file_list(div_id_name);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_constructionqualityresults').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+
+//操作ボタン部分の表示処理
+//action_sub:ページ番号
+function action_button_display(action_sub) {
+        var target_id = $('#target_budget_id').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var next_department = $('#next_department').val();
+        var next_division = $('#next_division').val();
+        var target_table = "prospecificationunit";
+        var level5_step_id = $('#level5_step_id').val();
+        var permit_user = $('#permit_user').val();
+        var target_step_id = $('#target_step_id').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var last_operation_step = $('#last_operation_step').val();
+        var target = $('#target').val();
+        var default_tab = $('#default_tab').val();
+
+        if(target_step_id == 212001001){
+            var target_id = 0;
+        }else if(target == 'probudgetunit'){
+            var target_id = $('#target_budget_id').val();
+            var target_table = "probudgetunit";
+        }else if(target == 'prospecificationunit'){
+            var target_id = $('#target_work_id').val();
+            var target_table = "prospecificationunit";
+        }else if(target == 'budget_carry_forward'){
+            var target_id = $('#target_unique_carry_forward_id').val();
+            var target_table = "budget_carry_forward";
+        }else{
+            $(target_div_id).empty();
+            return;
+        }
+
+        // 現在のタブ以外は操作ボタンを表示しない
+        if(Number(default_tab) != Number(action_sub)) return;
+
+        var target_div_id = "#" + target + action_sub + "_action_button"; // action_subを各画面で定義した場合、画面ごとの操作ボタンを生成
+                                                                          // 未定義の場合、idは"#"target"_action_button"となる
+        var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+        if(isNaN(start_work_stop_flag)){
+            start_work_stop_flag = 0;
+        }
+        $.ajax({
+                url: "/isk_tools/fms/parts/common/action_button_display/",
+                type: "POST",
+                data : {
+                    'next_department' : next_department,
+                    'next_division' : next_division,
+                    'target_budget_id' : target_budget_id,
+                    'target_table' : target_table,
+                    'target_id' : target_id,
+                    'level5_step_id' : level5_step_id,
+                    'permit_user' : permit_user,
+                    'target_step_id' : target_step_id,
+                    'user_department_cd' : user_department_cd,
+                    'last_operation_step' : last_operation_step,
+                    'target' : target,
+                    'start_work_stop_flag' : start_work_stop_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(target_div_id).empty();
+                    $(target_div_id).html(data);
+                    $('#action_sub').val(action_sub);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(target_div_id).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//ログリストの表示処理
+function log_list(a) {
+    if (document.getElementById("log_lists") != null) {
+        var log_source = a;
+        var target_budget_id = $('#target_budget_id').val();
+        var this_target = $('#target').val();
+        if (log_source == 1) {
+            var target_id = $('#target_budget_id').val();
+            var target = "budget";
+        }
+        if (log_source == 2) {
+            var target_id = $('#target_work_id').val();
+            var target = "prospecificationunit";
+        }
+        if (log_source == 3) {
+            var target_id = $('#target_budget_id').val();
+            var target = "budget";
+        }
+        if (log_source == 4) {
+            var target_id = $('#target_id').val();
+            var target = "cs";
+        }
+        if (log_source == 9) {
+            var target_id = $('#target_budget_id').val();
+            var target = "budget";
+        }
+        $.ajax({
+                url: "/isk_tools/fms/parts/common/log_list/",
+                type: "POST",
+                data : {
+                    'target_id': target_id,
+                    'target': target,
+                    'log_source': log_source,
+                    'target_budget_id': target_budget_id,
+                    'this_target': this_target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#log_lists').empty();
+                    $('#log_lists').html(data);
+                    log_class_value(log_source);//ログリストの対象を選択する「id=log_class」のvalueを同期するJS起動(log.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#log_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//予算取扱物質詳細情報の表示処理
+function budget_spec_handling_material_info(budget_material_id, data_source, work_id) {
+    if (document.getElementById("budget_spec_handling_material_detail") != null) {
+        var budget_material_id = budget_material_id;
+        var data_source = data_source;
+        var work_id = '';
+        var target_budget_id = $('#target_budget_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_handling_material_data_info/",
+                type: "POST",
+                data : {
+                    'target_budget_id': target_budget_id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'budget_material_id' : budget_material_id,
+                    'data_source' : data_source,
+                    'work_id' : work_id,
+                    'target_type' : 'budget',
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_spec_handling_material_detail').empty();
+                    $('#budget_spec_handling_material_detail').html(data);
+                    handling_material_list('budget', work_id);//取扱物質一覧表示のためのJS起動(このhtml内にプログラム有)
+                    //material_state_change();//取扱物質一覧ソース選択変更時のJS起動(handling_material_edit.html内にプログラム有)
+                    //concentration_unit_change();//濃度単位選択の値を呼び出した値と同期するJS起動(handling_material_edit.html内にプログラム有)
+                    //pressure_unit_change();//圧力単位選択の値を呼び出した値と同期するJS起動(handling_material_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_spec_handling_material_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事取扱物質詳細情報の表示処理
+function work_spec_handling_material_info(budget_material_id, data_source, work_id) {
+    if (document.getElementById("execution_work_sphand_material_detail") != null) {
+        var budget_material_id = budget_material_id;
+        var data_source = data_source;
+        var work_id = work_id;
+        var target_budget_id = $('#target_budget_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_handling_material_data_info/",
+                type: "POST",
+                data : {
+                    'target_budget_id': target_budget_id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'budget_material_id' : budget_material_id,
+                    'data_source' : data_source,
+                    'work_id' : work_id,
+                    'target_type' : 'work',
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#execution_work_sphand_material_detail').empty();
+                    $('#execution_work_sphand_material_detail').html(data);
+                    handling_material_list('work', work_id);//取扱物質一覧表示のためのJS起動(このhtml内にプログラム有)
+                    //material_state_change();//取扱物質一覧ソース選択変更時のJS起動(handling_material_edit.html内にプログラム有)
+                    //concentration_unit_change();//濃度単位選択の値を呼び出した値と同期するJS起動(handling_material_edit.html内にプログラム有)
+                    //pressure_unit_change();//圧力単位選択の値を呼び出した値と同期するJS起動(handling_material_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#execution_work_sphand_material_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//予算取扱物質一覧の表示処理
+function handling_material_list(target, work_id) {
+    if (document.getElementById("handling_material_lists") != null) {
+        var target_id = $('#target_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_handling_material_list/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'work_id' : work_id,
+                    'target_type' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    if (target == 'budget') {
+                        $('#handling_material_lists').empty();
+                        $('#handling_material_lists').html(data);
+                    } else {
+                        $('#work_handling_material_lists').empty();
+                        $('#work_handling_material_lists').html(data);
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if (target == 'budget') {
+                        $('#handling_material_lists').empty();
+                    } else {
+                        $('#work_handling_material_lists').empty();
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//予算要求機能詳細情報の表示処理
+function budget_required_function_info(a,b) {
+    // todo: 一旦、無効にする
+    return;
+
+    if (document.getElementById("execution_budget_function1_detail") != null) {
+        var budget_required_function_id = a;
+        var select_function = b;
+        var budget_id = $('#target_budget_id').val();
+        var work_id = $('#target_work_id').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+            $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_required_function_detail/",
+                type: "POST",
+                data : {
+                    'budget_required_function_id' : budget_required_function_id,
+                    'budget_id' : budget_id,
+                    'work_id' : work_id,
+                    'new_step' : new_step,
+                    'select_function' : select_function,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    //$('#function_edit').empty();･･･削除予定
+                    //$('#function_edit').html(data);･･･削除予定
+                    //if (document.getElementById("required_function_info") != null) {･･･削除予定
+                        //required_function_info(select_function);･･･削除予定
+                    //}･･･削除予定
+                    //div(id=execution_budget_function1_detail)があるかを確認
+                    if (document.getElementById("execution_budget_function1_detail") != null) {
+                        $('#execution_budget_function1_detail').empty();
+                        $('#execution_budget_function1_detail').html(data);
+                    }
+                    required_function_list();//要求機能一覧を表示するJSを起動(このhtml内にプログラム有)
+                    //div(id=required_function_id)のvalueに「budget_required_function_id」の値を代入
+                    $('#required_function_id').val(budget_required_function_id);
+                    //rf_pressure_unit_change();
+                    rf_material_capacity_unit_value_change();//物質量単位選択の値を呼び出した値と同期するJSを起動(required_function_edit.html内にプログラム有)
+                    rf_concentration_unit_change();//濃度単位選択の値を呼び出した値と同期するJSを起動(required_function_edit.html内にプログラム有)
+                    rf_pressure_unit_change();//圧力単位選択の値を呼び出した値と同期するJSを起動(required_function_edit.html内にプログラム有)
+                    rf_function_change();//機能選択の値を呼び出した値と同期するJSを起動(required_function_edit.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#function_edit').empty();
+                    $('#required_function_info').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//要求機能一覧の表示処理
+function required_function_list() {
+    if (document.getElementById("budget_function1_lists") != null) {
+        var target_id = $('#target_budget_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/required_function_list/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_function1_lists').empty();
+                    $('#budget_function1_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_function1_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//要求機能選択時の処理
+function required_function_choice() {
+    var choice_function = $('#required_function').val();
+    var choice_sub_no = $('#rf_sub_no').val();
+    //$('#work_function').val(choice_function);
+    //$('#work_function_sub_no').val(choice_sub_no);
+    $('#work_required_function').val(choice_function);
+    $('#required_function_sub_no').val(choice_sub_no);
+    //alert(choice_function);
+    //required_function_info(choice_function);
+}
+//選択された要求機能の表示処理(仕様詳細(規定)に表示する部分)
+function required_function_info(a) {
+    if (document.getElementById("required_function_info") != null) {
+        //var budget_required_function_id = a;
+        var budget_required_function_id = $('#required_function_id').val();
+        var select_function = a;
+        var budget_id = $('#target_budget_id').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        //alert(select_function);
+            $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_required_function_detail_info/",
+                type: "POST",
+                data : {
+                    'budget_required_function_id' : budget_required_function_id,
+                    'budget_id' : budget_id,
+                    'new_step' : new_step,
+                    'select_function' : select_function,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#required_function_info').empty();
+                    $('#required_function_info').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#function_edit').empty();
+                    $('#required_function_info').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//要求機能を選択したときの処理
+function selected_required_function_detail() {
+        var selected_required_function_id = $('#selected_required_function_id').val();
+        if ( selected_required_function_id != "" ){
+            budget_required_function_info(selected_required_function_id,'all');//予算要求機能詳細情報を表示するJSを起動(このhtml内にプログラム有)
+        }
+}
+//提出書類の表示処理
+function document_info() {
+    if (document.getElementById("work_required_document") != null) {
+        var this_step = $('#this_step').val();
+        //var work_id = a;
+        var work_id = $('#target_work_id').val();
+        var level5_step_id = $('#level5_step_id').val();
+        open_new_tab_flag = check_open_new_tab_flag();
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/document/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'this_step' : this_step,
+                    'level5_step_id' : level5_step_id,
+                    'div_id_name': 'work_required_document',
+                    'open_new_tab_flag' : open_new_tab_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_required_document').empty();
+                    $('#work_required_document').html(data);
+                    get_document_list(work_id);//提出書類一覧表示のためのJS起動(document_edit.html内にプログラム有)
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("add_button_div") != null){
+                        const p5 = document.getElementById("add_button_div");
+                        p5.style.display ="block";
+                    }
+                    if(document.getElementById("edit_button_div") != null){
+                        const p6 = document.getElementById("edit_button_div");
+                        p6.style.display ="none";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_required_document').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+function get_work_law_list(a) {
+        //var work_id = $('#target_work_id').val();
+        var work_id = a;
+        var select_pb_disp_flag = 0;
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_supplies/work_law_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step': document.getElementById('this_step').value,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_law_list').empty();
+                    $('#work_law_list').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_law_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+function get_work_supplies_list(a) {
+        //var work_id = $('#target_work_id').val();
+        var work_id = a;
+        var select_pb_disp_flag = 0;
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_supplies/work_supplies_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step': document.getElementById('this_step').value,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_supplies_list').empty();
+                    $('#work_supplies_list').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_supplies_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+//工事慣例法令･支給品の表示処理
+function work_law_supplies_info() {
+    if (document.getElementById("work_law_supplies") != null) {
+        var this_step = $('#this_step').val();
+        var level5_step_id = $('#level5_step_id').val();
+        //var work_id = a;･･･削除予定
+        var work_id = $('#target_work_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/work_law_supplies/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'this_step' : this_step,
+                    'level5_step_id' : level5_step_id,
+                    'div_id_name': 'work_law_supplies',
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_law_supplies').empty();
+                    $('#work_law_supplies').html(data);
+                    get_work_law_list(work_id);//工事関連法令一覧表示のためのJS起動(law_supplies_edit.html内にプログラム有)
+                    get_work_supplies_list(work_id);//工事支給品一覧表示のためのJS起動(law_supplies_edit.html内にプログラム有)
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("work_law_add_button_div") != null){
+                        const p1 = document.getElementById("work_law_add_button_div");
+                        p1.style.display ="block";
+                    }
+                    if(document.getElementById("work_law_edit_button_div") != null){
+                        const p2 = document.getElementById("work_law_edit_button_div");
+                        p2.style.display ="none";
+                    }
+                    if(document.getElementById("work_supplies_add_button_div") != null){
+                        const p3 = document.getElementById("work_supplies_add_button_div");
+                        p3.style.display ="block";
+                    }
+                    if(document.getElementById("work_supplies_edit_button_div") != null){
+                        const p4 = document.getElementById("work_supplies_edit_button_div");
+                        p4.style.display ="none";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_law_supplies').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+
+//工事方針概要詳細情報の表示処理
+function policy_overview_info() {
+    if (document.getElementById("construction_policy_overview") != null) {
+        var budget_id = $('#target_budget_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var this_step = $('#this_step').val();
+        var div_id_name = 'construction_policy_overview'
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/policy_overview_info/",
+                type: "POST",
+                data : {
+                    'budget_id': budget_id,
+                    'this_step' : this_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'div_id_name': div_id_name,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#construction_policy_overview').empty();
+                    $('#construction_policy_overview').html(data);
+                    required_spec_list();//要求仕様一覧表示のためのJS起動(このhtml内にプログラム有)
+                    construction_policy_overview_list(div_id_name);//工事方針概要一覧表示のためのJS起動(このhtml内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#construction_policy_overview').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//要求仕様一覧の表示処理
+function required_spec_list() {
+    if (document.getElementById("required_spec_lists") != null) {
+        var target_id = $('#target_budget_id').val();
+        var this_step = $('#this_step').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/required_spec_lists/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#required_spec_lists').empty();
+                    $('#required_spec_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#required_spec_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//工事方針概要一覧の表示処理
+function construction_policy_overview_list(div_id_name) {
+    if (document.getElementById(div_id_name + "_construction_policy_overview_lists") != null) {
+        var target_id = $('#target_budget_id').val();
+        var this_step = $('#this_step').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/policy_overview_lists/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#' + div_id_name + '_construction_policy_overview_lists').empty();
+                    $('#' + div_id_name + '_construction_policy_overview_lists').html(data);
+                    console.log('#' + div_id_name + '_construction_policy_overview_lists');
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#construction_policy_overview_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+// 工事絞込条件リセット
+function reset_work_filter() {
+    //セッション情報の削除
+    session_value_work_clear();
+    //工事フィルター再表示
+    execution_work_copy_source();
+}
+
+//本仕様書情報コピー用工事リスト表示処理
+function execution_work_copy_source() {
+    if (document.getElementById("work_copy") != null) {
+        var level5_step_id = $('#level5_step_id').val();
+        var user = $('#t_username').val();
+        var user_department_cd = $('#user_department_cd').val();
+
+        if (sessionStorage.getItem('sel_copy_prospecificationunit_next_division') == null) {
+            var next_division = "no_data";
+        }else{
+            var next_division = sessionStorage.getItem('sel_copy_prospecificationunit_next_division');
+        }
+
+        if (sessionStorage.getItem('sel_copy_prospecificationunit_next_department') == null) {
+            var next_department = "no_data";
+        }else{
+            var next_department = sessionStorage.getItem('sel_copy_prospecificationunit_next_department');
+        }
+
+        if (sessionStorage.getItem('sel_copy_prospecificationunit_next_parson') == null) {
+            var next_parson = "no_data";
+        }else{
+            var next_parson = sessionStorage.getItem('sel_copy_prospecificationunit_next_parson');
+        }
+
+
+        $.ajax({
+            url: "/isk_tools/fms/parts/execution/execution_work_copy_source/",
+            type: "POST",
+            data : {
+                    'level5_step_id' : level5_step_id,
+                    'user' : user,
+                    'user_department_cd' : user_department_cd,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_parson' : next_parson,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                    },
+            timeout: 1000000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+
+                $('#work_copy').empty();
+                $('#work_copy').html(data);
+                get_work_lists_search();
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#work_copy').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+    }
+}
+
+// 仕様停止を表示するためのJS
+function stop_work_info() {
+    if (document.getElementById("stop_work_info") != null || document.getElementById("stop_budget_info") != null) {
+        if (document.getElementById("stop_work_info") != null){
+            target_div_id_name = "proindividualcontractdoc";
+        }else{
+            target_div_id_name = "probudgetunit";
+        }
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var target_step_id = $('#target_step_id').val();  // 中止用のstep
+        var this_step = $('#this_step').val();  // 中止前の元のstep
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var div_id_name = target_div_id_name;
+        var present_operator = $('#present_operator').val();
+        var copy_check  = $('#copy_check').val();
+        var current_tab = $('.pagetitle')[$('.present').index()].children[0].id;
+        $.ajax({
+                url: "/isk_tools/fms/parts/irregular/stop_work_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'construction_id' : target_work_id,
+                    'this_step' : this_step,
+                    'target_step_id' : target_step_id,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    //'target_div_id_name': target_div_id_name,
+                    'div_id_name': div_id_name,
+                    'present_operator': present_operator,
+                    'copy_check' : copy_check,
+                    'current_tab': current_tab,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    if(target_div_id_name == "proindividualcontractdoc"){
+                        $('#stop_work_info').empty();
+                        $('#stop_work_info').html(data);
+                    }else{
+                        $('#stop_budget_info').empty();
+                        $('#stop_budget_info').html(data);
+                    }
+                    var this_page = $('#stop_work_cause_page').val();
+                    action_button_display(this_page);//操作ボタン表示のためのJS起動
+                    if(document.getElementById('stop_work_cause_name') != null){
+                        stop_work_cause_name_value_change()
+                    }
+                    if((this_step.substr(0, 3) == '212' || (this_step > 213004000 && this_step < 213009000)) && $('#start_work_stop_flag').val() != null){
+                        $('#start_work_stop_flag').val(2);
+                    }
+                    console.log('stop_work_info')
+                    upload_file_list(div_id_name);
+                    log_list(9); //ログ表示(工事単位デフォルト)のためのJS起動(このhtml内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if(target_div_id_name == "proindividualcontractdoc"){
+                        $('#stop_work_info').empty();
+                    }else{
+                        $('#stop_budget_info').empty();
+                    }
+                    //$('#stop_work_info').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+
+//関連法令一覧を表示するためのJS
+function cs_related_laws_lists_info() {
+    if (document.getElementById("cs_related_laws_lists") != null) {
+        var target_unique_id = 0;
+        var budget_id = $('#target_budget_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var this_step = $('#this_step').val();
+        var new_step = Number(level5_step_id) + 1;
+        $.ajax({
+                url: "/isk_tools/fms/parts/check_sheet/cs_detail/cs_related_laws_list_info/",
+                type: "POST",
+                data : {
+                    'target_unique_id': target_unique_id,
+                    'budget_id': budget_id,
+                    //'work_id': work_id,
+                    'this_step' : this_step,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#cs_related_laws_lists').empty();
+                    $('#cs_related_laws_lists').html(data);
+
+                    if (document.getElementById("work_common_detail") == null) {//工事詳細情報を表示するためのdivがないか判定
+                        log_list(4);//ログ表示(予算単位デフォルト)のためのJS起動(このhtml内にプログラム有)
+                    }
+
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    //$('#cs_detail').empty();
+                    $('#cs_related_laws_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//表示するタブを切り替える処理
+function tub_change(a) {
+    var i = a;
+    tab.init(i);
+}
+
+//予算関連情報を表示するためのJS
+function budget_information() {
+    if (document.getElementById("budget_information") != null) {
+        var target_budget_id = $('#target_budget_id').val();
+        var this_step = $('#this_step').val();
+        var div_id_name = "budget_information";
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/budget_information/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'div_id_name': div_id_name,
+                    'this_step': this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_information').empty();
+                    $('#budget_information').html(data);
+
+                    var this_page = $('#budget_information_page').val();
+                    // 予算繰越の予算一覧画面ではアクションボタンを表示しない
+                    if(this_page!='' && this_step != 213009000){
+                        action_button_display(this_page);
+                    }
+
+                    if(this_step == 213002021 || this_step == 213003001){
+                        //添付ファイル対応
+                        upload_file_list(div_id_name);
+                    }
+
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_information').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//見積関係の表示処理･･･引数aは不要かも
+function estimate_info(a, estimate_id) {
+    if (document.getElementById("work_estimate_detail") != null) {
+        var this_step = $('#this_step').val();
+        var work_id = $('#target_work_id').val();
+        var target = $('#target').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var target_work_id = $('#target_work_id').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var div_id_name = "estimate";
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/estimate/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'this_step' : this_step,
+                    'target': target,
+                    'target_budget_id': target_budget_id,
+                    'target_work_id': target_work_id,
+                    'level5_step_id': level5_step_id,
+                    'div_id_name': div_id_name,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_estimate_detail').empty();
+                    $('#work_estimate_detail').html(data);
+                    console.log('estimate_info')
+
+                    //実行側で計画側の見積資料を表示するため、targetを特殊指定
+                    upload_file_list(div_id_name,"work");
+
+                    //if(data.estimate_list_num > 0){  // 2021-1-21 natsume この構文は無効
+                    if($('#estimate_list_num').val() > 0){
+                        //get_discount_list();
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_estimate_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+
+//予算繰越情報を表示するためのJS
+function budget_carry_forward_info() {
+    if (document.getElementById("budget_carry_forward") != null) {
+        var target_budget_id = $('#target_budget_id').val();
+        var target_carry_forward_id = $('#target_unique_carry_forward_id').val();
+        var this_step = $('#this_step').val();
+        var div_id_name = "budget_carry_forward";
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/budget_carry_forward_info/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'target_carry_forward_id' : target_carry_forward_id,
+                    'div_id_name': div_id_name,
+                    'this_step': this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_carry_forward').empty();
+                    $('#budget_carry_forward').html(data);
+
+                    var this_page = $('#budget_carry_forward_page').val();
+                    if(this_page!=''){
+                        action_button_display(this_page);
+                        log_list(9);//ログ表示(予算に関するすべて)のためのJS起動(このhtml内にプログラム有)
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_carry_forward').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }else if (document.getElementById("budget_carry_forward_register") != null) {
+        var target_budget_id = $('#target_budget_id').val();
+        var this_step = $('#this_step').val();
+        var div_id_name = "budget_carry_forward_register";
+        var target_carry_forward_id = $('#target_unique_carry_forward_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/budget_carry_forward_register/",
+                type: "POST",
+                data : {
+                    'budget_id' : target_budget_id,
+                    'target_carry_forward_id' : target_carry_forward_id,
+                    'div_id_name': div_id_name,
+                    'this_step': this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_carry_forward_register').empty();
+                    $('#budget_carry_forward_register').html(data);
+
+                    var this_page = $('#budget_carry_forward_register_page').val();
+                    if(this_page!=''){
+                        action_button_display(this_page);
+                        log_list(9);//ログ表示(予算に関するすべて)のためのJS起動(このhtml内にプログラム有)
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_carry_forward_register').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+
+function check_open_new_tab_flag(){
+    if (history.length == 1){
+        var open_new_tab_flag = 1
+    }else{
+        var open_new_tab_flag = 0
+    }
+    return open_new_tab_flag
+}
+
+//工事一覧の表示処理
+function estimate_work_lists_display(target_estimate_id, new_price) {
+    if (document.getElementById("budget_work_lists") != null) {
+        var target_budget_unique_id = $('#target_budget_unique_id').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/estimate_work_lists_display/",
+                type: "POST",
+                data : {
+                    'target_budget_unique_id': target_budget_unique_id,
+                    'target_budget_id': target_budget_id,
+                    'new_step' : new_step,
+                    'this_step': this_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'target' : 'target',
+                    'target_estimate_id': target_estimate_id,
+                    'new_price': new_price,
+                    'div_id_name' : 'budget_work_lists',
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_work_lists').empty();
+                    $('#budget_work_lists').html(data);
+                    add_comma_value_at_open();  // 画面表示時に金額欄にカンマ追加
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_work_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+
+//画面表示時の処理
+window.onload = function() {
+        budget_detail_info();//予算詳細情報を表示するJSを起動(このhtml内にプログラム有)
+        budget_detail_info2();//調達予算情報テーブル情報を表示するJSを起動(このhtml内にプログラム有)
+        budget_spec_handling_material_info(0,'d','');//予算取扱物質詳細情報を表示するJSを起動(このhtml内にプログラム有)
+        //work_spec_handling_material_info(0,'d',$('#target_work_id').val());//工事取扱物質詳細情報を表示するJSを起動(このhtml内にプログラム有)
+        budget_required_function_info(0,'すべて');//予算要求機能詳細情報を表示するJSを起動(このhtml内にプログラム有)
+        work_detail_info();//工事詳細情報を表示するJSを起動(このhtml内にプログラム有)
+
+        proestimates_detail_info();//見積情報を表示するJSを起動(このhtml内にプログラム有)
+        provendorevaluation_detail_info();//業者評価を表示するJSを起動(このhtml内にプログラム有)
+        proindividualcontractdoc_detail_info();//個別契約書類を表示するJSを起動(このhtml内にプログラム有)
+        proinspectionresults_detail_info();//検査(立合)を表示するJSを起動(このhtml内にプログラム有)
+        prodelivery_detail_info();//納入詳細情報を表示するJSを起動(このhtml内にプログラム有)
+        proinspection_acceptance_detail_info();//検査(受入)を表示するJSを起動(このhtml内にプログラム有)
+        proconstructionprep_detail_info();//工事準備を表示するJSを起動(このhtml内にプログラム有)
+        proconstructionqualityresults_detail_info();//工事実行を表示するJSを起動(このhtml内にプログラム有)
+
+        budget_information();//予算関連情報を表示するJSを起動(このhtml内にプログラム有)
+        cs_related_laws_lists_info();//関連法令一覧を表示するためのJS(このhtml内にプログラム有)
+
+        document_info();//提出書類を表示するJSを起動(このhtml内にプログラム有)･･･2020/12/28 ueda追加
+        work_law_supplies_info();//工事慣例法令･支給品を表示するJSを起動(このhtml内にプログラム有)
+        execution_work_copy_source();
+
+        stop_work_info()
+
+        estimate_info(0, 0);//見積関係を表示するJSを起動(このhtml内にプログラム有)
+        policy_overview_info();//工事方針概要のページ内容を表示させるためのJS起動(このhtml内にプログラム有)
+        budget_carry_forward_info();//予算繰越情報を表示するJSを起動
+        estimate_work_lists_display(0, 0);// 予算見積用工事一覧を表示
+};
+</script>
+<style type="text/css">
+textarea {
+    font-size: 110%;
+}
+.page-header2 {
+    font-size: 150%;
+}
+</style>
+    <div style="width: auto;">
+        <div style="float:left">
+            <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+                <h2 class="page-header2">{{ step_name }}</h2>
+            </div>
+        </div>
+        <div style="float:right;">
+            {% if level5_step_id != 920000000 %}
+                <input TYPE=button VALUE=前の画面に戻る NAME=disp_return size=3 style="width:120px"
+                       onclick="level5_toppage({{ level5_step_id }});"/>
+            {% endif %}
+        </div>
+    </div>
+    <div style="clear: both;" ></div>
+    <div style="width: auto;">
+        <input type="hidden" id="target_unique_id" value="{{ target_id }}" >
+        <input type="hidden" id="target_budget_id" value="{{ target_budget_id }}" >
+<!--        <input type="hidden" id="target_budget_rev_no" value="{{ budget_rev_no }}" >-->
+        <input type="hidden" id="target_step_id" value="{{ target_step_id }}" >
+        <input TYPE="hidden" id="t_username" VALUE="{{t_username}}">
+        <input TYPE="hidden" id="user_division_cd" VALUE="{{user_division_cd}}" NAME=user_division_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="user_department_cd" VALUE="{{user_department_cd}}" NAME=user_department_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="user_authority" VALUE="{{user_authority}}" NAME=user_authority size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="confirm_user" VALUE="{{confirm_user}}" NAME=confirm_user size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="permit_user" VALUE="{{permit_user}}" NAME=permit_user size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="level5_step_id" VALUE="{{level5_step_id}}" NAME=level5_step_id size=3 style="width:150px; height:20px"/>
+        <input type="hidden" id="next_division" value="{{ next_division }}">
+        <input type="hidden" id="next_department" value="{{ next_department }}">
+        <input type="hidden" id="this_step" value="{{ this_step }}">
+        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+        <input type="hidden" id="last_operator" value="{{ last_operator }}">
+        <input type="hidden" id="this_department" value="{{ this_department }}">
+        <input type="hidden" id="this_division" value="{{ this_division }}">
+        <input type="hidden" id="last_operator_department" value="{{ last_operator_department }}">
+        <input type="hidden" id="last_operator_division" value="{{ last_operator_division }}">
+        <input type="hidden" id="target" value="{{ target }}">
+        {% if target == 'budget_carry_forward' %}
+        <input type="hidden" id="target_id" value="{{ target_unique_carry_forward_id }}" >
+        {% else %}
+        <input type="hidden" id="target_id" value="{{ target_budget_id }}" >
+        {% endif %}
+        <input type="hidden" id="function_amount" value="{{ function_amount }}">
+        <input type="hidden" id="target_unique_work_id" value="{{ target_unique_work_id }}" >
+        <input type="hidden" id="target_budget_unique_id" value="{{ target_unique_budget_id }}" >
+        <input type="hidden" id="target_unique_carry_forward_id" value="{{ target_unique_carry_forward_id }}" >
+        <input type="hidden" id="tab_num" value="{{ tab_num }}">
+        <input type="hidden" id="default_tab" value="{{ default_tab }}">
+        <input type="hidden" id="action_sub" value="{{ action_sub }}">
+        <input type="hidden" id="target_work_id" value="{{ target_work_id }}" >
+        <input type="hidden" id="target_work_rev_no" value="{{ target_work_rev_no }}" >
+        <input type="hidden" id="selected_required_function_id" value="{{ selected_required_function_id }}" >
+        <input type="hidden" id="select_tab" value="{{ select_tab }}" >
+        <input type="hidden" id="ref_flg" value="0">
+        <input type="hidden" id="org_unique_budget_id" value="{{ org_unique_budget_id }}" >
+        <input type="hidden" id="present_operator" value="{{ present_operator }}" >
+        <input type="hidden" id="copy_check" value="{{ copy_check }}" >
+        <input type="hidden" id="start_work_stop_flag" value="{{ start_work_stop_flag }}" >
+
+        <!-- 提出書類用 -->
+        <input type="hidden" id="work_id" value="{{ target_work_id }}">
+        <input type="hidden" id="work_rev_no" value="{{ target_work_rev_no }}" >
+    </div>
+    <div class='clear'></div>
+    <ul id="tab" style="width: auto;">
+        {% for page_item in page_lists %}
+            <li><a href="#">{{ page_item.item_name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    {% for page_item in page_lists %}
+        <div id="page{{ page_item.page }}" class="pagetitle">
+            <div id="{{ page_item.div_id_name }}" style="width: auto"></div>
+        </div>
+    {% endfor %}
+
+<script type="text/javascript">
+    var tab_num = $('#tab_num').val();
+    var default_tab = $('#default_tab').val();
+    tab.setup = {
+        tabs: document.getElementById('tab').getElementsByTagName('li'),
+            pages: [
+    {% for page_item in page_lists %}
+                    document.getElementById('page{{ page_item.page }}'),
+    {% endfor %}
+            ]
+    }
+    tab.init(default_tab);
+</script>
+
+{% endblock %}

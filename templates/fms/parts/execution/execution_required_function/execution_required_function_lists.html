@@ -1,0 +1,204 @@
+<script>
+//選択した要求機能の表示処理
+function required_function_detail(a) {
+        var budget_required_function_id = a;
+        budget_required_function_info(budget_required_function_id,'all');//予算要求機能詳細情報を表示するJSを起動(detail_template.html内にプログラム有)
+}
+// ここから下は変更前のJS･･･削除予定
+/*
+function old_required_function_detail(a) {
+        var budget_required_function_id = a;
+        var budget_id = $('#budget_id').val();
+                $.ajax({
+                url: "/isk_tools/fms/parts/required_function_detail/",
+                type: "POST",
+                data : {
+                    'budget_required_function_id' : budget_required_function_id,
+                    'budget_id' : budget_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#function_edit').empty();
+                    $('#function_edit').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#function_edit').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+*/
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.select_pb{
+    width:40px;
+    text-align: center;
+}
+.required_function{
+    width:100px;
+}
+.sub_no{
+    width:40px;
+}
+.material{
+    width:120px;
+}
+.required_material_capacity{
+    width:100px;
+}
+.required_cooling_temperature{
+    width:40px;
+}
+.required_heating_temperature{
+    width:40px;
+}
+.temperature{
+    width:40px;
+}
+.required_compress_pressure{
+    width:60px;
+}
+.required_vacuum_pressure{
+    width:60px;
+}
+.pressure{
+    width:60px;
+}
+.pressure_unit{
+    width:60px;
+}
+.required_moisture{
+    width:80px;
+}
+.required_moisture{
+    width:80px;
+}
+.required_concentration{
+    width:80px;
+}
+
+.required_particle_size{
+    width:50px;
+}
+.required_transfer_length{
+    width:40px;
+}
+.required_others{
+    width:280px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+                <input type="hidden" value="{{ handling_material_lists_num }}">
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="select_pb" ></th>
+                        <th class="required_function" >要求機能</th>
+                        <th class="sub_no" >サブNo</th>
+                        <th class="material" >取扱物質</th>
+                        <th class="required_material_capacity">要求量</th>
+                        <th class="required_cooling_temperature" >要求冷却温度(℃)</th>
+                        <th class="required_heating_temperature" >要求加熱温度(℃)</th>
+                        <th class="temperature" >温度(℃)</th>
+                        <th class="required_compress_pressure" >要求圧縮圧</th>
+                        <th class="required_vacuum_pressure" >要求減圧</th>
+                        <th class="pressure" >圧力</th>
+                        <th class="pressure_unit" >圧力単位</th>
+                        <th class="required_moisture" >要求水分(wt%)</th>
+                        <th class="required_concentration" >要求濃度</th>
+                        <th class="required_particle_size" >要求粒径(μm)</th>
+                        <th class="required_transfer_length" >要求輸送距離(m)</th>
+                        <th class="required_others" >その他要求</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% if required_function_lists_num > 0 %}
+                {% for required_function_lists in required_function_lists %}
+                    <tr>
+                        <td class="select_pb">
+                            <a href="#" id="{{ required_function_lists.id }}" class="select_pb" onclick="required_function_detail(id,{{ required_function_lists.function_cd }});">選択</a>
+                        </td>
+                        <td class="required_function">{{ required_function_lists.required_function }}</td>
+                        <td class="sub_no">{{ required_function_lists.sub_no }}</td>
+                        <td class="material">{{ required_function_lists.material }}</td>
+                        <td class="required_material_capacity">
+                            {% if required_function_lists.required_material_capacity is　not None %}
+                                {{ required_function_lists.required_material_capacity }} {{ required_function_lists.material_capacity_unit }}
+                            {% endif %}
+                        </td>
+                        <td class="required_cooling_temperature">
+                            {% if required_function_lists.required_cooling_temperature is not None %}
+                                {{ required_function_lists.required_cooling_temperature }}
+                            {% endif %}
+                        </td>
+                        <td class="required_heating_temperature">
+                            {% if required_function_lists.required_heating_temperature is not None %}
+                                {{ required_function_lists.required_heating_temperature }}
+                            {% endif %}
+                        </td>
+                        <td class="temperature">
+                            {% if required_function_lists.temperature is not None %}
+                                {{ required_function_lists.temperature }}
+                            {% endif %}
+                        </td>
+                        <td class="required_compress_pressure">
+                            {% if required_function_lists.required_compress_pressure is not None %}
+                                {{ required_function_lists.required_compress_pressure }}
+                            {% endif %}
+                        </td>
+                        <td class="required_vacuum_pressure">
+                            {% if required_function_lists.required_vacuum_pressure is not None %}
+                                {{ required_function_lists.required_vacuum_pressure }}
+                            {% endif %}
+                        </td>
+                        <td class="pressure">
+                            {% if required_function_lists.pressure is not None %}
+                                {{ required_function_lists.pressure }}
+                            {% endif %}
+                        </td>
+                        <td class="pressure_unit">
+                            {% if required_function_lists.pressure_unit is not None %}
+                                {{ required_function_lists.pressure_unit }}
+                            {% endif %}
+                        </td>
+                        <td class="required_moisture">
+                            {% if required_function_lists.required_moisture is not None %}
+                                {{ required_function_lists.required_moisture }}
+                            {% endif %}
+                        </td>
+                        <td class="required_concentration">
+                            {% if required_function_lists.required_concentration is not None %}
+                                {{ required_function_lists.required_concentration }} {{ required_function_lists.concentration_unit }}
+                            {% endif %}
+                        </td>
+                        <td class="required_particle_size">
+                            {% if required_function_lists.required_particle_size is not None %}
+                                {{ required_function_lists.required_particle_size }}
+                            {% endif %}
+                        </td>
+                        <td class="required_transfer_length">
+                            {% if required_function_lists.required_transfer_length is not None %}
+                                {{ required_function_lists.required_transfer_length }}
+                            {% endif %}
+                        </td>
+                        <td class="required_others">{{ required_function_lists.required_others }}</td>
+                    </tr>
+                {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>

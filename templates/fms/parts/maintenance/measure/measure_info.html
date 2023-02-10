@@ -1,0 +1,129 @@
+<script>
+//入力任意ページの場合、入力チェックが必要かの判定
+function measure_check_need_flg() {
+    return  0;
+}
+
+//画面表示時処理
+function measure_display_open() {
+    var file_folder = $('#measure_file_folder').val();
+    var div_id_name = $('#measure_div_id_name').val();
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag_measure').val();
+    var file_class = $('#measure_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+}
+
+</script>
+<style type="text/css">
+div.scroll_notification_check_info_div {
+  width: 1880px;
+  height: 780px;
+  overflow: scroll;
+}
+</style>
+    <div>
+    </div>
+    <div id="measure_measure_action_button" style="width: auto;"></div>
+<div class="scroll_notification_check_info_div">
+    <div style="float:left;">
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事/依頼内容</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4"><textarea name="order_detail" rows="9" cols="45" readonly>{{ measure_data.measure_order_detail | default_if_none:'' }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">案件区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ item_class_name | default_if_none:'' }}</font>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">故障/作業種別</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ measure_data.malfunction_class | default_if_none:'' }}</font>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">希望納期</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ measure_data.desired_delivery_date_start | default_if_none:'' }} ～ {{ measure_data.desired_delivery_date_end | default_if_none:'' }}</font>
+                </div></td>
+            </tr>
+        </table>
+        <div id="order_function">
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">原課担当部署</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ measure_data.work_order_charge_department.department_name | default_if_none:'' }}</font>
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">原課担当者</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ measure_data.work_order_department_charge_person.last_name | default_if_none:'' }}　{{ measure_data.work_order_department_charge_person.first_name | default_if_none:'' }}</font>
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">原価センター</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ cost_center_data.原価センタ | default_if_none:'' }}：{{ cost_center_data.原価センタテキスト | default_if_none:'' }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">指図書ＮＯ</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ instruction_no_data.指図書コード | default_if_none:'' }}：{{ instruction_no_data.テキスト短 | default_if_none:'' }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">勘定コード</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ account_cd_data.勘定コード | default_if_none:'' }}：{{ account_cd_data.テキスト短 | default_if_none:'' }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">整備診断区分</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ diagnosis_class_str | default_if_none:'' }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">想定依頼業者</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ desired_vendor | default_if_none:'' }}</font></div></td>
+                </tr>
+
+            </table>
+            <div style="border: 1px solid #000000;">
+                <div><font size="4">緊急工事項目</font></div>
+                <table>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">依頼状況</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{{ maintenance_status_str | default_if_none:'' }}</font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">対応依頼日</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{{ measure_data.response_request_date | default_if_none:'' }}</font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">依頼受付者</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="5">{{ measure_data.orders_received_person | default_if_none:'' }}</font></div></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+        <div>
+            <input type="hidden" id="delete_pb_disp_flag_measure" value="0">
+            <input type="hidden" id="measure_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_id }}\">
+            <input type="hidden" id="measure_div_id_name" name="div_id_name" value="measure">
+            <input type="hidden" id="measure_file_class" name="file_class" value="CorrespondencePolicyDecision">
+
+            <div id="upload_file_list_measure">添付ファイル無し</div>
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+</div>

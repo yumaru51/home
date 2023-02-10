@@ -1,0 +1,114 @@
+<script>
+
+function program_entry(a) {
+    var program_id = a;
+    var program_name = $('#program_name').val();
+    var description = $('#description').val();
+    var source_file_folder_path = $('#source_file_folder_path').val();
+    var source_file = $('#source_file').val();
+    var post_to_file_path = $('#post_to_file_path').val();
+    var post_to_file = $('#post_to_file').val();
+        $.ajax({
+                url: "/isk_tools/cpexcel/action/program_entry/",
+                type: "POST",
+                data : {
+                    'program_id': program_id,
+                    'program_name': program_name,
+                    'description': description,
+                    'source_file_folder_path': source_file_folder_path,
+                    'source_file': source_file,
+                    'post_to_file_path': post_to_file_path,
+                    'post_to_file': post_to_file,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#program_entry_page').empty();
+                    $('#program_entry_page').html(data);
+                    if (program_id == 0){
+                        alert("登録しました！！");
+                        var this_program_id = $('#program_entry_program_id').val();
+                        task_list_refresh(this_program_id)
+                    }else{
+                        alert("更新しました！！");
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    $('#program_entry_page').empty();
+                });
+}
+function get_source_file() {
+    //var old_file_name_full_path = $('#old_file').val();
+    var source_file_name = $('#select_source_file').prop('files')[0].name;
+    $('#source_file').val(source_file_name);
+}
+function get_post_to_file() {
+    //var new_file_name_full_path = $('#new_file').val();
+    var post_to_file_name = $('#select_post_to_file').prop('files')[0].name;
+    $('#post_to_file').val(post_to_file_name);
+}
+function task_import_file_download() {
+    //var resultJson = JSON.stringify($scope.jsonObj);
+    var program_id = $('#program_entry_program_id').val();
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = "task_import_file.xlsx";
+    //downLoadLink.href = URL.createObjectURL(new Blob([resultJson], {type: "text.plain"}));
+    downLoadLink.href = "/isk_tools/cpexcel/action/task_import_file_download?program_id=" + program_id ;
+    downLoadLink.dataset.downloadurl = ["text/plain", downLoadLink.download, downLoadLink.href].join(":");
+    downLoadLink.click();
+}
+function task_import_file_upload(){
+    // フォームデータを取得
+    var formdata = new FormData($('#task_import_file_upload_form').get(0));
+
+    // POSTでアップロード
+        $.ajax({
+                url  : "/isk_tools/cpexcel/action/task_import_file_upload/",
+                type : "POST",
+                data : formdata,
+                cache       : false,
+                contentType : false,
+                processData : false,
+                dataType    : "json"
+                })
+                .done(function(data){
+                    alert(data.msg);
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+
+     <div>
+         <input type="button" value="{{ label }}" onclick="program_entry({{ program_id }});">
+         <input type="hidden" id="program_entry_program_id" value="{{ program_id }}" >
+     </div>
+
+    <div>
+        <div>　プログラムID　　　　　　　　　：　{{ program_id_str }}</div>
+        <div>　プログラム名　　　　　　　　　：　<input type="text" id="program_name" value="{{ program_name }}" style="width:430px;"></div>
+        <div>　説明　　　　　　　　　　　　　：　<textarea id="description" name="description" rows="6" cols="59">{{ description }}</textarea></div>
+        <div>　コピー元ファイル保存フォルダ　：　<input type="text" id="source_file_folder_path" value="{{ source_file_folder_path }}" style="width:430px;" readonly></div>
+        <div>　コピー元ファイル名　　　　　　：　<input type="text" id="source_file" value="{{ source_file }}" style="width:430px;"></div>
+        <div>　コピー先ファイル保存フォルダ　：　<input type="text" id="post_to_file_path" value="{{ post_to_file_path }}" style="width:430px;" readonly></div>
+        <div>　コピー先ファイル名　　　　　　：　<input type="text" id="post_to_file" value="{{ post_to_file }}" style="width:430px;"></div>
+        <div>　コピー元ファイル選択　　　　　：　<input id="select_source_file" type="file" onchange="get_source_file();" /></div>
+        <div>　コピー先ファイル選択　　　　　：　<input id="select_post_to_file" type="file" onchange="get_post_to_file();" /></div>
+        <br>
+        <div>　タスクインポートファイル　　　：　<input type="button" value="エクスポート" onclick="task_import_file_download();" ></div>
+        <div>
+            <form id="task_import_file_upload_form" name="task_import_file_upload_form" action="/rpa_for_excel/action/task_import_file_upload_form/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    　タスクインポートファイル　　　：　<input type="file" name="file" >
+                    <input type="button" value="インポート" onclick="task_import_file_upload();">
+                </div>
+            </form>
+        </div>
+
+    </div>

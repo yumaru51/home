@@ -1,0 +1,506 @@
+<script>
+function work_action_button_empty() {
+    $('#work_work_common_detail_action_button').empty();
+}
+function get_work_law_list(a) {
+        //var work_id = $('#target_work_id').val();
+        var work_id = a;
+        var select_pb_disp_flag = 0;
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_supplies/work_law_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step': document.getElementById('this_step').value,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_law_list').empty();
+                    $('#work_law_list').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_law_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+function get_work_supplies_list(a) {
+        //var work_id = $('#target_work_id').val();
+        var work_id = a;
+        var select_pb_disp_flag = 0;
+            $.ajax({
+                url: "/isk_tools/fms/parts/law_supplies/work_supplies_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step': document.getElementById('this_step').value,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_supplies_list').empty();
+                    $('#work_supplies_list').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_supplies_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+</script>
+<style type="text/css">
+div.scroll_work_info_div {
+  width: 1880px;
+  height: 780px;
+  overflow: scroll;
+}
+</style>
+
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">{{ work_step_name }}</h2>
+    </div>
+    <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">
+    <input type="hidden" id="this_work_id" value="{{ work_data.work_id }}">
+    <input type="hidden" id="this_work_rev_no" value="{{ work_data.work_rev_no }}">
+    <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+    <input type="hidden" id="last_operator" value="{{ last_operator }}">
+    <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">
+    <input type="hidden" id="action" value="{{ action }}">
+    <input type="hidden" id="action_sub" value="{{ action_sub }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="work_rev_no" value="{{ work_data.work_rev_no }}">
+    <input type="hidden" id="work_id" value="{{ work_data.work_id }}">
+
+    <div id="work_work_common_detail_action_button" style="width: auto;"></div>
+
+
+        <font size="5">
+            <div>工事情報</div>
+        </font>
+    <div class="scroll_work_info_div">
+        <div style="float:left;width:auto;">
+            <table cellpadding="10" cellspacing="10">
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">工事ＩＤ</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ work_data.work_id }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">RevNO</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ work_data.work_rev_no }}</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">工事名</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ work_data.work_name }}</font>
+                        {% elif work_data.work_name == old_work_data.work_name %}
+                            <font size="5" color="black">{{ work_data.work_name }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_data.work_name }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">要求機能</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ work_data.work_required_function  | default_if_none:''}}</font>
+                        {% elif work_data.work_required_function == old_work_data.work_required_function %}
+                            <font size="5" color="black">{{ work_data.work_required_function  | default_if_none:''}}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_data.work_required_function  | default_if_none:''}}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">サブNO</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ work_data.sub_no | default_if_none:'' }}</font>
+                        {% elif work_data.sub_no == old_work_data.sub_no %}
+                            <font size="5" color="black">{{ work_data.sub_no | default_if_none:'' }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_data.sub_no | default_if_none:'' }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">物品/工事区分</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ work_class_name }}</font>
+                        {% elif work_data.work_class == old_work_data.work_class %}
+                            <font size="5" color="black">{{ work_class_name }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_class_name }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_budget_data_num == 0 %}
+                            <font size="5" color="black">{{ management_class_name }}</font>
+                        {% elif old_budget_data_num.management_class_cd == old_budget_data_num.management_class_cd %}
+                            <font size="5" color="black">{{ management_class_name }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ management_class_name }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">計画担当者</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ work_planning_charge_person_name }}</font>
+                        {% elif work_data.work_planning_charge_person == old_work_data.work_planning_charge_person %}
+                            <font size="5" color="black">{{ work_planning_charge_person_name }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_planning_charge_person_name }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">実行担当者</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ work_execution_charge_person_name | default_if_none:''  }}</font>
+                        {% elif work_data.work_execution_charge_person == old_work_data.work_execution_charge_person %}
+                            <font size="5" color="black">{{ work_execution_charge_person_name | default_if_none:''  }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_execution_charge_person_name | default_if_none:''  }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">原課担当者</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ work_order_department_charge_person_name }}</font>
+                        {% elif work_data.work_order_department_charge_person == old_work_data.work_order_department_charge_person %}
+                            <font size="5" color="black">{{ work_order_department_charge_person_name }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_order_department_charge_person_name }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">着工</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ start_date }}</font>
+                        {% elif work_data.start_date == old_work_data.start_date %}
+                            <font size="5" color="black">{{ start_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ start_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">完工</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ end_date }}</font>
+                        {% elif work_data.end_date == old_work_data.end_date %}
+                            <font size="5" color="black">{{ end_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ end_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">希望納期日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ delivery_date }}</font>
+                        {% elif work_data.delivery_date == old_work_data.delivery_date %}
+                            <font size="5" color="black">{{ delivery_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ delivery_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">見積提出希望日</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="5" color="black">{{ estimate_date }}</font>-->
+<!--                        {% elif work_data.estimate_date == old_work_data.estimate_date %}-->
+<!--                            <font size="5" color="black">{{ estimate_date }}</font>-->
+<!--                        {% else %}-->
+<!--                            <font size="5" color="red">{{ estimate_date }}</font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">見積提出期日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ estimate_limited_date }}</font>
+                        {% elif work_data.estimate_limited_date == old_work_data.estimate_limited_date %}
+                            <font size="5" color="black">{{ estimate_limited_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ estimate_limited_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                {% if is_mplan_flag %}
+                {% else %}
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">本仕様書作成期日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ make_limited_date }}</font>
+                        {% elif work_data.make_limited_date == old_work_data.make_limited_date %}
+                            <font size="5" color="black">{{ make_limited_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ make_limited_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">発注期日</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ order_limited_date }}</font>
+                        {% elif work_data.order_limited_date == old_work_data.order_limited_date %}
+                            <font size="5" color="black">{{ order_limited_date }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ order_limited_date }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+	            <tr>
+	                <td><div style="padding: 5px 0px;"><font size="4">定型/非定型</font></div></td>
+	                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+	                <td><div style="padding: 5px 0px;">
+	                    {% if old_work_data_num == 0 %}
+	                        <font size="5" color="black">{{ work_data.fixed_form | default_if_none:'' }}</font>
+	                    {% elif work_data.fixed_form == old_work_data.fixed_form %}
+	                        <font size="5" color="black">{{ work_data.fixed_form | default_if_none:'' }}</font>
+	                    {% else %}
+	                        <font size="5" color="red">{{ work_data.fixed_form | default_if_none:'' }}</font>
+	                    {% endif %}
+	                </div></td>
+	            </tr>
+            </table>
+        </div>
+        <div style="float:left;width:10px;" >　</div>
+        <div style="float:left;" >
+            <table>
+<!--                課題/要望No.354対応のため非表示 今後復活の可能性は0ではない-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">見積範囲</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="5" color="black">{{ estimate_range }}</font>-->
+<!--                        {% elif work_data.estimate_range == old_work_data.estimate_range %}-->
+<!--                            <font size="5" color="black">{{ estimate_range }}</font>-->
+<!--                        {% else %}-->
+<!--                            <font size="5" color="red">{{ estimate_range }}</font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">取扱い物質</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="5" color="black">{{ handling_material.name }}</font>-->
+<!--                        {% elif work_data.handling_material.cd == old_work_data.handling_material.cd %}-->
+<!--                            <font size="5" color="black">{{ handling_material.name }}</font>-->
+<!--                        {% else %}-->
+<!--                            <font size="5" color="red">{{ handling_material.name }}</font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">秘密保持条件</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="4" color="black"><textarea name="confidentiality" rows="10" cols="100" style="color:black;" readonly>{{ confidentiality }}</textarea></font>-->
+<!--                        {% elif work_data.confidentiality == old_work_data.confidentiality %}-->
+<!--                            <font size="4" color="black"><textarea name="confidentiality" rows="10" cols="100" style="color:black;" readonly>{{ confidentiality }}</textarea></font>-->
+<!--                        {% else %}-->
+<!--                            <font size="4" color="black"><textarea name="confidentiality" rows="10" cols="100" style="color:red;" readonly>{{ confidentiality }}</textarea></font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">瑕疵担保責任</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="4" color="black"><textarea name="warranty" rows="10" cols="100" style="color:black;" readonly>{{ warranty }}</textarea></font>-->
+<!--                        {% elif work_data.warranty == old_work_data.warranty %}-->
+<!--                            <font size="4" color="black"><textarea name="warranty" rows="10" cols="100" style="color:black;" readonly>{{ warranty }}</textarea></font>-->
+<!--                        {% else %}-->
+<!--                            <font size="4" color="black"><textarea name="warranty" rows="10" cols="100" style="color:red;" readonly>{{ warranty }}</textarea></font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">検収条件</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="4" color="black"><textarea name="acceptance_conditions" rows="10" cols="100" style="color:black;" readonly>{{ acceptance_conditions }}</textarea></font>-->
+<!--                        {% elif work_data.acceptance_conditions == old_work_data.acceptance_conditions %}-->
+<!--                            <font size="4" color="black"><textarea name="acceptance_conditions" rows="10" cols="100" style="color:black;" readonly>{{ acceptance_conditions }}</textarea></font>-->
+<!--                        {% else %}-->
+<!--                            <font size="4" color="black"><textarea name="acceptance_conditions" rows="10" cols="100" style="color:red;" readonly>{{ acceptance_conditions }}</textarea></font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">立会検査有無</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="5" color="black">{{ witness_inspection }}</font>-->
+<!--                        {% elif work_data.witness_inspection == old_work_data.witness_inspection %}-->
+<!--                            <font size="5" color="black">{{ witness_inspection }}</font>-->
+<!--                        {% else %}-->
+<!--                            <font size="5" color="red">{{ witness_inspection }}</font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">受入検査有無</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="5" color="black">{{ acceptance_inspection }}</font>-->
+<!--                        {% elif work_data.acceptance_inspection == old_work_data.acceptance_inspection %}-->
+<!--                            <font size="5" color="black">{{ acceptance_inspection }}</font>-->
+<!--                        {% else %}-->
+<!--                            <font size="5" color="red">{{ acceptance_inspection }}</font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">試運転有無</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="5" color="black">{{ test_run }}</font>-->
+<!--                        {% elif work_data.test_run == old_work_data.test_run %}-->
+<!--                            <font size="5" color="black">{{ test_run }}</font>-->
+<!--                        {% else %}-->
+<!--                            <font size="5" color="red">{{ test_run }}</font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">試運転の合格基準</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="4" color="black"><textarea name="test_run_pass" rows="10" cols="100" style="color:black;" readonly>{{ test_run_pass }}</textarea></font>-->
+<!--                        {% elif work_data.test_run_pass == old_work_data.test_run_pass %}-->
+<!--                            <font size="4" color="black"><textarea name="test_run_pass" rows="10" cols="100" style="color:black;" readonly>{{ test_run_pass }}</textarea></font>-->
+<!--                        {% else %}-->
+<!--                            <font size="4" color="black"><textarea name="test_run_pass" rows="10" cols="100" style="color:red;" readonly>{{ test_run_pass }}</textarea></font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">検査の期間</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>-->
+<!--                    <td><div style="padding: 5px 0px;">-->
+<!--                        {% if old_work_data_num == 0 %}-->
+<!--                            <font size="4" color="black"><textarea name="inspection_period" rows="10" cols="100" style="color:black;" readonly>{{ inspection_period }}</textarea></font>-->
+<!--                        {% elif work_data.inspection_period == old_work_data.inspection_period %}-->
+<!--                            <font size="4" color="black"><textarea name="inspection_period" rows="10" cols="100" style="color:black;" readonly>{{ inspection_period }}</textarea></font>-->
+<!--                        {% else %}-->
+<!--                            <font size="4" color="black"><textarea name="inspection_period" rows="10" cols="100" style="color:red;" readonly>{{ inspection_period }}</textarea></font>-->
+<!--                        {% endif %}-->
+<!--                    </div></td>-->
+<!--                </tr>-->
+                <tr>
+                    <td><div><font size="4">備考</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div>
+                        {% if old_work_data_num == 0 %}
+                            <font size="4" color="black"><textarea name="work_rem" rows="10" cols="45" style="color:black;" readonly>{{ work_rem }}</textarea></font>
+                        {% elif work_data.work_rem == old_work_data.work_rem %}
+                            <font size="4" color="black"><textarea name="work_rem" rows="10" cols="45" style="color:black;" readonly>{{ work_rem }}</textarea></font>
+                        {% else %}
+                            <font size="4" color="red"><textarea name="work_rem" rows="10" cols="45" style="color:red;" readonly>{{ work_rem }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div> </div></td>
+                    <td><div>　</div></td>
+                    <td><div><font size="3">※ここは印刷されません</font></div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">ドキュメントURL</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_data_num == 0 %}
+                            <font size="5" color="black">{{ Attachment_url }}</font>
+                        {% elif work_data.Attachment_url == old_work_data.Attachment_url %}
+                            <font size="5" color="black">{{ Attachment_url }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ Attachment_url }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+<!--                <tr>-->
+<!--                    <td><div></div></td>-->
+<!--                    <td><div></div></td>-->
+<!--                    <td><div><font size="4"><input type="text" id="doc_save_path" size="38" ></font><input type="button" name="action_document_save" value="　　ドキュメント保存　　" onclick="doc_save();"></div></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><div></div></td>-->
+<!--                    <td><div></div></td>-->
+<!--                    <td><div><font size="4"><input type="text" id="doc_read_path" size="38" ></font><input type="button" name="action_document_read" value="　　ドキュメント読み出し　　" onclick="doc_read();"></div></td>-->
+<!--                </tr>-->
+            </table>
+        </div>
+        <div style="float:left;width:10px;" >　</div>
+        <div style="float:left;" >
+            <div><h2 class="page-header">適用法規</h2>
+                <div id="work_law_list"></div>
+            </div>
+            <div><h2 class="page-header">支給品</h2>
+                <div id="work_supplies_list"></div>
+            </div>
+        <!--UploadFileList        -->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+        </div>
+    </div>

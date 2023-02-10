@@ -1,0 +1,278 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+//入力項目チェック(入力忘れ、文字数オーバー等)の処理
+function input_check(a,b,d) {
+    console.log(b);
+    var this_step = a;
+    var next_step = b;
+    var action_cd = d;
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常時処理
+    if( ng_all_flag == 0){
+        proinspection_acceptance_edit(this_step,next_step);
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+// 検査(受入)テーブル登録･更新処理
+function proinspection_acceptance_edit(a,b) {
+
+
+//    alert('sub_id : ' + $('#sub_id').val() + '  storage_loc : ' + $('#storage_loc').val());
+
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var comment = $('#comment').val();
+
+        var budget_id = $('#budget_id').val();
+        var rev_no = $('#rev_no').val();
+        var budget_no = $('#budget_no').val();
+        var budget_name = $('#budget_name').val();
+        var construction_id = $('#construction_id').val();
+        var sub_id = $('#sub_id').val();
+        var scheduled_date =  $('#scheduled_date').val();
+        var scheduled_datime =  $('#scheduled_datime').val();
+        var delivery_date =  $('#delivery_date').val();
+        var storage_loc =  $('#storage_loc').val();
+        var delivery_note_data =  $('#delivery_note_data').val();
+
+        var order_classification_from =  $('#order_classification_from').val();
+        var order_classification_to =  $('#order_classification_to').val();
+        var inspection_results =  $('#inspection_results').val();
+        var judge_kbn =  $('#judge_kbn').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/execution_proinspection_acceptance_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'comment' : comment,
+                    'budget_id' : budget_id,
+                    'rev_no' : rev_no,
+                    'budget_no' : budget_no,
+                    'budget_name' : budget_name,
+                    'construction_id' : construction_id,
+                    'sub_id' : sub_id,
+                    'scheduled_date' : scheduled_date,
+                    'scheduled_datime' : scheduled_datime,
+                    'delivery_date' : delivery_date,
+                    'storage_loc' : storage_loc,
+                    'delivery_note_data' : delivery_note_data,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}",
+                    //20201205y-kawauchi DB入力
+                    'order_classification_from': order_classification_from,
+                    'order_classification_to': order_classification_to,
+                    'inspection_results': inspection_results,
+                    'judge_kbn': judge_kbn
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                    }
+                    log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert(data.msg);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+}
+</script>
+<style type="text/css">
+
+/*20201205y-kawauchi フォームレイアウト*/
+dl {
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+dl dt{
+    width: 150px;
+    height: auto;
+    padding: 0px;
+    float:left;
+    clear:both;
+    font-weight: normal;
+    font-size: 18px;
+}
+dl dd{
+    height: auto;
+    padding: 0px;
+    font-size: 18px;
+}
+input, select, .vTextField {
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 6px;
+    margin-top: 0;
+}
+dd:nth-child(4n+2) {
+background-color:#dddddd
+}
+{% comment %}
+ターゲット:nth-child()
+even偶数
+odd基数
+Xnでn行間隔
++Xでn行目から
+dtは1から奇数間隔,dlは2から偶数間隔でセット、だがdlはdtの背景も含む
+{% endcomment %}
+
+</style>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+<!--        <input type="hidden" id="sub_id" value="{{ sub_id }}" >-->
+<!--        <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">-->
+<!--        <input type="hidden" id="this_work_id" value="{{ work_lists.work_id }}">-->
+<!--        <input type="hidden" id="this_work_rev_no" value="{{ work_lists.work_rev_no }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_proinspection_acceptance_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="execution_proinspection_acceptance_edit">
+
+        <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+        <div class="scroll_div" style="float: left;">
+        <!--FileUploadForm        -->
+<!--            <form id="file_upload_form" name="file_upload_form" action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">-->
+            <form id="file_upload_form_{{ div_id_name }}" name="file_upload_form_{{ div_id_name }}" action="/isk_tools/fms/action/file_upload/" method="POST" enctype="multipart/form-data">
+            <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+            <table>
+                <tr>
+                    <td><div><font size="4">品質/受入検査実施日</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="order_classification_from" class="datepicker" value="{{ order_classification_from }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('order_classification_from');"> ～ <input type="text" id="order_classification_to" class="datepicker" value="{{ order_classification_to }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('order_classification_to');"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">検査結果</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><textarea id="inspection_results" name="inspection_results" rows="5">{{ inspection_results }}</textarea></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">品質/受入検査結果データ</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><input type="file" id="inspection_date" name="inspection_date"></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">判定区分</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4">
+                        <select id="judge_kbn">
+                        {% if judge_kbn  == "OK" %}
+                            <option value="OK" selected>OK</option>
+                            <option value="NG">NG</option>
+                            <option value="手直し">手直し</option>
+                        {% elif judge_kbn  == "NG" %}
+                            <option value="OK">OK</option>
+                            <option value="NG" selected>NG</option>
+                            <option value="手直し">手直し</option>
+                        {% elif judge_kbn  == "手直し" %}
+                            <option value="OK">OK</option>
+                            <option value="NG">NG</option>
+                            <option value="手直し" selected>手直し</option>
+                        {% else %}
+                            <option value="OK">OK</option>
+                            <option value="NG">NG</option>
+                            <option value="手直し">手直し</option>
+                        {% endif %}</select></font></div>
+                    </td>
+                </tr>
+            </table>
+            </div><!--ng_character_checkここまで-->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            {% csrf_token %}
+<!--            <input type="button" value=" 格納 " onclick="file_upload();">-->
+            <input type="button" value=" 格納 " onclick="file_upload('{{ div_id_name }}');">
+            </form><br>
+        <!--FileUploadForm        -->
+        <!--UploadFileList        -->
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+{% endblock %}

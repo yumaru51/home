@@ -1,0 +1,36 @@
+<style>
+.discount_no{
+    width:50px;
+    font-size: 150%;
+}
+.discount_price{
+    width:120px;
+    font-size: 150%;
+}
+.discount_no_label{
+    width:50px;
+    font-size: 130%;
+}
+.discount_price_label{
+    width:120px;
+    font-size: 130%;
+}
+</style>
+        {% if discount_list_num > 0 %}
+            <table border="1" style="border-collapse: collapse">
+                <thead>
+                    <tr>
+                        <th class="discount_no_label">回数</th>
+                        <th class="discount_price_label">値引額</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for discount_list in discount_list %}
+                        <tr>
+                            <td class="discount_no">{{ discount_list.discount_no }}</td>
+                            <td class="discount_price">{{ discount_list.discount_price }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}

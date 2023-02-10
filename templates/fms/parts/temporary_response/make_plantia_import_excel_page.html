@@ -1,0 +1,183 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+// OUTPUT対象の取得
+function get_output_list(){
+    //選択案件リスト取得
+    var sel_output_list = [];
+    var cb_list = document.getElementsByName('sel_output_cb');
+
+    for (var i = 0; i < cb_list.length; i++) {
+        if (cb_list[i].checked == true) {
+            sel_output_list.push(cb_list[i].value);
+        }
+    }
+    if(sel_output_list.length == 0){
+        alert('案件が選択されていません');
+        return;
+    }
+
+    //出力処理 + ダウンロード処理
+    make_plantia_import_excel(sel_output_list);
+}
+
+// 台帳問い合わせExcelファイル作成
+function make_plantia_import_excel(output_unique_id_list) {
+    $("#loading").show();//呼び出し中に表示するgifを表示
+    $.ajax({
+        url: "/isk_tools/fms/action/make_plantia_import_excel/",
+        type: "POST",
+        data : {
+            'output_unique_id_list': output_unique_id_list,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 1000000,
+        dataType: 'json',
+        cache : false,
+    })
+    .done(function(data){
+        if(data.file_name == ''){
+            //出力対象無し、あたは異常データあり
+            $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert(data.msg);
+        }else{
+            //ファイルダウンロード
+            plantia_import_excel_download(data.target_folder, data.file_name)
+            $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+            alert(data.msg);
+        }
+    })
+   .fail(function(jqXHR,textStatus,errorThrown){
+        $("#loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        alert('Error!' +textStatus+' ' +errorThrown);
+    });
+}
+
+//台帳問い合わせExcelファイルダウンロード
+function plantia_import_excel_download(target_folder, file_name){
+    var link_str = "/isk_tools/fms/action/output_file_download/" + target_folder + "/"+ file_name;
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = file_name;
+    downLoadLink.href = link_str ;
+    downLoadLink.click();
+}
+
+// 絞込条件リセット
+function reset_end_maintenance_order_filter() {
+    //セッション情報の削除
+    session_value_phenomenon_clear();
+    //フィルター再表示
+    end_maintenance_order_filter_call();
+}
+
+// 故障対応工程完了済み案件リストフィルタ
+function end_maintenance_order_filter_call() {
+    var from_page = 13001;
+    var status1 = 100201;
+    var status2 = 100211;
+    var status3 = 0;
+    $.ajax({
+        url: "/isk_tools/fms/parts/temporary_response/end_maintenance_order_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'status1': status1,
+                'status2': status2,
+                'status3': status3,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#end_maintenance_order_filter').empty();
+            $('#end_maintenance_order_filter').html(data);
+            end_maintenance_order_list();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#end_maintenance_order_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+// チェックボックス全選択
+function select_check_all(is_check) {
+
+    var cb_list = document.getElementsByName('sel_output_cb');
+
+    if(is_check == 'true'){
+        for (var i = 0; i < cb_list.length; i++) {
+            cb_list[i].checked = true;
+        }
+    }else{
+        for (var i = 0; i < cb_list.length; i++) {
+            cb_list[i].checked = false;
+        }
+    }
+}
+
+// 指定状態のみチェックボックス選択
+function select_check_export_state(export_complete_flag) {
+    // リスト情報の取得(ヘッダを除く)
+    var export_complete_flag_list = document.getElementById('end_maintenance_order_lists').getElementsByClassName('scrollBody')[0]
+    // 行ごとの出力完了フラグを取得
+    for (let row of export_complete_flag_list.rows){
+        // 指定した出力完了フラグと一致すればチェック
+        if(row.cells[1].getElementsByTagName('input')[0].value == export_complete_flag){
+            row.cells[0].children.sel_output_cb.checked = true;
+        }else{
+            row.cells[0].children.sel_output_cb.checked = false;
+        }
+    }
+}
+
+window.onload = function() {
+    end_maintenance_order_filter_call();
+};
+
+</script>
+<style type="text/css">
+.datepicker {
+    width:150px;
+}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+</style>
+    <input TYPE="hidden" id="user_division_cd" VALUE="{{user_division_cd}}"/>
+    <input TYPE="hidden" id="user_department_cd" VALUE="{{user_department_cd}}"/>
+    <input TYPE="hidden" id="user_authority" VALUE="{{user_authority}}"/>
+    <input TYPE="hidden" id="confirm_user" VALUE="{{confirm_user}}"/>
+    <input TYPE="hidden" id="permit_user" VALUE="{{permit_user}}"/>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">PLANTIAインポート用Excelファイル作成</h2>
+    </div>
+    <br>
+    <div class='clear'></div>
+    <div>
+        <input type="button" name="end_maintenance_order_list" value=" 　リスト更新　 " onclick="end_maintenance_order_list();">
+        <input type="button" name="reset_end_maintenance_order_filter_button" value=" 　条件リセット　 " onclick="reset_end_maintenance_order_filter();">
+        <input type="button" name="get_end_maintenance_order_list" value=" 　　全選択　　 " onclick="select_check_all('true');">
+        <input type="button" name="get_end_maintenance_order_list" value=" 　　全解除　　 " onclick="select_check_all('false');">
+        <input type="button" name="get_end_maintenance_order_list" value="　 未出力のみ 　" onclick="select_check_export_state('1');">
+        <input type="button" name="get_end_maintenance_order_list" value="　　出力　　" onclick="get_output_list()">
+    </div>
+
+    <div id="end_maintenance_order_filter"></div>
+    <div>
+            異常報告リスト
+    </div>
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+    <div id="end_maintenance_order_list" style="width: 1400px;">
+    </div>
+
+{% endblock %}

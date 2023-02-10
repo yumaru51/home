@@ -1,0 +1,183 @@
+
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+//Lv5トップページの表示処理
+function level5_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '../level5_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+// 予算中止開始ページ表示
+function level5_stop_page(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/irregular/level5_step_stop/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+    .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: 1}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: 'prospecificationunit'}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+</script>
+<style type="text/css">
+
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 490px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+.square_small {
+   width: 160px;
+   height: 140px;
+   background: khaki;
+}
+.triangle_right_small {
+  width: 0;
+  height: 0;
+  border-left: 25px solid khaki;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+.space_right_small {
+  width: 0;
+  height: 0;
+  border-left: 50px solid transparent;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+.space_row_wide {
+  width: 0;
+  height: 0;
+  border-left: 1000px solid transparent;
+  border-top: 40px solid transparent;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">{{ step_name }}トップページ</h2>
+    </div>
+    <div style="float:right;">
+        <a href="/isk_tools/fms">
+            <input TYPE=button VALUE=前の画面に戻る NAME=disp_return size=3 style="width:120px"/>
+        </a>
+    </div>
+    <div class='clear'></div>
+    <div>
+        ユーザー：　<input TYPE=text VALUE="{{user_name}}" NAME=UseNM size=3 style="width:100px; height:20px"/>
+        　　　部門：　<input TYPE=text VALUE="{{user_division}}" NAME=user_division size=3 style="width:150px; height:20px"/>
+        　　　部署：　<input TYPE=text VALUE="{{user_department}}" NAME=User_department size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="user_division_cd" VALUE="{{user_division_cd}}" NAME=user_division_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="user_department_cd" VALUE="{{user_department_cd}}" NAME=user_department_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="user_authority" VALUE="{{user_authority}}" NAME=user_authority size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="confirm_user" VALUE="{{confirm_user}}" NAME=confirm_user size=3 style="width:150px; height:20px"/>
+        <input TYPE=hidden id="permit_user" VALUE="{{permit_user}}" NAME=permit_user size=3 style="width:150px; height:20px"/>
+    </div>
+    <div style="float:left;width:5px">　　</div>
+
+    <div style="float:left;width: auto;">
+    {% for step_id, step_data in step_num_list.items %}
+
+        {% if step_data.0 == "仕様書発行中" %}
+        <div style="clear: both; width: auto">
+            <input TYPE=button VALUE="実行中予算一覧（予算完了開始）" size=5 style="width:560px; height:45px; " onclick="level5_toppage(213000000);"/>
+        </div>
+        {% elif step_data.0 == "予算中止原課" %}
+        <div style="clear: both; width: auto">
+            <div class="space_row_wide"></div>
+        </div>
+        <div style="clear: both; width: auto">
+            <input TYPE=button VALUE="実行中予算一覧（予算中止開始）" size=5 style="width:560px; height:45px; " onclick="level5_stop_page(213004000);"/>
+        </div>
+        {% elif step_data.0 == "予算繰越申請" %}
+        <div style="clear: both; width: auto">
+            <div class="space_row_wide"></div>
+        </div>
+        <div style="clear: both; width: auto">
+            <input TYPE=button VALUE="実行中予算一覧（予算繰越開始）" size=5 style="width:370px; height:45px; " onclick="level5_toppage(213009000);"/>
+        </div>
+        {% endif %}
+        <div class="square_small" style="padding: 10px 5px 10px 5px; float:left; width:160px; align=center">
+            <div>
+            <!--# 予算関連トップページに仕様書発行中の件数を追加表示-->
+            {% if step_data.0 == "仕様書発行中" %}
+            <input TYPE=button VALUE="{{ step_data.0 }}" NAME=BdgEst size=3 style="width:160px; height:25px;" onclick="level5_toppage(213000000);"/>
+            {% else %}
+            <input TYPE=button VALUE="{{ step_data.0 }}" NAME=BdgEst size=3 style="width:160px; height:25px;" onclick="level5_toppage({{ step_id }});"/>
+            {% endif %}
+            </div>
+            <div style="height: 5px">　</div>
+            <table>
+                <tr>
+                    <td style="width:150px; align=center">部門：　</td>
+                    <td style="width:150px; align=center"><input TYPE=text NAME=IBP1 VALUE="{{ step_data.1 }}" SIZE=2 style=text-align:right; />件</td>
+                </tr>
+                <tr>
+                    <td style="width:150px; align=center">部署：　</td>
+                    <td style="width:150px; align=center"><input TYPE=text NAME=IBP1 VALUE="{{ step_data.2 }}" SIZE=2 style=text-align:right; />件</td>
+                </tr>
+                <tr>
+                    <td style="width:150px; align=center">自分：　</td>
+                    <td style="width:150px; align=center"><input TYPE=text NAME=IBP1 VALUE="{{ step_data.3 }}" SIZE=2 style=text-align:right; />件</td>
+                </tr>
+            </table>
+        </div>
+        {% if step_data.0 == "予算完了管理"  %}
+        <div class="space_right_small" style="float:left;"></div>
+        {% elif step_data.0 == "予算中止管理" %}
+        <div class="space_right_small" style="float:left;"></div>
+        {% elif step_data.0 == "予算繰越受付" %}
+        <div class="space_right_small" style="float:left;"></div>
+        {% else %}
+        <div class="triangle_right_small" style="float:left;"></div>
+        {% endif %}
+
+    {% endfor %}
+　　 </div>
+
+{% endblock %}

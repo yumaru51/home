@@ -1,0 +1,7 @@
+                            <input type="hidden" id="instruction_no" value="{{ instruction_no }}">
+                            <select id="sel_instruction_no" name="sel_instruction_no" onchange= "instruction_no_change(value);">
+                                <option value=""></option>
+                                {% for instruction_no_lists in instruction_no_lists %}
+                                    <option value="{{ instruction_no_lists.指図書コード }}">{{ instruction_no_lists.指図書コード }}：{{ instruction_no_lists.テキスト短 | default_if_none:''  }}</option>
+                                {% endfor %}
+                            </select>　※緊急工事は必須

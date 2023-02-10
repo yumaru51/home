@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ja">
+{% load staticfiles %}
+<head>
+<title>設備管理システム</title>
+
+    <script type="text/javascript" src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.csv.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.datetimepicker.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base3.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/icms.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/start/jquery-ui.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/jquery.datetimepicker.css' %}">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <link rel="icon" href="{% static 'img/favicon.ico' %}">
+
+<!--
+ formを使用時はコメント解除
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+    <link href="/static/bootstrap_datepicker_plus/css/datepicker-widget.css" type="text/css" media="all" rel="stylesheet">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="/static/bootstrap_datepicker_plus/js/datepicker-widget.js"></script>
+-->
+<script>
+//レベル4のトップページの表示処理(引数a=レベル3の工程ID)
+function level4_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '/isk_tools/fms/level4_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level4_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+//レベル5のトップページの表示処理(引数a=レベル4の工程ID)
+function level5_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var select_tab = $('#select_tab').val();
+    $('<form/>', {action: '../../../level5_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: select_tab}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+//イレギュラー処理の表示処理
+function irregular_menu() {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/irregular/irregular_menu/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+//一時対応MENUの表示処理
+function temporary_response_menu() {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/temporary_response/temporary_response_menu/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+//届出進捗状況画面表示処理
+function display_cs_laws_progress() {
+    $('<form/>', {action: '/isk_tools/fms/parts/check_sheet/cs_laws_progress_top_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+// ファイル削除処理
+function file_delete(data_id){
+//    var div_id_name = $('#div_id_name').val();
+    $.ajax({
+        url: "/isk_tools/fms/action/file_delete/",
+        type: "POST",
+        data : {
+            'data_id' : data_id,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache: false,
+        })
+        .done(function(data){
+            if (data.temporary_flag == 0) {
+                var file_folder = data.file_folder
+                var div_id_name = data.div_id_name
+                var delete_pb_disp_flag = data.delete_pb_disp_flag
+                var file_class = data.file_class;
+                upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+            } else if (data.temporary_flag == 1) {
+                console.log('file_delete')
+                upload_file_list(data.div_id_name);
+            }
+            alert(data.msg);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('#id').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+// 共通処理のため削除予定
+// ファイル削除処理・・・別タイプ
+function file_delete_other_type(data_id){
+    var div_id_name = $('#div_id_name').val();
+    $.ajax({
+        url: "/isk_tools/fms/action/file_delete/",
+        type: "POST",
+        data : {
+            'data_id' : data_id,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache: false,
+        })
+        .done(function(data){
+            var file_folder = data.file_folder;
+            var div_id_name = data.div_id_name;
+            var delete_pb_disp_flag = data.delete_pb_disp_flag;
+            var file_class = data.file_class;
+            upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+            alert(data.msg);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $('#id').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+//ファイルアップロード処理
+function file_upload(div_id_name){
+    var  cancelFlag = false;
+    if (cancelFlag == false) {
+        $(".button").prop("disabled", true);
+        cancelFlag = true;
+
+        // フォームデータを取得 formのid,nameが一意になるようパラメータで指定
+        form = '#file_upload_form_' + div_id_name
+        var form_data = new FormData($(form).get(0));
+
+        //file_budget_idが無効、もしくはtargetに指定された側のidが無効の場合はアップロード停止
+        if( (form_data.get('file_budget_id') == 0) ||
+            (form_data.get('file_target') == 'work' && form_data.get('file_work_id') == 0) ){
+            alert('ID未指定のためファイルをアップロードできません、先に保存してください');
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            cancelFlag = false;
+            return;
+        }
+
+        // POSTでアップロード
+        $.ajax({
+            url  : "/isk_tools/fms/action/file_upload/",
+            type : "POST",
+            data : form_data,
+            cache       : false,
+            contentType : false,
+            processData : false,
+            dataType    : "json"
+            })
+            .done(function(data){
+                alert(data.msg);
+                console.log('file_upload')
+                upload_file_list(data.div_id_name);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+        setTimeout(function () {
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            cancelFlag = false;
+        }, 2000);
+    }
+}
+//ファイルアップロード処理･･･別タイプ
+function file_upload_other_type(target){
+    var  cancelFlag = false;
+    if (cancelFlag == false) {
+        $(".button").prop("disabled", true);
+        cancelFlag = true;
+        var form_div_id = '#' + target + '_file_upload_form'
+        // フォームデータを取得
+        var formdata = new FormData($(form_div_id).get(0));
+        // POSTでアップロード
+            $.ajax({
+                    url  : "/isk_tools/fms/action/file_upload_other_type/",
+                    type : "POST",
+                    data : formdata,
+                    cache       : false,
+                    contentType : false,
+                    processData : false,
+                    dataType    : "json"
+                    })
+                    .done(function(data){
+                        alert(data.msg);
+                        var file_folder = data.file_folder;
+                        var div_id_name = data.div_id_name;
+                        var delete_pb_disp_flag = data.delete_pb_disp_flag;
+                        var file_class = data.file_class;
+                        upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+                    })
+                    .fail(function(jqXHR,textStatus,errorThrown){
+                        alert('Error!' +textStatus+' ' +errorThrown);
+                    });
+        setTimeout(function () {
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+            cancelFlag = false;
+        }, 2000);
+    }
+}
+//ファイルリスト表示処理
+function upload_file_list(div_id_nm, other_target = "None", other_work_id = -1) {
+    if(div_id_nm != 'Error'){
+        var file_target = $('#target').val();
+        if(other_target != "None"){
+            file_target = other_target;
+        }
+        var file_budget_id = $('#file_budget_id').val();
+        var div_id_name = div_id_nm;
+        if ($('#file_upload_form_' + div_id_name).find('#file_work_id').length > 0){
+            var file_work_id = $('#file_upload_form_' + div_id_name).find('#file_work_id')[0].value;
+        }else{
+            var file_work_id = $('#file_work_id').val();
+        }
+        if(other_work_id != -1){
+            file_work_id = other_work_id
+        }
+
+        var current_tab = $('.pagetitle')[$('.present').index()].children[0].id;
+            $.ajax({
+                url: "/isk_tools/fms/action/upload_file_list/",
+                type: "POST",
+                data : {
+                    'file_target': file_target,
+                    'file_budget_id': file_budget_id,
+                    'file_work_id': file_work_id,
+                    'div_id_name': div_id_name,
+                    'this_step': $('#this_step').val(),
+                    'current_tab': current_tab,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                    },
+                    timeout: 10000,
+                    dataType: 'html',
+                    cache : false,
+                    })
+                    .done(function(data){
+                        $('#upload_file_list_' + div_id_name).empty();
+                        $('#upload_file_list_' + div_id_name).html(data);
+                    })
+                    .fail(function(jqXHR,textStatus,errorThrown){
+                        $('#upload_file_list_' + div_id_name).empty();
+                        alert('Error!' +textStatus+' ' +errorThrown);
+                    });
+    }
+}
+//ファイルリスト表示処理･･･別タイプ
+function upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class) {
+    $.ajax({
+        url: "/isk_tools/fms/parts/common/upload_file_list_other_type/",
+        type: "POST",
+        data : {
+            'file_folder': file_folder,
+            'div_id_name': div_id_name,
+            'delete_pb_disp_flag': delete_pb_disp_flag,
+            'file_class': file_class,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#upload_file_list_' + div_id_name).empty();
+                $('#upload_file_list_' + div_id_name).html(data);
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#upload_file_list_' + div_id_name).empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+function date_clear(item_id) {
+    var div_id = "#" + item_id;
+    $(div_id).val('');
+}
+
+// 入力時に桁数認識用のコンマを追加する
+function add_comma_value(target_item){
+    if (target_item.value != ''){
+        target_item_value = Number(target_item.value.replace(/,/g, "")).toLocaleString();
+        if(target_item_value == "NaN"){
+            target_item_value = 0;
+        }
+        target_item.value = target_item_value;
+    }
+}
+
+//画面表示時に金額欄にカンマ追加
+function add_comma_target_value_at_open(target_id) {
+    var target_value = $(target_id).val();
+    if (target_value != ""){
+        target_value_with_comma = Number(target_value.replace(/,/g, "")).toLocaleString();
+        if(target_value_with_comma == "NaN"){
+            target_value_with_comma = 0;
+        }
+        $(target_id).val(target_value_with_comma);
+    }
+}
+
+//金額文字列からカンマを削除
+function remove_comma(commma_price_str) {
+	var price = '';
+    if (commma_price_str != ""){
+        price = commma_price_str.replace(/,/g, '');
+    }
+	return price;
+}
+
+//文字数カウント(全角半角識別カウント)
+function count_str_bytes(str) {
+    var chara_bytes = 0;
+    for (var i = 0; i < str.length; i++) {
+        var c = str.charCodeAt(i);
+        if ((c >= 0x0 && c < 0x81) || (c === 0xf8f0) || (c >= 0xff61 && c < 0xffa0) || (c >= 0xf8f1 && c < 0xf8f4)) {
+            chara_bytes += 1;
+        } else {
+            chara_bytes += 2;
+        }
+    }
+    return chara_bytes;
+}
+
+//文字数カウント(全角半角識別)
+function count_char(str) {
+    var chara_bytes = 0;
+
+    //models.CharField の max_length は、設定した数値までの「文字数」が保存できる仕様
+    //全角でも半角でも「１文字」として扱われるので、キャラクタコードによって消費する文字数は変化しない
+    //このためstr.lengthをそのまま返すように変更
+
+    chara_bytes = str.length;
+
+    //for (var i = 0; i < str.length; i++) {
+    //    var c = str.charCodeAt(i);
+    //    if ((c >= 0x0 && c < 0x81) || (c === 0xf8f0) || (c >= 0xff61 && c < 0xffa0) || (c >= 0xf8f1 && c < 0xf8f4)) {
+    //        chara_bytes += 1;
+    //    } else {
+    //        chara_bytes += 1;
+    //    }
+    //}
+
+    return chara_bytes;
+}
+
+//テキストエリアの入力上限チェック
+function check_text_area_max(value, max_row, max_col_bytes, max_bytes)
+{
+    var alert_msg_str = '';
+    var msg_str = '';
+
+    //1行ごとに分割
+    var arr = value.split(/\r\n|\r|\n/);
+
+    //行数チェック
+    if(arr.length > max_row){
+        alert_msg_str = alert_msg_str + '行数('+max_row+'行上限)オーバー：' + arr.length + '行あります！！！\n';
+    }
+
+    //合計文字数チェック
+    var text_bytes = count_str_bytes(value.replace(/\r\n|\n|\r/g,"\n"));
+    if(text_bytes > max_bytes){
+        alert_msg_str = alert_msg_str + '合計文字数('+Math.ceil(max_bytes / 2)+'文字上限)オーバー：' + Math.ceil(text_bytes / 2) + '文字あります！！！\n';
+    }
+
+    //1行ごとに上限文字数チェック
+    for(i=0;i < arr.length ;i++){
+        var row_str = arr[i];
+        //全角２文字、半角１文字として文字数チェック
+        var str_bytes = count_str_bytes(row_str);
+        if (str_bytes > max_col_bytes){
+            alert_msg_str = alert_msg_str + '1行文字数('+Math.ceil(max_col_bytes / 2)+'文字上限)オーバー：' + (i + 1) + '行目に' + Math.ceil(str_bytes / 2) + '文字入力されています！！！\n';
+        };
+    }
+
+    //正常時文字列
+    msg_str = arr.length + '行、' + Math.ceil(text_bytes / 2) + '文字入力されています。';
+
+    return { 1:alert_msg_str , 2:msg_str };
+}
+
+
+// テキスト情報をクリップボードにコピー
+function copy_to_clipboard(text){
+    if(!text || typeof(text) != "string") {
+        return "";
+    }
+
+    // テキストコピー用の一時要素を作成
+    $(document.body).append("<textarea id=\"function_copy_to_clipboard_temp\" style=\"position:fixed;right:100vw;font-size:16px;\" readonly=\"readonly\">" + text + "</textarea>");
+    var elm = $("#function_copy_to_clipboard_temp")[0];
+
+    //select()でtextarea内の文字を選択（ブラウザ複数種類対策）
+    elm.select();
+
+    //rangeでtextarea内の文字を選択（ブラウザ複数種類対策）
+    var range = document.createRange();
+    range.selectNodeContents(elm);
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+    elm.setSelectionRange(0, 999999);
+
+    // クリップボードにコピー
+    const result = document.execCommand('copy');
+
+    // 一時要素を削除
+    $(elm).remove();
+
+    return result;
+}
+
+
+//サーバーファイルダウンロード
+function download_server_file(target_path, file_name,){
+    var link_str = "/isk_tools/fms/action/server_file_download/"
+    var encode_path = encodeURIComponent(target_path);
+    var encode_file_name = encodeURIComponent(file_name);
+    var get_url = link_str + "?target_path=" + encode_path + "&file_name=" + encode_file_name
+
+    // XMLHttpRequestオブジェクト作成
+    var objXML = new XMLHttpRequest();
+    // URL指定
+    objXML.open("GET", get_url, true);
+    // ダウンロードがblobオブジェクトの指定
+    objXML.responseType = "blob";
+    // CSRFトークンの指定(GETリクエストには不要)
+    ///objXML.setRequestHeader('csrfmiddlewaretoken', "{{ csrf_token }}");
+    // ダウンロード完了時の処理関数
+    objXML.onload = function (oEvent) {
+        if (objXML.readyState === 4) {
+            if (objXML.status === 200) {
+                // blobオブジェクト
+                var objBlob = objXML.response;
+                if (window.navigator.msSaveBlob) {
+                    // IE, Edge
+                    window.navigator.msSaveBlob(objBlob, filename);
+                } else {
+                    // blobオブジェクトを指すURLオブジェクト
+                    var objURL = window.URL.createObjectURL(objBlob);
+                    // リンクを生成し、JavaScriptからクリック
+                    var objLink = document.createElement("a");
+
+                    document.body.appendChild(objLink);
+                    objLink.href = objURL;
+                    objLink.download = file_name;
+                    objLink.click();
+                }
+            } else {
+                console.error(objXML.statusText);
+                alert('Error!' + objXML.statusText);
+            }
+        }
+    };
+    objXML.onerror = function (oEvent) {
+        console.error(objXML.statusText);
+        alert('Error!' + objXML.statusText);
+    };
+    objXML.send();
+}
+
+// 禁止文字警告文字列取得
+function get_alert_msg_ng_char(ng_character_set) {
+    var alert_msg = ""
+    if( ng_character_set.size > 0 ){
+        // タブ文字を変換
+        if( ng_character_set.has("\t") ){
+            ng_character_set.delete("\t");
+            ng_character_set.add("Tab文字");
+        }
+        // 警告文字列化
+        ng_character_set.forEach(element => alert_msg += element + ',');
+        // 末尾の','を削除
+        alert_msg = alert_msg.slice(0,-1);
+        // 警告メッセージを作成
+        alert_msg = '禁止文字(' + alert_msg + ')が含まれています！！！\n';
+    }
+    return alert_msg;
+}
+
+// 禁止文字チェック処理
+function check_ng_character(str) {
+    var ng_character_set = new Set();
+    // 文字列中に複数の禁止文字が含まれる場合のため、正規表現にgを追加
+    var search_txt = /[{{ ng_character_list }}]/g;
+    // 禁止文字検索
+    let result = str.match(search_txt);
+    // 結果判定
+    if( result != null ){
+        //重複を削除
+        ng_character_set = new Set(result);
+    }else{
+        //禁止文字なし
+    }
+    return ng_character_set;
+}
+
+// 禁止文字チェック処理＋警告メッセージ作成
+function check_ng_character_msg(str) {
+    var ng_character_set = check_ng_character(str);
+    return get_alert_msg_ng_char(ng_character_set) ;
+}
+
+// 画面上の指定id要素以下のinput:text, textareaを全て取得する
+function get_all_text_input(target_id) {
+    var text_inputs;
+    let target = document.querySelector("#" + target_id)
+    text_inputs = target.querySelectorAll('input[type=text],textarea');
+    return text_inputs;
+}
+
+// 全入力エリアの禁止文字チェック＋背景色変更
+function check_all_ng_character(target_id) {
+    var alert_msg_str = ""
+    let text_inputs = get_all_text_input(target_id);
+    var ng_character_list = [];
+    text_inputs.forEach(function(element){
+        let ng_character_set_local = check_ng_character(element.value);
+        if (ng_character_set_local.size > 0 ){
+            element.style.backgroundColor = 'silver';
+            ng_character_set_local.forEach( element => ng_character_list.push(element));
+        }else{
+            element.style.backgroundColor = 'white';
+        }
+    });
+    let ng_character_set = new Set(ng_character_list);
+    alert_msg_str = get_alert_msg_ng_char(ng_character_set);
+
+    return alert_msg_str;
+}
+
+</script>
+<style type="text/css">
+#tab {
+	margin-left: 0;
+	padding-left: 0;
+	margin-bottom: 1em;
+	border-bottom: 2px solid #333;
+	height: 1.5em;
+	overflow: hidden;
+}
+#tab li {
+	float: left;
+	width: 94.84px;
+	height: 1.5em;
+	list-style: none;
+}
+#tab li a {
+	display: block;
+	width: 90px;
+	height: 1.5em;
+	border: 1px solid #ccc;
+	border-bottom: 0;
+	background-color: #ccc;
+	color: #777;
+	text-align: center;
+}
+#tab li a:hover,
+#tab li.present a {
+	border-color: #333;
+        background-color: white;
+        color: #000;
+}
+#page1, #page2, #page3, #page4, #page5, #page5, #page6, #page7, #page8, #page9, #page10 {
+<!--	margin-bottom: 12em;-->
+	padding-top: 0em;
+}
+#floatBox1Dialog, #floatBox2Dialog {
+    width: 200px;
+
+}
+.mode11 {
+    color: #ff0000;
+}
+.fms_side-bar{
+    width: 175px;
+    height: auto;
+    background: #b0c4de;
+    padding-top : 5px;
+}
+.fms_sidebar-list{
+    list-style: none;
+    margin: 10px -100px 0px -40px;
+}
+.fms_sidebar_list_str {
+    font-size: 12px;
+}
+.fms_sidebar-list{
+    font-size: 110%;
+}
+.fms_sidebar_list_str{
+    font-size: 110%;
+}
+.date_clear_button{
+    font-size: 60%;
+
+}
+html,
+body {
+  height: 100%;
+}
+</style>
+
+</head>
+<body class=" dashboard compress_body"
+  data-admin-utc-offset="32400">
+    <!-- Container -->
+        <div id="header">
+            <div id="branding">
+                <h1 id="site-name"><a href="/isk_tools/fms/">ISK四日市　設備管理</a></h1>
+            </div>
+            {% if user.is_authenticated %}
+                <div id="user-tools">
+                    <div>ようこそ {{user_last_name}} {{user_first_name}}　さん /
+                        <a href="/isk_tools/">ISKツールトップページ</a> /
+                        <a href="{% url 'admin:password_change' %}">パスワードの変更</a> /
+                        <a href="/accounts/logout/">ログアウト</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <!-- END Header -->
+        <!-- Content -->
+        <div style="width:auto;">
+        <div class="container-fluid" style="width:auto;">
+            <div class="row">
+                <div style="float:left;width:180px">
+                    <div class="fms_side-bar" style="height:93.5vh">
+                        <div class="fms_col-sm-3 col-md-2 sidebar">
+                            {% if user.is_authenticated %}
+                                <ul class="fms_nav nav-sidebar">
+                                    <li class="fms_sidebar-list"><a href="/isk_tools/">ISKツールトップ</a></li>
+                                    <br>
+                                    <li class="fms_sidebar-list"><a href="/isk_tools/fms">設備管理トップ</a></li>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open1').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">マネジメント推進</a>
+                                    </div>
+                                    <div id="open1" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#">・設計・構築</a></li>
+                                            <li class="fms_sidebar-list"><a href="#">・推進・評価</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open2').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">戦略策定</a>
+                                    </div>
+                                    <div id="open2" class="sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#">・設備管理戦略の策定</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(131000000);">・長期計画策定</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open3').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">計画策定</a>
+                                    </div>
+                                    <div id="open3" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(132000000);">・中期計画策定</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(133000000);">・単年度計画策定</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(136000000);">・追加予算申請</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(134000000);">・届出チェックシート</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(135000000);">・追加届出チェックシート</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="display_cs_laws_progress();">・届出進捗状況</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open4').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">高度化</a>
+                                    </div>
+                                    <div id="open4" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#">・ケミカルエンジ</a></li>
+                                            <li class="fms_sidebar-list"><a href="#">・先進技術開発</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open5').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">方式・基準</a>
+                                    </div>
+                                    <div id="open5" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#">・設備管理基準</a></li>
+                                            <li class="fms_sidebar-list"><a href="#">・その他</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open6').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">管理運営</a>
+                                    </div>
+                                    <div id="open6" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#">・計画実行(全体)調整</a></li>
+                                            <li class="fms_sidebar-list"><a href="#">・法令順守</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open7').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">計画工事</a>
+                                    </div>
+                                    <div id="open7" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(211000000);">・計画</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(212000000);">・仕様書中止</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open8').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">調達</a>
+                                    </div>
+                                    <div id="open8" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(241000000);">・発注</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(242000000);">・検査・検収</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" >・外注先管理</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open9').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">工事・検査実行</a>
+                                    </div>
+                                    <div id="open9" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(251000000);">・工事・検査準備</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(252000000);">・工事・検査実行</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" >・現場管理</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open10').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;"><p>劣化防止・リスク早期</p><p>　　　　　 発見/対応<p></a>
+                                    </div>
+                                    <div id="open10" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#" >・設備検査</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" >・日常保全</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open11').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">故障対応(小口)</a>
+                                    </div>
+                                    <div id="open11" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(231000000);">・評価･診断</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(233000000);">・小口届出チェック</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" onclick="level4_toppage(232000000);">・復旧推進</a></li>
+                                        </ul>
+                                    </div>
+                                    <div class="fms_sidebar-list" onclick="obj=document.getElementById('open12').style; obj.display=(obj.display=='none')?'block':'none';">
+                                        <a class="fms_sidebar_list_str" style="cursor:pointer;">実行機能の強化改善</a>
+                                    </div>
+                                    <div id="open12" class="fms_sidebar-list" style="display:none;clear:both;">
+                                        <ul class="fms_nav nav-sidebar">
+                                            <li class="fms_sidebar-list"><a href="#" >・故障発生時</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" >・ファンクション起点</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" >・経営課題起点</a></li>
+                                            <li class="fms_sidebar-list"><a href="#" >・組織の改善活動起点</a></li>
+                                        </ul>
+                                    </div>
+                                    <br>
+                                    <li class="fms_sidebar-list"><a href="#" onclick="irregular_menu();">イレギュラー処理Menu</a></li>
+                                    <br>
+                                    <li class="fms_sidebar-list"><a href="#" onclick="temporary_response_menu();">一時的対応Menu</a></li>
+                                    <br>
+                                    <li class="fms_sidebar-list"><a href="http://yplantia/PLANTIA/" target="_blank">PLANTIA</a></li>
+
+                                    {% if t_user_is_superuser == 1 %}
+                                    <li class="fms_sidebar-list"><a href="/admin/">システム管理</a></li>
+                                    <li class="fms_sidebar-list"><a href="/isk_tools/fms/parts/management/step_edit/">step登録/変更</a></li>
+                                    {% endif %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div style="float:left;width: auto;height:auto;">
+                    {% block contents %}{% endblock %}
+                </div>
+
+             </div>
+        </div>
+        </div>
+<script type="text/javascript">
+    var host_name = location.hostname;
+    var set_element = document.getElementById('header');
+    if (host_name == "i7161dd6"){
+        //テスト環境
+        set_element.style.backgroundColor = 'red';
+    }
+</script>
+</body>
+</html>

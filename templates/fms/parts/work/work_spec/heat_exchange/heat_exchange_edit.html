@@ -1,0 +1,705 @@
+<script>
+function hot_fluid_capacity_unit_change() {
+        var hot_fluid_capacity_unit = $('#hot_fluid_capacity_unit').val();
+        if (hot_fluid_capacity_unit != "") {
+            var pulldown_option = document.getElementById("sel_hot_fluid_capacity_unit").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == hot_fluid_capacity_unit){
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+function cool_fluid_capacity_unit_change() {
+        var cool_fluid_capacity_unit = $('#cool_fluid_capacity_unit').val();
+        if (cool_fluid_capacity_unit != "") {
+            var pulldown_option = document.getElementById("sel_cool_fluid_capacity_unit").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == cool_fluid_capacity_unit){
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+function hot_pressure_unit_change() {
+        var hot_pressure_unit = $('#hot_pressure_unit').val();
+        if (hot_pressure_unit != "") {
+            var pulldown_option = document.getElementById("sel_hot_pressure_unit").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == hot_pressure_unit){
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+function cool_pressure_unit_change() {
+        var cool_pressure_unit = $('#cool_pressure_unit').val();
+        if (cool_pressure_unit != "") {
+            var pulldown_option = document.getElementById("sel_cool_pressure_unit").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == cool_pressure_unit){
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+function exchange_type_change() {
+        var target_eqpt_tp = $('#eqpt_tp').val();
+        if ( target_eqpt_tp != "") {
+            var pulldown_option = document.getElementById("sel_eqpt_tp").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_eqpt_tp){
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//詳細仕様(雛形使用)情報登録･更新処理
+function template_spec_entry(a,b,c,d,e,f) {
+    //alert("熱交換テンプレートJS作動");
+    var work_id = a;
+    var this_step = $('#this_step').val();
+    var next_step = b;
+    var this_department = c;
+    var this_division = d;
+    var budget_id = e;
+    var work_rev_no = f;
+    var template_function_id = $('#template_function_id').val();
+    var exchange_type = $('#exchange_type').val();
+    var exchange_capacity = $('#exchange_capacity_value').val();
+    var exchange_area = $('#exchange_area_value').val();
+    var hot_fluid = $('#hot_fluid_value').val();
+    var hot_design_temperature_raw = $('#hot_design_temperature_value').val();
+    var hot_design_temperature = Math.round(hot_design_temperature_raw);
+    var hot_regular_use_temperature_raw = $('#hot_regular_use_temperature_value').val();
+    var hot_regular_use_temperature = Math.round(hot_regular_use_temperature_raw);
+    var hot_input_temperature_raw = $('#hot_input_temperature_value').val();
+    var hot_input_temperature = Math.round(hot_input_temperature_raw);
+    var hot_output_temperature_raw = $('#hot_output_temperature_value').val();
+    var hot_output_temperature = Math.round(hot_output_temperature_raw);
+    var hot_fluid_capacity = $('#hot_fluid_capacity_value').val();
+    var hot_fluid_capacity_unit = $('#hot_fluid_capacity_unit').val();
+    var hot_design_pressure = $('#hot_design_pressure_value').val();
+    var hot_regular_use_pressure = $('#hot_regular_use_pressure_value').val();
+    var hot_pressure_unit = $('#hot_pressure_unit').val();
+    var cool_fluid = $('#cool_fluid_value').val();
+    var cool_design_temperature_raw = $('#cool_design_temperature_value').val();
+    var cool_design_temperature = Math.round(cool_design_temperature_raw);
+    var cool_regular_use_temperature_raw = $('#cool_regular_use_temperature_value').val();
+    var cool_regular_use_temperature = Math.round(cool_regular_use_temperature_raw);
+    var cool_input_temperature_raw = $('#cool_input_temperature_value').val();
+    var cool_input_temperature = Math.round(cool_input_temperature_raw);
+    var cool_output_temperature_raw = $('#cool_output_temperature_value').val();
+    var cool_output_temperature = Math.round(cool_output_temperature_raw);
+    var cool_fluid_capacity = $('#cool_fluid_capacity_value').val();
+    var cool_fluid_capacity_unit = $('#cool_fluid_capacity_unit').val();
+    var cool_design_pressure = $('#cool_design_pressure_value').val();
+    var cool_regular_use_pressure = $('#cool_regular_use_pressure_value').val();
+    var cool_pressure_unit = $('#cool_pressure_unit').val();
+    var heat_exchange_rem = $('#heat_exchange_rem').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/heat_exchange_spec_entry/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'budget_id' : budget_id,
+                    'work_rev_no' : work_rev_no,
+                    'template_function_id' : template_function_id,
+                    'exchange_type' : exchange_type,
+                    'exchange_capacity' : exchange_capacity,
+                    'exchange_area' : exchange_area,
+                    'hot_fluid' : hot_fluid,
+                    'hot_design_temperature' : hot_design_temperature,
+                    'hot_regular_use_temperature' : hot_regular_use_temperature,
+                    'hot_input_temperature' : hot_input_temperature,
+                    'hot_output_temperature' : hot_output_temperature,
+                    'hot_fluid_capacity' : hot_fluid_capacity,
+                    'hot_fluid_capacity_unit' : hot_fluid_capacity_unit,
+                    'hot_design_pressure' : hot_design_pressure,
+                    'hot_regular_use_pressure' : hot_regular_use_pressure,
+                    'hot_pressure_unit' : hot_pressure_unit,
+                    'cool_fluid' : cool_fluid,
+                    'cool_design_temperature' : cool_design_temperature,
+                    'cool_regular_use_temperature' : cool_regular_use_temperature,
+                    'cool_input_temperature' : cool_input_temperature,
+                    'cool_output_temperature' : cool_output_temperature,
+                    'cool_fluid_capacity' : cool_fluid_capacity,
+                    'cool_fluid_capacity_unit' : cool_fluid_capacity_unit,
+                    'cool_design_pressure' : cool_design_pressure,
+                    'cool_regular_use_pressure' : cool_regular_use_pressure,
+                    'cool_pressure_unit' : cool_pressure_unit,
+                    'heat_exchange_rem' : heat_exchange_rem,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 100000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    //alert(data.msg);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function template_input_check(a,b,c) {
+    var this_step = a;
+    var next_step = b;
+    var action_cd = c;
+    var ng_flag = 0;
+    var exchange_type = $('#exchange_type').val();
+    var exchange_capacity = $('#exchange_capacity_value').val();
+    var exchange_area = $('#exchange_area_value').val();
+    var hot_fluid = $('#hot_fluid_value').val();
+    var hot_input_temperature = $('#hot_input_temperature_value').val();
+    var hot_output_temperature = $('#hot_output_temperature_value').val();
+    var hot_fluid_capacity = $('#hot_fluid_capacity_value').val();
+    var hot_fluid_capacity_unit = $('#hot_fluid_capacity_unit').val();
+    var hot_regular_use_pressure = $('#hot_regular_use_pressure_value').val();
+    var hot_pressure_unit = $('#hot_pressure_unit').val();
+    var cool_fluid = $('#cool_fluid_value').val();
+    var cool_input_temperature = $('#cool_input_temperature_value').val();
+    var cool_fluid_capacity = $('#cool_fluid_capacity_value').val();
+    var cool_fluid_capacity_unit = $('#cool_fluid_capacity_unit').val();
+    var msg = "";
+    var alert_ng_ch_msg_str = ""
+
+    if (exchange_type == "" ){
+        $('#exchange_type').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#exchange_type').css('background-color','white');
+    }
+    if (exchange_capacity == "" && exchange_area == "" ){
+        $('#exchange_capacity').css('background-color','orange');
+        $('#exchange_area').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#exchange_capacity').css('background-color','white');
+        $('#exchange_area').css('background-color','white');
+    }
+    if (hot_fluid == "" ){
+        $('#hot_fluid').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#hot_fluid').css('background-color','white');
+    }
+    if (hot_input_temperature == "" ){
+        $('#hot_input_temperature').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#hot_input_temperature').css('background-color','white');
+    }
+    if (hot_output_temperature == "" ){
+        $('#hot_output_temperature').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#hot_output_temperature').css('background-color','white');
+    }
+    if (hot_fluid_capacity == "" ){
+        $('#hot_fluid_capacity').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#hot_fluid_capacity').css('background-color','white');
+    }
+    if (hot_fluid_capacity_unit == "" ){
+        $('#hot_fluid_capacity_unit').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#hot_fluid_capacity_unit').css('background-color','white');
+    }
+    if (hot_regular_use_pressure == "" ){
+        $('#hot_regular_use_pressure').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#hot_regular_use_pressure').css('background-color','white');
+    }
+    if (hot_pressure_unit == "" ){
+        $('#hot_pressure_unit').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#hot_pressure_unit').css('background-color','white');
+    }
+    if (cool_fluid == "" ){
+        $('#cool_fluid').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#cool_fluid').css('background-color','white');
+    }
+    if (cool_input_temperature == "" ){
+        $('#cool_input_temperature').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#cool_input_temperature').css('background-color','white');
+    }
+    if (cool_fluid_capacity == "" ){
+        $('#cool_fluid_capacity').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#cool_fluid_capacity').css('background-color','white');
+    }
+    if (cool_fluid_capacity_unit == "" ){
+        $('#cool_fluid_capacity_unit').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#cool_fluid_capacity_unit').css('background-color','white');
+    }
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常時処理
+    if( ng_all_flag == 0){
+        template_spec_edit(this_step,next_step,action_cd);
+    }else{
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+function template_spec_edit(a,b,c){
+        var this_step = a;
+        //var next_step = b;
+        //var action_cd = c;
+        var work_target_id = $('#target_work_id').val();
+        var exchange_type = $('#exchange_type').val();
+        var exchange_capacity = $('#exchange_capacity_value').val();
+        var exchange_area = $('#exchange_area_value').val();
+        var hot_fluid = $('#hot_fluid_value').val();
+        var hot_design_temperature = $('#hot_design_temperature_value').val();
+        var hot_regular_use_temperature = $('#hot_regular_use_temperature_value').val();
+        var hot_input_temperature_raw = $('#hot_input_temperature_value').val();
+        var hot_input_temperature = Math.round(hot_input_temperature_raw);
+        alert(hot_input_temperature);
+        var hot_output_temperature = $('#hot_output_temperature_value').val();
+        var hot_fluid_capacity = $('#hot_fluid_capacity_value').val();
+        var hot_fluid_capacity_unit = $('#hot_fluid_capacity_unit').val();
+        var hot_design_pressure = $('#hot_design_pressure_value').val();
+        var hot_regular_use_pressure = $('#hot_regular_use_pressure_value').val();
+        var hot_pressure_unit = $('#hot_pressure_unit').val();
+        var cool_fluid = $('#cool_fluid_value').val();
+        var cool_design_temperature = $('#cool_design_temperature_value').val();
+        var cool_regular_use_temperature = $('#cool_regular_use_temperature_value').val();
+        var cool_input_temperature = $('#cool_input_temperature_value').val();
+        var cool_output_temperature = $('#cool_output_temperature_value').val();
+        var cool_fluid_capacity = $('#cool_fluid_capacity_value').val();
+        var cool_fluid_capacity_unit = $('#cool_fluid_capacity_unit').val();
+        var cool_design_pressure = $('#cool_design_pressure_value').val();
+        var cool_regular_use_pressure = $('#cool_regular_use_pressure_value').val();
+        var cool_pressure_unit = $('#cool_pressure_unit').val();
+        var heat_exchange_rem = $('#heat_exchange_rem').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/heat_exchange_spec_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'work_target_id' : work_target_id,
+                    'exchange_type' : exchange_type,
+                    'exchange_capacity' : exchange_capacity,
+                    'exchange_area' : exchange_area,
+                    'hot_fluid' : hot_fluid,
+                    'hot_design_temperature' : hot_design_temperature,
+                    'hot_regular_use_temperature' : hot_regular_use_temperature,
+                    'hot_input_temperature' : hot_input_temperature,
+                    'hot_output_temperature' : hot_output_temperature,
+                    'hot_fluid_capacity' : hot_fluid_capacity,
+                    'hot_fluid_capacity_unit' : hot_fluid_capacity_unit,
+                    'hot_design_pressure' : hot_design_pressure,
+                    'hot_regular_use_pressure' : hot_regular_use_pressure,
+                    'hot_pressure_unit' : hot_pressure_unit,
+                    'cool_fluid' : cool_fluid,
+                    'cool_design_temperature' : cool_design_temperature,
+                    'cool_regular_use_temperature' : cool_regular_use_temperature,
+                    'cool_input_temperature' : cool_input_temperature,
+                    'cool_output_temperature' : cool_output_temperature,
+                    'cool_fluid_capacity' : cool_fluid_capacity,
+                    'cool_fluid_capacity_unit' : cool_fluid_capacity_unit,
+                    'cool_design_pressure' : cool_design_pressure,
+                    'cool_regular_use_pressure' : cool_regular_use_pressure,
+                    'cool_pressure_unit' : cool_pressure_unit,
+                    'heat_exchange_rem' : heat_exchange_rem,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+}
+
+/* この下は不要
+function required_function_delete() {
+    var budget_required_function_id = $('#budget_required_function_id').val();
+    var this_department = $('#user_department_cd').val();
+    var this_division = $('#user_division_cd').val();
+    var this_step = $('#this_step').val();
+    $.ajax({
+        url: "/isk_tools/fms/action/required_function_delete/",
+                type: "POST",
+                data : {
+                    'budget_required_function_id' : budget_required_function_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#budget_required_function_id').val(0);
+                    required_function_list();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+*/
+function value_change(a, b) {
+    var id_name = a;
+    var value = b;
+    var target_id_name = "#" + id_name + "_value"
+    $(target_id_name).val(value);
+}
+function hot_fluid_capacity_unit_value_change(a) {
+    var value = a;
+    $('#hot_fluid_capacity_unit').val(value);
+}
+function cool_fluid_capacity_unit_value_change(a) {
+    var value = a;
+    $('#cool_fluid_capacity_unit').val(value);
+}
+function hot_pressure_unit_value_change(a) {
+    var value = a;
+    $('#hot_pressure_unit').val(value);
+}
+function cool_pressure_unit_value_change(a) {
+    var value = a;
+    $('#cool_pressure_unit').val(value);
+}
+function concentration_unit_value_change(a) {
+    var value = a;
+    $('#rf_concentration_unit').val(value);
+}
+function exchange_type_value_change(a) {
+    var value = a;
+    $('#eqpt_tp').val(value);
+    var choice_function = $('#specification_function').val();
+    var template_function_id = $('#template_function_id').val();
+    var work_id = $('#target_work_id').val();
+    if (work_id == "") {
+        work_id = 0;
+    }
+    var eqpt_tp = value;
+    work_template_function_info(choice_function,template_function_id,work_id,eqpt_tp);
+}
+</script>
+
+<style type="text/css">
+div.scroll_function_div {
+  width: 640px;
+  height: 830px;
+  overflow: scroll;
+}
+</style>
+    <div style="float:left; border-style: ridge;">
+        <div id="required_function_info">要求機能</div>
+    </div>
+    <div style="float:left;size=20px">　　　　　</div>
+    <div style="float:left;">
+        <div><h2 class="page-header">熱交換機能詳細</h2></div>
+        <div >
+            <div>
+            <input type="hidden" id="template_function_id" value="{{ template_function_id }}" size="4">
+            <input type="hidden" id="exchange_type" value="{{ exchange_type }}" size="4">
+            <input type="hidden" id="exchange_capacity_value" value="{{ exchange_capacity }}" size="4">
+            <input type="hidden" id="exchange_area_value" value="{{ exchange_area }}" size="4">
+            <input type="hidden" id="hot_fluid_value" value="{{ hot_fluid }}" size="4">
+            <input type="hidden" id="hot_design_temperature_value" value="{{ hot_design_temperature }}" size="4">
+            <input type="hidden" id="hot_regular_use_temperature_value" value="{{ hot_regular_use_temperature }}" size="4">
+            <input type="hidden" id="hot_input_temperature_value" value="{{ hot_input_temperature }}" size="4">
+            <input type="hidden" id="hot_output_temperature_value" value="{{ hot_output_temperature }}" size="4">
+            <input type="hidden" id="hot_fluid_capacity_value" value="{{ hot_fluid_capacity }}" size="4">
+            <input type="hidden" id="hot_fluid_capacity_unit" value="{{ hot_fluid_capacity_unit }}" size="4">
+            <input type="hidden" id="hot_design_pressure_value" value="{{ hot_design_pressure }}" size="4">
+            <br>
+            <input type="hidden" id="hot_regular_use_pressure_value" value="{{ hot_regular_use_pressure }}" size="4">
+            <input type="hidden" id="hot_pressure_unit" value="{{ hot_pressure_unit }}" size="4">
+            <input type="hidden" id="cool_fluid_value" value="{{ cool_fluid }}" size="4">
+            <input type="hidden" id="cool_design_temperature_value" value="{{ cool_design_temperature }}" size="4">
+            <input type="hidden" id="cool_regular_use_temperature_value" value="{{ cool_regular_use_temperature }}" size="4">
+            <input type="hidden" id="cool_input_temperature_value" value="{{ cool_input_temperature }}" size="4">
+            <input type="hidden" id="cool_output_temperature_value" value="{{ cool_output_temperature }}" size="4">
+            <input type="hidden" id="cool_fluid_capacity_value" value="{{ cool_fluid_capacity }}" size="4">
+            <input type="hidden" id="cool_fluid_capacity_unit" value="{{ cool_fluid_capacity_unit }}" size="4">
+            <input type="hidden" id="cool_design_pressure_value" value="{{ cool_design_pressure }}" size="4">
+            <input type="hidden" id="cool_regular_use_pressure_value" value="{{ cool_regular_use_pressure }}" size="4">
+            <input type="hidden" id="cool_pressure_unit" value="{{ cool_pressure_unit }}" size="4">
+            </div>
+
+            <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+
+            <div style="float:left;">
+                <table>
+                    <tr>
+                        <td><div><font size="4">機能</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="specification_function" value="熱交換" size="8"></font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">機器タイプ</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <input type="hidden" id="eqpt_tp" value="{{ exchange_type }}" size="12">
+                            <select id="sel_eqpt_tp" name="sel_eqpt_tp" onchange="exchange_type_value_change(value);">
+                                <option value=""></option>
+                                {% for heat_exchange_type_list in heat_exchange_type_list %}
+                                    <option value="{{ heat_exchange_type_list.eqpt_tp }}" >{{ heat_exchange_type_list.eqpt_cat_nm }}</option>
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                    <tr>
+                        <td><div><font size="4">熱交換熱量</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="exchange_capacity" value="{{ exchange_capacity }}" size="12" onchange="value_change(id, value);" >Mcal/h</font></div></td>
+                    </tr>
+                    {% if display_template_item_for_function_list.display_exchange_area_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">伝熱面積</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="exchange_area" value="{{ exchange_area }}" size="8" onchange="value_change(id, value);" >m2</font></div></td>
+                        </tr>
+                    {% endif %}
+                    <tr>
+                        <td><div><font size="4">その他</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><textarea id="heat_exchange_rem" name="heat_exchange_rem" rows="10" cols="30" onchange="value_change(id, value);">{{ heat_exchange_rem }}</textarea></font></div></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="float:left;size=5px">　</div>
+            <div style="float:left;">
+                <table>
+                    {% if display_template_item_for_function_list.display_hot_fluid_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温物質</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="hot_fluid" value="{{ hot_fluid }}" size="16" onchange="value_change(id, value);"></font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_design_temperature_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温側設計温度</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="hot_design_temperature" value="{{ hot_design_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_regular_use_temperature_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温側常陽温度</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="hot_regular_use_temperature" value="{{ hot_regular_use_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_input_temperature_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温側入口温度</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="hot_input_temperature" value="{{ hot_input_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_output_temperature_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温側出口温度</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="hot_output_temperature" value="{{ hot_output_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_fluid_capacity_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温物質流量</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="hot_fluid_capacity" value="{{ hot_fluid_capacity }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_fluid_capacity_unit_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温物質量単位</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4">
+                                <select id="sel_hot_fluid_capacity_unit" name="display_hot_fluid_capacity_unit_flag" onchange="hot_fluid_capacity_unit_value_change(value);">
+                                    <option value=""></option>
+                                    {% for amount_unit_list in amount_unit_list %}
+                                        <option value="{{ amount_unit_list.unit_id }}" >{{ amount_unit_list.unit }}</option>
+                                    {% endfor %}
+                                </select>
+                            </font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_design_pressure_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温側設計圧力</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="hot_design_pressure" value="{{ hot_design_pressure }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_regular_use_pressure_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温側常用圧力</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4"><input type="text" id="hot_regular_use_pressure" value="{{ hot_regular_use_pressure }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                        </tr>
+                    {% endif %}
+                    {% if display_template_item_for_function_list.display_hot_pressure_unit_flag == 1 %}
+                        <tr>
+                            <td><div><font size="4">高温側圧力単位</font></div></td>
+                            <td><div><font size="4">：　</font></div></td>
+                            <td><div><font size="4">
+                                <select id="sel_hot_pressure_unit" name="sel_hot_pressure_unit" onchange="hot_pressure_unit_value_change(value);">
+                                    <option value=""></option>
+                                    {% for pressure_unit_list in pressure_unit_list %}
+                                        <option value="{{ pressure_unit_list.unit_id }}" >{{ pressure_unit_list.unit }}</option>
+                                    {% endfor %}
+                                </select>
+                            </font></div></td>
+                        </tr>
+                    {% endif %}
+                </table>
+            </div>
+            <div style="float:left;size=5px">　</div>
+            <div style="float:left;">
+                <table>
+                {% if display_template_item_for_function_list.display_cool_fluid_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温物質</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="cool_fluid" value="{{ cool_fluid }}" size="16" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_design_temperature_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温側設計温度</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="cool_design_temperature" value="{{ cool_design_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_regular_use_temperature_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温側常陽温度</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="cool_regular_use_temperature" value="{{ cool_regular_use_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_input_temperature_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温側入口温度</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="cool_input_temperature" value="{{ cool_input_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_output_temperature_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温側出口温度</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="cool_output_temperature" value="{{ cool_output_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_fluid_capacity_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温物質流量</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="cool_fluid_capacity" value="{{ cool_fluid_capacity }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_fluid_capacity_unit_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温物質量単位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="sel_cool_fluid_capacity_unit" name="sel_cool_fluid_capacity_unit" onchange="cool_fluid_capacity_unit_value_change(value);">
+                                <option value=""></option>
+                                {% for amount_unit_list in amount_unit_list %}
+                                    <option value="{{ amount_unit_list.unit_id }}" >{{ amount_unit_list.unit }}</option>
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_design_pressure_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温側設計圧力</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="cool_design_pressure" value="{{ cool_design_pressure }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_regular_use_pressure_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温側常用圧力</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4"><input type="text" id="cool_regular_use_pressure" value="{{ cool_regular_use_pressure }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_pressure_unit_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">低温側圧力単位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="4">
+                            <select id="sel_cool_pressure_unit" name="sel_cool_pressure_unit" onchange="cool_pressure_unit_value_change(value);">
+                                <option value=""></option>
+                                {% for pressure_unit_list in pressure_unit_list %}
+                                    <option value="{{ pressure_unit_list.unit_id }}" >{{ pressure_unit_list.unit }}</option>
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                {% endif %}
+                </table>
+            </div>
+
+            </div><!--ng_character_checkここまで-->
+
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+

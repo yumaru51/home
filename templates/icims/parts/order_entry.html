@@ -1,0 +1,1362 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+function item_code_change() {
+        var item_code = $('#item_code_oe').val();
+        //alert($('#item_code').val());
+        //alert(item_code);
+        $('#selectitemcode7').val(item_code_oe);
+        //listfilter7()
+        //alert('通過');
+        $.ajax({
+                url: "/ics/get_item_info/",
+                type: "POST",
+                data : {
+                    'item_code': item_code,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#item_name_oe').val(data.item_name);
+                    $('#item_group_oe').val(data.item_group);
+                    $('#basic_amount').val(data.basic_amount);
+                    //$('#phone_no_oe').val(data.company_phone_no);
+                    //$('#place_for_receipt_of_goods_name_oe').val(data.company_name);
+                    //$('#place_for_receipt_of_goods_oe').val(data.company_code);
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function get_company_info() {
+        var company_code = $('#place_for_receipt_of_goods_oe').val();
+        var company_name = $('#place_for_receipt_of_goods_name_oe').val();
+        //alert(company_code);
+        //alert(company_name);
+            $.ajax({
+                url: "/imsds/get_company_info/",
+                type: "POST",
+                data : {
+                    'company_code': company_code,
+                    'company_name': company_name,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#prefecture_oe').val(data.company_prefecture);
+                    $('#address_oe').val(data.company_address);
+                    $('#post_no_oe').val(data.company_post_no);
+                    $('#phone_no_oe').val(data.company_phone_no);
+                    $('#place_for_receipt_of_goods_name_oe').val(data.company_name);
+                    $('#place_for_receipt_of_goods_oe').val(data.company_code);
+                    $('#carrier_oe').val(data.carrier);
+                    $('#incoterm_oe').val(data.incoterm);
+                    $('#delivery_point_oe').val(data.delivery_point);
+                    $('#handling_office_oe').val(data.handling_office);
+                    if ( data.reserve_flag == 1 ) {
+                        if ( data.low_spec_reservation_flag == 1 ) {
+                            $('#selectquality17').val('L');
+                        }else{
+                            $('#selectreservecompany7').val(data.company_code);
+                            $('#selectquality17').val('A');
+                        }
+                    }
+                    for (var i = 1; i < 21 ; i++ ) {
+                        if (i == data.supplemental_task1_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task2_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task3_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task4_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task5_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task6_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task7_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task8_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task9_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task10_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task11_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task12_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task13_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task14_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task15_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task16_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task17_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task18_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task19_flag) {
+                            supplemental_task_check(i);
+                        }
+                        else if ( i ==  data.supplemental_task20_flag) {
+                            supplemental_task_check(i);
+                        }
+                    }
+                    $('#rem1_oe').val(data.rem1);
+                    $('#rem2_oe').val(data.rem2);
+                    $('#rem3_oe').val(data.rem3);
+                    listfilter7()
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function supplemental_task_check(a) {
+
+        var supplemental_task1_no = $('#incidental_work_order1_oe').val();
+        var supplemental_task2_no = $('#incidental_work_order2_oe').val();
+        var supplemental_task3_no = $('#incidental_work_order3_oe').val();
+        var supplemental_task4_no = $('#incidental_work_order4_oe').val();
+        var supplemental_task5_no = $('#incidental_work_order5_oe').val();
+        var supplemental_task6_no = $('#incidental_work_order6_oe').val();
+        var supplemental_task7_no = $('#incidental_work_order7_oe').val();
+        var supplemental_task8_no = $('#incidental_work_order8_oe').val();
+        var supplemental_task9_no = $('#incidental_work_order9_oe').val();
+        var supplemental_task10_no = $('#incidental_work_order10_oe').val();
+        var supplemental_task11_no = $('#incidental_work_order11_oe').val();
+        var supplemental_task12_no = $('#incidental_work_order12_oe').val();
+        var supplemental_task13_no = $('#incidental_work_order13_oe').val();
+        var supplemental_task14_no = $('#incidental_work_order14_oe').val();
+        var supplemental_task15_no = $('#incidental_work_order15_oe').val();
+        var supplemental_task16_no = $('#incidental_work_order16_oe').val();
+        var supplemental_task17_no = $('#incidental_work_order17_oe').val();
+        var supplemental_task18_no = $('#incidental_work_order18_oe').val();
+        var supplemental_task19_no = $('#incidental_work_order19_oe').val();
+        var supplemental_task20_no = $('#incidental_work_order20_oe').val();
+
+    if (supplemental_task1_no == a) {
+        document.getElementById("incidental_work_order1_oe").checked = true;
+    }
+    else if (supplemental_task2_no == a) {
+        document.getElementById("incidental_work_order2_oe").checked = true;
+    }
+    else if (supplemental_task3_no == a) {
+        document.getElementById("incidental_work_order3_oe").checked = true;
+    }
+    else if (supplemental_task4_no == a) {
+        document.getElementById("incidental_work_order4_oe").checked = true;
+    }
+    else if (supplemental_task5_no == a) {
+        document.getElementById("incidental_work_order5_oe").checked = true;
+    }
+    else if (supplemental_task6_no == a) {
+        document.getElementById("incidental_work_order6_oe").checked = true;
+    }
+    else if (supplemental_task7_no == a) {
+        document.getElementById("incidental_work_order7_oe").checked = true;
+    }
+    else if (supplemental_task8_no == a) {
+        document.getElementById("incidental_work_order8_oe").checked = true;
+    }
+    else if (supplemental_task9_no == a) {
+        document.getElementById("incidental_work_order9_oe").checked = true;
+    }
+    else if (supplemental_task10_no == a) {
+        document.getElementById("incidental_work_order10_oe").checked = true;
+    }
+    else if (supplemental_task11_no == a) {
+        document.getElementById("incidental_work_order11_oe").checked = true;
+    }
+    else if (supplemental_task12_no == a) {
+        document.getElementById("incidental_work_order12_oe").checked = true;
+    }
+    else if (supplemental_task13_no == a) {
+        document.getElementById("incidental_work_order13_oe").checked = true;
+    }
+    else if (supplemental_task14_no == a) {
+        document.getElementById("incidental_work_order14_oe").checked = true;
+    }
+    else if (supplemental_task15_no == a) {
+        document.getElementById("incidental_work_order15_oe").checked = true;
+    }
+    else if (supplemental_task16_no == a) {
+        document.getElementById("incidental_work_order16_oe").checked = true;
+    }
+    else if (supplemental_task17_no == a) {
+        document.getElementById("incidental_work_order17_oe").checked = true;
+    }
+    else if (supplemental_task18_no == a) {
+        document.getElementById("incidental_work_order18_oe").checked = true;
+    }
+    else if (supplemental_task19_no == a) {
+        document.getElementById("incidental_work_order19_oe").checked = true;
+    }
+    else if (supplemental_task20_no == a) {
+        document.getElementById("incidental_work_order20_oe").checked = true;
+    }
+}
+function supplemental_task1_click() {
+        if (document.getElementById("incidental_work_order1_oe").checked == true) {
+            document.getElementById("incidental_work_order1_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order1_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task2_click() {
+        if (document.getElementById("incidental_work_order2_oe").checked == true) {
+            document.getElementById("incidental_work_order2_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order2_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task3_click() {
+        if (document.getElementById("incidental_work_order3_oe").checked == true) {
+            document.getElementById("incidental_work_order3_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order3_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task4_click() {
+        if (document.getElementById("incidental_work_order4_oe").checked == true) {
+            document.getElementById("incidental_work_order4_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order4_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task5_click() {
+        if (document.getElementById("incidental_work_order5_oe").checked == true) {
+            document.getElementById("incidental_work_order5_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order5_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task6_click() {
+        if (document.getElementById("incidental_work_order6_oe").checked == true) {
+            document.getElementById("incidental_work_order6_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order6_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task7_click() {
+        if (document.getElementById("incidental_work_order7_oe").checked == true) {
+            document.getElementById("incidental_work_order7_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order7_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task8_click() {
+        if (document.getElementById("incidental_work_order8_oe").checked == true) {
+            document.getElementById("incidental_work_order8_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order8_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task9_click() {
+        if (document.getElementById("incidental_work_order9_oe").checked == true) {
+            document.getElementById("incidental_work_order9_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order9_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task10_click() {
+        if (document.getElementById("incidental_work_order10_oe").checked == true) {
+            document.getElementById("incidental_work_order10_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order10_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task11_click() {
+        if (document.getElementById("incidental_work_order11_oe").checked == true) {
+            document.getElementById("incidental_work_order11_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order11_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task12_click() {
+        if (document.getElementById("incidental_work_order12_oe").checked == true) {
+            document.getElementById("incidental_work_order12_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order12_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task13_click() {
+        if (document.getElementById("incidental_work_order13_oe").checked == true) {
+            document.getElementById("incidental_work_order13_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order13_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task14_click() {
+        if (document.getElementById("incidental_work_order14_oe").checked == true) {
+            document.getElementById("incidental_work_order14_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order14_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task15_click() {
+        if (document.getElementById("incidental_work_order15_oe").checked == true) {
+            document.getElementById("incidental_work_order15_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order15_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task16_click() {
+        if (document.getElementById("incidental_work_order16_oe").checked == true) {
+            document.getElementById("incidental_work_order16_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order16_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task17_click() {
+        if (document.getElementById("incidental_work_order17_oe").checked == true) {
+            document.getElementById("incidental_work_order17_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order17_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task18_click() {
+        if (document.getElementById("incidental_work_order18_oe").checked == true) {
+            document.getElementById("incidental_work_order18_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order18_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task19_click() {
+        if (document.getElementById("incidental_work_order19_oe").checked == true) {
+            document.getElementById("incidental_work_order19_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order19_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task20_click() {
+        if (document.getElementById("incidental_work_order20_oe").checked == true) {
+            document.getElementById("incidental_work_order20_s").checked = true;
+        } else {
+            document.getElementById("incidental_work_order20_s").checked = false;
+        }
+        getstockdata(10001);
+}
+function supplemental_task21_click() {
+        if (document.getElementById("incidental_work_order21_oe").checked == true) {
+            alert('移動費用が1万円程度かかります！！');
+            document.getElementById("incidental_work_order1_s").checked = false;
+            document.getElementById("incidental_work_order2_s").checked = false;
+            document.getElementById("incidental_work_order3_s").checked = false;
+            document.getElementById("incidental_work_order4_s").checked = false;
+            document.getElementById("incidental_work_order5_s").checked = false;
+            document.getElementById("incidental_work_order6_s").checked = false;
+            document.getElementById("incidental_work_order7_s").checked = false;
+            document.getElementById("incidental_work_order8_s").checked = false;
+            document.getElementById("incidental_work_order9_s").checked = false;
+            document.getElementById("incidental_work_order10_s").checked = false;
+            document.getElementById("incidental_work_order11_s").checked = false;
+            document.getElementById("incidental_work_order12_s").checked = false;
+            document.getElementById("incidental_work_order13_s").checked = false;
+            document.getElementById("incidental_work_order14_s").checked = false;
+            document.getElementById("incidental_work_order15_s").checked = false;
+            document.getElementById("incidental_work_order16_s").checked = false;
+            document.getElementById("incidental_work_order17_s").checked = false;
+            document.getElementById("incidental_work_order18_s").checked = false;
+            document.getElementById("incidental_work_order19_s").checked = false;
+            document.getElementById("incidental_work_order20_s").checked = false;
+        } else {
+            if (document.getElementById("incidental_work_order1_oe").checked == true) {
+                document.getElementById("incidental_work_order1_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order1_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order2_oe").checked == true) {
+                document.getElementById("incidental_work_order2_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order2_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order3_oe").checked == true) {
+                document.getElementById("incidental_work_order3_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order3_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order4_oe").checked == true) {
+                document.getElementById("incidental_work_order4_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order4_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order5_oe").checked == true) {
+                document.getElementById("incidental_work_order5_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order5_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order6_oe").checked == true) {
+                document.getElementById("incidental_work_order6_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order6_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order7_oe").checked == true) {
+                document.getElementById("incidental_work_order7_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order7_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order8_oe").checked == true) {
+                document.getElementById("incidental_work_order8_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order8_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order9_oe").checked == true) {
+                document.getElementById("incidental_work_order9_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order9_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order10_oe").checked == true) {
+                document.getElementById("incidental_work_order10_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order10_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order11_oe").checked == true) {
+                document.getElementById("incidental_work_order11_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order11_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order12_oe").checked == true) {
+                document.getElementById("incidental_work_order12_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order12_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order13_oe").checked == true) {
+                document.getElementById("incidental_work_order13_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order13_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order14_oe").checked == true) {
+                document.getElementById("incidental_work_order14_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order14_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order15_oe").checked == true) {
+                document.getElementById("incidental_work_order15_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order15_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order16_oe").checked == true) {
+                document.getElementById("incidental_work_order16_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order16_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order17_oe").checked == true) {
+                document.getElementById("incidental_work_order17_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order17_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order18_oe").checked == true) {
+                document.getElementById("incidental_work_order18_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order18_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order19_oe").checked == true) {
+                document.getElementById("incidental_work_order19_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order19_s").checked = false;
+            }
+            if (document.getElementById("incidental_work_order20_oe").checked == true) {
+                document.getElementById("incidental_work_order20_s").checked = true;
+            } else {
+                document.getElementById("incidental_work_order20_s").checked = false;
+            }
+        }
+        getstockdata(10001);
+}
+function incidental_work_check() {
+            if (document.getElementById("supplemental_task1_flag").value > 0) {
+                document.getElementById("incidental_work_order1_oe").checked = true;
+            }else{
+                $('#incidental_work_order1_oe').val(1);
+            }
+            if (document.getElementById("supplemental_task2_flag").value > 0) {
+                document.getElementById("incidental_work_order2_oe").checked = true;
+            }else{
+                $('#incidental_work_order2_oe').val(2);
+            }
+            if (document.getElementById("supplemental_task3_flag").value > 0) {
+                document.getElementById("incidental_work_order3_oe").checked = true;
+            }else{
+                $('#incidental_work_order3_oe').val(3);
+            }
+            if (document.getElementById("supplemental_task4_flag").value > 0) {
+                document.getElementById("incidental_work_order4_oe").checked = true;
+            }else{
+                $('#incidental_work_order4_oe').val(4);
+            }
+            if (document.getElementById("supplemental_task5_flag").value > 0) {
+                document.getElementById("incidental_work_order5_oe").checked = true;
+            }else{
+                $('#incidental_work_order5_oe').val(5);
+            }
+            if (document.getElementById("supplemental_task6_flag").value > 0) {
+                document.getElementById("incidental_work_order6_oe").checked = true;
+            }else{
+                $('#incidental_work_order6_oe').val(6);
+            }
+            if (document.getElementById("supplemental_task7_flag").value > 0) {
+                document.getElementById("incidental_work_order7_oe").checked = true;
+            }else{
+                $('#incidental_work_order7_oe').val(7);
+            }
+            if (document.getElementById("supplemental_task8_flag").value > 0) {
+                document.getElementById("incidental_work_order8_oe").checked = true;
+            }else{
+                $('#incidental_work_order8_oe').val(8);
+            }
+            if (document.getElementById("supplemental_task9_flag").value > 0) {
+                document.getElementById("incidental_work_order9_oe").checked = true;
+            }else{
+                $('#incidental_work_order9_oe').val(9);
+            }
+            if (document.getElementById("supplemental_task10_flag").value > 0) {
+                document.getElementById("incidental_work_order10_oe").checked = true;
+            }else{
+                $('#incidental_work_order10_oe').val(10);
+            }
+            if (document.getElementById("supplemental_task11_flag").value > 0) {
+                document.getElementById("incidental_work_order11_oe").checked = true;
+            }else{
+                $('#incidental_work_order11_oe').val(11);
+            }
+            if (document.getElementById("supplemental_task12_flag").value > 0) {
+                document.getElementById("incidental_work_order12_oe").checked = true;
+            }else{
+                $('#incidental_work_order12_oe').val(12);
+            }
+            if (document.getElementById("supplemental_task13_flag").value > 0) {
+                document.getElementById("incidental_work_order13_oe").checked = true;
+            }else{
+                $('#incidental_work_order13_oe').val(13);
+            }
+            if (document.getElementById("supplemental_task14_flag").value > 0) {
+                document.getElementById("incidental_work_order14_oe").checked = true;
+            }else{
+                $('#incidental_work_order14_oe').val(14);
+            }
+            if (document.getElementById("supplemental_task15_flag").value > 0) {
+                document.getElementById("incidental_work_order15_oe").checked = true;
+            }else{
+                $('#incidental_work_order15_oe').val(15);
+            }
+            if (document.getElementById("supplemental_task16_flag").value > 0) {
+                document.getElementById("incidental_work_order16_oe").checked = true;
+            }else{
+                $('#incidental_work_order16_oe').val(16);
+            }
+            if (document.getElementById("supplemental_task17_flag").value > 0) {
+                document.getElementById("incidental_work_order17_oe").checked = true;
+            }else{
+                $('#incidental_work_order17_oe').val(17);
+            }
+            if (document.getElementById("supplemental_task18_flag").value > 0) {
+                document.getElementById("incidental_work_order18_oe").checked = true;
+            }else{
+                $('#incidental_work_order18_oe').val(18);
+            }
+            if (document.getElementById("supplemental_task19_flag").value > 0) {
+                document.getElementById("incidental_work_order19_oe").checked = true;
+            }else{
+                $('#incidental_work_order19_oe').val(19);
+            }
+            if (document.getElementById("supplemental_task20_flag").value > 0) {
+                document.getElementById("incidental_work_order20_oe").checked = true;
+            }else{
+                $('#incidental_work_order20_oe').val(20);
+            }
+}
+function temporary_entry(a,b) {
+    var order_id = a ;
+    var entry_mode = 100201 ;
+    var old_packed_amount = $('#old_order_packed_amount_oe').val();
+    var new_packed_amount = $('#order_packed_amount_oe').val();
+    var difference_packed_amount = old_packed_amount - new_packed_amount;
+    var reserve_packed_amount = $('#reserve_packed_amount').val();
+    var non_stock_allocation_packed_amount = $('#non_stock_allocation_packed_amount').val();
+    if ( b == 100201 ) {
+        order_entry(order_id, entry_mode);
+    }else{
+        if ( old_packed_amount == new_packed_amount) {
+            order_entry(order_id, entry_mode);
+        }else if ( non_stock_allocation_packed_amount == old_packed_amount) {
+            order_entry(order_id, entry_mode);
+        }else{
+            alert('引当を取り消してから受注数量の変更をしてください！！');
+        }
+    }
+}
+function entry(a) {
+        var order_id = a ;
+        var entry_mode = 100251 ;
+        var order_date= $('#datepicker3').val();
+        var order_no = $('#order_no_oe').val();
+        var shipment_no = $('#shipment_no_oe').val();
+        var voucher_type = $('#voucher_type_oe').val();
+        var registration_division = $('#registration_division_oe').val();
+        var delivery_date = $('#datepicker4').val();
+        var delivery_point = $('#delivery_point_oe').val();
+        var order_route = $('#order_route_oe').val();
+        var place_for_receipt_of_goods = $('#place_for_receipt_of_goods_oe').val();
+        var customer_order_no = $('#customer_order_no_oe').val();
+        var incidental_work_order1 = $('#incidental_work_order1_oe').val();
+        var incidental_work_order2 = $('#incidental_work_order2_oe').val();
+        var incidental_work_order3 = $('#incidental_work_order3_oe').val();
+        var incidental_work_order4 = $('#incidental_work_order4_oe').val();
+        var incidental_work_order5 = $('#incidental_work_order5_oe').val();
+        var incidental_work_order6 = $('#incidental_work_order6_oe').val();
+        var incidental_work_order7 = $('#incidental_work_order7_oe').val();
+        var incidental_work_order8 = $('#incidental_work_order8_oe').val();
+        var incidental_work_order9 = $('#incidental_work_order9_oe').val();
+        var incidental_work_order10 = $('#incidental_work_order10_oe').val();
+        var incidental_work_order11 = $('#incidental_work_order11_oe').val();
+        var incidental_work_order12 = $('#incidental_work_order12_oe').val();
+        var incidental_work_order13 = $('#incidental_work_order13_oe').val();
+        var incidental_work_order14 = $('#incidental_work_order14_oe').val();
+        var incidental_work_order15 = $('#incidental_work_order15_oe').val();
+        var incidental_work_order16 = $('#incidental_work_order16_oe').val();
+        var incidental_work_order17 = $('#incidental_work_order17_oe').val();
+        var incidental_work_order18 = $('#incidental_work_order18_oe').val();
+        var incidental_work_order19 = $('#incidental_work_order19_oe').val();
+        var incidental_work_order20 = $('#incidental_work_order20_oe').val();
+        var item_code = $('#item_code_oe').val();
+        var order_packed_amount = $('#order_packed_amount_oe').val();
+        var order_amount = $('#order_amount_oe').val();
+        var rem1 = $('#rem1_oe').val();
+        var rem2 = $('#rem2_oe').val();
+        var rem3 = $('#rem3_oe').val();
+        var ng_flag = 0;
+        var old_packed_amount = $('#old_order_packed_amount_oe').val();
+        var new_packed_amount = $('#order_packed_amount_oe').val();
+        var difference_packed_amount = old_packed_amount - new_packed_amount;
+        var reserve_packed_amount = $('#reserve_packed_amount').val();
+        var non_stock_allocation_packed_amount = $('#non_stock_allocation_packed_amount').val();
+        if (order_date == "" ){
+            $('#datepicker3').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (order_no == "" ){
+            $('#order_no_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (voucher_type == "" ){
+            $('#voucher_type_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (registration_division == "" ){
+            $('#registration_division_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (delivery_date == "" ){
+            $('#item_cdatepicker4ategory_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (order_route == "" ){
+            $('#order_route_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (place_for_receipt_of_goods == "" ){
+            $('#place_for_receipt_of_goods_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (customer_order_no == "" ){
+            $('#customer_order_no_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (item_code == "" ){
+            $('#item_code_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (order_packed_amount == "" ){
+            $('#order_packed_amount_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (order_amount == "" ){
+            $('#order_amount_oe').css('background-color','orange');
+            ng_flag = ng_flag + 1 ;
+        }
+        if (non_stock_allocation_packed_amount == 0 ) {
+            if ( ng_flag == 0 ) {
+                order_entry(order_id, entry_mode);
+            }
+            else{
+                alert('未入力項目があります！！');
+            }
+        }else{
+            alert('引当が完了していません！！');
+        }
+}
+function order_entry(a, b) {
+        var order_id = a ;
+        var order_date_before= $('#datepicker3').val();
+        var order_date_before = order_date_before.replace( '年', '-' );
+        var order_date_before = order_date_before.replace( '月', '-' );
+        var order_date = order_date_before.replace( '日', ' ' ) + '00:00';
+        var order_no = $('#order_no_oe').val();
+        var shipment_no = $('#shipment_no_oe').val();
+        var voucher_type = $('#voucher_type_oe').val();
+        var registration_division = $('#registration_division_oe').val();
+        var delivery_date_before = $('#datepicker4').val();
+        var delivery_date_before = delivery_date_before.replace( '年', '-' );
+        var delivery_date_before = delivery_date_before.replace( '月', '-' );
+        var delivery_date = delivery_date_before.replace( '日', '' );
+        var delivery_point = $('#delivery_point_oe').val();
+        var order_route = $('#order_route_oe').val();
+        var place_for_receipt_of_goods = $('#place_for_receipt_of_goods_oe').val();
+        var customer_order_no = $('#customer_order_no_oe').val();
+        if (document.getElementById("incidental_work_order1_oe").checked == true) {
+            var incidental_work_order1 = $('#incidental_work_order1_oe').val();
+        }else{
+            var incidental_work_order1 = 0;
+        }
+        if (document.getElementById("incidental_work_order2_oe").checked == true) {
+            var incidental_work_order2 = $('#incidental_work_order2_oe').val();
+        }else{
+            var incidental_work_order2 = 0;
+        }
+        if (document.getElementById("incidental_work_order3_oe").checked == true) {
+            var incidental_work_order3 = $('#incidental_work_order3_oe').val();
+        }else{
+            var incidental_work_order3 = 0;
+        }
+        if (document.getElementById("incidental_work_order4_oe").checked == true) {
+            var incidental_work_order4 = $('#incidental_work_order4_oe').val();
+        }else{
+            var incidental_work_order4 = 0;
+        }
+        if (document.getElementById("incidental_work_order5_oe").checked == true) {
+            var incidental_work_order5 = $('#incidental_work_order5_oe').val();
+        }else{
+            var incidental_work_order5 = 0;
+        }
+        if (document.getElementById("incidental_work_order6_oe").checked == true) {
+            var incidental_work_order6 = $('#incidental_work_order6_oe').val();
+        }else{
+            var incidental_work_order6 = 0;
+        }
+        if (document.getElementById("incidental_work_order7_oe").checked == true) {
+            var incidental_work_order7 = $('#incidental_work_order7_oe').val();
+        }else{
+            var incidental_work_order7 = 0;
+        }
+        if (document.getElementById("incidental_work_order8_oe").checked == true) {
+            var incidental_work_order8 = $('#incidental_work_order8_oe').val();
+        }else{
+            var incidental_work_order8 = 0;
+        }
+        if (document.getElementById("incidental_work_order9_oe").checked == true) {
+            var incidental_work_order9 = $('#incidental_work_order9_oe').val();
+        }else{
+            var incidental_work_order9 = 0;
+        }
+        if (document.getElementById("incidental_work_order10_oe").checked == true) {
+            var incidental_work_order10 = $('#incidental_work_order10_oe').val();
+        }else{
+            var incidental_work_order10 = 0;
+        }
+        if (document.getElementById("incidental_work_order11_oe").checked == true) {
+            var incidental_work_order11 = $('#incidental_work_order11_oe').val();
+        }else{
+            var incidental_work_order11 = 0;
+        }
+        if (document.getElementById("incidental_work_order12_oe").checked == true) {
+            var incidental_work_order12 = $('#incidental_work_order12_oe').val();
+        }else{
+            var incidental_work_order12 = 0;
+        }
+        if (document.getElementById("incidental_work_order13_oe").checked == true) {
+            var incidental_work_order13 = $('#incidental_work_order13_oe').val();
+        }else{
+            var incidental_work_order13 = 0;
+        }
+        if (document.getElementById("incidental_work_order14_oe").checked == true) {
+            var incidental_work_order14 = $('#incidental_work_order14_oe').val();
+        }else{
+            var incidental_work_order14 = 0;
+        }
+        if (document.getElementById("incidental_work_order15_oe").checked == true) {
+            var incidental_work_order15 = $('#incidental_work_order15_oe').val();
+        }else{
+            var incidental_work_order15 = 0;
+        }
+        if (document.getElementById("incidental_work_order16_oe").checked == true) {
+            var incidental_work_order16 = $('#incidental_work_order16_oe').val();
+        }else{
+            var incidental_work_order16 = 0;
+        }
+        if (document.getElementById("incidental_work_order17_oe").checked == true) {
+            var incidental_work_order17 = $('#incidental_work_order17_oe').val();
+        }else{
+            var incidental_work_order17 = 0;
+        }
+        if (document.getElementById("incidental_work_order18_oe").checked == true) {
+            var incidental_work_order18 = $('#incidental_work_order18_oe').val();
+        }else{
+            var incidental_work_order18 = 0;
+        }
+        if (document.getElementById("incidental_work_order19_oe").checked == true) {
+            var incidental_work_order19 = $('#incidental_work_order19_oe').val();
+        }else{
+            var incidental_work_order19 = 0;
+        }
+        if (document.getElementById("incidental_work_order20_oe").checked == true) {
+            var incidental_work_order20 = $('#incidental_work_order20_oe').val();
+        }else{
+            var incidental_work_order20 = 0;
+        }
+        var item_code = $('#item_code_oe').val();
+        var order_packed_amount = $('#order_packed_amount_oe').val();
+        var order_amount = $('#order_amount_oe_num').val();
+        var rem1 = $('#rem1_oe').val();
+        var rem2 = $('#rem2_oe').val();
+        var rem3 = $('#rem3_oe').val();
+        var to_status = b;
+        $.ajax({
+            url: "/imsds/order_entry/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'order_date': order_date,
+                    'order_no': order_no,
+                    'shipment_no': shipment_no,
+                    'voucher_type': voucher_type,
+                    'registration_division': registration_division,
+                    'delivery_date': delivery_date,
+                    'delivery_point': delivery_point,
+                    'order_route': order_route,
+                    'place_for_receipt_of_goods': place_for_receipt_of_goods,
+                    'customer_order_no': customer_order_no,
+                    'incidental_work_order1': incidental_work_order1,
+                    'incidental_work_order2': incidental_work_order2,
+                    'incidental_work_order3': incidental_work_order3,
+                    'incidental_work_order4': incidental_work_order4,
+                    'incidental_work_order5': incidental_work_order5,
+                    'incidental_work_order6': incidental_work_order6,
+                    'incidental_work_order7': incidental_work_order7,
+                    'incidental_work_order8': incidental_work_order8,
+                    'incidental_work_order9': incidental_work_order9,
+                    'incidental_work_order10': incidental_work_order10,
+                    'incidental_work_order11': incidental_work_order11,
+                    'incidental_work_order12': incidental_work_order12,
+                    'incidental_work_order13': incidental_work_order13,
+                    'incidental_work_order14': incidental_work_order14,
+                    'incidental_work_order15': incidental_work_order15,
+                    'incidental_work_order16': incidental_work_order16,
+                    'incidental_work_order17': incidental_work_order17,
+                    'incidental_work_order18': incidental_work_order18,
+                    'incidental_work_order19': incidental_work_order19,
+                    'incidental_work_order20': incidental_work_order20,
+                    'item_code': item_code,
+                    'order_packed_amount': order_packed_amount,
+                    'order_amount': order_amount,
+                    'rem1': rem1,
+                    'rem2': rem2,
+                    'rem3': rem3,
+                    'to_status': to_status,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    var this_order_id = data.order_id
+                    order_entry_page_open(this_order_id);
+                    order_entry_pb_refresh();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+
+function reserve_allocation() {
+        var target_order_id = $('#order_id').val();
+        var selectitemcode = $('#selectitemcode7').val();
+        var selectwarehouse = $('#selectwarehouse7').val();
+        var selectstartlotno = $('#selectstartlotno7').val();
+        var selectendlotno = $('#selectendlotno7').val();
+        var selectquality1 = $('#selectquality17').val();
+        var selectquality2 = $('#selectquality27').val();
+        var selectquality3 = $('#selectquality37').val();
+        var from_page = 11;
+        $.ajax({
+                url: "/ics/reserve_allocation/",
+                type: "POST",
+                data : {
+                        'target_order_id': target_order_id,
+                        'selectitemcode': selectitemcode,
+                        'selectwarehouse': selectwarehouse,
+                        'selectstartlotno': selectstartlotno,
+                        'selectendlotno': selectendlotno,
+                        'selectquality1': selectquality1,
+                        'selectquality2': selectquality2,
+                        'selectquality3': selectquality3,
+                        'from_page': from_page,
+                        'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#order_entry').empty();
+                    $('#order_entry').html(data);
+                    listfilter7();
+                    alert('引当予約完了');
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_entry').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+}
+function item_code_change() {
+        var item_code = $('#item_code_oe').val();
+        $('#selectitemcode7').val(item_code);
+        $.ajax({
+                url: "/imsds/action/get_item_info/",
+                type: "POST",
+                data : {
+                    'item_code': item_code,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#item_name_oe').val(data.item_name);
+                    $('#item_group_oe').val(data.item_group);
+                    $('#basic_amount').val(data.basic_amount);
+                    document.getElementById("packing_unit").innerText = data.packing_unit;
+                    document.getElementById("basic_unit").innerText = data.basic_unit;
+                    getstockdata(10001);
+                    //$('#phone_no_oe').val(data.company_phone_no);
+                    //$('#place_for_receipt_of_goods_name_oe').val(data.company_name);
+                    //$('#place_for_receipt_of_goods_oe').val(data.company_code);
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function get_company_info() {
+        var company_code = $('#place_for_receipt_of_goods_oe').val();
+        var company_name = $('#place_for_receipt_of_goods_name_oe').val();
+        //alert(company_code);
+        //alert(company_name);
+            $.ajax({
+                url: "/imsds/action/get_company_info/",
+                type: "POST",
+                data : {
+                    'company_code': company_code,
+                    'company_name': company_name,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#prefecture_oe').val(data.company_prefecture);
+                    $('#address_oe').val(data.company_address);
+                    $('#post_no_oe').val(data.company_post_no);
+                    $('#phone_no_oe').val(data.company_phone_no);
+                    $('#place_for_receipt_of_goods_name_oe').val(data.company_name);
+                    $('#place_for_receipt_of_goods_oe').val(data.company_code);
+                    $('#carrier_oe').val(data.carrier);
+                    $('#incoterm_oe').val(data.incoterm);
+                    $('#delivery_point_oe').val(data.delivery_point);
+                    $('#handling_office_oe').val(data.handling_office);
+                    if ( data.reserve_flag == 1 ) {
+                        if ( data.low_spec_reservation_flag == 1 ) {
+                            $('#selectquality17').val('L');
+                        }else{
+                            $('#selectreservecompany7').val(data.company_code);
+                            $('#selectquality17').val('A');
+                        }
+                    }
+                    document.getElementById("incidental_work_order1_oe_name").innerText = data.supplemental_task1_flag_name;
+                    document.getElementById("incidental_work_order2_oe_name").innerText = data.supplemental_task2_flag_name;
+                    document.getElementById("incidental_work_order3_oe_name").innerText = data.supplemental_task3_flag_name;
+                    document.getElementById("incidental_work_order4_oe_name").innerText = data.supplemental_task4_flag_name;
+                    document.getElementById("incidental_work_order5_oe_name").innerText = data.supplemental_task5_flag_name;
+                    document.getElementById("incidental_work_order6_oe_name").innerText = data.supplemental_task6_flag_name;
+                    document.getElementById("incidental_work_order7_oe_name").innerText = data.supplemental_task7_flag_name;
+                    document.getElementById("incidental_work_order8_oe_name").innerText = data.supplemental_task8_flag_name;
+                    document.getElementById("incidental_work_order9_oe_name").innerText = data.supplemental_task9_flag_name;
+                    document.getElementById("incidental_work_order10_oe_name").innerText = data.supplemental_task10_flag_name;
+                    document.getElementById("incidental_work_order11_oe_name").innerText = data.supplemental_task11_flag_name;
+                    document.getElementById("incidental_work_order12_oe_name").innerText = data.supplemental_task12_flag_name;
+                    document.getElementById("incidental_work_order13_oe_name").innerText = data.supplemental_task13_flag_name;
+                    document.getElementById("incidental_work_order14_oe_name").innerText = data.supplemental_task14_flag_name;
+                    document.getElementById("incidental_work_order15_oe_name").innerText = data.supplemental_task15_flag_name;
+                    document.getElementById("incidental_work_order16_oe_name").innerText = data.supplemental_task16_flag_name;
+                    document.getElementById("incidental_work_order17_oe_name").innerText = data.supplemental_task17_flag_name;
+                    document.getElementById("incidental_work_order18_oe_name").innerText = data.supplemental_task18_flag_name;
+                    document.getElementById("incidental_work_order19_oe_name").innerText = data.supplemental_task19_flag_name;
+                    document.getElementById("incidental_work_order20_oe_name").innerText = data.supplemental_task20_flag_name;
+                    $('#supplemental_task1_flag').val(data.supplemental_task1_flag);
+                    $('#supplemental_task2_flag').val(data.supplemental_task2_flag);
+                    $('#supplemental_task3_flag').val(data.supplemental_task3_flag);
+                    $('#supplemental_task4_flag').val(data.supplemental_task4_flag);
+                    $('#supplemental_task5_flag').val(data.supplemental_task5_flag);
+                    $('#supplemental_task6_flag').val(data.supplemental_task6_flag);
+                    $('#supplemental_task7_flag').val(data.supplemental_task7_flag);
+                    $('#supplemental_task8_flag').val(data.supplemental_task8_flag);
+                    $('#supplemental_task9_flag').val(data.supplemental_task9_flag);
+                    $('#supplemental_task10_flag').val(data.supplemental_task10_flag);
+                    $('#supplemental_task11_flag').val(data.supplemental_task11_flag);
+                    $('#supplemental_task12_flag').val(data.supplemental_task12_flag);
+                    $('#supplemental_task13_flag').val(data.supplemental_task13_flag);
+                    $('#supplemental_task14_flag').val(data.supplemental_task14_flag);
+                    $('#supplemental_task15_flag').val(data.supplemental_task15_flag);
+                    $('#supplemental_task16_flag').val(data.supplemental_task16_flag);
+                    $('#supplemental_task17_flag').val(data.supplemental_task17_flag);
+                    $('#supplemental_task18_flag').val(data.supplemental_task18_flag);
+                    $('#supplemental_task19_flag').val(data.supplemental_task19_flag);
+                    $('#supplemental_task20_flag').val(data.supplemental_task20_flag);
+                    $('#rem1_oe').val(data.rem1);
+                    $('#rem2_oe').val(data.rem2);
+                    $('#rem3_oe').val(data.rem3);
+                    incidental_work_check();
+                    supplemental_task1_click();
+                    supplemental_task2_click();
+                    supplemental_task3_click();
+                    supplemental_task4_click();
+                    supplemental_task5_click();
+                    supplemental_task6_click();
+                    supplemental_task7_click();
+                    supplemental_task8_click();
+                    supplemental_task9_click();
+                    supplemental_task10_click();
+                    supplemental_task11_click();
+                    supplemental_task12_click();
+                    supplemental_task13_click();
+                    supplemental_task14_click();
+                    supplemental_task15_click();
+                    supplemental_task16_click();
+                    supplemental_task17_click();
+                    supplemental_task18_click();
+                    supplemental_task19_click();
+                    supplemental_task20_click();
+                    getstockdata(10001)
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function order_packed_amount_change() {
+        var order_packed_amount_oe = $('#order_packed_amount_oe').val();
+        var basic_amount = $('#basic_amount').val();
+        var order_amount = order_packed_amount_oe * basic_amount;
+        $('#order_amount_oe_num').val(order_amount);
+        var order_amount_str = String(order_amount);
+        order_amount_str = order_amount_str.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        $('#order_amount_oe').val(order_amount_str);
+}
+function order_amount_change() {
+        var order_amount_oe = $('#order_amount_oe').val();
+        var basic_amount = $('#basic_amount').val();
+        var order_amount_oe_num = order_amount_oe.split(",").join("");
+        var order_packed_amount = order_amount_oe_num / basic_amount;
+        $('#order_packed_amount_oe').val(order_packed_amount);
+        $('#order_amount_oe_num').val(order_amount_oe_num);
+        var order_amount_str = String(order_amount_oe_num);
+        order_amount_str = order_amount_str.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        $('#order_amount_oe').val(order_amount_str);
+}
+function order_entry_pb_refresh() {
+        var order_id = $('#order_id').val();
+            $.ajax({
+                url: "/imsds/action/order_entry_pb/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#order_entry_pb').empty();
+                    $('#order_entry_pb').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_entry_pb').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+#stocklist{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+</style>
+    <div>
+        <input type="hidden" id="reserve_packed_amount" value="{{ reserve_packed_amount }}" >
+        <input type="hidden" id="non_stock_allocation_packed_amount" value="{{ non_stock_allocation_packed_amount }}" >
+        <input type="hidden" id="old_order_packed_amount_oe" value="{{ order_packed_amount }}" >
+        <input type="hidden" id="basic_amount" value="{{ item_data.weight_for_basic_unit }}" >
+        <input type="hidden" id="order_detail_id" value="{{ order_lists.id }}">
+    </div>
+    <div id="order_entry_pb" >
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+            <input type="hidden" id="order_id" value="{{ order_id }}">
+            <input type="hidden" id="pb_order_id" value="{{ pb_order_id }}">
+            <h2 class="page-header">受注登録　<input type="button" id="{{ pb_order_id }}" value="{{ link_label }}" onclick="temporary_entry(id,'{{ status }}');" >　　
+            {% if order_lists.stock_allocation_status == 100201 %}
+                {% if order_id > 0 %}
+                        <input type="button" value="  登録完了 " onclick="entry({{ order_id }});" >
+                {% endif %}
+            {% endif %}
+            </h2>
+        </div>
+    </div>
+    <div style="float:left;width:500px;">
+        <div>受注日　　　　:　<input type="text" id="datepicker3" class="datepicker" value="{{ order_date }}"><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('datepicker3');"></div>
+        <div>受注管理ＮＯ　:　<input type="text" id="order_no_oe" value="{{ order_no }}"></div>
+        <div>出荷管理ＮＯ　:　<input type="text" id="shipment_no_oe" value="{{ order_lists.delivery_no }}"></div>
+        <div>製品部門　　　:　<input type="text" id="item_category_oe" value="{{ item_data.item_category }}"></div>
+        <div>伝票タイプ　　:　<input type="text" id="voucher_type_oe" value="{{ order_lists.voucher_type }}"></div>
+        <div>訂正区分　　　:　<input type="text" id="registration_division_oe" value="{{ order_lists.registration_division }}"></div>
+        <div>指定納入期日　:　<input type="text" id="datepicker4" class="datepicker" value="{{ delivery_date }}"><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('datepicker4');"></div>
+        <div>運送会社　　　:　<input type="text" id="carrier_oe" value="{{ company_sub_data.carrier }}"></div>
+        <div>出荷ポイント　:　<input type="text" id="delivery_point_oe" value="{{ company_sub_data.delivery_point }}"></div>
+        <div>備考１　　　　:　<textarea id="rem1_oe" name="rem1" rows="2" cols="44">{{ order_lists.rem1 }}</textarea></div>
+    </div>
+    <div style="float:left;width:500px;" >
+        <div>担当営業　　　:　<input type="text" id="handling_office_oe" value="{{ company_sub_data.handling_office }}"></div>
+        <div>インコターム　:　<input type="text" id="incoterm_oe" value="{{ company_sub_data.incoterm }}"></div>
+        <div>受注経路　　　:　<input type="text" id="order_route_oe" value="{{ order_lists.order_route }}"></div>
+        <div>荷受先　　　　:　<input type="text" id="place_for_receipt_of_goods_oe" value="{{ order_lists.place_for_receipt_of_goods }}" onchange="get_company_info();"></div>
+        <div>荷受先名　　　:　<input type="text" id="place_for_receipt_of_goods_name_oe" value="{{ company_data.company_name }}" style="width:300px;" onchange="get_company_info();"></div>
+        <div>都道府県　　　:　<input type="text" id="prefecture_oe" value="{{ company_data.company_prefecture }}"></div>
+        <div>住所　　　　　:　<input type="text" id="address_oe" value="{{ company_data.company_address }}" style="width:340px;"></div>
+        <div>郵便番号　　　:　<input type="text" id="post_no_oe" value="{{ company_data.company_post_no }}"></div>
+        <div>電話番号　　　:　<input type="text" id="phone_no_oe" value="{{ company_data.company_phone_no }}"></div>
+        <div>得意先発注ＮＯ:　<input type="text" id="customer_order_no_oe" value="{{ order_lists.customer_order_no }}"></div>
+        <div>備考２　　　　:　<textarea id="rem2_oe" name="rem2" rows="2" cols="44">{{ order_lists.rem2 }}</textarea></div>
+    </div>
+    <div style="float:left;width:600px;" >
+        <div>品目グループ　:　<input type="text" id="item_group_oe" value="{{ item_data.item_group }}"></div>
+        <div id="detail_item_code">品目コード　　:　<input type="text" id="item_code_oe" value="{{ order_lists.item_code }}" onchange="item_code_change();"></div>
+        <div>品目名　　　　:　<input type="text" id="item_name_oe" value="{{ item_data.item_name }}" style="width:300px;"></div>
+        <div style="float:left;"><div style="float:left;">受注数量　　　:　</div>
+            <div style="float:left;"><input type="text" id="order_packed_amount_oe" value="{{ order_packed_amount_oe }}" style="width:40px;" onchange="order_packed_amount_change();"></div>
+            <div id="packing_unit" style="float:left; padding-top: 8px;">{{ item_data.packing_unit }}　</div>
+        　  <div style="float:left;">　=　<input type="text" id="order_amount_oe" value="{{ order_amount }}" style="width:50px;" onchange="order_amount_change();"></div>
+            <div id="basic_unit" style="float:left; padding-top: 8px;">{{ item_data.basic_unit }}</div>
+            <input type="hidden" id="order_amount_oe_num" value="{{ order_lists.order_amount }}">
+        </div>
+        <div style="clear: both;"></div>
+        <div style="float:left;width:200px;">
+            <input type="hidden" id="supplemental_task1_flag" value="{{ supplemental_task1_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order1_oe" type="checkbox" value="{{ supplemental_task1_flag }}" onclick="supplemental_task1_click();"></div>
+                <div id="incidental_work_order1_oe_name" style="float:left;">{{ supplemental_task1_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task2_flag" value="{{ supplemental_task2_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order2_oe" type="checkbox" value="{{ supplemental_task2_flag }}"  onclick="supplemental_task2_click();"></div>
+                <div id="incidental_work_order2_oe_name"  style="float:left;">{{ supplemental_task2_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task3_flag" value="{{ supplemental_task3_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order3_oe" type="checkbox" value="{{ supplemental_task3_flag }}" onclick="supplemental_task3_click();"></div>
+                <div id="incidental_work_order3_oe_name"  style="float:left;">{{ supplemental_task3_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task4_flag" value="{{ supplemental_task4_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order4_oe" type="checkbox" value="{{ supplemental_task4_flag }}" onclick="supplemental_task4_click();"></div>
+                <div id="incidental_work_order4_oe_name"  style="float:left;">{{ supplemental_task4_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task5_flag" value="{{ supplemental_task5_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order5_oe" type="checkbox" value="{{ supplemental_task5_flag }}" onclick="supplemental_task5_click();"></div>
+                <div id="incidental_work_order5_oe_name"  style="float:left;">{{ supplemental_task5_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task6_flag" value="{{ supplemental_task6_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order6_oe" type="checkbox" value="{{ supplemental_task6_flag }}" onclick="supplemental_task6_click();"></div>
+                <div id="incidental_work_order6_oe_name"  style="float:left;">{{ supplemental_task6_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task7_flag" value="{{ supplemental_task7_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order7_oe" type="checkbox" value="{{ supplemental_task7_flag }}" onclick="supplemental_task7_click();"></div>
+                <div id="incidental_work_order7_oe_name"  style="float:left;">{{ supplemental_task7_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div style="float:left;width:200px;">
+            <input type="hidden" id="supplemental_task8_flag" value="{{ supplemental_task8_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order8_oe" type="checkbox" value="{{ supplemental_task8_flag }}" onclick="supplemental_task8_click();"></div>
+                <div id="incidental_work_order8_oe_name"  style="float:left;">{{ supplemental_task8_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task9_flag" value="{{ supplemental_task9_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order9_oe" type="checkbox" value="{{ supplemental_task9_flag }}" onclick="supplemental_task9_click();"></div>
+                <div id="incidental_work_order9_oe_name"  style="float:left;">{{ supplemental_task9_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task10_flag" value="{{ supplemental_task10_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order10_oe" type="checkbox" value="{{ supplemental_task10_flag }}" onclick="supplemental_task10_click();"></div>
+                <div id="incidental_work_order10_oe_name"  style="float:left;">{{ supplemental_task10_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task11_flag" value="{{ supplemental_task11_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order11_oe" type="checkbox" value="{{ supplemental_task11_flag }}" onclick="supplemental_task11_click();"></div>
+                <div id="incidental_work_order11_oe_name"  style="float:left;">{{ supplemental_task11_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task12_flag" value="{{ supplemental_task12_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order12_oe" type="checkbox" value="{{ supplemental_task12_flag }}" onclick="supplemental_task12_click();"></div>
+                <div id="incidental_work_order12_oe_name"  style="float:left;">{{ supplemental_task12_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task13_flag" value="{{ supplemental_task13_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order13_oe" type="checkbox" value="{{ supplemental_task13_flag }}" onclick="supplemental_task13_click();"></div>
+                <div id="incidental_work_order13_oe_name"  style="float:left;">{{ supplemental_task13_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task14_flag" value="{{ supplemental_task14_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order14_oe" type="checkbox" value="{{ supplemental_task14_flag }}" onclick="supplemental_task14_click();"></div>
+                <div id="incidental_work_order14_oe_name"  style="float:left;">{{ supplemental_task14_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div style="float:left;width:200px;">
+            <input type="hidden" id="supplemental_task15_flag" value="{{ supplemental_task15_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order15_oe" type="checkbox" value="{{ supplemental_task15_flag }}" onclick="supplemental_task15_click();"></div>
+                <div id="incidental_work_order15_oe_name"  style="float:left;">{{ supplemental_task15_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task16_flag" value="{{ supplemental_task16_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order16_oe" type="checkbox" value="{{ supplemental_task16_flag }}" onclick="supplemental_task16_click();"></div>
+                <div id="incidental_work_order16_oe_name"  style="float:left;">{{ supplemental_task16_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task17_flag" value="{{ supplemental_task17_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order17_oe" type="checkbox" value="{{ supplemental_task17_flag }}" onclick="supplemental_task17_click();"></div>
+                <div id="incidental_work_order17_oe_name"  style="float:left;">{{ supplemental_task17_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task18_flag" value="{{ supplemental_task18_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order18_oe" type="checkbox" value="{{ supplemental_task18_flag }}" onclick="supplemental_task18_click();"></div>
+                <div id="incidental_work_order18_oe_name"  style="float:left;">{{ supplemental_task18_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task19_flag" value="{{ supplemental_task19_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order19_oe" type="checkbox" value="{{ supplemental_task19_flag }}" onclick="supplemental_task19_click();"></div>
+                <div id="incidental_work_order19_oe_name"  style="float:left;">{{ supplemental_task19_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <input type="hidden" id="supplemental_task20_flag" value="{{ supplemental_task20_flag }}" >
+            <div style="float:left;">
+                <div style="float:left;"><input id="incidental_work_order20_oe" type="checkbox" value="{{ supplemental_task20_flag }}" onclick="supplemental_task20_click();"></div>
+                <div id="incidental_work_order20_oe_name"  style="float:left;">{{ supplemental_task20_flag_name }}</div>
+            </div>
+            <div style="clear: both;"></div>
+            <div>
+                <input id="incidental_work_order21_oe" type="checkbox" value="21" onclick="supplemental_task21_click();">倉庫移動　　　
+            </div>
+        </div>
+        <div style="clear: both;"></div>
+        <div>備考３　　　　:　<textarea id="rem3_oe" name="rem3" rows="2" cols="44">{{ order_lists.rem3 }}</textarea></div>
+    </div>
+    <div style="clear: both;"></div>
+
+

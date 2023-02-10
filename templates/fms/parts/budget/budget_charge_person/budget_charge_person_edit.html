@@ -1,0 +1,94 @@
+<script>
+//予算担当者を一覧から選択したときの処理
+function select_budget_charge_person( user_name, user_full_name ) {
+    //担当者欄に表示
+    $('#budget_charge_person').val(user_name);
+    $('#budget_charge_person_full_name').val(user_full_name);
+    //ボタン表示
+    if(document.getElementById("entry_button_div") != null){
+        const p5 = document.getElementById("entry_button_div");
+        p5.style.display ="block";
+    }
+}
+//予算担当者を登録処理
+function budget_charge_person_entry() {
+    var budget_charge_person = $('#budget_charge_person').val();
+    var budget_id = $('#target_budget_id').val();
+    //以下、ログ用情報
+    var this_step = $('#this_step').val();
+    var this_budget_id = $('#target_budget_id').val();
+    var this_department = $('#this_department').val();
+    var this_division = $('#this_division').val();
+
+        $.ajax({
+            url: "/isk_tools/fms/action/budget_charge_person_entry/",
+            type: "POST",
+            data : {
+                'budget_id' : budget_id,
+                'budget_charge_person' : budget_charge_person,
+                'this_step' : this_step,
+                'this_budget_id' : this_budget_id,
+                'this_department' : this_department,
+                'this_division' : this_division,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                //予算基本情報の表示を更新
+                budget_detail_info();
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    height: 35px;
+}
+div.scrool_budget_charge_person_master_div {
+  width: 200px;
+  height: 760px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">予算担当者</h2>
+    </div>
+    <div style="float:left; border-style: ridge;">
+        <div style="border-style: ridge;"><h2 class="page-header">担当者選択</h2></div>
+        <div class="scrool_budget_charge_person_master_div">
+            <ul>
+            {% for user_item in user_list %}
+                <li class="fms_sidebar-list"><font size="4"><a href="#" onclick="select_budget_charge_person('{{ user_item.username }}','{{ user_item.full_name }}');">{{ user_item.full_name }}</a></font></li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div style="float:left;size=5px">　</div>
+    <div style="float:left;"><h2 class="page-header">登録</h2>
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;">
+            <table>
+                <tr>
+                    <td><div><font size="4">担当者</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="budget_charge_person_full_name" size="16" value="" readonly="readonly"></font></div></td>
+                </tr>
+            </table>
+            <input type="hidden" id="budget_charge_person" value="" size="4" >
+            <br>
+            {% if edit_flag == 1 %}
+            <div id="entry_button_div" style="float:left;" >
+                <input type="button" id="budget_charge_person_entry_button" value="　登録　" onclick="budget_charge_person_entry()" >
+            </div>
+            {% endif %}
+        </div>
+    </div>

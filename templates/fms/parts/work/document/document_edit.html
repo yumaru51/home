@@ -1,0 +1,338 @@
+<script>
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//入力項目の未入力、文字数オーバーをチェック
+function document_edit_input_check() {
+    var alert_input_check_msg = "";
+
+    var document_name = $('#document_name').val();
+    var submission_deadline = $('#submission_deadline').val();
+    var number_of_copies = $('#number_of_copies').val();
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    if (document_name == "" ){
+        $('#document_name').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else if (document_name.length > 50){
+        $('#document_name').css('background-color','silver');
+        ng_str_count_flag = ng_str_count_flag + 1 ;
+    }else{
+        $('#document_name').css('background-color','white');
+    }
+
+    if (submission_deadline == "" ){
+        $('#submission_deadline').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else if (submission_deadline.length > 50){
+        $('#submission_deadline').css('background-color','silver');
+        ng_str_count_flag = ng_str_count_flag + 1 ;
+    }else{
+        $('#submission_deadline').css('background-color','white');
+    }
+
+    if (number_of_copies == "" ){
+        $('#number_of_copies').css('background-color','orange');
+        ng_flag = ng_flag + 1 ;
+    }else{
+        $('#number_of_copies').css('background-color','white');
+    }
+
+
+    if ( ng_flag > 0 ) {
+        alert_input_check_msg += '未入力項目があります！！\n';
+    }
+    if ( ng_str_count_flag > 0 ) {
+        alert_input_check_msg += '文字数オーバーです！！\n';
+    }
+
+    if ( ng_flag == 0 && ng_str_count_flag == 0) {
+        //禁止文字チェック
+        alert_input_check_msg += check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        console.log("{{ div_id_name }}_ng_character_check");
+        console.log(alert_input_check_msg);
+    }
+    return alert_input_check_msg;
+}
+
+//提出書類の登録･更新処理
+function document_edit(a) {
+    var action_type = a;
+    var work_id = $('#work_id').val();
+    var phenomenon_id = $('#target_phenomenon_id').val();
+    if (work_id == undefined && phenomenon_id != undefined ){
+        work_id = phenomenon_id;
+    }
+
+    if (work_id == 0){
+        alert("工事データを先に登録(一時保存)してください！！");
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+        return;
+    }
+
+    var alert_input_check_msg = document_edit_input_check();
+    if ( alert_input_check_msg.length > 0 ) {
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        }
+        alert(alert_input_check_msg);
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+        return;
+    }
+
+    var rev_no = $('#work_rev_no').val();
+    if (rev_no == undefined){
+        rev_no = 0;
+    }
+
+    $.ajax({
+        url: "/isk_tools/fms/action/document_entry/",
+        type: "POST",
+        data : {
+            'action_type' : action_type,
+            'work_id' : work_id,
+            'rev_no' : rev_no,
+            'document_id' : $('#document_id').val(),
+            'document_name' : $('#document_name').val(),
+            'submission_deadline' : $('#submission_deadline').val(),
+            'number_of_copies' : $('#number_of_copies').val(),
+            'display_order' : $('#display_order').val(),
+            'this_step' : $('#this_step').val(),
+            'this_budget_id' : $('#target_budget_id').val(),
+            'this_department' : $('#user_department_cd').val(),
+            'this_division' : $('#user_division_cd').val(),
+            'target' : $('#target').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache : false,
+        })
+        .done(function(data){
+            alert(data.msg);
+            get_document_list(work_id);//登録済提出書類一覧を表示するJSを起動(このhtml内にプログラム有)
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            alert('Error!' +textStatus+' ' +errorThrown);
+            // アクションボタン有効化
+            $(".button").prop("disabled", false);
+        });
+}
+//提出書類の削除処理
+function document_delete(a) {
+    var action_type = a;
+    var document_id = $('#document_id').val();
+    if (document_id != 0) {
+        var work_id = $('#target_work_id').val();
+        var phenomenon_id = $('#target_phenomenon_id').val();
+        if (work_id == undefined && phenomenon_id != undefined ){
+            work_id = phenomenon_id;
+        }
+        var this_step = $('#this_step').val();
+        var this_budget_id = $('#target_budget_id').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var document_name = $('#document_name').val();
+            $.ajax({
+                url: "/isk_tools/fms/action/document_delete/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'work_id' : work_id,
+                    'document_id' : document_id,
+                    'document_name' : document_name,
+                    'this_step' : this_step,
+                    'this_budget_id' : this_budget_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#document_id').val(0);
+                    $('#document_name').val("");
+                    $('#submission_deadline').val("");
+                    $('#number_of_copies').val("");
+                    get_document_list(work_id);//登録済提出書類一覧を表示するJSを起動(このhtml内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//マスタから提出書類を選択したときの処理
+function select_document(a) {
+    var document_master_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/select_document/",
+                type: "POST",
+                data : {
+                    'document_master_id' : document_master_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#document_name').val(data.document_name);
+                    $('#submission_deadline').val(data.default_submission_deadline);
+                    $('#number_of_copies').val(data.default_number_of_copies);
+                    $('#display_order').val(data.display_order);
+                    $('#document_id').val(data.document_id);
+
+                    //ボタン表示/非表示処理
+                    if(document.getElementById("document_add_button_div") != null){
+                        const p5 = document.getElementById("document_add_button_div");
+                        p5.style.display ="block";
+                    }
+                    if(document.getElementById("document_edit_button_div") != null){
+                        const p6 = document.getElementById("document_edit_button_div");
+                        p6.style.display ="none";
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//登録済提出書類一覧の表示処理
+function get_document_list(a) {
+        var work_id = a;
+        var select_pb_disp_flag = 1;
+        var this_step = $('#this_step').val();
+        var target = $('#target').val();
+            $.ajax({
+                url: "/isk_tools/fms/parts/document/document_list/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'select_pb_disp_flag' : select_pb_disp_flag,
+                    'this_step' : this_step,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#document_list').empty();
+                    $('#document_list').html(data);
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#document_list').empty();
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+
+}
+
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scrool_document_master_div {
+  width: 240px;
+  height: 760px;
+  overflow: scroll;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">提出書類関係</h2>
+    </div>
+    <div style="float:left; border-style: ridge;">
+        <div style="border-style: ridge;"><h2 class="page-header">提出書類選択</h2></div>
+        <div class="scrool_document_master_div">
+            <ul>
+            {% for document_master_lists in document_master_lists %}
+                <li class="fms_sidebar-list"><font size="4"><a href="#" onclick="select_document({{ document_master_lists.id }});">{{ document_master_lists.document_name }}</a></font></li>
+            {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div style="float:left;size=5px">　</div>
+    <div style="float:left;"><h2 class="page-header">新規登録</h2>
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;">
+            <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+            <table>
+                <tr>
+                    <td><div><font size="4">書類名</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="document_name" size="16" value="" ></font>　※必須</div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">提出期限</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="submission_deadline" size="16" value="" ></font>　※必須</div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">部数</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="number_of_copies" size="4" value=""></font>　※必須</div></td>
+                </tr>
+            </table>
+            </div><!--ng_character_checkここまで-->
+            <input type="hidden" id="display_order" value="" size="4" >
+            <input type="hidden" id="document_id" value="" size="4" >
+            <br>
+            <div id="document_add_button_div" style="float:left;" >
+                <input type="button" id="add_button" value="　追加　" onclick="document_edit('add')" >
+            </div>
+            <div id="document_edit_button_div" style="float:left;" >
+                <input type="button" id="edit_button" value="　変更　" onclick="document_edit('edit')" >　　　　　
+                <input type="button" id="delete_button" value="　削除　" onclick="document_delete('delete')" >
+            </div>
+        </div>
+    </div>
+    <div style="float:left;size=10px">　</div>
+    <div style="float:left;"><h2 class="page-header">登録済提出書類リスト</h2>
+        <div id="document_list"></div>
+    </div>

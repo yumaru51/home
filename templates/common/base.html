@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+{% load staticfiles %}
+<head>
+<title>isk_tools</title>
+
+    <script type="text/javascript" src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery-ui.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.csv.js' %}"></script>
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base3.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/dashboard.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/icms.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/start/jquery-ui.min.css' %}">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+
+<style type="text/css">
+#tab {
+	margin-left: 0;
+	padding-left: 0;
+	margin-bottom: 1em;
+	border-bottom: 2px solid #333;
+	height: 1.5em;
+	overflow: hidden;
+}
+#tab li {
+	float: left;
+	width: 94.84px;
+	height: 1.5em;
+	list-style: none;
+}
+#tab li a {
+	display: block;
+	width: 90px;
+	height: 1.5em;
+	border: 1px solid #ccc;
+	border-bottom: 0;
+	background-color: #ccc;
+	color: #777;
+	text-align: center;
+}
+#tab li a:hover,
+#tab li.present a {
+	border-color: #333;
+        background-color: white;
+        color: #000;
+}
+
+
+#page1, #page2, #page3, #page4 {
+	margin-bottom: 12em;
+	padding-top: 0em;
+}
+#floatBox1Dialog, #floatBox2Dialog {
+    width: 200px;
+
+}
+.mode11 {
+    color: #ff0000;
+}
+
+</style>
+
+</head>
+<body class=" dashboard"
+  data-admin-utc-offset="32400">
+    <!-- Container -->
+
+        <div id="header">
+            <div id="branding">
+                <h1 id="site-name"><a href="/isk_tools/">小改善ツール集<font size="3">　(offered by 業務IT化PJ)</font></a></h1>
+            </div>
+            {% if user.is_authenticated %}
+                <div id="user-tools">
+                    <div>ようこそ {{user_last_name}} {{user_first_name}}　さん /
+                        <a href="/rpa_for_excel/">トップページ</a> /
+                        <a href="{% url 'admin:password_change' %}">パスワードの変更</a> /
+                        <a href="/isk_tools/accounts/logout/">ログアウト</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        <!-- END Header -->
+        <!-- Content -->
+
+        <div class="container-fluid">
+            <div class="row">
+                <div style="float:left;width:170px">
+                    <div class="side-bar" style="height:860px">
+                        <div class="col-sm-3 col-md-2 sidebar">
+                            {% if user.is_authenticated %}
+                                <ul class="nav nav-sidebar">
+                                    <li class="sidebar-list"><a href="/isk_tools/">トップページ</a></li>
+                                    <li class="sidebar-list"><a href="/isk_tools/cpexcel/">エクセルコピペツール</a></li>
+                                    {% if t_user_is_superuser == 1 %}
+                                    <li class="sidebar-list"><a href="/admin/">システム管理</a></li>
+                                    {% endif %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div style="float:left;width:1650px;height:860px">
+                    {% block contents %}{% endblock %}
+                </div>
+
+             </div>
+        </div>
+
+</body>
+</html>

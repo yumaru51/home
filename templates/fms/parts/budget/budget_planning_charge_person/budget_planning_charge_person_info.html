@@ -1,0 +1,38 @@
+<script>
+//登録済の計画担当者一覧を表示する
+function get_charge_person_list(a) {
+        var budget_id = a;
+        var charge_person_list_edit_flag = document.getElementById("planning_person_full_name") != null;
+            $.ajax({
+                url: "/isk_tools/fms/parts/budget/budget_planning_charge_person/planning_charge_person_list/",
+                type: "POST",
+                data : {
+                    'budget_id' : budget_id,
+                    'charge_person_list_edit_flag' : charge_person_list_edit_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#planning_charge_person_list').empty();
+                    $('#planning_charge_person_list').html(data);
+               })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#planning_charge_person_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+               });
+}
+</script>
+<style type="text/css">
+
+</style>
+
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">予算計画担当者</h2>
+    </div>
+    <div style="float:left;size=10px">　</div>
+    <div style="float:left;"><h2 class="page-header">登録済担当者リスト</h2>
+        <div id="planning_charge_person_list"></div>
+    </div>

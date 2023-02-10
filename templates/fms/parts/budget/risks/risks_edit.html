@@ -1,0 +1,355 @@
+<script>
+
+// チェックボックスのクリックイベントで、イベントの伝播を防ぐ
+$("table tr input[type=checkbox]").on("click", function(e){
+   e.stopPropagation();
+});
+
+// チェックボックスの状態を同期
+function budget_list_check_box_change(){
+    carry_over_flag_list = {{carry_over_flag_list}};
+    budget_list_data_num = $('#val_budget_list_data_num').val();
+    if(budget_list_data_num > 0){
+        for(loop in carry_over_flag_list){
+            if(carry_over_flag_list[loop] != 1){
+                document.getElementsByName('sel_selected_item')[loop].checked = true;
+            }
+            else{
+                document.getElementsByName('sel_selected_item')[loop].checked = false;
+            }
+            document.getElementsByName('sel_selected_item')[loop].disabled = !Number($('#edit_flag').val());
+
+        }
+    }
+}
+//予算データの詳細を別タブでの表示処理
+function risk_budget_detail(id, budget_id) {
+    window.open('', 'budget_copy_source');
+    var budget_step_present_user = $('#t_username').val();
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    var level5_step_id = String(133009902);
+    var new_step = Number(level5_step_id) + 1;
+    $('<form/>', {action: '/isk_tools/fms/parts/common/detail_template/', target: 'budget_copy_source', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: id}))
+    .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+    .append($('<input/>', {type: 'hidden', name: 'target', value: 'budget'}))
+    .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+    .append($('<input/>', {type: 'hidden', name: 'present_operator', value: budget_step_present_user}))
+    .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+    .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 1}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+//入力項目チェック
+function budget_risks_input_check() {
+    var alert_input_check_msg = "";
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+
+    // チェック対象の読み込み
+    var txt_risks_data = $('#txt_risks').val();
+    var txt_note_data = $('#txt_note').val();
+
+    // リスク評価結果の文字数チェック
+    if (txt_risks_data.length > $('#txt_risks')[0].maxLength){
+        $('#txt_risks').css('background-color','silver');
+        ng_str_count_flag = ng_str_count_flag + 1 ;
+    }else{
+        $('#txt_risks').css('background-color','white');
+    }
+
+    // 備考の文字数チェック
+    if (txt_note_data.length > $('#txt_note')[0].maxLength){
+        $('#txt_note').css('background-color','silver');
+        ng_str_count_flag = ng_str_count_flag + 1 ;
+    }else{
+        $('#txt_note').css('background-color','white');
+    }
+
+    if ( ng_flag > 0 ) {
+        alert_input_check_msg += '未入力項目があります！！\n';
+    }
+    if ( ng_str_count_flag > 0 ) {
+        alert_input_check_msg += '文字数オーバーです！！\n';
+    }
+
+    if ( ng_flag == 0 && ng_str_count_flag == 0) {
+        //禁止文字チェック
+        alert_input_check_msg += check_all_ng_character("{{ div_id_name }}_ng_character_check");
+    }
+    return alert_input_check_msg;
+}
+
+//入力項目の未入力、文字数オーバーをチェック
+function input_check(a,b,d) {  // a:自工程id, b:次工程id,  d:action_cd
+    var alert_input_check_msg = budget_risks_input_check();
+    if ( alert_input_check_msg.length > 0 ) {
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+        }
+        alert(alert_input_check_msg);
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }else{
+        budget_risks_edit(a,b);//データ登録･更新処理のJSを起動(このhtml内にプログラム有)
+    }
+}
+
+function budget_risks_edit(a, b){  // a:自工程id, b:次工程id
+    var this_step = a;
+    var next_step = b;
+    var target_budget_id = $('#target_budget_id').val();
+    var this_department = $('#user_department_cd').val();
+    var this_division = $('#user_division_cd').val();
+    var next_division = $('#next_division').val();
+    var next_department = $('#next_department').val();
+    var comment = $('#comment').val();
+    if ( a == b ){
+        var next_person = $('#this_user').val();
+        var user_attribute_id = 0;
+    }else{
+        var next_person = $('#sel_next_person').val();
+        var user_attribute_id = $('#sel_next_person').val();
+    }
+
+    var risks_data = $('#txt_risks').val();
+    var note_data = $('#txt_note').val();
+
+    // チェックBOXの状態でIDを振り分け
+    adopted_budget_id = [];
+    carry_over_budget_id = [];
+
+    // 全チェックBOXのうち
+    $("input:checkbox").each(function(){
+        var $this = $(this);
+        if($this.is(":checked")){
+            // チェックされているもの
+            adopted_budget_id.push($this.attr("id"))
+        }else{
+            // チェックされていないもの
+            carry_over_budget_id.push($this.attr("id"))
+        }
+    });
+
+    $.ajax({
+            url: "/isk_tools/fms/action/risks_entry/",
+            type: "POST",
+            data : {
+                'next_step' : next_step,
+                'next_division' : next_division,
+                'next_department' : next_department,
+                'next_person' : next_person,
+                'target_budget_id' : target_budget_id,
+                //'work_id' : work_id,
+                'risks_data': risks_data,
+                'note_data': note_data,
+                //'check_state': check_state,
+                'adopted_budget_id': adopted_budget_id,
+                'carry_over_budget_id': carry_over_budget_id,
+                'user_attribute_id' : user_attribute_id,
+                'this_step': this_step,
+                'this_department' : this_department,
+                'this_division' : this_division,
+                'comment': comment,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            async: false,
+            cache: false,
+            })
+            .done(function(data){
+                //現状の進捗工程と処理後の進捗工程とが別かを判定
+                if ( this_step != next_step ){
+                    $('#budget_budget_risks_action_button').empty();//別の場合は、「操作」ボタンを非表示に
+                }
+                log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                if($("#action_pb_loading") != null){
+                    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                }
+                alert(data.msg);
+                // アクションボタン有効化
+                $(".button").prop("disabled", false);
+
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                if($("#action_pb_loading") != null){
+                    $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                }
+                alert('Error!' +textStatus+' ' +errorThrown);
+                // アクションボタン有効化
+                $(".button").prop("disabled", false);
+            });
+}
+function budget_risk_action_button_empty() {
+    //現状の進捗工程と処理後の進捗工程とが別かを判定
+    if ( this_step != next_step ){
+        $('#budget_budget_risks_action_button').empty();//別の場合は、「操作」ボタンを非表示に
+    }
+}
+
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    width:750px;
+    font-size: 100%;
+}
+input[type=checkbox] {
+    width: 20px;
+    height: 20px;
+    background-color: blue;
+    color: blue;
+}
+input[type=checkbox]:disabled {
+    background-color: blue;
+    color: blue;
+    cursor: not-allowed;
+}
+td,th{
+    table-layout:fixed;
+}
+.selected_item{
+    width:40px;
+    text-align: center;
+}
+.budget_id{
+    width:60px;
+}
+.budget_name{
+    width:250px;
+}
+.business_year{
+    width:60px;
+}
+.budget_main_department{
+    width:150px;
+}
+.prospect_price{
+    width:150px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+    <div style="width: auto;">
+        <div style="float:left">
+            <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+                <h2 class="page-header2">{{ step_name }}</h2>
+            </div>
+        </div>
+    </div>
+    <div style="clear: both;" ></div>
+    <input type="hidden" id="val_budget_list_data" value="{{ budget_list_data }}">
+    <input type="hidden" id="val_budget_list_data_num" value="{{ budget_list_data_num }}">
+    <input type="hidden" id="val_carry_over_flag_list" value="{{ carry_over_flag_list }}">
+    <input type="hidden" id="target_entry_new_price_id">
+    <input type="hidden" id="edit_flag" value="{{ edit_flag }}">
+
+    <div id="budget_budget_risks_action_button" style="width: auto;"></div>
+
+    <div>
+        <table>
+            <tr><td><font size="4" style="line-height:130%">予算見積調整合計額</font></td></tr>
+            <tr><td><input type="tel" id="txt_prospect_price" size="15"
+                            value="{{ total_budget_price_value }}"></td></tr>
+        </table>
+    </div>
+    <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+        <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5"
+               style="border-collapse: collapse; float:left">
+            <thead class="scrollHead">
+                <tr>
+                    <th class="selected_item" style="font-size:120%">対象</th>
+                    <th class="budget_id" style="text-align:center; vertical-align:middle; font-size:120%">予算ID</th>
+                    <th class="budget_name" style="text-align:center; vertical-align:middle; font-size:120%">予算名</th>
+                    <th class="business_year" style="text-align:center; vertical-align:middle; font-size:120%">年度</th>
+                    <th class="budget_main_department"
+                                    style="text-align:center; vertical-align:middle; font-size:120%">担当部署</th>
+                    <th class="prospect_price"
+                                    style="text-align:center; vertical-align:middle; font-size:120%">予算見積調整額</th>
+                </tr>
+            </thead>
+            <tbody class="scrollBody" style="height:550px;">
+
+            {% if budget_list_data_num > 0 %}
+                {% for list_item in budget_list_data %}
+                    <tr onclick="risk_budget_detail({{ list_item.id }}, {{ list_item.budget_id }})">
+                        <td class="selected_item">
+                            {% if edit_flag == 1 %}
+                                <input type="checkbox" id="{{ list_item.id }}" name="sel_selected_item" checked>
+                            {% else %}
+                                <input type="checkbox" id="{{ list_item.id }}_" name="sel_selected_item" checked disabled>
+                            {% endif %}
+                        </td>
+                        <td class="budget_id">
+                            {% if list_item.budget_id is　not None %}
+                                {{ list_item.budget_id }}
+                            {% endif %}
+                        </td>
+                        <td class="budget_name">
+                            {% if list_item.budget_name is　not None %}
+                                {{ list_item.budget_name }}
+                            {% endif %}
+                        </td>
+                        <td class="business_year">
+                            {% if list_item.business_year_id is　not None %}
+                                {{ list_item.business_year_id }}
+                            {% endif %}
+                        </td>
+                        <td class="budget_main_department">
+                            {% if list_item.department_name is　not None %}
+                                {{ list_item.department_name }}
+                            {% endif %}
+                        </td>
+                        <td class="prospect_price">
+                            {% if list_item.budget_price is　not None %}
+                                {{ list_item.budget_price }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <div>対象データなし</div>
+            {% endif %}
+            </tbody>
+        </table>
+        <table style="float:left">
+            <tr>
+                <th style="font-size:120%">リスク評価結果</th>
+<!--                <td>残り文字数:</td>-->
+            </tr>
+            {% if edit_flag == 1 %}
+                <tr><td><textarea id="txt_risks" maxlength="2400"
+                                  rows="29" cols="60" style="font-size:120%">{{ risks }}</textarea></td></tr>
+            {% else %}
+                <tr><td><textarea id="txt_risks_read_only" maxlength="2400"
+                                  rows="30" cols="60" disabled style="font-size:120%">{{ risks }}</textarea></td></tr>
+            {% endif %}
+        </table>
+        <table style="float:left">
+            <tr><th style="font-size:120%">備考</th></tr>
+            {% if edit_flag == 1 %}
+                <tr><td><textarea id="txt_note" maxlength="400"
+                                  rows="10" cols="60" style="font-size:120%">{{ note }}</textarea></td></tr>
+            {% else %}
+                <tr><td><textarea id="txt_note_read_only" maxlength="400"
+                                  rows="10" cols="60" disabled style="font-size:120%">{{ note }}</textarea></td></tr>
+            {% endif %}
+        </table>
+    </div><!--ng_character_checkここまで-->

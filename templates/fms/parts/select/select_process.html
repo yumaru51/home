@@ -1,0 +1,7 @@
+{% for process_list in process_list %}
+    {% if process_list.process_cd2 == facility_process %}
+        <option value="{{ process_list.process_cd2 }}" selected>{{ process_list.process_cd }} : {{ process_list.process_name }}</option>
+    {% else %}
+        <option value="{{ process_list.process_cd2 }}">{{ process_list.process_cd }} : {{ process_list.process_name }}</option>
+    {% endif %}
+{% endfor %}

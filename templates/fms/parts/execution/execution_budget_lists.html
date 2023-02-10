@@ -1,0 +1,267 @@
+<script>
+//予算一覧から選択された予算データの詳細の表示処理
+function execution_budget_detail(a,b,c) {
+    if (c == 999999999) {
+        alert('工程完了の情報は「MotionBoard」で確認してください！！');
+    }else{
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1
+        var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+        $('<form/>', {action: '/isk_tools/fms/parts/execution/execution_detail_template/', method: 'post'})
+        .append($('<input/>', {type: 'hidden', name: 'target_unique_budget_id', value: a}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_id', value: b}))
+        .append($('<input/>', {type: 'hidden', name: 'target', value: 'probudgetunit'}))
+        .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+        .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+        .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+        .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+        .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+        .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+        .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+        .appendTo(document.body)
+        .submit();
+    }
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:57px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.budget_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.rev_no{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_no{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.condition{
+    width:140px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.step{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_class{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.next_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.business_year{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_name{
+    width:300px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.division{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.department{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.construction_name{
+    width:280px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.order_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.desired_date{
+    width:220px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.plan_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.PM_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.process{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.cost_center{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.rem{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+    overflow: hidden;
+}
+.supplemental_task_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.jurisdiction_area{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.area_person_in_charge{
+    width:110px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.original_sec_person_in_charge{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.sche_gov_inspection_date{
+    width:130px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if execution_budget_lists_num > 0 %}
+            表示件数：{{ execution_budget_lists_num }}件
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="budget_id">予算ID</th>
+                        <th class="rev_no">RevNO</th>
+                        <th class="budget_no">予算NO</th>
+                        <th class="step">工程</th>
+                        <th class="next_person">次作業者</th>
+                        <th class="budget_name">予算名</th>
+                        <th class="department">部署</th>
+                        <th class="division">部門</th>
+                        <th class="jurisdiction_area">所管エリア</th>
+                        <th class="area_person_in_charge">エリア管理者</th>
+                        <th class="original_sec_person_in_charge">原課担当者</th>
+                        <th class="sche_gov_inspection_date">官庁検査予定日</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for execution_budget_lists in execution_budget_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" id="{{ execution_budget_lists.id }}" class="detailpb" onclick="execution_budget_detail(id,{{ execution_budget_lists.budget_id }},{{ execution_budget_lists.step_id }});">詳細</a>
+                        </td>
+                        <td class="budget_id">{{ execution_budget_lists.budget_id }}</td>
+                        <td class="rev_no">
+                            {% if execution_budget_lists.rev_no is not None %}
+                                {{ execution_budget_lists.rev_no }}
+                            {% endif %}
+                        </td>
+                        <td class="budget_no">
+                            {% if execution_budget_lists.budget_no is not None %}
+                                {{ execution_budget_lists.budget_no }}
+                            {% endif %}
+                        </td>
+                        <td class="step">{{ execution_budget_lists.step_name }}</td>
+                        <td class="next_person">
+                            {% if execution_budget_lists.U1_last_name is not None and execution_budget_lists.U1_first_name is not None %}
+                                {{ execution_budget_lists.U1_last_name }}{{ execution_budget_lists.U1_first_name }}
+                            {% endif %}
+                        </td>
+                        <td class="budget_name">
+                            {% if execution_budget_lists.budget_name is not None %}
+                                {{ execution_budget_lists.budget_name }}
+                            {% endif %}
+                        </td>
+                        <td class="department">
+                            {% if execution_budget_lists.department_name is not None %}
+                                {{ execution_budget_lists.department_name }}
+                            {% endif %}
+                        </td>
+                        <td class="division">
+                            {% if execution_budget_lists.division is not None %}
+                                {{ execution_budget_lists.division_name }}
+                            {% endif %}
+                        </td>
+                        <td class="jurisdiction_area">
+                            {% if execution_budget_lists.jurisdiction_area is not None %}
+                                {{ execution_budget_lists.jurisdiction_area }}
+                            {% endif %}
+                        </td>
+                        <td class="area_person_in_charge">
+                            {% if execution_budget_lists.U2_last_name is not None and execution_budget_lists.U2_first_name is not None %}
+                                {{ execution_budget_lists.U2_last_name }}{{ execution_budget_lists.U2_first_name }}
+                            {% endif %}
+                        </td>
+                        <td class="original_sec_person_in_charge">
+                            {% if execution_budget_lists.U3_last_name is not None and execution_budget_lists.U3_first_name is not None %}
+                                {{ execution_budget_lists.U3_last_name }}{{ execution_budget_lists.U3_first_name }}
+                            {% endif %}
+                        </td>
+                        <td class="sche_gov_inspection_date">
+                            {% if execution_budget_lists.sche_gov_inspection_date is not None %}
+                                {{ execution_budget_lists.sche_gov_inspection_date }}
+                            {% endif %}
+                        </td>
+
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

@@ -1,0 +1,6 @@
+                    荷受先：<select id="selectcompany"　name="company" style="width:360px; height:30px">
+                        <option value=""></option>
+                        {% for company_list in company_list %}
+                            <option value="{{ company_list.company_code }}">{{ company_list.company_name }}</option>
+                        {% endfor %}
+                        </select>

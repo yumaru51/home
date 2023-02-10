@@ -1,0 +1,128 @@
+<script>
+//日付入力をカレンダー化
+$('.datepicker').datepicker();
+//カレンダーを日本語化
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//対象の予算一覧の表示処理
+function get_phenomenon_lists_search() {
+        // 検索条件を保持する
+        session_value_phenomenon_write();
+        // 検索
+        get_phenomenon_lists();
+}
+
+// 絞込条件リセット
+function reset_phenomenon_filter() {
+    //セッション情報の削除
+    session_value_phenomenon_clear();
+    //フィルター再表示
+    phenomenon_filter_call();
+}
+
+//異常報告一覧絞込パーツ表示処理
+function phenomenon_filter_call() {
+    var level5_step_id = $('#level5_step_id').val();
+    var user = $('#t_username').val();
+    var user_department_cd = $('#user_department_cd').val();
+
+    if (sessionStorage.getItem('sel_phenomenon_next_division') == null) {
+        var next_division = "no_data";
+    }else{
+        var next_division = sessionStorage.getItem('sel_phenomenon_next_division');
+    }
+
+    if (sessionStorage.getItem('sel_phenomenon_next_department') == null) {
+        var next_department = "no_data";
+    }else{
+        var next_department = sessionStorage.getItem('sel_phenomenon_next_department');
+    }
+
+    if (sessionStorage.getItem('sel_phenomenon_next_parson') == null) {
+        var next_parson = "no_data";
+    }else{
+        var next_parson = sessionStorage.getItem('sel_phenomenon_next_parson');
+    }
+
+    var list_type = 'copy'
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/maintenance/phenomenon_filter/",
+        type: "POST",
+        data : {
+                'level5_step_id' : level5_step_id,
+                'user' : user,
+                'user_department_cd' : user_department_cd,
+                'next_division' : next_division,
+                'next_department' : next_department,
+                'next_parson' : next_parson,
+                'list_type' : list_type,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#phenomenon_filter').empty();
+            $('#phenomenon_filter').html(data);
+            get_phenomenon_lists();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#phenomenon_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+</script>
+<style type="text/css">
+#budget_copy_source_list{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+</style>
+    <input TYPE="hidden" id="user" VALUE="{{ user }}" NAME=user size=3 style="width:150px; height:20px"/>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">コピー元故障対応情報選択</h2>
+    </div>
+    <div>
+        <input type="button" name="get_phenomenon_list" value=" 　リスト更新　 " onclick="get_phenomenon_lists_search();">
+        <input type="button" name="reset_phenomenon_filter_button" value=" 　条件リセット　 " onclick="reset_phenomenon_filter();">
+    </div>
+
+    <div id="phenomenon_filter"></div>
+    <div>
+            異常報告リスト
+    </div>
+
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+    <div id="maintenance_lists"  style="width: 1800px;">
+
+    </div>

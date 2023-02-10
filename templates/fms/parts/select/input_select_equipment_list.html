@@ -1,0 +1,5 @@
+
+    <option value=""></option>
+{% for equipment_basic_list in equipment_basic_list %}
+    <option value="{{ equipment_basic_list.t_fclty_ldgr_skey }}">{{ equipment_basic_list.eqpt_id }}:{{ equipment_basic_list.fclty_nm }}</option>
+{% endfor %}

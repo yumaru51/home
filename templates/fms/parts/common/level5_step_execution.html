@@ -1,0 +1,309 @@
+{% extends 'fms/parts/common/level5_step_top_page.html' %}
+
+{% block sub_contents %}
+
+<script>
+
+// 予算絞込条件リセット
+function reset_budget_filter() {
+    //セッション情報の削除
+    session_value_budget_clear();
+    //予算フィルター再表示
+    budget_filter_call();
+}
+
+//予算一覧絞込パーツ表示処理
+function budget_filter_call() {
+        var level5_step_id = $('#level5_step_id').val();
+        var user = $('#user').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var target = $('#target').val();
+
+        if (sessionStorage.getItem('sel_probudgetunit_next_division') == null) {
+            var next_division = "no_data";
+        }else{
+            var next_division = sessionStorage.getItem('sel_probudgetunit_next_division');
+        }
+
+        if (sessionStorage.getItem('sel_probudgetunit_next_department') == null) {
+            var next_department = "no_data";
+        }else{
+            var next_department = sessionStorage.getItem('sel_probudgetunit_next_department');
+        }
+
+        if (sessionStorage.getItem('sel_probudgetunit_next_parson') == null) {
+            var next_parson = "no_data";
+        }else{
+            var next_parson = sessionStorage.getItem('sel_probudgetunit_next_parson');
+        }
+
+        var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+        if(isNaN(start_work_stop_flag)){
+            start_work_stop_flag = 0;
+        }
+        $.ajax({
+            url: "/isk_tools/fms/parts/execution/execution_budget_filter/",
+            type: "POST",
+            data : {
+                    'level5_step_id' : level5_step_id,
+                    'user' : user,
+                    'user_department_cd' : user_department_cd,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_parson' : next_parson,
+                    'start_work_stop_flag' : start_work_stop_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                    },
+            timeout: 1000000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#budget_filter').empty();
+                $('#budget_filter').html(data);
+                //get_execution_budget_lists();
+                //var division = $('#sel_budget_next_division').val();
+                //budget_select_next_division(division);
+                get_budget_lists_search();
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#budget_filter').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+
+// 工事絞込条件リセット
+function reset_work_filter() {
+    //セッション情報の削除
+    session_value_work_clear();
+    //工事フィルター再表示
+    work_filter_call();
+}
+
+//工事一覧絞込パーツ表示処理
+function work_filter_call() {
+    var level5_step_id = $('#level5_step_id').val();
+    var user = $('#user').val();
+    var user_department_cd = $('#user_department_cd').val();
+
+    if (sessionStorage.getItem('sel_prospecificationunit_next_division') == null) {
+        var next_division = "no_data";
+    }else{
+        var next_division = sessionStorage.getItem('sel_prospecificationunit_next_division');
+    }
+
+    if (sessionStorage.getItem('sel_prospecificationunit_next_department') == null) {
+        var next_department = "no_data";
+    }else{
+        var next_department = sessionStorage.getItem('sel_prospecificationunit_next_department');
+    }
+
+    if (sessionStorage.getItem('sel_prospecificationunit_next_parson') == null) {
+        var next_parson = "no_data";
+    }else{
+        var next_parson = sessionStorage.getItem('sel_prospecificationunit_next_parson');
+    }
+
+    var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+    if(isNaN(start_work_stop_flag)){
+        start_work_stop_flag = 0;
+    }
+    $.ajax({
+        url: "/isk_tools/fms/parts/execution/execution_work_filter/",
+        type: "POST",
+        data : {
+                'level5_step_id' : level5_step_id,
+                'user' : user,
+                'user_department_cd' : user_department_cd,
+                'next_division' : next_division,
+                'next_department' : next_department,
+                'next_parson' : next_parson,
+                'start_work_stop_flag' : start_work_stop_flag,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+
+            $('#work_filter').empty();
+            $('#work_filter').html(data);
+            //var division = $('#sel_work_next_division').val();
+            //work_select_next_division(division);
+            get_execution_work_lists();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#work_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+//タブ表示のためのJS
+var tab = {
+	init: function(a){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var show_page_id = 'page' + a;
+		for(i=0; i<pages.length; i++){
+			if(pages[i] != null){
+			    if( pages[i].id == show_page_id ) {
+                    pages[i].style.display = 'block';
+                    tabs[i].className = 'present';
+                    tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                }else{
+                    pages[i].style.display = 'none';
+                    tabs[i].className = null;
+                    tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                }
+            }
+		}
+	},
+	showpage: function(obj){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var num;
+		for(num=0; num<tabs.length; num++) {
+			if(tabs[num] === obj) break;
+		}
+		for(var i=0; i<pages.length; i++) {
+			if(i == num) {
+				pages[num].style.display = 'block';
+				tabs[num].className = 'present';
+			}
+			else{
+				pages[i].style.display = 'none';
+				tabs[i].className = null;
+			}
+		}
+	}
+}
+window.onload = function() {
+        budget_filter_call();//予算一覧絞込パーツを表示するJSを起動(このhtml内にプログラム有)
+{% if level3_step_id != 213000000 or start_work_stop_flag == 1 %}
+        work_filter_call();//工事一覧絞込パーツを表示するJSを起動(このhtml内にプログラム有)
+{% endif %}
+};
+</script>
+<style type="text/css">
+
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 490px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+.square_small {
+   width: 160px;
+   height: 140px;
+   background: khaki;
+}
+.triangle_right_small {
+  width: 0;
+  height: 0;
+  border-left: 25px solid khaki;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+#budget_lists{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+#work_lists{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+.button{
+    width:100px;
+}
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+
+</style>
+
+        <input type="hidden" id="level5_step_id" VALUE="{{level5_step_id}}" NAME=level5_step_id size=3 style="width:150px; height:20px"/>
+        <input type="hidden" id="select_tab" VALUE="{{select_tab}}" NAME=select_tab size=3 style="width:50px; height:20px"/>
+        <input type="hidden" id="default_tab" value="{{ default_tab }}">
+        <input type="hidden" id="target" value="{{ target }}">
+        <input type="hidden" id="start_work_stop_flag" value="{{ start_work_stop_flag }}">
+
+    <ul id="tab" style="width:auto;">
+        <li class="present"><a href="#page1">予算リスト</a></li>
+{% if level3_step_id != 213000000 or start_work_stop_flag == 1 %}
+        <li><a href="#page2">工事リスト</a></li>
+{% endif %}
+    </ul>
+    <div id="page1" class="pagetitle" >
+        <div>
+            <input type="button" name="get_budget_list" value=" 　リスト更新　 " onclick="get_budget_lists_search();">
+            <input type="button" name="reset_budget_filter_button" value=" 　条件リセット　 " onclick="reset_budget_filter();">
+        </div>
+
+        <div id="budget_filter"></div>
+        <div>
+                予算リスト
+        </div>
+        <div id="loading">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="budget_lists" style="width: 1920px;">
+        </div>
+    </div>
+
+{% if level3_step_id != 213000000 or start_work_stop_flag == 1 %}
+    <div id="page2" class="pagetitle">
+        <div>
+            <input type="button" name="get_work_list" value=" 　リスト更新　 " onclick="get_work_lists_search();">
+            <input type="button" name="reset_work_filter_button" value=" 　条件リセット　 " onclick="reset_work_filter();">
+        </div>
+        <div id="work_filter"></div>
+        <div>
+            工事リスト
+        </div>
+        <div id="loading2">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="work_lists" style="width: 1920px;">
+        </div>
+    </div>
+{% endif %}
+
+<script type="text/javascript">
+var default_tab = $('#default_tab').val();
+tab.setup = {
+	tabs: document.getElementById('tab').getElementsByTagName('li'),
+{% if level3_step_id != 213000000 or start_work_stop_flag == 1 %}
+	pages: [
+		document.getElementById('page1'),
+		document.getElementById('page2')
+	]
+{% else %}
+	pages: [
+		document.getElementById('page1')
+	]
+{% endif %}
+}
+tab.init(default_tab);
+</script>
+
+{% endblock %}

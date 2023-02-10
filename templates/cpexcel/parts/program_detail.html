@@ -1,0 +1,115 @@
+<script>
+
+function program_execute(a) {
+    var program_id = a;
+        $.ajax({
+                url: "/isk_tools/cpexcel/action/program_execute/",
+                type: "POST",
+                data : {
+                    'program_id': program_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    task_list_refresh(program_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function program_execute(a) {
+    var program_id = a;
+    var post_to_file = $('#post_to_file_name').val();
+        $.ajax({
+                url: "/isk_tools/cpexcel/action/program_execute/",
+                type: "POST",
+                data : {
+                    'program_id': program_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    task_list_refresh(program_id);
+                    file_download(post_to_file);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function file_download(file_name) {
+    //var resultJson = JSON.stringify($scope.jsonObj);
+    var downLoadLink = document.createElement("a");
+    downLoadLink.download = "作業完了_" + file_name;
+    //downLoadLink.href = URL.createObjectURL(new Blob([resultJson], {type: "text.plain"}));
+    downLoadLink.href = "/isk_tools/cpexcel/action/file_download?file_name=作業完了_" + file_name ;
+    downLoadLink.dataset.downloadurl = ["text/plain", downLoadLink.download, downLoadLink.href].join(":");
+    downLoadLink.click();
+}
+function file_upload(a){
+    // フォームデータを取得
+    if (a ==1 ) {
+        var formdata = new FormData($('#file_upload_form1').get(0));
+    }else{
+        var formdata = new FormData($('#file_upload_form2').get(0));
+    }
+
+    // POSTでアップロード
+        $.ajax({
+                url  : "/isk_tools/cpexcel/action/file_upload/",
+                type : "POST",
+                data : formdata,
+                cache       : false,
+                contentType : false,
+                processData : false,
+                dataType    : "json"
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    if(a ==1 ){
+                        $('#upload_pb1').val("送信完了");
+                    }else{
+                        $('#upload_pb2').val("送信完了");
+                    }
+                })
+                .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+</script>
+
+    <div>
+        <input type="hidden" id="post_to_file_name" value="{{ post_to_file }}">
+        <input type="button" value="　実行　" onclick="program_execute({{ program_id_str }});" >
+    </div>
+    <div>
+        <div>　プログラムID　　　　　　　　　：　{{ program_id_str }}</div>
+        <div>　プログラム名　　　　　　　　　：　{{ program_name }}</div>
+        <div>　説明　　　　　　　　　　　　　：　<textarea id="description" name="description" rows="6" cols="60">{{ description }}</textarea></div>
+        <div>　コピー元ファイル保存フォルダ　：　{{ source_file_folder_path }}</div>
+        <div>　コピー元ファイル名　　　　　　：　{{ source_file }}</div>
+        <div>　コピー先ファイル保存フォルダ　：　{{ post_to_file_path }}</div>
+        <div>　コピー先ファイル名　　　　　　：　{{ post_to_file }}</div>
+        <form id="file_upload_form1" name="file_upload_form" action="/rpa_for_excel/action/file_upload/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+            <div class="form-group">
+                　コピー元ファイル名　　　　　　：<input type="file" name="file" >
+                <input type="button" id="upload_pb1" value="送信" onclick="file_upload(1);">
+            </div>
+        </form>
+                <form id="file_upload_form2" name="file_upload_form" action="/rpa_for_excel/action/file_upload/" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+            <div class="form-group">
+                　コピー先ファイル名　　　　　　：<input type="file" name="file" >
+                <input type="button"  id="upload_pb2" value="送信" onclick="file_upload(2);">
+            </div>
+        </form>
+    </div>

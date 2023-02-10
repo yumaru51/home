@@ -1,0 +1,153 @@
+{% extends 'fms/parts/common/level5_step_top_page.html' %}
+
+{% block sub_contents %}
+
+<script>
+
+// 絞込条件リセット
+function reset_cs_filter() {
+    //セッション情報の削除
+    session_value_cs_clear();
+    //フィルター再表示
+    cs_filter_call();
+}
+
+//届出チェックシート一覧絞込パーツ表示処理
+function cs_filter_call() {
+    var level5_step_id = $('#level5_step_id').val();
+
+    var user = $('#user').val();
+    var user_department_cd = $('#user_department_cd').val();
+
+    if (sessionStorage.getItem('sel_cs_next_division') == null) {
+        var next_division = "no_data";
+    }else{
+        var next_division = sessionStorage.getItem('sel_cs_next_division');
+    }
+
+    if (sessionStorage.getItem('sel_cs_next_department') == null) {
+        var next_department = "no_data";
+    }else{
+        var next_department = sessionStorage.getItem('sel_cs_next_department');
+    }
+
+    if (sessionStorage.getItem('sel_cs_next_parson') == null) {
+        var next_parson = "no_data";
+    }else{
+        var next_parson = sessionStorage.getItem('sel_cs_next_parson');
+    }
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/check_sheet/cs_filter/",
+        type: "POST",
+        data : {
+                'level5_step_id' : level5_step_id,
+                'user' : user,
+                'user_department_cd' : user_department_cd,
+                'next_division' : next_division,
+                'next_department' : next_department,
+                'next_parson' : next_parson,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#cs_filter').empty();
+            $('#cs_filter').html(data);
+            var division = $('#sel_cs_next_division').val();
+            //cs_select_next_division(division);
+            get_cs_lists();
+            session_value_cs_write();
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#cs_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+//予算新規登録ページ表示処理
+function cs_new_entry(a) {
+    $("#loading").show();//呼び出し中に表示するgifを表示
+    var step_id = a;
+    var budget_id_edit_flg = 1;
+    cs_detail("0","0","0",budget_id_edit_flg,step_id);//予算データの詳細の表示処理を表示するJSを起動(cs_lists.html内にプログラム有)
+
+}
+window.onload = function() {
+        cs_filter_call();//予算一覧絞込パーツを表示するJSを起動(このhtml内にプログラム有)
+};
+</script>
+<style type="text/css">
+
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 490px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+.square_small {
+   width: 160px;
+   height: 140px;
+   background: khaki;
+}
+.triangle_right_small {
+  width: 0;
+  height: 0;
+  border-left: 25px solid khaki;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+#cs_lists{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+.button{
+    width:100px;
+}
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+
+</style>
+
+    <input TYPE=hidden id="level5_step_id" VALUE="{{level5_step_id}}" NAME=level5_step_id size=3 style="width:150px; height:20px"/>
+
+    <div id="page1" class="pagetitle" >
+        <div>
+            <input type="button" name="get_cs_list" value=" 　リスト更新　 " onclick="get_cs_lists_search();">
+            <input type="button" name="reset_cs_filter_button" value=" 　条件リセット　 " onclick="reset_cs_filter();">
+            {% if new_entry_flag == 1 %}
+                <input type="button" name="new_entry" value="　追加届出作成　" onclick="cs_new_entry({{ level5_step_id }});">
+            <input type="hidden" value="{{ level5_step_id }}">
+            {% endif %}
+        </div>
+
+        <div id="cs_filter"></div>
+        <div>
+                届出リスト
+        </div>
+        <div id="loading">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="cs_lists" style="width: 1800px;">
+        </div>
+    </div>
+
+{% endblock %}

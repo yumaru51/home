@@ -1,0 +1,430 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+</script>
+<style type="text/css">
+div.scroll_work_info_div {
+  width: 1880px;
+  height: 780px;
+  overflow: scroll;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:100px;
+}
+div.scroll_div {
+  border: solid 1px;
+  width: 1000px;
+  height: 900px;
+  overflow: scroll;
+}
+.pv_body1 {
+    width: 950px;
+    height: 400px;
+    border:1px solid rgb(0, 0, 0);
+}
+.pv_body2 {
+    width: 950px;
+    height: 400px;
+    border:1px solid rgb(0, 0, 0);
+}
+.pv_body3 {
+    width: 950px;
+    height: 400px;
+    border:1px solid rgb(0, 0, 0);
+}
+.pv_body4 {
+    width: 950px;
+    height: 400px;
+    border:1px solid rgb(0, 0, 0);
+}
+.pv_body5 {
+    width: 950px;
+    height: 400px;
+    border:1px solid rgb(0, 0, 0);
+}
+.pv_body6 {
+    width: 950px;
+    height: 400px;
+    border:1px solid rgb(0, 0, 0);
+}
+/* タブ実装 */
+.title1, .pv_body1 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title2, .pv_body2 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title3, .pv_body3 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title4, .pv_body4 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title5, .pv_body5 {
+    border:1px solid rgb(0, 0, 0);
+}
+.title6, .pv_body6 {
+    border:1px solid rgb(0, 0, 0);
+}
+.tab-title {
+    border-bottom: none;
+    padding: .3em .5em;
+    border-radius: .3em .3em 0 0;
+    text-align: center;
+    display: table;
+}
+.tab-body > div {
+    /*border-radius: 0 .3em .3em .3em;*/
+    padding: 1em;
+}
+.tab-body {
+    width: auto;
+    height: auto;
+}
+/* radio non-display */
+.container .radio {
+    display: none;
+}
+/* tabs position */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    position: relative;
+}
+.container::after {
+    content: "";
+    width: 100%;
+}
+.container .tab-title {
+    position: relative;
+    border-bottom: solid transparent;
+    top: 1px;
+    left: 1px;
+}
+.container .tab-title:hover {
+    cursor: pointer;
+}
+.container .tab-body {
+    order: 1;
+}
+/* tab's body init */
+.add-control .tab-body > div {
+    display: none;
+}
+
+/* selected tab's color change */
+.add-control .radio:checked + .tab-title {
+    color: #fff;
+    border-bottom-color: #fff;
+}
+.add-control #execution_provendorevaluation_info_tab1:checked ~ .title1 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_provendorevaluation_info_tab2:checked ~ .title2 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_provendorevaluation_info_tab3:checked ~ .title3 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_provendorevaluation_info_tab4:checked ~ .title4 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_provendorevaluation_info_tab5:checked ~ .title5 {
+    background: rgba(0, 0, 0, .5);
+}
+.add-control #execution_provendorevaluation_info_tab6:checked ~ .title6 {
+    background: rgba(0, 0, 0, .5);
+}
+
+/* tabs control */
+.add-control #execution_provendorevaluation_info_tab1:checked ~ .tab-body > .pv_body1 {
+    display: block;
+}
+.add-control #execution_provendorevaluation_info_tab2:checked ~ .tab-body > .pv_body2 {
+    display: block;
+}
+.add-control #execution_provendorevaluation_info_tab3:checked ~ .tab-body > .pv_body3 {
+    display: block;
+}
+.add-control #execution_provendorevaluation_info_tab4:checked ~ .tab-body > .pv_body4 {
+    display: block;
+}
+.add-control #execution_provendorevaluation_info_tab5:checked ~ .tab-body > .pv_body5 {
+    display: block;
+}
+.add-control #execution_provendorevaluation_info_tab6:checked ~ .tab-body > .pv_body6 {
+    display: block;
+}
+</style>
+
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+<!--            <h2 class="page-header">{{ work_step_name }}</h2>-->
+        </div>
+<!--        <input type="hidden" id="work_detail_id" value="{{ work_lists.id }}">-->
+<!--        <input type="hidden" id="this_work_id" value="{{ work_lists.work_id }}">-->
+<!--        <input type="hidden" id="this_work_rev_no" value="{{ work_lists.work_rev_no }}">-->
+<!--        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">-->
+<!--        <input type="hidden" id="last_operator" value="{{ last_operator }}">-->
+<!--        <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">-->
+
+        <!--        <input type="hidden" id="action" value="{{ action }}">-->
+
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_provendorevaluation_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+
+<!--        <div id="{{ action_button_id }}" style="width: auto;"></div>-->
+
+        <div class="scroll_div" style="float: left;">
+<!--
+            <div class="container add-control">
+                <input type="radio" id="execution_provendorevaluation_info_tab1" class="radio" name="tab" checked="checked"><label class="tab-title title1" for="execution_provendorevaluation_info_tab1">見積査定評価まとめ</label>
+                <input type="radio" id="execution_provendorevaluation_info_tab2" class="radio" name="tab" ><label class="tab-title title2" for="execution_provendorevaluation_info_tab2">候補業者1</label>
+                <input type="radio" id="execution_provendorevaluation_info_tab3" class="radio" name="tab" ><label class="tab-title title3" for="execution_provendorevaluation_info_tab3">候補業者2</label>
+                <input type="radio" id="execution_provendorevaluation_info_tab4" class="radio" name="tab" ><label class="tab-title title4" for="execution_provendorevaluation_info_tab4">候補業者3</label>
+                <input type="radio" id="execution_provendorevaluation_info_tab5" class="radio" name="tab" ><label class="tab-title title5" for="execution_provendorevaluation_info_tab5">候補業者4</label>
+                <input type="radio" id="execution_provendorevaluation_info_tab6" class="radio" name="tab" ><label class="tab-title title6" for="execution_provendorevaluation_info_tab6">候補業者5</label>
+                <div class="tab-body">
+                    <div class="pv_body1">
+                        <div style="padding: 5px 0px;">
+                            {% if old_provendorevaluation_data_num == 0 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ estimate_assessment_evaluation_sum }}</textarea></font>
+                            {% elif provendorevaluation_data.estimate_assessment_evaluation_sum == old_provendorevaluation_data.estimate_assessment_evaluation_sum %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ estimate_assessment_evaluation_sum }}</textarea></font>
+                            {% else %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ estimate_assessment_evaluation_sum }}</textarea></font>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="pv_body2">
+                        <div style="padding: 5px 0px;">
+                            {% if old_provendorevaluation_data_num == 0 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment1 }}</textarea></font>
+                            {% elif provendorevaluation_data.candidate_vendor_comment1 == old_provendorevaluation_data.candidate_vendor_comment1 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment1 }}</textarea></font>
+                            {% else %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ candidate_vendor_comment1 }}</textarea></font>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="pv_body3">
+                        <div style="padding: 5px 0px;">
+                            {% if old_provendorevaluation_data_num == 0 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment2 }}</textarea></font>
+                            {% elif provendorevaluation_data.candidate_vendor_comment2 == old_provendorevaluation_data.candidate_vendor_comment2 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment2 }}</textarea></font>
+                            {% else %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ candidate_vendor_comment2 }}</textarea></font>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="pv_body4">
+                        <div style="padding: 5px 0px;">
+                            {% if old_provendorevaluation_data_num == 0 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment3 }}</textarea></font>
+                            {% elif provendorevaluation_data.candidate_vendor_comment3 == old_provendorevaluation_data.candidate_vendor_comment3 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment3 }}</textarea></font>
+                            {% else %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ candidate_vendor_comment3 }}</textarea></font>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="pv_body5">
+                        <div style="padding: 5px 0px;">
+                            {% if old_provendorevaluation_data_num == 0 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment4 }}</textarea></font>
+                            {% elif provendorevaluation_data.candidate_vendor_comment4 == old_provendorevaluation_data.candidate_vendor_comment4 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment4 }}</textarea></font>
+                            {% else %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ candidate_vendor_comment4 }}</textarea></font>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="pv_body6">
+                        <div style="padding: 5px 0px;">
+                            {% if old_provendorevaluation_data_num == 0 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment5 }}</textarea></font>
+                            {% elif provendorevaluation_data.candidate_vendor_comment5 == old_provendorevaluation_data.candidate_vendor_comment5 %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ candidate_vendor_comment5 }}</textarea></font>
+                            {% else %}
+                                <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ candidate_vendor_comment5 }}</textarea></font>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+-->
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">最終金額評価</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_provendorevaluation_data_num == 0 %}
+                            <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ eva_final_price }}</textarea></font>
+                        {% elif provendorevaluation_data.eva_final_price == old_provendorevaluation_data.eva_final_price %}
+                            <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ eva_final_price }}</textarea></font>
+                        {% else %}
+                            <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ eva_final_price }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+{% endblock %}
+
+{% block under_sub_contents %}
+        <br>
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予想額</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.probable_price | default_if_none:'' }}</font>
+                    {% elif work_common_data.prospecificationunit_data.probable_price == work_common_data.old_prospecificationunit_data.probable_price %}
+                        <font size="5" color="black">{{ work_common_data.probable_price | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.probable_price | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者1</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:'' }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor1 == work_common_data.old_prospecificationunit_data.candidate_vendor1 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor1 | default_if_none:''  }}</font>
+                    {% endif %}
+
+                        <div style="float:right;" >
+                    {% if work_common_data.prospecificationunit_data.special_vendor_check %}
+                        <font size="4"><input type="checkbox" checked="checked" disabled='disabled'> 特命</font>
+                    {% else %}
+                        <font size="4"><input type="checkbox" disabled='disabled'> 特命</font>
+                    {% endif %}
+                        </div>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者2</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor2 == work_common_data.old_prospecificationunit_data.candidate_vendor2 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor2 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者3</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor3 == work_common_data.old_prospecificationunit_data.candidate_vendor3 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor3 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者4</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor4 == work_common_data.old_prospecificationunit_data.candidate_vendor4 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor4 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">候補業者5</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% elif work_common_data.prospecificationunit_data.candidate_vendor5 == work_common_data.old_prospecificationunit_data.candidate_vendor5 %}
+                        <font size="5" color="black">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ work_common_data.prospecificationunit_data.candidate_vendor5 | default_if_none:''  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">備考</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.memo == work_common_data.old_prospecificationunit_data.memo %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="memo" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.memo | default_if_none:''  }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">特命コメント</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.special_vendor_comment == work_common_data.old_prospecificationunit_data.special_vendor_comment %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="special_vendor_comment" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_comment | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">調達G特命コメント</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="4">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="special_vendor_si_comment" rows="5" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_si_comment | default_if_none:'' }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.special_vendor_si_comment == work_common_data.old_prospecificationunit_data.special_vendor_si_comment %}
+                        <font size="4"><textarea name="special_vendor_si_comment" rows="5" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_si_comment | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="special_vendor_si_comment" rows="5" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.special_vendor_si_comment | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事概要</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if work_common_data.old_prospecificationunit_data_num == 0 %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% elif work_common_data.prospecificationunit_data.construction_outline == work_common_data.old_prospecificationunit_data.construction_outline %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:black;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% else %}
+                        <font size="4"><textarea name="work_rem" rows="10" cols="40" style="color:red;" readonly>{{ work_common_data.prospecificationunit_data.construction_outline | default_if_none:''  }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+        </table>
+{% endblock %}

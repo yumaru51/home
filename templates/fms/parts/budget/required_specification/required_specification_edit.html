@@ -1,0 +1,168 @@
+<script>
+
+//入力項目チェック
+function required_spec_input_check() {
+    var alert_input_check_msg = "";
+
+    //禁止文字チェック
+    var alert_ng_ch_msg = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+    alert_input_check_msg += alert_ng_ch_msg;
+
+    return alert_input_check_msg;
+}
+
+//要求仕様登録･更新処理
+function required_spec_entry(action_type) {
+    var budget_id = $('#target_budget_id').val();
+    if (budget_id == 0){
+        alert("予算データを先に登録(一時保存)してください！！");
+        return;
+    }
+
+    //入力項目チェック
+    var alert_input_check_msg = required_spec_input_check();
+    if ( alert_input_check_msg.length > 0 ) {
+        alert(alert_input_check_msg);
+        return;
+    }
+
+    $.ajax({
+        url: "/isk_tools/fms/action/required_spec_entry/",
+        type: "POST",
+        data : {
+            'action_type' : action_type,
+            'budget_id' : budget_id,
+            'budget_rev_no' : $('#budget_rev_no').val(),
+            'required_spec_id' : $('#required_spec_id').val(),
+            'no' : $('#rs_no').val(),
+            'required_spec' : $('#required_spec').val(),
+            'this_department' : $('#user_department_cd').val(),
+            'this_division' : $('#user_division_cd').val(),
+            'this_step' : $('#this_step').val(),
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'json',
+        cache : false,
+        })
+        .done(function(data){
+            alert(data.msg);
+            $('#required_spec_id').val(data.required_spec_id);
+            $('#rs_no').val(data.no);
+            required_spec_list();//要求仕様一覧を表示するJS起動(detail_template.html内にプログラム有)
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+//要求仕様削除処理
+function required_spec_delete() {
+    var required_spec_id = $('#required_spec_id').val();
+    if(required_spec_id == 0){
+        return;
+    }
+    $.ajax({
+        url: "/isk_tools/fms/action/required_spec_delete/",
+            type: "POST",
+            data : {
+                'required_spec_id' : required_spec_id,
+                'this_department' : $('#user_department_cd').val(),
+                'this_division' : $('#user_division_cd').val(),
+                'this_step' : $('#this_step').val(),
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                $('#required_spec_id').val(0);
+                $('#rs_no').val('');
+                $('#required_spec').val('');
+                required_spec_list();//要求仕様一覧を表示するJS起動(detail_template.html内にプログラム有)
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+</script>
+<style type="text/css">
+div.scroll_required_spec_div {
+  width: 440px;
+  height: 880px;
+  overflow: scroll;
+}
+</style>
+    <div style="float: left;">
+        <input type="hidden" id="required_spec_id" value="{{ required_spec_id }}" size="4">
+        <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+        <table>
+            <tr>
+                <td><div><font size="4">NO</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><input type="text" id="rs_no" value="{{ rs_no }}" size="2" readonly="readonly">※自動取得</font></div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">要求仕様</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div><font size="3"><textarea id="required_spec" name="required_spec" rows="18" cols="54" >{{ required_spec }}</textarea></font></div></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>
+                    <div style="float: left;">
+                        <input type="button" value="新規登録" onclick="required_spec_entry('add');">　
+                        <input type="button" value="　更新　" onclick="required_spec_entry('update');">
+                    </div>
+                    <div style="float: right;">
+                        <input type="button" value="　削除　" onclick="required_spec_delete();">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><div><font size="4">記載例</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                        <input id="get_sample_help_file_button_1" type="button" name="get_sample_help_file_button" value="機械工事" onclick='download_server_file("\\\\Ydomnserv\\COMMON\\部門間フォルダ\\FacilityData\\template_files\\manuals\\要求仕様記載例\\機械工事","【機械工事】要求仕様記載例.xlsx")'>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">　　　</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                        <input id="get_sample_help_file_button_2" type="button" name="get_sample_help_file_button" value="電気工事" onclick='download_server_file("\\\\Ydomnserv\\COMMON\\部門間フォルダ\\FacilityData\\template_files\\manuals\\要求仕様記載例\\電気工事","【電気工事】要求仕様記載例.xlsx")'>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">　　　</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                        <input id="get_sample_help_file_button_3" type="button" name="get_sample_help_file_button" value="計装工事" onclick='download_server_file("\\\\Ydomnserv\\COMMON\\部門間フォルダ\\FacilityData\\template_files\\manuals\\要求仕様記載例\\計装工事","【計装工事】要求仕様記載例.xlsx")'>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">　　　</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                        <input id="get_sample_help_file_button_4" type="button" name="get_sample_help_file_button" value="土建工事" onclick='download_server_file("\\\\Ydomnserv\\COMMON\\部門間フォルダ\\FacilityData\\template_files\\manuals\\要求仕様記載例\\土建工事","【土建工事】要求仕様記載例.xlsx")'>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">　　　</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                        <input id="get_sample_help_file_button_5" type="button" name="get_sample_help_file_button" value="購入品" onclick='download_server_file("\\\\Ydomnserv\\COMMON\\部門間フォルダ\\FacilityData\\template_files\\manuals\\要求仕様記載例\\購入品","【購入品】要求仕様記載例.xlsx")'>
+                </div></td>
+            </tr>
+        </table>
+        </div><!--ng_character_checkここまで-->
+
+    </div>
+    <div style="float: left;size=10px">　</div>
+    <div style="float: left;">登録済要求仕様一覧
+        <div id="required_spec_lists" style="width: auto;">
+            要求仕様リスト
+        </div>
+    </div>

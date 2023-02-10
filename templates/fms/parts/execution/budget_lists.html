@@ -1,0 +1,336 @@
+<script>
+//予算一覧から選択された予算データの詳細の表示処理
+function budget_detail(id,budget_id,budget_step_present_user,probudget_step_id,new_tab_flag) {
+    if (probudget_step_id == 999999999) {
+        alert('工程完了の情報は「MotionBoard」で確認してください！！');
+    }else{
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        if(start_work_stop_flag == 1){
+            var new_step = Number(213004000) + 1
+            if(new_tab_flag == 1){
+                var level5_step_id = String(920000000);
+                $('<form/>', {action: '/isk_tools/fms/parts/execution/execution_detail_template/', target: 'budget_stop_source', method: 'post'})
+                .append($('<input/>', {type: 'hidden', name: 'target_unique_budget_id', value: id}))
+                .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+                .append($('<input/>', {type: 'hidden', name: 'target', value: 'probudgetunit'}))
+                .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+                .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+                .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+                .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+                .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+                .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+                .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+                .append($('<input/>', {type: 'hidden', name: 'present_operator', value: budget_step_present_user}))
+                .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+                .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 1}))
+                .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+                .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+                .appendTo(document.body)
+                .submit();
+            }else{
+                var level5_step_id = String(213004000);
+                $('<form/>', {action: '/isk_tools/fms/parts/execution/execution_detail_template/', method: 'post'})
+                .append($('<input/>', {type: 'hidden', name: 'target_unique_budget_id', value: id}))
+                .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+                .append($('<input/>', {type: 'hidden', name: 'target', value: 'probudgetunit'}))
+                .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+                .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+                .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+                .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+                .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+                .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+                .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+                .append($('<input/>', {type: 'hidden', name: 'present_operator', value: budget_step_present_user}))
+                .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+                .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 1}))
+                .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+                .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+                .appendTo(document.body)
+                .submit();
+            }
+        }else{
+            $('<form/>', {action: '/isk_tools/fms/parts/execution/execution_detail_template/', method: 'post'})
+            .append($('<input/>', {type: 'hidden', name: 'target_unique_budget_id', value: id}))
+            .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+            .append($('<input/>', {type: 'hidden', name: 'target', value: 'probudgetunit'}))
+            .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+            .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+            .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+            .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+            .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+            .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+            .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+            .append($('<input/>', {type: 'hidden', name: 'present_operator', value: budget_step_present_user}))
+            .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+            .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+            .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+            .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+            .appendTo(document.body)
+            .submit();
+        }
+    }
+}
+
+function budget_detail_main(id, budget_id, budget_step_present_user, step_id) {
+    if (step_id == 999999999) {
+        alert('工程完了の情報は「MotionBoard」で確認してください！！');
+    }else{
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        $('<form/>', {action: '/isk_tools/fms/parts/common/detail_template/', method: 'post'})
+        .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: id}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+        .append($('<input/>', {type: 'hidden', name: 'target', value: 'budget'}))
+        .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+        .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+        .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+        .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+        .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+        .append($('<input/>', {type: 'hidden', name: 'present_operator', value: budget_step_present_user}))
+        .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+        .appendTo(document.body)
+        .submit();
+    }
+}
+</script>
+<style type="text/css">
+table table-strriped {
+    height: 1400px;
+    width:1850px;
+}
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.return_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.stop_budget_stop_pb{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.budget_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_no{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.condition{
+    width:120px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.step{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.B_step_name{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_class{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.next_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.business_year{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_name{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.department{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.facility_process{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.construction_name{
+    width:280px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.order_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.desired_date{
+    width:220px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.plan_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.PM_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.process{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.cost_center{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.rem{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+    overflow: hidden;
+}
+.supplemental_task_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.days_stay{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+        <input type="hidden" id="list_kind" value="{{ list_kind }}" >
+        {% if budget_lists_num > 0 %}
+            表示件数：{{ budget_lists_num }}件
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb">詳細</th>
+                        {% if list_kind != 'stop_budget' %}
+                            <th class="return_flag">差戻</th>
+                        {% else %}
+                            <th class="stop_budget_stop_pb"></th>
+                        {% endif %}
+                        <th class="budget_id">予算ID</th>
+                        <th class="budget_no">予算NO</th>
+                        <th class="condition">予算状態</th>
+                        <th class="B_step_name">進捗状況</th>
+                        <th class="business_year">年度</th>
+                        <th class="budget_class">工事区分</th>
+                        <th class="budget_name">予算名</th>
+                        <th class="facility_process">工程</th>
+                        <th class="department">部署</th>
+                        <th class="next_person">次作業者</th>
+                        <th class="days_stay">滞留日数</th>
+                        <th class="step">予算状況</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for budget_lists in budget_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                        {% if budget_lists.B_step_id != 213003011 %}
+                            <a href="#" id="{{ budget_lists.id }}" class="detailpb"
+                               onclick="budget_detail({{ budget_lists.id }}, {{ budget_lists.budget_id }}, '{{ budget_lists.username }}',{{ budget_lists.B_step_id }}, 1);">詳細</a>
+                        {% else %}
+                            <a href="#" id="{{ budget_lists.id }}" class="detailpb"
+                               onclick="budget_detail_main({{ budget_lists.id }}, {{ budget_lists.budget_id }}, '{{ budget_lists.username }}',{{ budget_lists.step_id }});">詳細</a>
+                        {% endif %}
+                        </td>
+                        {% if list_kind != 'stop_budget' %}
+                            {% if budget_lists.return_flag == 1  %}
+                                <td class="return_flag"><font color="yellow" style="background-color:red; font-weight:bold">
+                                    差戻
+                                </font></td>
+                            {% else %}
+                                <td class="return_flag"></td>
+                            {% endif %}
+                        {% else %}
+                            <td class="stop_budget_stop_pb">
+                                <a href="#" class="detailpb"
+                                   onclick="budget_detail({{ budget_lists.id }}, {{ budget_lists.budget_id }}, '{{ budget_lists.username }}', {{ budget_lists.B_step_id }}, 0);">中止</a>
+                            </td>
+                        {% endif %}
+                        <td class="budget_id">{{ budget_lists.budget_id }}</td>
+                        <td class="budget_no">{{ budget_lists.bd_no }}</td>
+                        <td class="condition">{{ budget_lists.condition_name }}</td>
+                        <td class="B_step_name">{{ budget_lists.B_step_name }}</td>
+                        <td class="business_year">{{ budget_lists.business_year }}</td>
+                        <td class="budget_class">{{ budget_lists.budget_class }}</td>
+                        <td class="budget_name">{{ budget_lists.budget_name }}</td>
+                        <td class="facility_process">{{ budget_lists.facility_process }}</td>
+                        <td class="department">{{ budget_lists.department_name }}</td>
+                        <td class="next_person">
+                        {% if budget_lists.last_name is not None %}
+                            {{ budget_lists.last_name }}　{{ budget_lists.first_name }}
+                        {% endif %}
+                        </td>
+                        {% if budget_lists.days_stay == None %}
+                            <td class="days_stay"></td>
+                        {% else %}
+                            <td class="days_stay">{{ budget_lists.days_stay }}</td>
+                        {% endif %}
+                        <td class="step">{{ budget_lists.step_name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

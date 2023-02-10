@@ -1,0 +1,6 @@
+                        <select id="discovery_person" name="discovery_person" onchange= "discovery_person_change(value);">
+                                <option value="{{ discoverer.username }}" hidden>{{ discoverer.last_name }}　{{ discoverer.first_name }}</option>
+                            {% for discovery_person_lists in discovery_person_lists %}
+                                <option value="{{ discovery_person_lists.username }}">{{ discovery_person_lists.last_name }}　{{ discovery_person_lists.first_name }}</option>
+                            {% endfor %}
+                        </select>　※必須

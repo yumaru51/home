@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ja">
+{% load staticfiles %}
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+        <script type="text/javascript" src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+
+</head>
+<script>
+$(function() {
+  //マウスを乗せたら発動
+    $("[class^='pin']").hover(function() {
+        value = $(this).attr('id');
+        //alert(value);
+        $.ajax({
+            url: "/isk_tools/fms/action/construction_data_get/",
+            type: "POST",
+            data : {
+                'id': value,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'html',
+            cache : false,
+        })
+        .done(function(data){
+            $('#construction_detail').empty();
+            $('#construction_detail').html(data);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#construction_detail').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+        //マウスを乗せたら色が変わる
+        //$('#data_info').css('background', '#FF0000');
+    }, function() {
+        $('#construction_detail').empty();
+        //色指定を空欄にすれば元の色に戻る
+        //$('#data_info').css('background', '#008080');
+    });
+});
+
+function page_refresh() {
+    var start_date = $('#start_date').val();
+    var end_date = $('#end_date').val();
+    var sel_fire_flag = $('#sel_fire_flag').val();
+    var sel_high_place_flag = $('#sel_high_place_flag').val();
+    var sel_entering_the_tank_flag = $('#sel_entering_the_tank_flag').val();
+    var sel_heavy_equipment_flag = $('#sel_heavy_equipment_flag').val();
+    var sel_brake_off_flag = $('#sel_brake_off_flag').val();
+    var sel_contamination_flag = $('#sel_contamination_flag').val();
+    var sel_blockage_flag =  $('#sel_blockage_flag').val();
+    $('<form/>', {action: '/isk_tools/fms/parts/daily_construction/daily_construction_display/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'start_date', value: start_date}))
+    .append($('<input/>', {type: 'hidden', name: 'end_date', value: end_date}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_fire_flag', value: sel_fire_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_high_place_flag', value: sel_high_place_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_entering_the_tank_flag', value: sel_entering_the_tank_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_heavy_equipment_flag', value: sel_heavy_equipment_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_brake_off_flag', value: sel_brake_off_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_contamination_flag', value: sel_contamination_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'sel_blockage_flag', value: sel_blockage_flag}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+function entry_page() {
+    var start_date = '';
+    var end_date = '';
+    $('<form/>', {action: '/isk_tools/fms/parts/daily_construction/daily_construction_entry_page/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'start_date', value: start_date}))
+    .append($('<input/>', {type: 'hidden', name: 'end_date', value: end_date}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+function checkbox_value_set(id_name) {
+    var elem = document.getElementById(id_name);
+    if (elem.checked) {
+        elem.value = 1;
+    }else{
+        elem.value = 0;
+    }
+}
+
+function check_box_change(){
+    if($('#sel_fire_flag').val() == "1"){
+        document.getElementById("sel_fire_flag").checked = 1;
+    }else{
+        document.getElementById("sel_fire_flag").checked = 0;
+    }
+    if($('#sel_high_place_flag').val() == "1"){
+        document.getElementById("sel_high_place_flag").checked = 1;
+    }else{
+        document.getElementById("sel_high_place_flag").checked = 0;
+    }
+    if($('#sel_entering_the_tank_flag').val() == "1"){
+        document.getElementById("sel_entering_the_tank_flag").checked = 1;
+    }else{
+        document.getElementById("sel_entering_the_tank_flag").checked = 0;
+    }
+    if($('#sel_heavy_equipment_flag').val() == "1"){
+        document.getElementById("sel_heavy_equipment_flag").checked = 1;
+    }else{
+        document.getElementById("sel_heavy_equipment_flag").checked = 0;
+    }
+    if($('#sel_brake_off_flag').val() == "1"){
+        document.getElementById("sel_brake_off_flag").checked = 1;
+    }else{
+        document.getElementById("sel_brake_off_flag").checked = 0;
+    }
+    if($('#sel_contamination_flag').val() == "1"){
+        document.getElementById("sel_contamination_flag").checked = 1;
+    }else{
+        document.getElementById("sel_contamination_flag").checked = 0;
+    }
+    if($('#sel_blockage_flag').val() == "1"){
+        document.getElementById("sel_blockage_flag").checked = 1;
+    }else{
+        document.getElementById("sel_blockage_flag").checked = 0;
+    }
+}
+
+</script>
+
+<style type="text/css">
+.img {
+    position: relative;
+}
+{% for construction_list in construction_list %}
+.pin_{{ construction_list.id}} {
+    width: 30px;
+    height: 20px;
+    color: #ffffff;
+    {% if construction_list.construction_class != 3 %}
+        background-color: #FF0000;
+    {% else %}
+        background-color: #0000FF;
+    {% endif %}
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+
+    position: absolute;
+    top: {{ construction_list.position_y }}px;
+    left: {{ construction_list.position_x }}px;
+}
+{% endfor %}
+{% for blocking_construction_list in blocking_construction_list %}
+.pin_blocking_{{ blocking_construction_list.id}} {
+    width: 30px;
+    height: 20px;
+    color: #ffffff;
+    {% if blocking_construction_list.construction_class != 3 %}
+        background-color: #FF0000;
+    {% else %}
+        background-color: #0000FF;
+    {% endif %}
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.5rem;
+    border-radius: 0%;
+    cursor: pointer;
+
+    position: absolute;
+    top: {{ blocking_construction_list.blockage_position_y }}px;
+    left: {{ blocking_construction_list.blockage_position_x }}px;
+}
+{% endfor %}
+
+</style>
+<body>
+<h2 class="page-header">表示画面</h2>
+<div style="float:left">
+    対象期間 : <input type="date" id="start_date" value="{{start_date | date:'Y-m-d' }}">　～　<input type="date" id="end_date" value="{{end_date | date:'Y-m-d' }}">
+    <input type="checkbox" id="sel_fire_flag" name="sel_fire_flag" value="{{ fire_flag }}" onchange="checkbox_value_set(id);">火気使用　　
+    <input type="checkbox" id="sel_high_place_flag" name="sel_high_place_flag" value="{{ high_place_flag }}" onclick="checkbox_value_set(id);">高所作業　　
+    <input type="checkbox" id="sel_entering_the_tank_flag" name="sel_entering_the_tank_flag" value="{{ entering_the_tank_flag }}" onclick="checkbox_value_set(id);">入槽作業　　
+    <input type="checkbox" id="sel_heavy_equipment_flag" name="sel_heavy_equipment_flag" value="{{ heavy_equipment_flag }}" onclick="checkbox_value_set(id);">重機　　
+    <input type="checkbox" id="sel_brake_off_flag" name="sel_brake_off_flag" value="{{ brake_off_flag }}" onclick="checkbox_value_set(id);">縁切　　
+    <input type="checkbox" id="sel_contamination_flag" name="sel_contamination_flag" value="{{ contamination_flag }}" onclick="checkbox_value_set(id);">異物　　
+    <input type="checkbox" id="sel_blockage_flag" name="sel_blockage_flag" value="{{ blockage_flag }}" onclick="checkbox_value_set(id);">交通遮断　　
+    <input type="button" value="　更新　" onclick="page_refresh();">
+</div>
+<div style="float:right">
+    <a href="#" onclick="entry_page();">登録画面へ</a>
+</div>
+<div style="float:right">　　</div>
+<div style="float:right">
+    <a href="/isk_tools/fms">設備管理トップ画面へ</a>
+</div>
+<div style="clear: both;"></div>
+<div id="data_info" style="height:100px;background-color: #e6e6fa;" >
+    <div id="construction_detail"></div>
+
+</div>
+<div id="js-target" class="img" style="width:1600px; height:880px;">
+    <img src="/static/img/fms/MainImage.JPG" width="100%" height="100%">
+    {% for construction_list in construction_list %}
+    <div id="{{ construction_list.id }}" class="pin_{{ construction_list.id }}">
+        <i class="fa fa-thumbs-o-up" aria-hidden="true">{{ construction_list.display_number }}</i>
+    </div>
+    {% endfor %}
+    {% for blocking_construction_list in blocking_construction_list %}
+    <div id="{{ blocking_construction_list.id }}" class="pin_blocking_{{ blocking_construction_list.id }}">
+        <i class="fa fa-thumbs-o-up" aria-hidden="true">{{ blocking_construction_list.display_number }}</i>
+    </div>
+    {% endfor %}
+</div>
+<script>
+check_box_change();
+</script>
+</body>
+</html>

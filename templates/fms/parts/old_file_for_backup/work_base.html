@@ -1,0 +1,861 @@
+{% extends 'fms/fms_base.html' %}
+
+{% block contents %}
+
+<script>
+var tab = {
+	init: function(a){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		for(i=0; i<pages.length; i++) {
+			if(i == a) {
+                            pages[a].style.display = 'block';
+                            tabs[a].className = 'present';
+                            tabs[a].onclick = function(){ tab.showpage(this); return false; };
+                        }
+                        else{
+                            pages[i].style.display = 'none';
+                            tabs[i].className = null;
+                            tabs[i].onclick = function(){ tab.showpage(this); return false; };
+                        }
+		}
+	},
+	showpage: function(obj){
+		var tabs = this.setup.tabs;
+		var pages = this.setup.pages;
+		var num;
+		for(num=0; num<tabs.length; num++) {
+			if(tabs[num] === obj) break;
+		}
+		for(var i=0; i<pages.length; i++) {
+			if(i == num) {
+				pages[num].style.display = 'block';
+				tabs[num].className = 'present';
+			}
+			else{
+				pages[i].style.display = 'none';
+				tabs[i].className = null;
+			}
+		}
+	}
+}
+function budget_detail_info() {
+        var id = $('#target_budget_unique_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/budget_detail/budget_data_info/",
+                type: "POST",
+                data : {
+                    'id': id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_detail').empty();
+                    $('#budget_detail').html(data);
+                    //action_button_display();
+                    //business_year_selected_judgment();
+                    //application_class_selected_judgment();
+                    //budget_class_selected_judgment();
+                    //period_class_selected_judgment();
+                    //budget_department_selected_judgment();
+                    //process_selected_judgment();
+                    //budget_condition_selected_judgment();
+                    //purpose_class_selected_judgment();
+                    //budget_department_charge_person_selected_judgment();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function work_detail_info() {
+        var id = $('#target_unique_work_id').val();;
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        var this_step = $('#this_step').val();
+        var budget_unique_id = $('#target_budget_unique_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/work_detail/work_common_data_info/",
+                type: "POST",
+                data : {
+                    'id': id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'this_step' : this_step,
+                    'budget_unique_id' : budget_unique_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_common_detail').empty();
+                    $('#work_common_detail').html(data);
+                    var work_id = $('#target_work_id').val();
+                    var work_rev_no = $('#work_rev_no').val();
+                    //$('#target_work_rev_no').val(work_rev_no);
+                    get_document_list(work_id);
+                    // var choice_function = $('#work_required_function').val();　・・・　検討中
+                    var choice_function = "熱交換"
+                    work_template_function_info(choice_function,0,0,999,3);
+                    selected_required_function_detail();
+                    planning_charge_person_info();
+                    work_planning_charge_person_value_change();
+                    work_execution_charge_person_value_change();
+                    work_order_department_charge_person_value_change();
+                    work_class_value_change();
+                    work_charge_division_value_change();
+                    work_charge_department_value_change();
+                    work_charge_process_value_change();
+                    //selected_required_function();
+                    //action_button_display();
+                    //business_year_selected_judgment();
+                    //application_class_selected_judgment();
+                    //budget_class_selected_judgment();
+                    //period_class_selected_judgment();
+                    //budget_department_selected_judgment();
+                    //process_selected_judgment();
+                    //budget_condition_selected_judgment();
+                    //purpose_class_selected_judgment();
+                    //budget_department_charge_person_selected_judgment();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_common_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function action_button_display() {
+        //var target_id = $('#target_budget_id').val();
+        var target_budget_id = $('#target_budget_id').val();
+        var next_department = $('#next_department').val();
+        var next_division = $('#next_division').val();
+        var target_table = "work";
+        var level5_step_id = $('#level5_step_id').val();
+        var permit_user = $('#permit_user').val();
+        var target_step_id = $('#target_step_id').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var last_operation_step = $('#last_operation_step').val();
+        var target = "work";
+        var target_div_id = "#" + target + "_action_button";
+        var target_id = $('#target_work_id').val();
+        //alert(target_id);
+        $.ajax({
+                url: "/isk_tools/fms/parts/common/action_button_display/",
+                type: "POST",
+                data : {
+                    'next_department' : next_department,
+                    'next_division' : next_division,
+                    'target_budget_id' : target_budget_id,
+                    'target_table' : target_table,
+                    'target_id' : target_id,
+                    'level5_step_id' : level5_step_id,
+                    'permit_user' : permit_user,
+                    'target_step_id' : target_step_id,
+                    'user_department_cd' : user_department_cd,
+                    'last_operation_step' : last_operation_step,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(target_div_id).empty();
+                    $(target_div_id).html(data);
+                    //alert("ok");
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(target_div_id).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function log_list() {
+        //var target_id = $('#target_budget_id').val();
+        //var target = "budget";
+        var target_id = $('#target_work_id').val();
+        var target = "work";
+        $.ajax({
+                url: "/isk_tools/fms/parts/common/log_list/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#log_lists').empty();
+                    $('#log_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#log_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function budget_spec_handling_material_info(a,b) {
+        var budget_material_id = a;
+        var data_source = b;
+        var target_budget_unique_id = $('#target_budget_unique_id').val();
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/handling_material_data_info/",
+                type: "POST",
+                data : {
+                    'target_budget_unique_id': target_budget_unique_id,
+                    'new_step' : new_step,
+                    'user_division_cd' : user_division_cd,
+                    'user_department_cd' : user_department_cd,
+                    'user_authority' : user_authority,
+                    'confirm_user' : confirm_user,
+                    'permit_user' : permit_user,
+                    'level5_step_id' : level5_step_id,
+                    'budget_material_id' : budget_material_id,
+                    'data_source' : data_source,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_spec_handling_material_detail').empty();
+                    $('#budget_spec_handling_material_detail').html(data);
+                    material_state_change();
+                    concentration_unit_change();
+                    pressure_unit_change();
+                    //action_button_display();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_spec_handling_material_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function handling_material_list() {
+        var target_id = $('#target_budget_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/handling_material_list/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#handling_material_lists').empty();
+                    $('#handling_material_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#handling_material_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function level4_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '../../level4_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level4_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+function level5_toppage(a) {
+    var user_division_cd = $('#user_division_cd').val();
+    var user_department_cd = $('#user_department_cd').val();
+    var user_authority = $('#user_authority').val();
+    var confirm_user = $('#confirm_user').val();
+    var permit_user = $('#permit_user').val();
+    $('<form/>', {action: '../../../level5_step_top/', method: 'post'})
+    .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: a}))
+    .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+    .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+    .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+    .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+    .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+    .appendTo(document.body)
+    .submit();
+}
+
+function budget_required_function_info(a,b) {
+        var budget_required_function_id = a;
+        var select_function = b;
+        var budget_id = $('#target_budget_id').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1;
+            $.ajax({
+                url: "/isk_tools/fms/parts/budget/required_function_detail/",
+                type: "POST",
+                data : {
+                    'budget_required_function_id' : budget_required_function_id,
+                    'budget_id' : budget_id,
+                    'new_step' : new_step,
+                    'select_function' : select_function,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#function_edit').empty();
+                    $('#function_edit').html(data);
+                    $('#required_function_info').empty();
+                    $('#required_function_info').html(data);
+                    //rf_pressure_unit_change();
+                    rf_material_capacity_unit_value_change();
+                    rf_concentration_unit_change();
+                    rf_pressure_unit_change();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#function_edit').empty();
+                    $('#required_function_info').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function required_function_list() {
+        var target_id = $('#target_budget_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/execution/execution_required_function_list/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#budget_function1_lists').empty();
+                    $('#budget_function1_lists').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#budget_function1_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+}
+function required_function_choice() {
+    var choice_function = $('#required_function').val();
+    var choice_sub_no = $('#rf_sub_no').val();
+    $('#work_function').val(choice_function);
+    $('#work_function_sub_no').val(choice_sub_no);
+    $('#work_required_function').val(choice_function);
+    $('#required_function_sub_no').val(choice_sub_no);
+    work_template_function_info(choice_function,0,0,999,6,1);
+}
+function selected_required_function_detail() {
+        var selected_required_function_id = $('#selected_required_function_id').val();
+        if ( selected_required_function_id != "" ){
+            budget_required_function_info(selected_required_function_id,'all');
+        }
+}
+function work_template_function_info(a,b,c,d,e,f) {
+    //alert(a);
+    var choice_function = a;
+    var template_function_id = b;
+    //var work_id = c;
+    var work_id = $('#target_work_id').val();
+    var work_rev_no = $('#target_work_rev_no').val();
+    var eqpt_tp = d;
+    var action_cls = f;
+    var this_step = $('#this_step').val();
+    var select_tab_no = e;
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/template_function/",
+                type: "POST",
+                data : {
+                    'choice_function' : choice_function,
+                    'template_function_id' : template_function_id,
+                    'work_id' : work_id,
+                    'work_rev_no' : work_rev_no,
+                    'this_step' : this_step,
+                    'eqpt_tp' : eqpt_tp,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_template_detail').empty();
+                    $('#work_template_detail').html(data);
+                    if (choice_function == "熱交換") {
+                        exchange_type_change();
+                        hot_fluid_capacity_unit_change();
+                        cool_fluid_capacity_unit_change();
+                        hot_pressure_unit_change();
+                        cool_pressure_unit_change();
+                    }
+                    if (action_cls == 1) {
+                        tub_change(select_tab_no);
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_template_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function work_free_spec_info(a) {
+        var this_step = $('#this_step').val();
+        //var work_id = a;
+        var work_id = $('#target_work_id').val();
+        var work_rev_no = $('#target_work_rev_no').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/free_spec_detail/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'work_rev_no' : work_rev_no,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_free_detail').empty();
+                    $('#work_free_detail').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_free_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function estimate_info(a) {
+        var this_step = $('#this_step').val();
+        //var work_id = a;
+        var work_id = $('#target_work_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/estimate/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_estimate_detail').empty();
+                    $('#work_estimate_detail').html(data);
+                    get_discount_list();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_estimate_detail').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function document_info() {
+        var this_step = $('#this_step').val();
+        //var work_id = a;
+        var work_id = $('#target_work_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/document/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'this_step' : this_step,
+                    'div_id_name': 'work_required_document',
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_required_document').empty();
+                    $('#work_required_document').html(data);
+                    get_document_list(work_id);
+                    const p5 = document.getElementById("add_button_div");
+                    const p6 = document.getElementById("edit_button_div");
+                    p5.style.display ="block";
+                    p6.style.display ="none";
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_required_document').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function work_law_supplies_info() {
+        var this_step = $('#this_step').val();
+        //var work_id = a;
+        var work_id = $('#target_work_id').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/work/work_law_supplies/",
+                type: "POST",
+                data : {
+                    'work_id' : work_id,
+                    'this_step' : this_step,
+                    'div_id_name': 'work_required_document',
+                    'div_id_name': 'work_law_supplies',
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_law_supplies').empty();
+                    $('#work_law_supplies').html(data);
+                    get_work_law_list(work_id);
+                    get_work_supplies_list(work_id);
+                    const p1 = document.getElementById("work_law_add_button_div");
+                    const p2 = document.getElementById("work_law_edit_button_div");
+                    const p3 = document.getElementById("work_supplies_add_button_div");
+                    const p4 = document.getElementById("work_supplies_edit_button_div");
+                    p1.style.display ="block";
+                    p2.style.display ="none";
+                    p3.style.display ="block";
+                    p4.style.display ="none";
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_law_supplies').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function planning_charge_person_info() {
+        var target_id = $('#target_budget_id').val();
+        var this_step = $('#this_step').val();
+        $.ajax({
+                url: "/isk_tools/fms/parts/budget/planning_charge_person_data_info/",
+                type: "POST",
+                data : {
+                    'target_id' : target_id,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#planning_charge_person').empty();
+                    $('#planning_charge_person').html(data);
+                    get_charge_person_list(target_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#planning_charge_person').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+
+}
+function tub_change(a) {
+    var i = a;
+    //var i = 4;
+    tab.init(i);
+
+}
+window.onload = function() {
+        budget_detail_info();
+        budget_spec_handling_material_info(0,'d');
+        handling_material_list();
+        budget_required_function_info(0,'すべて');
+        required_function_list();
+        work_free_spec_info(0);
+        work_detail_info();
+        estimate_info(0);
+        document_info();
+        work_law_supplies_info();
+        log_list();
+        action_button_display();
+};
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_budget_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+
+</style>
+    <div style="width: auto;">
+        <div style="float:left">
+            <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main">
+                <h2 class="page-header">{{ budget_step_name }}</h2>
+            </div>
+        </div>
+        <div style="float:right;">
+            <input TYPE=button VALUE=前の画面に戻る NAME=disp_return size=3 style="width:120px" onclick="level5_toppage({{ level5_step_id }});"/>
+        </div>
+    </div>
+    <div style="clear: both;" ></div>
+    <div style="width: auto;">
+        <input type="hidden" id="target_unique_work_id" value="{{ target_unique_work_id }}" >
+        <input type="hidden" id="target_budget_unique_id" value="{{ target_unique_budget_id }}" >
+        <input type="hidden" id="target_budget_id" value="{{ target_budget_id }}" >
+        <input type="hidden" id="target_step_id" value="{{ target_step_id }}" >
+        <input TYPE="hidden" id="user_division_cd" VALUE="{{user_division_cd}}" NAME=user_division_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="user_department_cd" VALUE="{{user_department_cd}}" NAME=user_department_cd size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="user_authority" VALUE="{{user_authority}}" NAME=user_authority size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="confirm_user" VALUE="{{confirm_user}}" NAME=confirm_user size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="permit_user" VALUE="{{permit_user}}" NAME=permit_user size=3 style="width:150px; height:20px"/>
+        <input TYPE="hidden" id="level5_step_id" VALUE="{{level5_step_id}}" NAME=level5_step_id size=3 style="width:150px; height:20px"/>
+        <input type="hidden" id="next_division" value="{{ next_division }}">
+        <input type="hidden" id="next_department" value="{{ next_department }}">
+        <input type="hidden" id="this_step" value="{{ this_step }}">
+        <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+        <input type="hidden" id="last_operator" value="{{ last_operator }}">
+        <input type="hidden" id="this_department" value="{{ this_department }}">
+        <input type="hidden" id="this_division" value="{{ this_division }}">
+        <input type="hidden" id="last_operator_department" value="{{ last_operator_department }}">
+        <input type="hidden" id="last_operator_division" value="{{ last_operator_division }}">
+        <input type="hidden" id="target" value="{{ target }}">
+        <input type="hidden" id="target_id" value="{{ target_budget_id }}" >
+        <input type="text" id="tab_num" value="{{ tab_num }}">
+        <input type="hidden" id="target_work_id" value="{{ target_work_id }}" >
+        <input type="hidden" id="target_work_rev_no" value="{{ target_work_rev_no }}" >
+        <input type="hidden" id="selected_required_function_id" value="{{ selected_required_function_id }}" >
+
+    </div>
+    <div class='clear'></div>
+    <ul id="tab" style="width: auto;">
+        <li><a href="#page1">予算基本情報</a></li>
+        <li><a href="#page2">物質情報</a></li>
+        <li><a href="#page3">要求機能</a></li>
+        <li><a href="#page4">計画担当者</a></li>
+        <li class="present"><a href="#page5">工事共通情報</a></li>
+        <li><a href="#page6">法令/支給品</a></li>
+        <li><a href="#page7">詳細仕様定型</a></li>
+        <li><a href="#page8">詳細仕様自由</a></li>
+        <li><a href="#page9">提出書類</a></li>
+        <li><a href="#page10">見積関係</a></li>
+        {% if tab_num > 11 %}
+            <li><a href="#page11">予備</a></li>
+        {% endif %}
+        <li><a href="#page12">処理履歴</a></li>
+    </ul>
+    <div id="page1" class="pagetitle">
+        <div id="budget_detail" style="width: auto"></div>
+    </div>
+    <div id="page2" class="pagetitle">
+        <div style="float: left;">
+            <div id="budget_spec_handling_material_detail" style="width: auto;"></div>
+        </div>
+        <div style="float: left;">
+            <div id="handling_material_lists" style="width: auto;">
+                    取扱物質リスト
+            </div>
+        </div>
+    </div>
+    <div id="page3" class="pagetitle">
+        <div id="budget_function1_detail" style="width: auto;">
+            <div style="float: left;">
+                <div id="function_edit" style="width: 460px;">機能登録内容</div>
+            </div>
+            <div style="float: left;">
+                <div id="budget_function1_lists" style="width: auto;">
+                    機能リスト
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="page4" class="pagetitle">
+        <div id="planning_charge_person" style="width: auto;">
+        </div>
+    </div>
+    <div id="page5" class="pagetitle">
+        <div id="work_common_detail" style="width: auto">工事基本情報</div>
+    </div>
+    <div id="page6" class="pagetitle">
+        <div id="work_law_supplies" style="width: auto">法令/支給品</div>
+    </div>
+    <div id="page7" class="pagetitle">
+        <div  style="float:left; border-style: ridge;">
+            <div id="required_function_info">要求機能</div>
+        </div>
+        <div style="float:left;size=20px">　　　　　</div>
+        <div  style="float:left">
+            <div id="work_template_detail" style="width: auto">仕様詳細(規定)</div>
+        </div>
+    </div>
+    <div id="page8" class="pagetitle">
+        <div id="work_free_detail" style="width: auto">仕様詳細(自由)</div>
+    </div>
+    <div id="page9" class="pagetitle">
+        <div id="work_required_document" style="width: auto">提出書類</div>
+    </div>
+    <div id="page10" class="pagetitle">
+        <div id="work_estimate_detail" style="width: auto">見積</div>
+    </div>
+    {% if tab_num > 11 %}
+        <div id="page11" class="pagetitle">
+            <div id="reserve" style="width: auto"></div>
+        </div>
+    {% endif %}
+    <div id="page12" class="pagetitle">
+        <div id="log_lists" style="width: auto;">
+        </div>
+    </div>
+<script type="text/javascript">
+var tab_num = $('#tab_num').val();
+var target_work_id = $('#target_work_id').val();
+if (target_work_id ==""){
+    target_work_id = 0;
+}
+//alert(target_work_id);
+//alert(tab_num);
+    if ( tab_num == 9 ){
+        // <![CDATA[
+        tab.setup = {
+            tabs: document.getElementById('tab').getElementsByTagName('li'),
+                pages: [
+                    document.getElementById('page1'),
+                    document.getElementById('page2'),
+                    document.getElementById('page3'),
+                    document.getElementById('page4'),
+                    document.getElementById('page5'),
+                    document.getElementById('page6'),
+                    document.getElementById('page7'),
+                    document.getElementById('page8'),
+                    document.getElementById('page12')
+                ]
+        }
+        //tab.init(0);
+        //if (target_work_id != 0) {
+            tab.init(4);
+        //}eise{
+            //tab.init(0);
+        //}
+        // ]]>
+    }else if ( tab_num == 10 ){
+        // <![CDATA[
+        tab.setup = {
+            tabs: document.getElementById('tab').getElementsByTagName('li'),
+                pages: [
+                    document.getElementById('page1'),
+                    document.getElementById('page2'),
+                    document.getElementById('page3'),
+                    document.getElementById('page4'),
+                    document.getElementById('page5'),
+                    document.getElementById('page6'),
+                    document.getElementById('page7'),
+                    document.getElementById('page8'),
+                    document.getElementById('page9'),
+                    document.getElementById('page12')
+                ]
+        }
+        //tab.init(0);
+        //if (target_work_id != 0) {
+            tab.init(4);
+        //}eise{
+            //tab.init(0);
+        //}
+        // ]]>
+    }else if ( tab_num == 11 ){
+        // <![CDATA[
+        tab.setup = {
+            tabs: document.getElementById('tab').getElementsByTagName('li'),
+                pages: [
+                    document.getElementById('page1'),
+                    document.getElementById('page2'),
+                    document.getElementById('page3'),
+                    document.getElementById('page4'),
+                    document.getElementById('page5'),
+                    document.getElementById('page6'),
+                    document.getElementById('page7'),
+                    document.getElementById('page8'),
+                    document.getElementById('page9'),
+                    document.getElementById('page10'),
+                    document.getElementById('page12')
+                ]
+        }
+        //tab.init(0);
+        //if (target_work_id != 0) {
+            tab.init(4);
+        //}eise{
+            //tab.init(0);
+        //}
+        // ]]>
+    }else if ( tab_num == 12 ){
+        // <![CDATA[
+        tab.setup = {
+            tabs: document.getElementById('tab').getElementsByTagName('li'),
+                pages: [
+                    document.getElementById('page1'),
+                    document.getElementById('page2'),
+                    document.getElementById('page3'),
+                    document.getElementById('page4'),
+                    document.getElementById('page5'),
+                    document.getElementById('page6'),
+                    document.getElementById('page7'),
+                    document.getElementById('page8'),
+                    document.getElementById('page9'),
+                    document.getElementById('page10'),
+                    document.getElementById('page11'),
+                    document.getElementById('page12')
+                ]
+        }
+        //tab.init(0);
+        //if (target_work_id != 0) {
+            tab.init(4);
+        //}eise{
+            //tab.init(0);
+        //}
+        // ]]>
+    }
+</script>
+
+{% endblock %}

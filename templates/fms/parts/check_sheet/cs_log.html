@@ -1,0 +1,213 @@
+<script>
+
+</script>
+<style type="text/css">
+
+thead.cs_scrollHead,tbody.cs_scrollBody{
+    display:block;
+}
+tbody.cs_scrollBody{
+    overflow-y:scroll;
+    height:720px;
+}
+td,th{
+    table-layout:fixed;
+    font-size: 16px;
+}
+.operation_datetime{
+    width:120px;
+}
+.message_step_name{
+    width:50px;
+}
+.message_action_name{
+    width:80px;
+}
+.message_operator_name{
+    width:90px;
+}
+.message_comment{
+    width:200px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+    <div id="cs_log"><font size="4">
+        <div>処理履歴(新しい順)</div>
+        <div class="message_list" style="float:left;">申請部門
+        {% if log_ga_lists_num > 0 %}
+            表示件数：{{ log_ga_lists_num }}件
+            <div>
+            <table class="table cs_massage" border="1" cellspacing="0" cellpadding="0" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="cs_scrollHead">
+                    <tr>
+                        <th class="message_step_name">工程</th>
+                        <th class="message_action_name">操作</th>
+                        <th class="message_operator_name">作業者</th>
+                        <th class="message_comment">コメント</th>
+                    </tr>
+                </thead>
+                <tbody class="cs_scrollBody">
+                {% for log_bd_lists in log_bd_lists %}
+                    <tr>
+                        <td class="message_step_name">{{ log_bd_lists.step_name }}</td>
+                        {% if log_bd_lists.action_name == "差戻"  %}
+                            <td class="message_action_name"><font color="yellow" style="background-color:red; font-weight:bold">
+                                {{ log_bd_lists.action_name }}
+                            </font></td>
+                        {% else %}
+                            <td class="message_action_name">{{ log_bd_lists.action_name }}</td>
+                        {% endif %}
+                        <td class="message_operator_name">{{ log_bd_lists.last_name }}{{ log_bd_lists.first_name }}</td>
+                        <td class="message_comment"><textarea name="comment" rows="6" cols="15" readonly>{{ log_bd_lists.comment }}</textarea></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+            <div>対象データなし</div>
+        {% endif %}
+        </div>
+        <div style="float:left; width: 5px;">　</div>
+        <div class="message_list" style="float:left;">総務関係
+        {% if log_ga_lists_num > 0 %}
+            <div>
+            <table class="table cs_massage" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="cs_scrollHead">
+                    <tr>
+                        <th class="message_step_name">工程</th>
+                        <th class="message_action_name">操作</th>
+                        <th class="message_operator_name">作業者</th>
+                        <th class="message_comment">コメント</th>
+                    </tr>
+                </thead>
+                <tbody class="cs_scrollBody">
+                {% for log_ga_lists in log_ga_lists %}
+                    <tr>
+                        <td class="message_step_name">{{ log_ga_lists.step_name }}</td>
+                        {% if log_ga_lists.action_name == "差戻"  %}
+                            <td class="message_action_name"><font color="yellow" style="background-color:red; font-weight:bold">
+                                {{ log_ga_lists.action_name }}
+                            </font></td>
+                        {% else %}
+                            <td class="message_action_name">{{ log_ga_lists.action_name }}</td>
+                        {% endif %}
+                        <td class="message_operator_name">{{ log_ga_lists.last_name }}{{ log_ga_lists.first_name }}</td>
+                        <td class="message_comment"><textarea name="comment" rows="6" cols="15" readonly>{{ log_ga_lists.comment }}</textarea></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+            <div>対象データなし</div>
+        {% endif %}
+        </div>
+        <div style="float:left; width: 5px;">　</div>
+        <div class="message_list" style="float:left;">環境関係
+        {% if log_ev_lists_num > 0 %}
+            <div>
+            <table class="table cs_massage" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="cs_scrollHead">
+                    <tr>
+                        <th class="message_step_name">工程</th>
+                        <th class="message_action_name">操作</th>
+                        <th class="message_operator_name">作業者</th>
+                        <th class="message_comment">コメント</th>
+                    </tr>
+                </thead>
+                <tbody class="cs_scrollBody">
+                {% for log_ev_lists in log_ev_lists %}
+                    <tr>
+                        <td class="message_step_name">{{ log_ev_lists.step_name }}</td>
+                        {% if log_ev_lists.action_name == "差戻"  %}
+                            <td class="message_action_name"><font color="yellow" style="background-color:red; font-weight:bold">
+                                {{ log_ev_lists.action_name }}
+                            </font></td>
+                        {% else %}
+                            <td class="message_action_name">{{ log_ev_lists.action_name }}</td>
+                        {% endif %}
+                        <td class="message_operator_name">{{ log_ev_lists.last_name }}{{ log_ev_lists.first_name }}</td>
+                        <td class="message_comment"><textarea name="comment" rows="6" cols="15" readonly>{{ log_ev_lists.comment }}</textarea></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+            <div>対象データなし</div>
+        {% endif %}
+        </div>
+        <div style="float:left; width: 5px;">　</div>
+        <div class="message_list" style="float:left;">安全衛生関係
+        {% if log_sh_lists_num > 0 %}
+            <div>
+            <table class="table cs_massage" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="cs_scrollHead">
+                    <tr>
+                        <th class="message_step_name">工程</th>
+                        <th class="message_action_name">操作</th>
+                        <th class="message_operator_name">作業者</th>
+                        <th class="message_comment">コメント</th>
+                    </tr>
+                </thead>
+                <tbody class="cs_scrollBody">
+                {% for log_sh_lists in log_sh_lists %}
+                    <tr>
+                        <td class="message_step_name">{{ log_sh_lists.step_name }}</td>
+                        {% if log_sh_lists.action_name == "差戻"  %}
+                            <td class="message_action_name"><font color="yellow" style="background-color:red; font-weight:bold">
+                                {{ log_sh_lists.action_name }}
+                            </font></td>
+                        {% else %}
+                            <td class="message_action_name">{{ log_sh_lists.action_name }}</td>
+                        {% endif %}
+                        <td class="message_operator_name">{{ log_sh_lists.last_name }}{{ log_sh_lists.first_name }}</td>
+                        <td class="message_comment"><textarea name="comment" rows="6" cols="15" readonly>{{ log_sh_lists.comment }}</textarea></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+            <div>対象データなし</div>
+        {% endif %}
+        </div>
+        <div style="float:left; width: 5px;">　</div>
+        <div class="message_list" style="float:left;">工務関係
+        {% if log_en_lists_num > 0 %}
+            <div>
+            <table class="table cs_massage" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="cs_scrollHead">
+                    <tr>
+                        <th class="message_step_name">工程</th>
+                        <th class="message_action_name">操作</th>
+                        <th class="message_operator_name">作業者</th>
+                        <th class="message_comment">コメント</th>
+                    </tr>
+                </thead>
+                <tbody class="cs_scrollBody">
+                {% for log_en_lists in log_en_lists %}
+                    <tr>
+                        <td class="message_step_name">{{ log_en_lists.step_name }}</td>
+                        {% if log_en_lists.action_name == "差戻"  %}
+                            <td class="message_action_name"><font color="yellow" style="background-color:red; font-weight:bold">
+                                {{ log_en_lists.action_name }}
+                            </font></td>
+                        {% else %}
+                            <td class="message_action_name">{{ log_en_lists.action_name }}</td>
+                        {% endif %}
+                        <td class="message_operator_name">{{ log_en_lists.last_name }}{{ log_en_lists.first_name }}</td>
+                        <td class="message_comment"><textarea name="comment" rows="6" cols="15" readonly>{{ log_en_lists.comment }}</textarea></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        {% else %}
+            <div>対象データなし</div>
+        {% endif %}
+        </div>
+    </font></div>

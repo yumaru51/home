@@ -1,0 +1,201 @@
+<script>
+
+</script>
+
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.return_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.sel_output_budget{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_no{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.condition{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.step{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_class{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.next_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.business_year{
+    width:55px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.budget_name{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.department{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.construction_name{
+    width:280px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.order_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.desired_date{
+    width:220px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.plan_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.PM_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.process{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.cost_center{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.rem{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+    overflow: hidden;
+}
+.supplemental_task_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.facility_process{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.days_stay{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.related_work{
+    width:90px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.complete_num{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if budget_lists_num > 0 %}
+            表示件数：{{ budget_lists_num }}件
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse;">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="sel_output_budget">選択</th>
+                        <th class="budget_id">予算ID</th>
+                        <th class="budget_no">予算NO</th>
+                        <th class="condition">予算状態</th>
+                        <th class="budget_class">工事区分</th>
+                        <th class="step">進捗状況</th>
+                        <th class="next_person">次作業者</th>
+                        <th class="business_year">年度</th>
+                        <th class="budget_name">予算名</th>
+                        <th class="department">部署</th>
+                        <th class="facility_process">工程</th>
+                        <th class="days_stay">滞留日数</th>
+                        <th class="related_work">仕様検討中</th>
+                        <th class="complete_num">完了数</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for budget_item in budget_lists %}
+                    <tr>
+                        <td class="sel_output_budget" >
+                            <input type="checkbox" value="{{ budget_item.budget_id }}" name="sel_output_cb" style="float:left;margin-left:15px;" checked>
+                        </td>
+                        <td class="budget_id">{{ budget_item.budget_id }}</td>
+                        <td class="budget_no">{{ budget_item.bd_no }}</td>
+                        <td class="condition">{{ budget_item.condition_name }}</td>
+                        <td class="budget_class">{{ budget_item.budget_class }}</td>
+                        <td class="step">{{ budget_item.step_name }}</td>
+                        <td class="next_person">{{ budget_item.last_name }}　{{ budget_item.first_name }}</td>
+                        <td class="business_year">{{ budget_item.business_year }}</td>
+                        <td class="budget_name">{{ budget_item.budget_name }}</td>
+                        <td class="department">{{ budget_item.department_name }}</td>
+                        <td class="facility_process">{{ budget_item.facility_process }}</td>
+                        {% if budget_item.days_stay == None %}
+                            <td class="days_stay"></td>
+                        {% else %}
+                            <td class="days_stay">{{ budget_item.days_stay }}</td>
+                        {% endif %}
+                        <td class="related_work" style="font-weight:bold; color:blue;" >{{ budget_item.related_work }}</td>
+                        <td class="complete_num">{{ budget_item.complete_num }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

@@ -1,0 +1,422 @@
+<script>
+//日付入力をカレンダー化
+$('.datepicker').datepicker();
+//カレンダーを日本語化
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+//対象の予算一覧の表示処理
+function get_notification_check_search() {
+        // 検索条件を保持する
+        session_value_notification_check_write();
+        // 検索
+        get_notification_check_lists();
+}
+//対象の小口届出チェック報告一覧の表示処理
+function get_notification_check_lists() {
+        $("#loading2").show();//呼び出し中に表示するgifを表示
+        $.ajax({
+                url: "/isk_tools/fms/parts/maintenance/notification_check_list/",
+                type: "POST",
+                data : {
+                    'sel_step': $('#sel_ph_nc_step').val(),
+                    'sel_phenomenon_id': $('#sel_ph_nc_id').val(),
+                    'sel_project_name': $('#sel_ph_nc_project_name').val(),
+                    'sel_item_class' : $('#sel_ph_nc_item_class').val(),
+                    'sel_maintenance_status' : $('#sel_ph_nc_maintenance_status').val(),
+                    'sel_malfunction_class' : $('#sel_ph_nc_malfunction_class').val(),
+                    'sel_delivery_date_start' : $('#sel_ph_nc_delivery_date_start').val(),
+                    'sel_delivery_date_end' : $('#sel_ph_nc_delivery_date_end').val(),
+                    'sel_division': $('#sel_ph_nc_division').val(),
+                    'sel_department': $('#sel_ph_nc_department').val(),
+                    'sel_process': $('#sel_ph_nc_process').val(),
+                    'sel_next_division': $('#sel_ph_nc_next_division').val(),
+                    'sel_next_department': $('#sel_ph_nc_next_department').val(),
+                    'sel_next_parson': $('#sel_ph_nc_next_parson').val(),
+                    'sel_mng_charge_person': $('#sel_ph_nc_charge_person').val(),
+                    'sel_on_work': $('#sel_ph_nc_on_work').prop('checked'),
+                    'sel_display_order': $("input[name='sel_ph_nc_display_order']:checked").val(),
+                    'level5_step_id' : $('#level5_step_id').val(),
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#maintenance_notification_check_lists').empty();
+                    $('#maintenance_notification_check_lists').html(data);
+                    $("#loading2").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    $("#maintenance_lists").fadeIn();//対象の一覧をフェードイン
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#maintenance_notification_check_lists').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+// セッション情報削除
+function session_value_notification_check_clear() {
+    sessionStorage.removeItem("sel_ph_nc_step");
+    sessionStorage.removeItem("sel_ph_nc_id");
+    sessionStorage.removeItem("sel_ph_nc_project_name");
+    sessionStorage.removeItem("sel_ph_nc_item_class");
+    sessionStorage.removeItem("sel_ph_nc_maintenance_status");
+    sessionStorage.removeItem("sel_ph_nc_malfunction_class");
+
+    sessionStorage.removeItem("sel_ph_nc_delivery_date_start");
+    sessionStorage.removeItem("sel_ph_nc_delivery_date_end");
+    sessionStorage.removeItem("sel_ph_nc_division");
+    sessionStorage.removeItem("sel_ph_nc_department");
+    sessionStorage.removeItem("sel_ph_nc_process");
+
+    sessionStorage.removeItem("sel_ph_nc_charge_person");
+    sessionStorage.removeItem("sel_ph_nc_next_division");
+    sessionStorage.removeItem("sel_ph_nc_next_department");
+    sessionStorage.removeItem("sel_ph_nc_next_parson");
+
+    sessionStorage.removeItem("sel_ph_nc_on_work");
+    sessionStorage.removeItem("sel_ph_nc_display_order");
+}
+
+// セッション情報読込
+function session_value_notification_check_read() {
+    if (sessionStorage.getItem('sel_ph_nc_step')){
+        set_combo_value('sel_ph_nc_step', sessionStorage.getItem('sel_ph_nc_step'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_id')){
+        $('#sel_ph_nc_id').val(sessionStorage.getItem('sel_ph_nc_id'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_project_name')){
+        $('#sel_ph_nc_project_name').val(sessionStorage.getItem('sel_ph_nc_project_name'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_item_class')){
+        set_combo_value('sel_ph_nc_item_class', sessionStorage.getItem('sel_ph_nc_item_class'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_maintenance_status')){
+        set_combo_value('sel_ph_nc_maintenance_status', sessionStorage.getItem('sel_ph_nc_maintenance_status'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_malfunction_class')){
+        set_combo_value('sel_ph_nc_malfunction_class', sessionStorage.getItem('sel_ph_nc_malfunction_class'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_delivery_date_start')){
+        $('#sel_ph_nc_delivery_date_start').val(sessionStorage.getItem('sel_ph_nc_delivery_date_start'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_delivery_date_end')){
+        $('#sel_ph_nc_delivery_date_end').val(sessionStorage.getItem('sel_ph_nc_delivery_date_end'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_division')){
+        set_combo_value('sel_ph_nc_division', sessionStorage.getItem('sel_ph_nc_division'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_department')){
+        set_combo_value('sel_ph_nc_department', sessionStorage.getItem('sel_ph_nc_department'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_process')){
+        set_combo_value('sel_ph_nc_process', sessionStorage.getItem('sel_ph_nc_process'));
+    }
+    if (sessionStorage.getItem('sel_ph_nc_charge_person')){
+        set_combo_value('sel_ph_nc_charge_person', sessionStorage.getItem('sel_ph_nc_charge_person'));
+    }
+
+    // 未処理のみ
+    if(sessionStorage.getItem('sel_ph_nc_on_work')){
+        if(sessionStorage.getItem('sel_ph_nc_on_work') == 'true'){
+            $('#sel_ph_nc_on_work').prop('checked', true);
+        }else{
+            $('#sel_ph_nc_on_work').prop('checked', false);
+        }
+    }
+    // 表示順
+    if (sessionStorage.getItem('sel_ph_nc_display_order')){
+        $('input[name=sel_ph_nc_display_order]:eq(' + (sessionStorage.getItem('sel_ph_nc_display_order') - 1) + ')').prop('checked', true);
+    }
+}
+
+// セッション情報書込み
+function session_value_notification_check_write() {
+    value = $('#sel_ph_nc_step').val();
+    sessionStorage.setItem('sel_ph_nc_step', value);
+    value = $('#sel_ph_nc_id').val();
+    sessionStorage.setItem('sel_ph_nc_id', value);
+    value = $('#sel_ph_nc_project_name').val();
+    sessionStorage.setItem('sel_ph_nc_project_name', value);
+    value = $('#sel_ph_nc_item_class').val();
+    sessionStorage.setItem('sel_ph_nc_item_class', value);
+    value = $('#sel_ph_nc_maintenance_status').val();
+    sessionStorage.setItem('sel_ph_nc_maintenance_status', value);
+    value = $('#sel_ph_nc_malfunction_class').val();
+    sessionStorage.setItem('sel_ph_nc_malfunction_class', value);
+
+    value = $('#sel_ph_nc_delivery_date_start').val();
+    sessionStorage.setItem('sel_ph_nc_delivery_date_start', value);
+    value = $('#sel_ph_nc_delivery_date_end').val();
+    sessionStorage.setItem('sel_ph_nc_delivery_date_end', value);
+    value = $('#sel_ph_nc_division').val();
+    sessionStorage.setItem('sel_ph_nc_division', value);
+    value = $('#sel_ph_nc_department').val();
+    sessionStorage.setItem('sel_ph_nc_department', value);
+    value = $('#sel_ph_nc_process').val();
+    sessionStorage.setItem('sel_ph_nc_process', value);
+
+    value = $('#sel_ph_nc_charge_person').val();
+    sessionStorage.setItem('sel_ph_nc_charge_person', value);
+    value = $('#sel_ph_nc_next_division').val();
+    sessionStorage.setItem('sel_ph_nc_next_division', value);
+    value = $('#sel_ph_nc_next_department').val();
+    sessionStorage.setItem('sel_ph_nc_next_department', value);
+    value = $('#sel_ph_nc_next_parson').val();
+    sessionStorage.setItem('sel_ph_nc_next_parson', value);
+
+    value = $('#sel_ph_nc_on_work').prop('checked');
+    sessionStorage.setItem('sel_ph_nc_on_work', value);
+    value = $("input[name='sel_ph_nc_display_order']:checked").val();
+    sessionStorage.setItem('sel_ph_nc_display_order', value);
+}
+
+//次部門選択時処理
+function ph_nc_select_next_division(division){
+    var division = division;
+    var target = 'ph_nc';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_next_division/",
+                type: "POST",
+                data : {
+                    'division' : division,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(ph_nc_next_department).empty();
+                    $(ph_nc_next_department).html(data);
+                    ph_nc_select_next_department('');
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(ph_nc_next_department).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//次部署選択時処理
+function ph_nc_select_next_department(department){
+    var department = department;
+    var target = 'ph_nc';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_next_department/",
+                type: "POST",
+                data : {
+                    'department' : department,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(ph_nc_next_person).empty();
+                    $(ph_nc_next_person).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(ph_nc_next_person).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//部門選択時処理
+function ph_nc_select_filter_division(division){
+    var division = division;
+    var target = 'ph_nc';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_filter_division/",
+                type: "POST",
+                data : {
+                    'division' : division,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(ph_nc_filter_department).empty();
+                    $(ph_nc_filter_department).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(ph_nc_filter_department).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//コンボボックスを選択する
+function set_combo_value(id, val) {
+    if (val != "") {
+        document.getElementById(id).value = val;
+    }
+}
+
+</script>
+    <div style="width: auto;height:160px;background:#99FF99; border-style:double none;">
+        絞込条件<br>
+        <div class="filter_item" style="float:left;">
+
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">
+                    進捗状況：<select id="sel_ph_nc_step" name="sel_step" style="width: 220px;">
+                    <option value=""></option>
+                        {% for step_list in step_list %}
+                            <option value="{{ step_list.step_id }}">{{ step_list.step_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">案件ID：<input type="text" id="sel_ph_nc_id" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">案件名：<input type="text" id="sel_ph_nc_project_name" value="" size="30">※あいまい</div>
+                <div class="item" style="float:left;margin-left:15px;">案件区分：<select id="sel_ph_nc_item_class" name="sel_ph_nc_item_class" >
+                        <option value=""></option>
+                        <option value="9">緊急</option>
+                        <option value="1">定常</option>
+                        <option value="4">自主整備</option>
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">依頼状況：<select id="sel_ph_nc_maintenance_status" name="sel_ph_nc_maintenance_status" >
+                        <option value=""></option>
+                        <option value="1">小口依頼済</option>
+                        <option value="2">電気整備依頼済</option>
+                        <option value="3">計装整備依頼済</option>
+                        <option value="0">緊急対応無</option>
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">故障/作業種別：<select id="sel_ph_nc_malfunction_class" name="sel_ph_nc_malfunction_class" >
+                        <option value=""></option>
+                        <option value="重故障修理">重故障修理</option>
+                        <option value="軽故障修理">軽故障修理</option>
+                        <option value="整備点検">整備点検</option>
+                        <option value="点検検査">点検検査</option>
+                        <option value="土建工事">土建工事</option>
+                        <option value="その他-保全G関連">その他-保全G関連</option>
+                        <option value="その他-調達G関連">その他-調達G関連</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="clear: both;"></div>
+
+            <div class="line" style="float:left">
+                <div class="item" style="float:left;margin-left:15px;">
+                    希望納期(期限)：<input type="text" id="sel_ph_nc_delivery_date_start" class="datepicker" size="10" value="" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button" value="クリア" onclick="date_clear('sel_ph_nc_delivery_date_start');">
+                    ～
+                    <input type="text" id="sel_ph_nc_delivery_date_end" class="datepicker" size="10" value="" autocomplete="off" readonly>
+                    <input type="button" class="date_clear_button" value="クリア" onclick="date_clear('sel_ph_nc_delivery_date_end');">
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">部門：<select id="sel_ph_nc_division" name="sel_ph_nc_division" onchange="ph_nc_select_filter_division(value)">
+                    <option value=""></option>
+                        {% for division_list in division_list %}
+                            <option value="{{ division_list.division_cd }}">{{ division_list.division_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="ph_nc_filter_department" class="item" style="float:left;margin-left:15px;">部署：<select id="sel_ph_nc_department" name="sel_ph_nc_department">
+                    <option value=""></option>
+                        {% for departments_list in departments_list %}
+                            <option value="{{ departments_list.department_cd }}">{{ departments_list.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="process_cd" class="item" style="float:left;margin-left:15px;">工場：<select id="sel_ph_nc_process" name="sel_ph_nc_process">
+                        <option value=""></option>
+                        {% for facility_list in facility_list %}
+                            {% if facility_list.facility_cd == "0" %}
+                                <option value="{{ facility_list.m_location_skey }}" selected>{{ facility_list.location_nm_1 }}</option>
+                            {% else %}
+                                <option value="{{ facility_list.m_location_skey }}">{{ facility_list.location_nm_1 }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div style="clear: both;"></div>
+
+            <div class="line" style="float:left;">
+                <div id="mng_charge_person" class="item" style="float:left;margin-left:15px;">保全G担当者：<select id="sel_ph_nc_charge_person" name="sel_ph_nc_charge_person">
+                    <option value=""></option>
+                        {% for mng_charge_person in mng_charge_person_list %}
+                            <option value="{{ mng_charge_person.username }}">{{ mng_charge_person.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">次作業者部門：<select id="sel_ph_nc_next_division" name="sel_ph_nc_next_division" onchange="ph_nc_select_next_division(value);">
+                    <option value=""></option>
+                        {% for division_list in division_list %}
+                            {% if division_list.division_cd == user_division_cd %}
+                                <option value="{{ division_list.division_cd }}" selected>{{ division_list.division_name }}</option>
+                            {% else %}
+                                <option value="{{ division_list.division_cd }}">{{ division_list.division_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="ph_nc_next_department" class="item" style="float:left;margin-left:15px;">
+                    次作業者部署：<select id="sel_ph_nc_next_department" name="sel_next_department" onchange="ph_nc_select_next_department(value);">
+                            <option value=""></option>
+                            {% for next_departments_list in next_departments_list %}
+                                {% if next_departments_list.department_cd == user_department_cd %}
+                                    <option value="{{ next_departments_list.department_cd }}" selected>{{ next_departments_list.department_name }}</option>
+                                {% else %}
+                                    <option value="{{ next_departments_list.department_cd }}">{{ next_departments_list.department_name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                    </select>
+                </div>
+                <div id="ph_nc_next_person" class="item" style="float:left;margin-left:15px;">次作業者：<select id="sel_ph_nc_next_parson" name="sel_ph_nc_next_parson">
+                    <option value=""></option>
+                        {% for next_user in next_user_list %}
+                            {% if next_user.username == user %}
+                                <option value="{{ next_user.username }}" selected>{{ next_user.full_name }}</option>
+                            {% else %}
+                                <option value="{{ next_user.username }}">{{ next_user.full_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div style="clear: both;"></div>
+
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">
+                    <input type="checkbox" id="sel_ph_nc_on_work" size="18" checked>未処理のみ
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">表示順：
+                    <label><input type="radio" id="sel_ph_nc_display_order1" value="1" name="sel_ph_nc_display_order" size="18" checked>案件ID</label>
+                    <label><input type="radio" id="sel_ph_nc_display_order2" value="2" name="sel_ph_nc_display_order" size="18" >発見日時</label>
+                    <label><input type="radio" id="sel_ph_nc_display_order3" value="3" name="sel_ph_nc_display_order" size="18" >滞留日数</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    session_value_notification_check_read();
+</script>

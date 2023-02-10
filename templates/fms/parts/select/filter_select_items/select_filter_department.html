@@ -1,0 +1,6 @@
+部署：<select id="sel_{{ target }}_department" name="sel_filter_department" onchange="{{ target }}_select_filter_department(value);">
+                    <option value=""></option>
+                        {% for filter_departments_list in filter_departments_list %}
+                            <option value="{{ filter_departments_list.department_cd }}">{{ filter_departments_list.department_name }}</option>
+                        {% endfor %}
+                    </select>

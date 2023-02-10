@@ -1,0 +1,108 @@
+<script>
+//操作の詳細の詳細表示処理
+function action_detail(a) {
+    var action_cd = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/step_detail/",
+                type: "POST",
+                data : {
+                    'action_cd' : action_cd,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#step_id').val(data.step_id);
+                    $('#step_name').val(data.step_name);
+                    $('#charge_department_class').val(data.charge_department_class);
+                    $('#step_level').val(data.step_level);
+                    $('#template_class').val(data.template_class);
+                    $('#new_entry_flag').val(data.new_entry_flag);
+                    $('#target').val(data.target);
+                    $('#lost_flag').val(data.lost_flag);
+                    //get_step_action_list(step_id);･･･不要?=削除予定
+                    //get_step_relation_list(step_id);･･･不要?=削除予定
+                    //get_step_display_item_list(step_id);･･･不要?=削除予定
+                    //get_data_entry_step_list(step_id);･･･不要?=削除予定
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.action_cd{
+    width:150px;
+}
+.action_name{
+    width:200px;
+}
+.status_after_action{
+    width:150px;
+}
+.action_authority{
+    width:50px;
+}
+.action_class{
+    width:80px;
+}
+.lost_flag{
+    width:50px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if action_master_list_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="action_cd">アクションCD</th>
+                        <th class="action_name">アクション名</th>
+                        <th class="status_after_action">アクション後遷移</th>
+                        <th class="action_authority">権限</th>
+                        <th class="action_class">アクション区分</th>
+                        <th class="lost_flag">無効FL</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for action_master_list in action_master_list %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" class="detailpb" onclick="action_detail({{ action_master_list.action_cd }});">詳細</a>
+                        </td>
+                        <td class="action_cd">{{ action_master_list.action_cd }}</td>
+                        <td class="action_name">{{ action_master_list.action_name }}</td>
+                        <td class="status_after_action">{{ action_master_list.status_after_action }}</td>
+                        <td class="action_authority">{{ action_master_list.action_authority }}</td>
+                        <td class="action_class">{{ action_master_list.action_class }}</td>
+                        <td class="lost_flag">{{ action_master_list.lost_flag }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

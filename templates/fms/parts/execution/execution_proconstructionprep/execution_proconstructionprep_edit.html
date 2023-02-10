@@ -1,0 +1,312 @@
+{% extends 'fms/parts/execution/execution_detail/execution_work_info_base.html' %}
+
+{% block execution_sub_contents %}
+
+<script>
+function action_button_empty() {
+    var tab = Number($('#default_tab').val());
+    $('#prospecificationunit' + tab + '_action_button').empty();
+}
+//部署を選択したときにユーザー・工程選択の一覧を絞込
+function change_department(department) {
+        $.ajax({
+                url: "/isk_tools/fms/action/budget/budget/budget_change_department/",
+                type: "POST",
+                data : {
+                    'department': department,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('[list=userList]').empty();
+                    $('[list=userList]').html(data.user_list);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//入力項目チェック(入力忘れ、文字数オーバー等)の処理
+function input_check(a,b,d) {
+    console.log(b);
+    var this_step = a;
+    var next_step = b;
+    var action_cd = d;
+    var ng_flag = 0;
+    var ng_str_count_flag = 0;
+    var msg = ""
+    var alert_ng_ch_msg_str = ""
+
+    // 全て正常時のみ禁止文字チェック
+    var ng_all_flag = ng_flag + ng_str_count_flag;
+    if ( ng_all_flag == 0) {
+        alert_ng_ch_msg_str = check_all_ng_character("{{ div_id_name }}_ng_character_check");
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            ng_all_flag += 1;
+        }
+    }
+
+    //正常時処理
+    if( ng_all_flag == 0){
+        proconstructionprep_edit(this_step,next_step);
+    }else{
+        //呼び出し中に表示するgifをフェードアウト
+        if($("#action_pb_loading") != null){
+            $("#action_pb_loading").fadeOut();
+        }
+        //警告表示
+        if ( ng_flag > 0 ) {
+            msg += '未入力項目があります！！\n';
+        }
+        if ( ng_str_count_flag > 0 ) {
+            msg += '文字数オーバーです！！\n';
+        }
+        if ( alert_ng_ch_msg_str.length > 0 ) {
+            msg += alert_ng_ch_msg_str;
+        }
+        if ( msg.length > 0 ) {
+            alert(msg);
+        }
+        // アクションボタン有効化
+        $(".button").prop("disabled", false);
+    }
+}
+
+// 工事納入情報テーブル登録･更新処理
+function proconstructionprep_edit(a,b) {
+
+//    alert('sub_id : ' + $('#sub_id').val() + '  storage_loc : ' + $('#storage_loc').val());
+
+        var this_step = a;
+        var next_step = b;
+        var next_division = $('#next_division').val();
+        var next_department = $('#next_department').val();
+        if ( a == b ){
+            var next_person = $('#this_user').val();
+            var user_attribute_id = 0;
+        }else{
+            var next_person = "";
+            var user_attribute_id = $('#sel_next_person').val();
+        }
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var comment = $('#comment').val();
+        var budget_id = $('#budget_id').val();
+        var rev_no = $('#rev_no').val();
+        var budget_no = $('#budget_no').val();
+        var budget_name = $('#budget_name').val();
+        var construction_id = $('#construction_id').val();
+        var sub_id = $('#sub_id').val();
+        var scheduled_date =  $('#scheduled_date').val();
+        var scheduled_datime =  $('#scheduled_datime').val();
+        var delivery_date =  $('#delivery_date').val();
+        var storage_loc =  $('#storage_loc').val();
+        var delivery_note_data =  $('#delivery_note_data').val();
+
+        var delivery_prep_period_from =  $('#delivery_prep_period_from').val();
+        var delivery_prep_period_to =  $('#delivery_prep_period_to').val();
+        var prep_contents =  $('#prep_contents').val();
+        var prep_result =  $('#prep_result').val();
+        var implementation_department =  $('#implementation_department').val();
+        var execution_department_manager =  $('#execution_department_manager').val();
+        var memo =  $('#memo').val();
+        var delivery_prep_completion_date =  $('#delivery_prep_completion_date').val();
+        var required_procedure =  $('#required_procedure').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/execution_proconstructionprep_entry/",
+                type: "POST",
+                data : {
+                    'this_step' : this_step,
+                    'next_step' : next_step,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_person' : next_person,
+                    'comment' : comment,
+                    'budget_id' : budget_id,
+                    'rev_no' : rev_no,
+                    'budget_no' : budget_no,
+                    'budget_name' : budget_name,
+                    'construction_id' : construction_id,
+                    'sub_id' : sub_id,
+                    'scheduled_date' : scheduled_date,
+                    'scheduled_datime' : scheduled_datime,
+                    'delivery_date' : delivery_date,
+                    'storage_loc' : storage_loc,
+                    'delivery_note_data' : delivery_note_data,
+                    'user_attribute_id' : user_attribute_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}",
+                    //20201209y-kawauchi DB入力
+                    'delivery_prep_period_from': delivery_prep_period_from,
+                    'delivery_prep_period_to': delivery_prep_period_to,
+                    'prep_contents': prep_contents,
+                    'prep_result': prep_result,
+                    'implementation_department': implementation_department,
+                    'execution_department_manager': execution_department_manager,
+                    'memo': memo,
+                    'delivery_prep_completion_date': delivery_prep_completion_date,
+                    'required_procedure': required_procedure
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    //現状の進捗工程と処理後の進捗工程とが別かを判定
+                    if ( this_step != next_step ){
+                        $('#{{ action_button_id }}').empty();//別の場合は、「操作」ボタンを非表示に
+                        console.log('作成されました！')
+                    }
+                    log_list(1);//ログ表示(予算単位デフォルト)のためのJS起動(detail_template.html内にプログラム有)
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert(data.msg);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    if($("#action_pb_loading") != null){
+                        $("#action_pb_loading").fadeOut();//呼び出し中に表示するgifをフェードアウト
+                    }
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                    // アクションボタン有効化
+                    $(".button").prop("disabled", false);
+                });
+}
+</script>
+<style type="text/css">
+
+/*20201205y-kawauchi フォームレイアウト*/
+dl {
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+}
+dl dt{
+    width: 150px;
+    height: auto;
+    padding: 0px;
+    float:left;
+    clear:both;
+    font-weight: normal;
+    font-size: 18px;
+}
+dl dd{
+    height: auto;
+    padding: 0px;
+    font-size: 18px;
+}
+input, select, .vTextField {
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 6px;
+    margin-top: 0;
+}
+dd:nth-child(4n+2) {
+background-color:#dddddd
+}
+
+</style>
+
+    <div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        </div>
+        <input type="hidden" id="action" value="{{ action }}">
+        <input type="hidden" id="execution_proconstructionprep_page" value="{{ this_page }}">
+        <input type="hidden" id="this_user" value="{{ t_username }}">
+        <input type="hidden" id="execution_proconstructionprep_edit">
+
+        <div id="{{ action_button_id }}" style="width: auto;"></div>
+
+        <div class="scroll_div" style="float: left;">
+            <div id="{{ div_id_name }}_ng_character_check"><!--ng_character_check ここから-->
+            <table>
+                <tr>
+                    <td><div><font size="4">引渡準備期間</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="delivery_prep_period_from" class="datepicker" value="{{ delivery_prep_period_from }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('delivery_prep_period_from');"> ～ <input type="text" id="delivery_prep_period_to" class="datepicker" value="{{ delivery_prep_period_to }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('delivery_prep_period_to');"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">準備内容</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><textarea id="prep_contents" name="prep_contents" rows="5">{{ prep_contents }}</textarea></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">準備結果</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4">
+                        <select id="prep_result" name="prep_result">
+                            {% if proconstructionprep_data.prep_result  == "要" %}
+                                <option value="要" selected>要</option>
+                                <option value="否">否</option>
+                            {% elif proconstructionprep_data.prep_result  == "否" %}
+                                <option value="要">要</option>
+                                <option value="否" selected>否</option>
+                            {% else %}
+                                <option value="要">要</option>
+                                <option value="否">否</option>
+                            {% endif %}</select></font></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">実施部署</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <select id="implementation_department" name="implementation_department" list="departmentList" onchange="change_department(value);">
+                            <option hidden></option>
+                        <datalist id="departmentList">
+                            {{ departments_list | safe }}
+                        </datalist>
+                        </select>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">実施部署責任者</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <select id="execution_department_manager" name="execution_department_manager" list="userList">
+                            <option hidden></option>
+                        <datalist id="userList">
+                            {{ user_list | safe }}
+                        </datalist>
+                        </select>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">備考</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><textarea id="memo" name="memo" rows="5">{{ memo }}</textarea></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">引渡準備完了日</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4"><input type="text" id="delivery_prep_completion_date" class="datepicker" value="{{ delivery_prep_completion_date }}" autocomplete="off" readonly><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('delivery_prep_completion_date');"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">必要手続き</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="4">
+                        <select id="required_procedure" name="required_procedure">
+                            <option hidden value="{{ required_procedure }}">{{ required_procedure }}</option>
+                            {% for FCLTY_CD in FCLTY_CD %}
+                                <option value="{{ FCLTY_CD.1 }}">{{ FCLTY_CD.1 }}</option>
+                            {% endfor %}
+                        </select>
+                    </font></div></td>
+                </tr>
+            </table>
+            </div><!--ng_character_checkここまで-->
+
+        </div>
+    </div>
+    <div style="clear: both;"></div>
+
+{% endblock %}

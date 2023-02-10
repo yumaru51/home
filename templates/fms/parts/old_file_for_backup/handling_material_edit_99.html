@@ -1,0 +1,401 @@
+<script>
+function material_state_change() {
+        var target_state = $('#state').val();
+        var pulldown_option = document.getElementById("sel_state").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].text == target_state){
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+}
+function concentration_unit_change() {
+        var target_concentration_unit = $('#concentration_unit').val();
+        var pulldown_option = document.getElementById("sel_concentration_unit").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].text == target_concentration_unit){
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+}
+function pressure_unit_change() {
+        var target_pressure_unit = $('#pressure_unit').val();
+        var pulldown_option = document.getElementById("sel_pressure_unit").getElementsByTagName('option');
+        var i = 0;
+        for(i=0;pulldown_option.length>i;i++){
+            if(pulldown_option[i].text == target_pressure_unit){
+                pulldown_option[i].selected = true;
+                break;
+            }
+        }
+}
+function handling_material_entry(a) {
+    var budget_id = $('#target_budget_id').val();
+    if (budget_id == 0){
+        alert("予算データを先に登録(一時保存)してください！！");
+    }else{
+        var action_type = a;
+        var budget_rev_no = $('#budget_rev_no').val();
+        var handling_material_name = $('#handling_material_name').val();
+        var sub_no = $('#sub_no').val();
+        var chemical_formula = $('#chemical_formula').val();
+        var normal_pressure = $('#normal_pressure').val();
+        var maximum_pressure = $('#maximum_pressure').val();
+        var minimum_pressure = $('#minimum_pressure').val();
+        var pressure_unit = $('#sel_pressure_unit').val();
+        var normal_temperature = $('#normal_temperature').val();
+        var maximum_temperature = $('#maximum_temperature').val();
+        var minimum_temperature = $('#minimum_temperature').val();
+        var state = $('#sel_state').val();
+        var concentration = $('#concentration').val();
+        var concentration_unit = $('#sel_concentration_unit').val();
+        var pH = $('#pH').val();
+        var viscosity = $('#viscosity').val();
+        var bulk_specific_gravity = $('#bulk_specific_gravity').val();
+        var true_specific_gravity = $('#true_specific_gravity').val();
+        var apparent_specific_gravity = $('#apparent_specific_gravity').val();
+        var particle_size = $('#particle_size').val();
+        var moisture = $('#moisture').val();
+        var others = $('#others').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var this_step = $('#this_step').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/handling_material_entry/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'budget_id' : budget_id,
+                    'budget_rev_no' : budget_rev_no,
+                    'handling_material_name' : handling_material_name,
+                    'sub_no' : sub_no,
+                    'chemical_formula' : chemical_formula,
+                    'normal_pressure' : normal_pressure,
+                    'maximum_pressure' : maximum_pressure,
+                    'minimum_pressure' : minimum_pressure,
+                    'pressure_unit' : pressure_unit,
+                    'normal_temperature' : normal_temperature,
+                    'maximum_temperature' : maximum_temperature,
+                    'minimum_temperature' : minimum_temperature,
+                    'state' : state,
+                    'concentration' : concentration,
+                    'concentration_unit' : concentration_unit,
+                    'pH' : pH,
+                    'viscosity' : viscosity,
+                    'bulk_specific_gravity' : bulk_specific_gravity,
+                    'true_specific_gravity' : true_specific_gravity,
+                    'apparent_specific_gravity' : apparent_specific_gravity,
+                    'particle_size' : particle_size,
+                    'moisture' : moisture,
+                    'others' : others,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#sub_no').val(data.sub_no);
+                    handling_material_list();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+function handling_material_delete() {
+    var handling_material_id = $('#handling_material_id').val();
+    var this_department = $('#user_department_cd').val();
+    var this_division = $('#user_division_cd').val();
+    var this_step = $('#this_step').val();
+    $.ajax({
+        url: "/isk_tools/fms/action/handling_material_delete/",
+                type: "POST",
+                data : {
+                    'handling_material_id' : handling_material_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    handling_material_list();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function handling_material_my_master_entry(a) {
+    var handling_material_id = $('#handling_material_id').val();
+    var action_type = a;
+    var handling_material_name = $('#handling_material_name').val();
+    var sub_no = $('#sub_no').val();
+    var chemical_formula = $('#chemical_formula').val();
+    var normal_pressure = $('#normal_pressure').val();
+    var maximum_pressure = $('#maximum_pressure').val();
+    var minimum_pressure = $('#minimum_pressure').val();
+    var pressure_unit = $('#sel_pressure_unit').val();
+    var normal_temperature = $('#normal_temperature').val();
+    var maximum_temperature = $('#maximum_temperature').val();
+    var minimum_temperature = $('#minimum_temperature').val();
+    var state = $('#sel_state').val();
+    var concentration = $('#concentration').val();
+    var concentration_unit = $('#sel_concentration_unit').val();
+    var pH = $('#pH').val();
+    var viscosity = $('#viscosity').val();
+    var bulk_specific_gravity = $('#bulk_specific_gravity').val();
+    var true_specific_gravity = $('#true_specific_gravity').val();
+    var apparent_specific_gravity = $('#apparent_specific_gravity').val();
+    var particle_size = $('#particle_size').val();
+    var moisture = $('#moisture').val();
+    var others = $('#others').val();
+    var this_department = $('#user_department_cd').val();
+    var this_division = $('#user_division_cd').val();
+    var this_step = $('#this_step').val();
+    $.ajax({
+            url: "/isk_tools/fms/action/handling_material_my_master_entry/",
+            type: "POST",
+            data : {
+                'action_type' : action_type,
+                'handling_material_id' : handling_material_id,
+                'handling_material_name' : handling_material_name,
+                'chemical_formula' : chemical_formula,
+                'normal_pressure' : normal_pressure,
+                'maximum_pressure' : maximum_pressure,
+                'minimum_pressure' : minimum_pressure,
+                'pressure_unit' : pressure_unit,
+                'normal_temperature' : normal_temperature,
+                'maximum_temperature' : maximum_temperature,
+                'minimum_temperature' : minimum_temperature,
+                'state' : state,
+                'concentration' : concentration,
+                'concentration_unit' : concentration_unit,
+                'pH' : pH,
+                'viscosity' : viscosity,
+                'bulk_specific_gravity' : bulk_specific_gravity,
+                'true_specific_gravity' : true_specific_gravity,
+                'apparent_specific_gravity' : apparent_specific_gravity,
+                'particle_size' : particle_size,
+                'moisture' : moisture,
+                'others' : others,
+                'this_department' : this_department,
+                'this_division' : this_division,
+                'this_step' : this_step,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                alert(data.msg);
+                $('#sub_no').val(data.sub_no);
+                handling_material_list();
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+function handling_material_my_master_delete() {
+    var handling_material_id = $('#handling_material_id').val();
+    var this_department = $('#user_department_cd').val();
+    var this_division = $('#user_division_cd').val();
+    var this_step = $('#this_step').val();
+    $.ajax({
+        url: "/isk_tools/fms/action/handling_material_my_master_delete/",
+                type: "POST",
+                data : {
+                    'handling_material_id' : handling_material_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    handling_material_my_master_list();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+
+<style type="text/css">
+div.scroll_material_div {
+  width: 400px;
+  height: 830px;
+  overflow: scroll;
+}
+</style>
+    <div>
+        <div><h2 class="page-header">取扱物質</h2></div>
+        <div class="scroll_material_div">
+            <input type="hidden" id="handling_material_id" value="{{ handling_material_id }}">
+            <table>
+                <tr>
+                    <td><div><font size="4">取扱物質</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="handling_material_name" value="{{ material_name }}" size="24"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">化学式</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="chemical_formula" value="{{ chemical_formula }}" size="24"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">サブNO</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="sub_no" value="{{ sub_no }}" size="2" readonly="readonly">※自動取得</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">通常圧力</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="normal_pressure" value="{{ normal_pressure }}" size="10"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">最高圧力</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="maximum_pressure" value="{{ maximum_pressure }}" size="10"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">最低圧力</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="minimum_pressure" value="{{ minimum_pressure }}" size="10"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">圧力単位</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <input type="hidden" id="pressure_unit" value="{{ pressure_unit }}">
+                        <select id="sel_pressure_unit" name="sel_pressure_unit">
+                            <option value=""></option>
+                            {% for pressure_unit_list in pressure_unit_list %}
+                                <option value="{{ pressure_unit_list.unit_id }}" >{{ pressure_unit_list.unit }}</option>
+                            {% endfor %}
+                        </select>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">通常温度</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="normal_temperature" value="{{ normal_temperature }}" size="10">℃</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">最高温度</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="maximum_temperature" value="{{ maximum_temperature }}" size="10">℃</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">最低温度</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="minimum_temperature" value="{{ minimum_temperature }}" size="10">℃</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">状態</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <input type="hidden" id="state" value="{{ state }}">
+                        <select id="sel_state" name="sel_state">
+                            <option value=""></option>
+                            {% for state_list in state_list %}
+                                <option value="{{ state_list.state_id }}" >{{ state_list.state_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">濃度</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="concentration" value="{{ concentration }}" size="10"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">濃度単位</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3">
+                        <input type="hidden" id="concentration_unit" value="{{ concentration_unit }}">
+                        <select id="sel_concentration_unit" name="sel_concentration_unit">
+                            <option value=""></option>
+                            {% for concentration_unit_list in concentration_unit_list %}
+                                <option value="{{ concentration_unit_list.unit_id }}" >{{ concentration_unit_list.unit }}</option>
+                            {% endfor %}
+                        </select>
+                    </font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">pH</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="pH" value="{{ ph }}" size="6"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">粘度</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="viscosity" value="{{ viscosity }}" size="10">cP</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">嵩比重</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="bulk_specific_gravity" value="{{ bulk_specific_gravity }}" size="10"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">真比重</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="true_specific_gravity" value="{{ true_specific_gravity }}" size="10"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">見掛比重</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="apparent_specific_gravity" value="{{ apparent_specific_gravity }}" size="10"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">平均粒径</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="particle_size" value="{{ particle_size }}" size="10">μm</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">水分</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="moisture" value="{{ moisture }}" size="10">wt%</font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">その他</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><textarea id="others" name="others" rows="3" cols="25">{{ others }}</textarea></font></div></td>
+                </tr>
+            </table>
+            <input type="button" value="新規登録" onclick="handling_material_entry(0);">　
+            <input type="button" value="　更新　" onclick="handling_material_entry(1);">　　　　　　　　　
+            <input type="button" value="　削除　" onclick="handling_material_delete();">
+            <br>
+            <div style="border-style: ridge;">
+                <div>マイマスタへの登録関係</div>
+                <input type="button" value="　登録　" onclick="handling_material_my_master_entry(0);">　
+                <input type="button" value="　更新　" onclick="handling_material_my_master_entry(1);">　　　　　　　　　
+                <input type="button" value="　削除　" onclick="handling_material_my_master_delete();">
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+

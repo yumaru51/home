@@ -1,0 +1,83 @@
+<script>
+//画面表示時処理
+function report_origin_g_display_open() {
+    var file_folder = $('#report_origin_g_file_folder').val();
+    var div_id_name = $('#report_origin_g_div_id_name').val();
+    var delete_pb_disp_flag = $('#report_origin_g_delete_pb_disp_flag').val();
+    var file_class = $('#report_origin_g_file_class').val();
+    upload_file_list_other_type(file_folder,div_id_name,delete_pb_disp_flag,file_class);
+}
+</script>
+<style type="text/css">
+input, textarea {
+    font-size: 100%;
+}
+select {
+    font-size: 100%;
+    height:35px;
+}
+.datepicker {
+    width:150px;;
+}
+div.scroll_maintenance_order_div {
+  width: auto;
+  height: 810px;
+  overflow: scroll;
+}
+</style>
+
+<div>
+    <div id="{{ action_button_id }}" style="width: auto;"></div>
+    <div><font size="5">原課入力</font></div>
+    <div style="float:left;">
+
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">管理区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ mgt_class.mgt_cls_nm_1 }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工場名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ facility.location_nm_1 }}</font></div></td>
+            </tr>
+        </table>
+
+        <br><br>
+        <font size="4">機器一覧：</font>
+        <div id="report_equipment_list" name="equipment_list">
+            {{ equipment_list | safe }}
+        </div>
+        <br>
+    </div>
+
+        <div style="float: left;" size="5px">　</div>
+        <div style="float: left;"><br>
+            <div><font size="4">特記：　</font></div>
+            <div><font size="3"><textarea id="special_note_production" name="special_note_production" rows="8" cols="45" readonly>{{ equipment_history_report_data.special_note_production | default_if_none:"" }}</textarea></font></div>
+
+            <div><font size="4">申送事項：　</font></div>
+            <div><font size="3"><textarea id="items_to_be_sent_production" name="items_to_be_sent_production" rows="8" cols="45" readonly>{{ equipment_history_report_data.items_to_be_sent_production | default_if_none:"" }}</textarea></font></div>
+            <div>
+                <table>
+                    <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">停止時間(h)</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="5">{{ equipment_history_report_data.stop_time | default_if_none:'' }}</font></div></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+    <div style="float:left;">　　</div>
+    <div style="float:left;">
+        <input type="hidden" id="report_origin_g_delete_pb_disp_flag" value="0">
+        <input type="hidden" id="report_origin_g_file_folder" name="file_folder" value="\FailureCorrespondence\{{ phenomenon_data.phenomenon_id }}\">
+        <input type="hidden" id="report_origin_g_div_id_name" name="div_id_name" value="report_origin_g">
+        <input type="hidden" id="report_origin_g_file_class" name="file_class" value="Evaluation_Origin">
+
+        <div id="upload_file_list_report_origin_g">添付ファイル無し</div>
+    </div>
+    <div style="clear: both;"></div>
+</div>

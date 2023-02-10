@@ -1,0 +1,85 @@
+<script>
+//情報登録有無の詳細表示処理
+function data_entry_step_detail(a) {
+    var id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/data_entry_step_detail/",
+                type: "POST",
+                data : {
+                    'id' : id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#data_entry_step_id').val(data.data_entry_step_id);
+                    $('#data_entry_step_step_id').val(data.data_entry_step_step_id);
+                    $('#data_entry_step_target_table').val(data.data_entry_step_target_table);
+                    $('#data_entry_step_lost_flag').val(data.data_entry_step_lost_flag);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.step_id{
+    width:100px;
+}
+.target_table{
+    width:150px;
+}
+.lost_flag{
+    width:50px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if data_entry_step_list_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="step_id">ステップid</th>
+                        <th class="target_table">対象テーブル</th>
+                        <th class="lost_flag">無効FL</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for data_entry_step_list in data_entry_step_list %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" class="detailpb" onclick="data_entry_step_detail({{ data_entry_step_list.id }});">詳細</a>
+                        </td>
+                        <td class="step_id">{{ data_entry_step_list.step_id }}</td>
+                        <td class="target_table">{{ data_entry_step_list.target_table }}</td>
+                        <td class="lost_flag">{{ data_entry_step_list.lost_flag }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

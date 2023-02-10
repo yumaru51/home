@@ -1,0 +1,341 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+function getstockdata(a) {
+        var target_start_packed_date_before = $('#datepicker5').val();
+        var target_start_packed_date_before = target_start_packed_date_before.replace( '年', '-' );
+        var target_start_packed_date_before = target_start_packed_date_before.replace( '月', '-' );
+        var target_start_packed_date = target_start_packed_date_before.replace( '日', '' );
+        var target_end_packed_date_before = $('#datepicker6').val();
+        var target_end_packed_date_before = target_end_packed_date_before.replace( '年', '-' );
+        var target_end_packed_date_before = target_end_packed_date_before.replace( '月', '-' );
+        var target_end_packed_date = target_end_packed_date_before.replace( '日', '' );
+        var target_start_lot_no = $('#selectstartlotno7').val();
+        var target_end_lot_no = $('#selectendlotno7').val();
+        var target_warehouse_code = $('#selectwarehouse7').val();
+        var target_grade_type = $('#selectgradetype7').val();
+        var target_item_group = $('#selectitemgroup7').val();
+        var target_item_code = $('#selectitemcode7').val();
+        var target_item_name  = $('#selectitemname7').val();
+        var target_start_packed_amount = $('#selectstartpackedamount7').val();
+        var target_end_packed_amount = $('#selectendpackedamount7').val();
+        var target_start_stock_amount = $('#selectstartamount7').val();
+        var target_end_stock_amount = $('#selectendamount7').val();
+        var target_reserve_company = $('#selectreservecompany7').val();
+        var target_q_status1 = $('#selectquality17').val();
+        var target_q_status2 = $('#selectquality27').val();
+        var target_q_status3 = $('#selectquality37').val();
+        if (document.getElementById("incidental_work_order1_s").checked == true) {
+            var incidental_work1 = 1;
+        } else {
+            var incidental_work1 = 0;
+        }
+        if (document.getElementById("incidental_work_order2_s").checked == true) {
+            var incidental_work2 = 2;
+        } else {
+            var incidental_work2 = 0;
+        }
+        if (document.getElementById("incidental_work_order3_s").checked == true) {
+            var incidental_work3 = 3;
+        } else {
+            var incidental_work3 = 0;
+        }
+        if (document.getElementById("incidental_work_order4_s").checked == true) {
+            var incidental_work4 = 4;
+        } else {
+            var incidental_work4 = 0;
+        }
+        if (document.getElementById("incidental_work_order5_s").checked == true) {
+            var incidental_work5 = 5;
+        } else {
+            var incidental_work5 = 0;
+        }
+        if (document.getElementById("incidental_work_order6_s").checked == true) {
+            var incidental_work6 = 6;
+        } else {
+            var incidental_work6 = 0;
+        }
+        if (document.getElementById("incidental_work_order7_s").checked == true) {
+            var incidental_work7 = 7;
+        } else {
+            var incidental_work7 = 0;
+        }
+        if (document.getElementById("incidental_work_order8_s").checked == true) {
+            var incidental_work8 = 8;
+        } else {
+            var incidental_work8 = 0;
+        }
+        if (document.getElementById("incidental_work_order9_s").checked == true) {
+            var incidental_work9 = 9;
+        } else {
+            var incidental_work9 = 0;
+        }
+        if (document.getElementById("incidental_work_order10_s").checked == true) {
+            var incidental_work10 = 10;
+        } else {
+            var incidental_work10 = 0;
+        }
+        if (document.getElementById("incidental_work_order11_s").checked == true) {
+            var incidental_work11 = 11;
+        } else {
+            var incidental_work11 = 0;
+        }
+        if (document.getElementById("incidental_work_order12_s").checked == true) {
+            var incidental_work12 = 12;
+        } else {
+            var incidental_work12 = 0;
+        }
+        if (document.getElementById("incidental_work_order13_s").checked == true) {
+            var incidental_work13 = 13;
+        } else {
+            var incidental_work13 = 0;
+        }
+        if (document.getElementById("incidental_work_order14_s").checked == true) {
+            var incidental_work14 = 14;
+        } else {
+            var incidental_work14 = 0;
+        }
+        if (document.getElementById("incidental_work_order15_s").checked == true) {
+            var incidental_work15 = 15;
+        } else {
+            var incidental_work15 = 0;
+        }
+        if (document.getElementById("incidental_work_order16_s").checked == true) {
+            var incidental_work16 = 16;
+        } else {
+            var incidental_work16 = 0;
+        }
+        if (document.getElementById("incidental_work_order17_s").checked == true) {
+            var incidental_work17 = 17;
+        } else {
+            var incidental_work17 = 0;
+        }
+        if (document.getElementById("incidental_work_order18_s").checked == true) {
+            var incidental_work18 = 18;
+        } else {
+            var incidental_work18 = 0;
+        }
+        if (document.getElementById("incidental_work_order19_s").checked == true) {
+            var incidental_work19 = 19;
+        } else {
+            var incidental_work19 = 0;
+        }
+        if (document.getElementById("incidental_work_order20_s").checked == true) {
+            var incidental_work20 = 20;
+        } else {
+            var incidental_work20 = 0;
+        }
+        var from_page = a;
+        var target_start_move_date = "";
+        var target_end_move_date = "";
+        $("#loading2").show();
+        $.ajax({
+                url: "/imsds/parts/stock_list/",
+                type: "POST",
+                data : {
+                    'target_start_packed_date': target_start_packed_date,
+                    'target_end_packed_date': target_end_packed_date,
+                    'target_start_move_date': target_start_move_date,
+                    'target_end_move_date': target_end_move_date,
+                    'selectstartlotno': target_start_lot_no,
+                    'selectendlotno': target_end_lot_no,
+                    'selectwarehouse': target_warehouse_code,
+                    'target_grade_type': target_grade_type,
+                    'target_item_group': target_item_group,
+                    'selectitemcode': target_item_code,
+                    'target_item_name': target_item_name,
+                    'target_start_packed_amount': target_start_packed_amount,
+                    'target_end_packed_amount': target_end_packed_amount,
+                    'target_start_stock_amount': target_start_stock_amount,
+                    'target_end_stock_amount': target_end_stock_amount,
+                    'target_reserve_company': target_reserve_company,
+                    'selectquality1': target_q_status1,
+                    'selectquality2': target_q_status2,
+                    'selectquality3': target_q_status3,
+                    'incidental_work1': incidental_work1,
+                    'incidental_work2': incidental_work2,
+                    'incidental_work3': incidental_work3,
+                    'incidental_work4': incidental_work4,
+                    'incidental_work5': incidental_work5,
+                    'incidental_work6': incidental_work6,
+                    'incidental_work7': incidental_work7,
+                    'incidental_work8': incidental_work8,
+                    'incidental_work9': incidental_work9,
+                    'incidental_work10': incidental_work10,
+                    'incidental_work11': incidental_work11,
+                    'incidental_work12': incidental_work12,
+                    'incidental_work13': incidental_work13,
+                    'incidental_work14': incidental_work14,
+                    'incidental_work15': incidental_work15,
+                    'incidental_work16': incidental_work16,
+                    'incidental_work17': incidental_work17,
+                    'incidental_work18': incidental_work18,
+                    'incidental_work19': incidental_work19,
+                    'incidental_work20': incidental_work20,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 1000000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#stock_list').empty();
+                    $('#stock_list').html(data);
+                    $("#loading2").fadeOut();
+                    $("#stock_list").fadeIn();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#stock_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+
+</script>
+    <div style="width: 1660px;height:140px;background:#ffcccc; border-style:double none;">
+        絞込条件<br>
+        <div class="filter_item" style="float:left;">
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">
+                    包装日：<INPUT id="datepicker5" class="datepicker" TYPE=text VALUE="" NAME="start_packed_date" size=3 style="width:110px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    ～ <INPUT id="datepicker6" class="datepicker" TYPE=text VALUE="" NAME="end_packed_date" size=3 style="width:110px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    ロットNO：<INPUT id="selectstartlotno7" TYPE=text VALUE="" NAME="start_lot_no" size=3 style="width:60px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    ～ <INPUT id="selectendlotno7" TYPE=text VALUE="" NAME="end_lot_no" size=3 style="width:60px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    保管倉庫：<select id="selectwarehouse7"　name="warehouse_code" style="width:160px; height:30px">
+                        <option value=""></option>
+                        {% for warehouse_list in warehouse_list %}
+                            <option value="{{ warehouse_list.warehouse_code }}">{{ warehouse_list.warehouse_name }}</option>
+                        {% endfor %}
+                        </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    型：<select id="selectgradetype7"　name="grade_type" style="width:55px; height:30px">
+                        <option value=""></option>
+                        {% for grade_type_list in grade_type_list %}
+                            <option value="{{ grade_type_list.grade_type_code }}">{{ grade_type_list.grade_type_code_name }}</option>
+                        {% endfor %}
+                        </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    品目グループ：<INPUT id="selectitemgroup7" TYPE=text VALUE="{{ item_group }}" NAME="item_group" size=3 style="width:160px; height:20px; background-color: #FFFFBB;"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    品目コード：<INPUT id="selectitemcode7" TYPE=text VALUE="{{ item_code }}" NAME="item_code" size=3 style="width:160px; height:20px; background-color: #FFFFBB;"/>
+                </div>
+                <br>
+                <div class="item" style="float:left;margin-left:15px;">
+                    品目名：<INPUT id="selectitemname7" TYPE=text VALUE="{{ item_name }}" NAME="item_name" size=3 style="width:230px; height:20px; background-color: #FFFFBB;"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    袋数：<INPUT id="selectstartpackedamount7" TYPE=text VALUE="" NAME="start_packing_amount" size=3 style="width:40px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    ～ <INPUT id="selectendpackedamount7" TYPE=text VALUE="" NAME="end_packing_amount" size=3 style="width:40px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    数量：<INPUT id="selectstartamount7" TYPE=text VALUE="" NAME="start_amount" size=3 style="width:50px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    ～ <INPUT id="selectendamount7" TYPE=text VALUE="" NAME="end_amount" size=3 style="width:50px; height:20px"/>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    予約先：<select id="selectreservecompany7"　name="reserve_company" style="width:250px; height:30px">
+                        <option value=""></option>
+                        {% for company_list in company_list %}
+                            {% if company_list.company_code == place_for_receipt_of_goods %}
+                                <option value="{{ company_list.company_code }}" selected="selected">{{ company_list.company_name }}</option>
+                            {% else %}
+                                <option value="{{ company_list.company_code }}">{{ company_list.company_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                        </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    品質情報：<select id="selectquality17"　name="quality1" style="width:100px; height:30px">
+                        <option value=""></option>
+                        {% for quality_status_list in quality_status_list %}
+                            {% if quality_status_list.quality_status_code == quality_status_code %}
+                                <option value="{{ quality_status_list.quality_status_code }}" selected="selected">{{ quality_status_list.quality_status_name }}</option>
+                            {% else %}
+                                <option value="{{ quality_status_list.quality_status_code }}">{{ quality_status_list.quality_status_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                        </select>
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    or<select id="selectquality27"　name="quality2" style="width:100px; height:30px">
+                        <option value=""></option>
+                        {% for quality_status_list in quality_status_list %}
+                            <option value="{{ quality_status_list.quality_status_code }}">{{ quality_status_list.quality_status_name }}</option>
+                        {% endfor %}
+                        </select>
+                </div>
+                <div class="item" style="float:left;margin-left:5px;">
+                    or<select id="selectquality37"　name="quality3" style="width:100px; height:30px">
+                        <option value=""></option>
+                        {% for quality_status_list in quality_status_list %}
+                            <option value="{{ quality_status_list.quality_status_code }}">{{ quality_status_list.quality_status_name }}</option>
+                        {% endfor %}
+                        </select>
+                </div>
+                <br>
+                <div class="item" style="float:left;margin-left:12px;">
+                        <input id="incidental_work_order1_s" type="checkbox" value="{{ supplemental_task1_flag }}" >{{ supplemental_task1_flag_name }}　　
+                        <input id="incidental_work_order2_s" type="checkbox" value="{{ supplemental_task2_flag }}" >{{ supplemental_task2_flag_name }}　　
+                        <input id="incidental_work_order3_s" type="checkbox" value="{{ supplemental_task3_flag }}" >{{ supplemental_task3_flag_name }}　　
+                        <input id="incidental_work_order4_s" type="checkbox" value="{{ supplemental_task4_flag }}" >{{ supplemental_task4_flag_name }}　　
+                        <input id="incidental_work_order5_s" type="checkbox" value="{{ supplemental_task5_flag }}" >{{ supplemental_task5_flag_name }}　　
+                        <input id="incidental_work_order6_s" type="checkbox" value="{{ supplemental_task6_flag }}" >{{ supplemental_task6_flag_name }}　　
+                        <input id="incidental_work_order7_s" type="checkbox" value="{{ supplemental_task7_flag }}" >{{ supplemental_task7_flag_name }}　　
+                        <input id="incidental_work_order8_s" type="checkbox" value="{{ supplemental_task8_flag }}" >{{ supplemental_task8_flag_name }}　　
+                        <input id="incidental_work_order9_s" type="checkbox" value="{{ supplemental_task9_flag }}" >{{ supplemental_task9_flag_name }}　　
+                        <input id="incidental_work_order10_s" type="checkbox" value="{{ supplemental_task10_flag }}" >{{ supplemental_task10_flag_name }}　　
+                </div>
+                <br>
+                <div class="item" style="float:left;margin-left:12px;">
+                        <input id="incidental_work_order11_s" type="checkbox" value="{{ supplemental_task11_flag }}" >{{ supplemental_task11_flag_name }}　　
+                        <input id="incidental_work_order12_s" type="checkbox" value="{{ supplemental_task12_flag }}" >{{ supplemental_task12_flag_name }}　　
+                        <input id="incidental_work_order13_s" type="checkbox" value="{{ supplemental_task13_flag }}" >{{ supplemental_task13_flag_name }}　　
+                        <input id="incidental_work_order14_s" type="checkbox" value="{{ supplemental_task14_flag }}" >{{ supplemental_task14_flag_name }}　　
+                        <input id="incidental_work_order15_s" type="checkbox" value="{{ supplemental_task15_flag }}" >{{ supplemental_task15_flag_name }}　　
+                        <input id="incidental_work_order16_s" type="checkbox" value="{{ supplemental_task16_flag }}" >{{ supplemental_task16_flag_name }}　　
+                        <input id="incidental_work_order17_s" type="checkbox" value="{{ supplemental_task17_flag }}" >{{ supplemental_task17_flag_name }}　　
+                        <input id="incidental_work_order18_s" type="checkbox" value="{{ supplemental_task18_flag }}" >{{ supplemental_task18_flag_name }}　　
+                        <input id="incidental_work_order19_s" type="checkbox" value="{{ supplemental_task19_flag }}" >{{ supplemental_task19_flag_name }}　　
+                        <input id="incidental_work_order20_s" type="checkbox" value="{{ supplemental_task20_flag }}" >{{ supplemental_task20_flag_name }}　　
+                </div>
+            </div>
+        </div>
+    </div>

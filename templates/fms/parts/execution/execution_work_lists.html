@@ -1,0 +1,270 @@
+<script>
+//工事一覧から選択された工事データの詳細の表示処理
+function execution_work_detail(id, work_id, budget_unique_id, budget_id, step_id, present_operator) {
+    if (step_id == 999999999) {
+        alert('工程完了の情報は「MotionBoard」で確認してください！！');
+    }else{
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var level5_step_id = $('#level5_step_id').val();
+        var new_step = Number(level5_step_id) + 1
+        var target = 'prospecificationunit';
+        var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+
+
+        $('<form/>', {action: '/isk_tools/fms/parts/execution/execution_detail_template/', method: 'post'})
+        .append($('<input/>', {type: 'hidden', name: 'id', value: id}))
+        .append($('<input/>', {type: 'hidden', name: 'work_id', value: work_id}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: budget_unique_id}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+        .append($('<input/>', {type: 'hidden', name: 'target', value: target}))
+        .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+        .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+        .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+        .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+        .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+        .append($('<input/>', {type: 'hidden', name: 'present_operator', value: present_operator}))
+        .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 1}))
+        .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'start_work_stop_flag', value: start_work_stop_flag}))
+        .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+        .appendTo(document.body)
+        .submit();
+    }
+}
+</script>
+<style type="text/css">
+.table table-strriped {
+    height: 1400px;
+    width:1900px;
+}
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.work_detail_pb{
+    width:40px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.return_flag{
+    width:40px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_budget_id{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_rev_no{
+    width:40px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_budget_no{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_budget_name{
+    width:230px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_id{
+    width:65px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_sub_id{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_step{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_next_person{
+    width:90px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_business_year{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_division{
+    width:140px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_department{
+    width:150px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.specification_person_in_charge{
+    width:90px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.planning_charge_person{
+    width:90px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_name{
+    width:250px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.days_stay{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_budget_class{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.work_process{
+    width:120px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if execution_work_lists_num > 0 %}
+            表示件数：{{ execution_work_lists_num }}件
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="work_detail_pb"></th>
+                        <th class="return_flag">差戻</th>
+                        <th class="work_id">工事ID</th>
+                        <th class="work_rev_no">Rev</th>
+                        <th class="work_step">進捗状況</th>
+                        <th class="work_next_person">次作業者</th>
+                        <th class="work_name">工事名</th>
+                        <th class="specification_person_in_charge">仕様書担当</th>
+                        <th class="planning_charge_person">計画担当</th>
+                        <th class="work_budget_id">予算ID</th>
+                        <th class="work_budget_no">予算NO</th>
+                        <th class="budget_class">工事区分</th>
+                        <th class="work_business_year">年度</th>
+                        <th class="work_budget_name">予算名</th>
+                        <th class="work_division">部門</th>
+                        <th class="work_department">部署</th>
+                        <th class="work_process">工程</th>
+                        <th class="days_stay">滞留日数</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for execution_work_lists in execution_work_lists %}
+                    <tr>
+                        <td class="work_detail_pb">
+                            <a href="#" id="{{ execution_work_lists.id }}" class="detailpb"
+                               onclick="execution_work_detail({{ execution_work_lists.id }},{{ execution_work_lists.construction_id }},{{ execution_work_lists.budget_unique_id }},{{ execution_work_lists.budget_id }},{{ execution_work_lists.step_id }}, '{{ execution_work_lists.present_operator }}');">詳細</a>
+                        </td>
+                        {% if execution_work_lists.return_flag == 1  %}
+                            <td class="return_flag"><font color="yellow" style="background-color:red; font-weight:bold">
+                                差戻
+                            </font></td>
+                        {% else %}
+                            <td class="return_flag"></td>
+                        {% endif %}
+                        <td class="work_id">
+                            {% if execution_work_lists.construction_id is not None %}
+                                {{ execution_work_lists.construction_id }}
+                            {% endif %}
+                        </td>
+                        <td class="work_rev_no">
+                            {% if execution_work_lists.rev_no is not None %}
+                                {{ execution_work_lists.rev_no }}
+                            {% endif %}
+                        </td>
+                        <td class="work_step">{{ execution_work_lists.step_name }}</td>
+                        <td class="work_next_person">
+                            {% if execution_work_lists.U1_last_name is not None and execution_work_lists.U1_first_name is not None %}
+                                {{ execution_work_lists.U1_last_name }}{{ execution_work_lists.U1_first_name }}
+                            {% endif %}
+                        </td>
+                        <td class="work_name">
+                            {% if execution_work_lists.work_name is not None %}
+                                {{ execution_work_lists.work_name }}
+                            {% endif %}
+                        </td>
+                        <td class="specification_person_in_charge">
+                            {% if execution_work_lists.U2_last_name is not None and execution_work_lists.U2_first_name is not None %}
+                                {{ execution_work_lists.U2_last_name }}{{ execution_work_lists.U2_first_name }}
+                            {% endif %}
+                        </td>
+                        <td class="planning_charge_person">
+                            {% if execution_work_lists.planningchargepersondata_last_name is not None and execution_work_lists.planningchargepersondata_first_name is not None %}
+                                {{ execution_work_lists.planningchargepersondata_last_name }}{{ execution_work_lists.planningchargepersondata_first_name }}
+                            {% endif %}
+                        </td>
+                        <td class="work_budget_id">{{ execution_work_lists.budget_id }}</td>
+                        <td class="work_budget_no">
+                            {% if execution_work_lists.bd_no is not None %}
+                                {{ execution_work_lists.bd_no }}
+                            {% endif %}
+                        </td>
+                        <td class="budget_class">{{ execution_work_lists.budget_class }}</td>
+                        <td class="work_business_year">
+                            {% if execution_work_lists.business_year_id is not None %}
+                                {{ execution_work_lists.business_year_id }}
+                            {% endif %}
+                        </td>
+                        <td class="work_budget_name">
+                            {% if execution_work_lists.budget_budget_name is not None %}
+                                {{ execution_work_lists.budget_budget_name }}
+                            {% endif %}
+                        </td>
+                        <td class="work_division">
+                            {% if execution_work_lists.division_name is not None %}
+                                {{ execution_work_lists.division_name }}
+                            {% endif %}
+                        </td>
+                        <td class="work_department">
+                            {% if execution_work_lists.department_name is not None %}
+                                {{ execution_work_lists.department_name }}
+                            {% endif %}
+                        </td>
+                        <td class="work_process">{{ execution_work_lists.process_cd }}:{{ execution_work_lists.process_name }}</td>
+                        {% if execution_work_lists.days_stay == None %}
+                            <td class="days_stay"></td>
+                        {% else %}
+                            <td class="days_stay">{{ execution_work_lists.days_stay }}</td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

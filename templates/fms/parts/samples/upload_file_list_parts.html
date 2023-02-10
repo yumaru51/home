@@ -1,0 +1,55 @@
+<script>
+//アップロードされたファイルリスト表示
+function get_upload_file() {
+    var delete_pb_disp_flag = $('#delete_pb_disp_flag').val();
+    // 単一の場合
+    var file_folder = $('#file_folder').val();
+    //　複数の場合
+    var file_folder = document.getElementById("file_folder").value;
+            $.ajax({
+                url: "/isk_tools/fms/parts/uploade_file_list/",
+                type: "POST",
+                data : {
+                    'file_folder': file_folder,
+                    'delete_pb_disp_flag' : delete_pb_disp_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#upload_file_list').empty();
+                    $('#upload_file_list').html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#upload_file_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+            <!–
+                ファイル取込画面では、削除可能FL(delete_pb_disp_flagのvalue)は「1」、読込画面なら削除可能FL(delete_pb_disp_flagのvalue)は「0」
+            –>
+            <input type="hidden" id="delete_pb_disp_flag" value="0 or 1">
+            <!–
+                「file_folderのvalue」の記述方法は、・・・
+            –>
+
+            <!–
+                対象が単一の場合
+            –>
+            <input type="hidden" id="file_folder" value="{{ file_folder }}">
+            <!–
+                対象が複数場合
+            –>
+            <select id="sel_file_folder" >対象
+                <option value="{{ file_folder1 }}">対象名1</option>
+                <option value="{{ file_folder2 }}">対象名2</option>
+                <option value="{{ file_folder3 }}">対象名3</option>
+                <option value="{{ file_folder4 }}">対象名4</option>
+            </select>
+            <!–
+                この下は共通（表示部分）
+            –>
+            <div id="upload_file_list"></div>

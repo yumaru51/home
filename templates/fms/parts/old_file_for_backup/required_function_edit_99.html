@@ -1,0 +1,348 @@
+<script>
+//容量単位選択のコンボボックスの選択を呼び出した値(引数?)と同期
+function rf_material_capacity_unit_value_change() {
+        var target_material_capacity_unit = $('#rf_material_capacity_unit').val();
+        if (target_material_capacity_unit != "") {
+            var pulldown_option = document.getElementById("sel_rf_material_capacity_unit").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_material_capacity_unit){
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//圧力単位選択のコンボボックスの選択を呼び出した値(引数?)と同期
+function rf_pressure_unit_change() {
+        var target_pressure_unit = $('#rf_pressure_unit').val();
+        if (target_pressure_unit != "") {
+            var pulldown_option = document.getElementById("sel_rf_pressure_unit").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_pressure_unit){
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//濃度単位選択のコンボボックスの選択を呼び出した値(引数?)と同期
+function rf_concentration_unit_change() {
+        var target_concentration_unit = $('#rf_concentration_unit').val();
+        if ( target_concentration_unit != "") {
+            var pulldown_option = document.getElementById("sel_rf_concentration_unit").getElementsByTagName('option');
+            var i = 0;
+            for(i=0;pulldown_option.length>i;i++){
+                if(pulldown_option[i].value == target_concentration_unit){
+                    pulldown_option[i].selected = true;
+                    break;
+                }
+            }
+        }
+}
+//要求機能登録･更新処理
+function required_function_entry(a) {
+    var budget_id = $('#target_budget_id').val();
+    if (budget_id == 0){
+        alert("予算データを先に登録(一時保存)してください！！");
+    }else{
+        var required_function = $('#required_function').val();
+        var budget_rev_no = $('#budget_rev_no').val();
+        var budget_required_function_id = $('#budget_required_function_id').val();
+        var action_type = a;
+        var sub_no = $('#rf_sub_no').val();
+        var material = $('#material_value').val();
+        var required_material_capacity = $('#required_material_capacity_value').val();
+        var material_capacity_unit = $('#rf_material_capacity_unit').val();
+        var required_cooling_temperature = $('#required_cooling_temperature_value').val();
+        var required_heating_temperature = $('#required_heating_temperature_value').val();
+        var temperature = $('#temperature_value').val();
+        var required_compress_pressure = $('#required_compress_pressure_value').val();
+        var required_vacuum_pressure = $('#required_vacuum_pressure_value').val();
+        var pressure = $('#pressure_value').val();
+        var pressure_unit = $('#rf_pressure_unit').val();
+        var required_moisture = $('#required_moisture_value').val();
+        var required_concentration = $('#required_concentration_value').val();
+        var concentration_unit = $('#rf_concentration_unit').val();
+        var required_particle_size = $('#required_particle_size_value').val();
+        var required_transfer_length = $('#required_transfer_length_value').val();
+        var required_others = $('#required_others').val();
+        var this_department = $('#user_department_cd').val();
+        var this_division = $('#user_division_cd').val();
+        var this_step = $('#this_step').val();
+        $.ajax({
+                url: "/isk_tools/fms/action/required_function_entry/",
+                type: "POST",
+                data : {
+                    'action_type' : action_type,
+                    'budget_id' : budget_id,
+                    'budget_rev_no' : budget_rev_no,
+                    'required_function' : required_function,
+                    'budget_required_function_id' : budget_required_function_id,
+                    'sub_no' : sub_no,
+                    'material' : material,
+                    'required_material_capacity' : required_material_capacity,
+                    'material_capacity_unit' : material_capacity_unit,
+                    'required_cooling_temperature' : required_cooling_temperature,
+                    'required_heating_temperature' : required_heating_temperature,
+                    'temperature' : temperature,
+                    'required_compress_pressure' : required_compress_pressure,
+                    'required_vacuum_pressure' : required_vacuum_pressure,
+                    'pressure' : pressure,
+                    'pressure_unit' : pressure_unit,
+                    'required_moisture' : required_moisture,
+                    'required_concentration' : required_concentration,
+                    'concentration_unit' : concentration_unit,
+                    'required_particle_size' : required_particle_size,
+                    'required_transfer_length' : required_transfer_length,
+                    'required_others' : required_others,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#budget_required_function_id').val(data.budget_required_function_id);
+                    $('#rf_sub_no').val(data.sub_no);
+                    //udget_required_function_list();･･･削除予定
+                    required_function_list();//要求機能一覧を表示するJS起動(detail_template.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+    }
+}
+//要求機能削除処理
+function required_function_delete() {
+    var budget_required_function_id = $('#budget_required_function_id').val();
+    var this_department = $('#user_department_cd').val();
+    var this_division = $('#user_division_cd').val();
+    var this_step = $('#this_step').val();
+    $.ajax({
+        url: "/isk_tools/fms/action/required_function_delete/",
+                type: "POST",
+                data : {
+                    'budget_required_function_id' : budget_required_function_id,
+                    'this_department' : this_department,
+                    'this_division' : this_division,
+                    'this_step' : this_step,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    $('#budget_required_function_id').val(0);
+                    required_function_list();//要求機能一覧を表示するJS起動(detail_template.html内にプログラム有)
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+//入力欄の値を変更したときに格納値の値を同期
+function value_change(a, b) {
+    var id_name = a;
+    var value = b;
+    var target_id_name = "#" + id_name + "_value"
+    $(target_id_name).val(value);
+}
+//容量単位選択のコンボボックスを変更したときに選択値と格納値を同期
+function material_capacity_unit_value_change(a) {
+    var value = a;
+    $('#rf_material_capacity_unit').val(value);
+}
+//圧力単位選択のコンボボックスを変更したときに選択値と格納値を同期
+function pressure_unit_value_change(a) {
+    var value = a;
+    $('#rf_pressure_unit').val(value);
+}
+//濃度単位選択のコンボボックスを変更したときに選択値と格納値を同期
+function concentration_unit_value_change(a) {
+    var value = a;
+    $('#rf_concentration_unit').val(value);
+}
+</script>
+
+<style type="text/css">
+div.scroll_function_div {
+  width: 440px;
+  height: 830px;
+  overflow: scroll;
+}
+</style>
+    <div>
+        <div class="scroll_function_div">
+            <input type="hidden" id="budget_required_function_id" value="{{ budget_required_function_id }}" size="4">
+            <input type="hidden" id="material_value" value="{{ material }}" size="4">
+            <input type="hidden" id="required_material_capacity_value" value="{{ required_material_capacity }}" size="4">
+            <input type="hidden" id="rf_material_capacity_unit" value="{{ material_capacity_unit }}" size="4">
+            <input type="hidden" id="required_cooling_temperature_value" value="{{ required_cooling_temperature }}" size="4">
+            <input type="hidden" id="required_heating_temperature_value" value="{{ required_heating_temperature }}" size="4">
+            <input type="hidden" id="temperature_value" value="{{ temperature }}" size="4">
+            <input type="hidden" id="required_compress_pressure_value" value="{{ required_compress_pressure }}" size="4">
+            <input type="hidden" id="required_vacuum_pressure_value" value="{{ required_vacuum_pressure }}" size="4">
+            <input type="hidden" id="pressure_value" value="{{ pressure }}" size="4">
+            <input type="hidden" id="rf_pressure_unit" value="{{ pressure_unit }}" size="4">
+            <input type="hidden" id="required_moisture_value" value="{{ required_moisture }}" size="4">
+            <input type="hidden" id="required_concentration_value" value="{{ required_concentration }}" size="4">
+            <input type="hidden" id="rf_concentration_unit" value="{{ concentration_unit }}" size="4">
+            <input type="hidden" id="required_particle_size_value" value="{{ required_particle_size }}" size="4">
+            <input type="hidden" id="required_transfer_length_value" value="{{ required_transfer_length }}" size="4">
+            <table>
+                <tr>
+                    <td><div ><font size="4">要求機能</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="required_function" value="{{ required_function }}" size="8"></font></div></td>
+                </tr>
+                <tr>
+                    <td><div><font size="4">サブNO</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><input type="text" id="rf_sub_no" value="{{ sub_no }}" size="2" readonly="readonly">※自動取得</font></div></td>
+                </tr>
+                {% if display_required_item_for_function_list.display_material_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">取扱物質</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="material" value="{{ material }}" size="24" onchange="value_change(id, value);" ></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_material_capacity_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求(処理)量</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_material_capacity" value="{{ required_material_capacity }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_material_capacity_unit_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">量単位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3">
+                            <select id="sel_rf_material_capacity_unit" name="sel_material_capacity_unit" onchange="material_capacity_unit_value_change(value);">
+                                <option value=""></option>
+                                {% for amount_unit_list in amount_unit_list %}
+                                    <option value="{{ amount_unit_list.unit_id }}" >{{ amount_unit_list.unit }}</option>
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_cooling_temperature_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求冷却温度</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_cooling_temperature" value="{{ required_cooling_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_heating_temperature_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求加熱温度</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_heating_temperature" value="{{ required_heating_temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_temperature_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">温度</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="temperature" value="{{ temperature }}" size="8" onchange="value_change(id, value);">℃</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_compress_pressure_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求圧縮圧</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_compress_pressure" value="{{ required_compress_pressure }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_vacuum_pressure_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求減圧</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_vacuum_pressure" value="{{ required_vacuum_pressure }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_pressure_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求圧力</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="pressure" value="{{ pressure }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_pressure_unit_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">圧力単位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3">
+                            <select id="sel_rf_pressure_unit" name="sel_pressure_unit" onchange="pressure_unit_value_change(value);">
+                                <option value=""></option>
+                                {% for pressure_unit_list in pressure_unit_list %}
+                                    <option value="{{ pressure_unit_list.unit_id }}" >{{ pressure_unit_list.unit }}</option>
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_moisture_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求水分</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_moisture" value="{{ required_moisture }}" size="8" onchange="value_change(id, value);">wt%</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_concentration_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求濃度</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_concentration" value="{{ required_concentration }}" size="8" onchange="value_change(id, value);"></font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_concentration_unit_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">濃度単位</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3">
+                            <select id="sel_rf_concentration_unit" name="sel_concentration_unit" onchange="concentration_unit_value_change(value);">
+                                <option value=""></option>
+                                {% for concentration_unit_list in concentration_unit_list %}
+                                    <option value="{{ concentration_unit_list.unit_id }}" >{{ concentration_unit_list.unit }}</option>
+                                {% endfor %}
+                            </select>
+                        </font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_particle_size_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求粒径</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_particle_size" value="{{ required_particle_size }}" size="8" onchange="value_change(id, value);">μm</font></div></td>
+                    </tr>
+                {% endif %}
+                {% if display_required_item_for_function_list.display_required_transfer_length_flag == 1 %}
+                    <tr>
+                        <td><div><font size="4">要求輸送距離</font></div></td>
+                        <td><div><font size="4">：　</font></div></td>
+                        <td><div><font size="3"><input type="text" id="required_transfer_length" value="{{ required_transfer_length }}" size="8" onchange="value_change(id, value);">m</font></div></td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td><div><font size="4">その他要求</font></div></td>
+                    <td><div><font size="4">：　</font></div></td>
+                    <td><div><font size="3"><textarea id="required_others" name="required_others" rows="10" cols="30" onchange="value_change(id, value);">{{ required_others }}</textarea></font></div></td>
+                </tr>
+
+            </table>
+            <input type="button" value="新規登録" onclick="required_function_entry(0);">　
+            <input type="button" value="　更新　" onclick="required_function_entry(1);">　　　　　　　　　
+            <input type="button" value="　削除　" onclick="required_function_delete();">
+        </div>
+    </div>
+

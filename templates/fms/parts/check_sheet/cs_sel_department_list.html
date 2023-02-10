@@ -1,0 +1,7 @@
+<div id="cs_filter_department" class="item" style="float:left;margin-left:15px;">部署：<select style="background-color:#FFFFFF;" id="sel_cs_department" name="sel_cs_department" onchange="cs_budget_id_filter()">
+    <option value=""></option>
+        {% for departments_list in filter_departments_list %}
+            <option value="{{ departments_list.department_cd }}">{{ departments_list.department_name }}</option>
+        {% endfor %}
+    </select>
+</div>

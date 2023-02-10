@@ -1,0 +1,6 @@
+<select id="sel_facility_code" name="sel_facility_code" onchange="equipment_filter();">
+        <option value="" hidden></option>
+    {% for facility_code_lists in facility_code_lists %}
+        <option value="{{ facility_code_lists.location_cd }}">{{ facility_code_lists.location_nm_1 }}</option>
+    {% endfor %}
+</select>

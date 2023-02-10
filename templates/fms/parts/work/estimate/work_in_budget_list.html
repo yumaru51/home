@@ -1,0 +1,73 @@
+                <input type="hidden" id="complete_flag" value="{{ complete_flag }}" >
+                <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5"
+                       style="border-collapse: collapse;">
+                    <thead class="scrollHead">
+                        <tr>
+                            {% if work_entry_possible_flag == 0 %}
+                            <th class="select_pb"></th>
+                            {% endif %}
+                            <th class="detail_pb"></th>
+                            <th class="work_id" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">工事ID</font>
+                            </th>
+                            <th class="work_name" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">工事名</font>
+                            </th>
+                            <th class="budget_price" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">予算見積額</font>
+                            </th>
+                            <th class="prospect_price" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">予算見積調整額</font>
+                            </th>
+                            <th class="step_name" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">進捗状況</font>
+                            </th>
+                            {% if return_pb_disp_flag == 1 %}
+                             <th class="return_pb" style="text-align:center; vertical-align:middle;">
+                                <font size="3" style="line-height:130%">差戻</font>
+                            </th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody class="scrollBody">
+
+                    {% if work_price_lists_num > 0 %}
+                        {% for work_price_lists in work_price_lists %}
+                            <tr onclick="work_detail({{ work_price_lists.work_unique_id }}, {{ work_price_lists.work_id }}, {{ work_price_lists.budget_unique_id }}, {{ work_price_lists.budget_id }})">
+                                {% if work_entry_possible_flag == 0 %}
+                                <td class="select_pb"><font size="4" style="line-height:130%">
+                                    <a href="#" id="{{ work_price_lists.id }}" class="select_pb"
+                                       onclick="display_prospect_price({{ work_price_lists.id }}, '{{ work_price_lists.prospect_price }}');">見積調整</a>
+                                </font></td>
+                                {% endif %}
+                                <td class="detail_pb"><font size="4" style="line-height:130%">
+                                    <a href="#" id="derail_{{ work_price_lists.id }}" class="select_pb"
+                                       onclick="work_detail_check({{ work_price_lists.work_unique_id }}, {{ work_price_lists.work_id }}, {{ work_price_lists.budget_unique_id }}, {{ work_price_lists.budget_id }});">詳細</a>
+                                </font></td>
+                                <td class="work_id">
+                                    <font size="4" style="line-height:130%"
+                                    >{% if work_price_lists.work_id is　not None %}{{ work_price_lists.work_id }}{% endif %}</font></td>
+                                <td class="work_name">
+                                    <font size="4" style="line-height:130%"
+                                    >{% if work_price_lists.work_name is　not None %}{{ work_price_lists.work_name }}{% endif %}</font></td>
+                                <td class="budget_price">
+                                    <font size="4" style="line-height:130%"
+                                    >{% if work_price_lists.estimate_price is　not None %}{{ work_price_lists.estimate_price }}{% endif %}</font></td>
+                                <td class="prospect_price">
+                                    <font size="4" style="line-height:130%"
+                                    >{% if work_price_lists.prospect_price is　not None %}{{ work_price_lists.prospect_price }}{% endif %}</font></td>
+                                <td class="step_name">
+                                    <font size="4" style="line-height:130%"
+                                    >{% if work_price_lists.step_name is　not None %}{{ work_price_lists.step_name }}{% endif %}</font></td>
+                               {% if return_pb_disp_flag == 1 %}
+                                    <td class="return_pb">
+                                        <input type="button" value="差戻" onclick="work_return({{ work_price_lists.work_id }},{{ work_price_lists.budget_id }});">
+                                    </td>
+                               {% endif %}
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <div>対象データなし</div>
+                    {% endif %}
+                    </tbody>
+                </table>

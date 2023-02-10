@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+<script language="javascript" type="text/javascript" charset="UTF-8" xmlns="http://www.w3.org/1999/html">
+
+function order_filter_call() {
+    var from_page = 14001;
+    var status1 = 100451;
+    var status2 = 100501;
+    var status3 = 0;
+    $.ajax({
+        url: "/imsds/parts/order_filter/",
+        type: "POST",
+        data : {
+                'from_page': from_page,
+                'status1': status1,
+                'status2': status2,
+                'status3': status3,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+        timeout: 1000000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $('#order_filter').empty();
+            $('#order_filter').html(data);
+            getorderdata(14001);
+        })
+        .fail(function(jqXHR,textStatus,errorThrown){
+            $('#order_filter').empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+function supplementaltask(a) {
+        var order_id = a ;
+        var from_page = 14001 ;
+        $.ajax({
+                url: "/imsds/parts/order_detail/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'from_page': from_page,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+
+                    $("#floatBox4Dialog").dialog({
+                        modal:true,
+                        width: 1700,
+                        height: 900,
+                        title:"付帯作業決定画面",
+                    });
+                    $('#order_ditail2').empty();
+                    $('#order_ditail2').html(data);
+                    supplemental_task_entry_pb(order_id);
+
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#order_ditail2').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function supplemental_task_entry_pb(a) {
+    var order_id = a ;
+        $.ajax({
+                url: "/imsds/action/supplemental_task_entry_pb/",
+                type: "POST",
+                data : {
+                    'order_id': order_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#supplemental_task_entry').empty();
+                    $('#supplemental_task_entry').html(data);
+                    //incidental_work_check();
+                    supplemental_task_list_refresh();
+                    supplemental_task_master_list_refresh();
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#supplemental_task_entry').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+function supplemental_task_entry(a) {
+    var to_status = a;
+    var order_id = $('#order_detail_id').val();
+    var other_supplemental_task_order = $('#other_supplemental_task_order').val();
+        $.ajax({
+            url: "/imsds/action/supplemental_task_entry/",
+            type: "POST",
+            data : {
+                    'order_id': order_id,
+                    'other_supplemental_task_order': other_supplemental_task_order,
+                    'to_status': to_status,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    alert(data.msg);
+                    ship_date_entry_pb(order_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+
+window.onload = function() {
+        order_filter_call();
+};
+</script>
+<style type="text/css">
+#order_list{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:150px;
+}
+#stock_list{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+#allocation_result_list{display:none;}
+#loading3{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:600px;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">付帯作業管理</h2>
+    </div>
+
+    <div class="pagetitle">
+        <input type="hidden" id="this_page" value="1">
+        <div>
+            <input type="button" name="getorderdata" value=" 受注データ更新 " onclick="getorderdata(14001);">　　
+        </div>
+    </div>
+    <div id="order_filter"></div>
+    <div>
+            受注リスト
+    </div>
+
+    <div id="loading">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+
+    <div id="order_list" style="width: 1680px;">
+    </div>
+
+    <div id="floatBox4Dialog" style="display:none;">
+        <div id="order_ditail2" style="width: 1680px;">
+        </div>
+        <div id="supplemental_task_entry" style="width: 1680px;">
+        </div>
+    </div>
+
+{% endblock %}

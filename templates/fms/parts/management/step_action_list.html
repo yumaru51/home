@@ -1,0 +1,103 @@
+<script>
+//進捗工程での操作の詳細表示処理
+function step_action_detail(a) {
+    var id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/step_action_detail/",
+                type: "POST",
+                data : {
+                    'id' : id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#step_action_id').val(data.step_action_id);
+                    $('#step_action_step_id').val(data.step_action_step_id);
+                    $('#step_action_action_cd').val(data.step_action_action_cd);
+                    $('#step_action_next_step').val(data.step_action_next_step);
+                    $('#step_action_target').val(data.step_action_target);
+                    $('#step_action_display_order').val(data.step_action_display_order);
+                    $('#step_action_lost_flag').val(data.step_action_lost_flag);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.step_id{
+    width:100px;
+}
+.action_cd{
+    width:200px;
+}
+.next_step{
+    width:100px;
+}
+.target{
+    width:100px;
+}
+.display_order{
+    width:80px;
+}
+.lost_flag{
+    width:50px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+
+        {% if step_action_lists_num > 0 %}
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="step_id">ステップID</th>
+                        <th class="action_cd">アクションCD</th>
+                        <th class="next_step">次ステップ</th>
+                        <th class="target">対象</th>
+                        <th class="display_order">表示順</th>
+                        <th class="lost_flag">無効FL</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for step_action_lists in step_action_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" class="detailpb" onclick="step_action_detail({{ step_action_lists.id }});">詳細</a>
+                        </td>
+                        <td class="step_id">{{ step_action_lists.step_id }}</td>
+                        <td class="action_cd">{{ step_action_lists.action_cd }}</td>
+                        <td class="next_step">{{ step_action_lists.next_step }}</td>
+                        <td class="target">{{ step_action_lists.target }}</td>
+                        <td class="display_order">{{ step_action_lists.display_order }}</td>
+                        <td class="lost_flag">{{ step_action_lists.lost_flag }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

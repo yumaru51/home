@@ -1,0 +1,78 @@
+<script>
+//選択した要求仕様の表示処理
+function required_spec_detail(a) {
+        var required_spec_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/required_spec_detail/",
+                type: "POST",
+                data : {
+                    'required_spec_id' : required_spec_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#rs_no').val(data.no);
+                    $('#required_spec').val(data.required_spec);
+                    $('#required_spec_id').val(data.required_spec_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.rs_scrollHead,tbody.rs_scrollBody{
+    display:block;
+}
+tbody.rs_scrollBody{
+    overflow-y:scroll;
+    height:800px;
+}
+td,th{
+    table-layout:fixed;
+}
+.select_pb{
+    width:40px;
+    text-align: center;
+}
+.sub_no{
+    width:40px;
+    font-size: 120%;
+}
+.required_spec{
+    width:505px;
+    font-size: 120%;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="rs_scrollHead">
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <th class="select_pb" ></th>
+                        {% endif %}
+                        <th class="sub_no" >No</th>
+                        <th class="required_spec" >要求仕様</th>
+                    </tr>
+                </thead>
+                <tbody class="rs_scrollBody">
+                {% if required_specification_lists_num > 0 %}
+                {% for required_specification_lists in required_specification_lists %}
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <td class="select_pb">
+                                <a href="#" id="{{ required_specification_lists.id }}" class="select_pb" onclick="required_spec_detail(id);">選択</a>
+                            </td>
+                        {% endif %}
+                        <td class="sub_no">{{ required_specification_lists.no }}</td>
+                        <td class="required_spec"><textarea id="required_spec" name="required_spec" rows="18" cols="54" readonly>{{ required_specification_lists.required_spec }}</textarea></td>
+                    </tr>
+                {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>

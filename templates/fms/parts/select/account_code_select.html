@@ -1,0 +1,9 @@
+                    <font size="3">
+                        <input type="hidden" id="account_code" value="{{ account_cd }}">
+                        <select id="sel_account_code" name="sel_account_code" onchange= "account_code_change(value);">
+                            <option value=""></option>
+                            {% for account_code_lists in account_code_lists %}
+                                <option value="{{ account_code_lists.勘定コード }}">{{ account_code_lists.勘定コード }}: {{ account_code_lists.テキスト短 }}</option>
+                            {% endfor %}
+                        </select>　※緊急工事は必須
+                    </font>

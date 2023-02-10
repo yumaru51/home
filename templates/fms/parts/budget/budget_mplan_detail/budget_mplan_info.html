@@ -1,0 +1,456 @@
+{% load humanize %}
+
+<script>
+//操作PBを非表示にするプログラム
+function action_button_empty() {
+    $('#budget_budget_detail_action_button').empty();
+    $('#probudgetunit1_action_button').empty();
+}
+</script>
+<style type="text/css">
+div.scroll_budget_info_div {
+  width: 1880px;
+  height: 780px;
+  overflow: scroll;
+}
+td, th {
+    font-size: 13px;
+    line-height: 16px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+    padding: 0px 0px 0px 2px;
+    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">{{ budget_step_name }}</h2>
+    </div>
+    <input type="hidden" id="budget_detail_id" value="{{ budget_lists.id }}">
+    <input type="hidden" id="last_operation_step" value="{{ last_operation_step }}">
+    <input type="hidden" id="last_operator" value="{{ last_operator }}">
+    <input type="hidden" id="charge_department_class" value="{{ charge_department_class }}">
+    <input type="hidden" id="action" value="{{ action }}">
+    <input type="hidden" id="action_sub" value="{{ action_sub }}">
+    <input type="hidden" id="this_user" value="{{ t_username }}">
+    <input type="hidden" id="budget_rev_no" value="{{ budget_rev_no }}">
+    <input type="hidden" id="budget_charge_person_hidden_value" value="{{ budget_data.budget_person | default_if_none:'' }}">
+    <div id="budget_budget_detail_action_button" style="width: auto;"></div>
+
+    <font size="5">
+    <div>予算情報</div>
+    </font>
+    <div class="scroll_budget_info_div">
+    <div style="float:left;width:640px;">
+        <table cellpadding="10" cellspacing="10">
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算ＩＤ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="5">{{ budget_data.budget_id | default_if_none:'' }}</font></div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算状態</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    <font size="5">{{ condition_name | default_if_none:'' }}</font>
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">年度</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.business_year | default_if_none:'' }}</font>
+                    {% elif budget_data.business_year == old_budget_data.business_year %}
+                        <font size="5" color="black">{{ budget_data.business_year | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.business_year | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">工事区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_class_name | default_if_none:'' }}</font>
+                    {% elif budget_data.budget_class == old_budget_data.budget_class %}
+                        <font size="5" color="black">{{ budget_class_name | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_class_name | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">申請希望額</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.mplan_desired_amount | default_if_none:''| intcomma }}</font>
+                    {% elif budget_data.mplan_desired_amount == old_budget_data.mplan_desired_amount %}
+                        <font size="5" color="black">{{ budget_data.mplan_desired_amount | default_if_none:''| intcomma }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.mplan_desired_amount | default_if_none:''| intcomma }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">申請後調整額</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.mplan_adjustment_amount | default_if_none:''| intcomma }}</font>
+                    {% elif budget_data.mplan_adjustment_amount == old_budget_data.mplan_adjustment_amount %}
+                        <font size="5" color="black">{{ budget_data.mplan_adjustment_amount | default_if_none:''| intcomma }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.mplan_adjustment_amount | default_if_none:''| intcomma }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">申請希望額根拠</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.mplan_basis.name | default_if_none:'' }}</font>
+                    {% elif budget_data.mplan_basis_id == old_budget_data.mplan_basis_id %}
+                        <font size="5" color="black">{{ budget_data.mplan_basis.name | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.mplan_basis.name | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">申請額根拠コメント</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.mplan_basis_comment | default_if_none:'' }}</font>
+                    {% elif budget_data.mplan_basis_comment == old_budget_data.mplan_basis_comment %}
+                        <font size="5" color="black">{{ budget_data.mplan_basis_comment | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.mplan_basis_comment | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">仕様単位の積み上げ</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ application_price | default_if_none:''| intcomma  }}</font>
+                    {% elif budget_data.application_price == old_budget_data.application_price %}
+                        <font size="5" color="black">{{ application_price | default_if_none:''| intcomma  }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ application_price | default_if_none:''| intcomma  }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算見積額</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_price | default_if_none:'' }}</font>
+                    {% elif budget_data.budget_price == old_budget_data.budget_price %}
+                        <font size="5" color="black">{{ budget_price | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_price | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">部署</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ department_name | default_if_none:'' }}</font>
+                    {% elif budget_data.budget_department == old_budget_data.budget_department %}
+                        <font size="5" color="black">{{ department_name | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ department_name | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">原課担当者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_department_charge_person_name | default_if_none:'' }}</font>
+                    {% elif budget_data.budget_department_charge_person == old_budget_data.budget_department_charge_person %}
+                        <font size="5" color="black">{{ budget_department_charge_person_name | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_department_charge_person_name | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">予算担当者</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_person_name | default_if_none:'' }}</font>
+                    {% elif budget_data.budget_person == old_budget_data.budget_person %}
+                        <font size="5" color="black">{{ budget_person_name | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_person_name | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">設備工程</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.facility_process | default_if_none:'' }}</font>
+                    {% elif budget_data.facility_process == old_budget_data.facility_process %}
+                        <font size="5" color="black">{{ budget_data.facility_process | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.facility_process | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">依頼名</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.request_name | default_if_none:'' }}</font>
+                    {% elif budget_data.request_name == old_budget_data.request_name %}
+                        <font size="5" color="black">{{ budget_data.request_name | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.request_name | default_if_none:'' }}</font>
+                    {% endif %}
+                    </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">希望着工日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.start_date | default_if_none:'' }}</font>
+                    {% elif budget_data.start_date == old_budget_data.start_date %}
+                        <font size="5" color="black">{{ budget_data.start_date | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.start_date | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">希望完工日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.end_date | default_if_none:'' }}</font>
+                    {% elif budget_data.end_date == old_budget_data.end_date %}
+                        <font size="5" color="black">{{ budget_data.end_date | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.end_date | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">希望納期日</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.delivery_date | default_if_none:'' }}</font>
+                    {% elif budget_data.delivery_date == old_budget_data.delivery_date %}
+                        <font size="5" color="black">{{ budget_data.delivery_date | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.delivery_date | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">定修区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{ budget_data.asdm_flag | default_if_none:'' }}</font>
+                    {% elif budget_data.asdm_flag == old_budget_data.asdm_flag %}
+                        <font size="5" color="black">{{ budget_data.asdm_flag | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{ budget_data.asdm_flag | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">中計評価</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num != 0 %}
+                        <font size="4" color="black">
+                            {% if budget_data.mpaln_evaluation_id != old_budget_data.mpaln_evaluation_id %}
+                                <font color="red">{{ budget_data.mpaln_evaluation.criteria_detail | default:'未選択' }}</font>
+                            {% else %}
+                                <font color="black">{{ budget_data.mpaln_evaluation.criteria_detail | default:'未選択' }}</font>
+                            {% endif %}
+                        </font>
+                    {% else %}
+                        <font size="4" color="black">
+                            {{ budget_data.mpaln_evaluation.criteria_detail | default_if_none:'' }}
+                        </font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">物質情報入力の該当</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    <font size="5"
+                    {% if old_budget_data_num == 0 %}
+                        color="black"
+                    {% elif budget_data.check_material_flag == old_budget_data.check_material_flag %}
+                         color="black"
+                    {% else %}
+                        color="red"
+                    {% endif %}
+                            >{{ budget_data.check_material_flag | default:'未選択' }}</font>
+                </div></td>
+            </tr>
+        </table>
+    </div>
+    <div style="float:left;width:660px;" >
+        <table>
+            <tr>
+                <td><div style="padding: 5px 0px;"><font size="4">目的区分</font></div></td>
+                <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                <td><div style="padding: 5px 0px;">
+                    {% if old_budget_data_num == 0 %}
+                        <font size="5" color="black">{{  budget_data.purpose_class | default_if_none:'' }}</font>
+                    {% elif budget_data.purpose_class == old_budget_data.purpose_class %}
+                        <font size="5" color="black">{{  budget_data.purpose_class | default_if_none:'' }}</font>
+                    {% else %}
+                        <font size="5" color="red">{{  budget_data.purpose_class | default_if_none:'' }}</font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">目的詳細</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                    {% if old_budget_data_num == 0 %}
+                        <font size="4" color="black"><textarea name="purpose" rows="8" cols="45" style="color:black;" readonly>{{ budget_data.purpose | default_if_none:'' }}</textarea></font>
+                    {% elif budget_data.purpose == old_budget_data.purpose %}
+                        <font size="4" color="black"><textarea name="purpose" rows="8" cols="45" style="color:black;" readonly>{{ budget_data.purpose | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4" color="red"><textarea name="purpose" rows="8" cols="45" style="color:red;" readonly>{{ budget_data.purpose | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">依頼内容</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                    {% if old_budget_data_num == 0 %}
+                        <font size="4" color="black"><textarea name="purpose" rows="8" cols="45" style="color:black;" readonly>{{ budget_data.request_detail | default_if_none:'' }}</textarea></font>
+                    {% elif budget_data.request_detail == old_budget_data.request_detail %}
+                        <font size="4" color="black"><textarea name="purpose" rows="8" cols="45" style="color:black;" readonly>{{ budget_data.request_detail | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4" color="red"><textarea name="purpose" rows="8" cols="45" style="color:red;" readonly>{{ budget_data.request_detail | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">懸念事項(申請背景)</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                    {% if old_budget_data_num == 0 %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.mplan_concerns | default_if_none:'' }}</textarea></font>
+                    {% elif budget_data.mplan_concerns == old_budget_data.mplan_concerns %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.mplan_concerns | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4" color="red"><textarea name="purpose" rows="5" cols="45" style="color:red;" readonly>{{ budget_data.mplan_concerns | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">効果</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                    {% if old_budget_data_num == 0 %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.effect| default_if_none:''  }}</textarea></font>
+                    {% elif budget_data.effect == old_budget_data.effect %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.effect | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4" color="red"><textarea name="purpose" rows="5" cols="45" style="color:red;" readonly>{{ budget_data.effect | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">操業への影響</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                    {% if old_budget_data_num == 0 %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.influence_for_operation | default_if_none:'' }}</textarea></font>
+                    {% elif budget_data.influence_for_operation == old_budget_data.influence_for_operation %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.influence_for_operation | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4" color="red"><textarea name="purpose" rows="5" cols="45" style="color:red;" readonly>{{ budget_data.influence_for_operation | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">品質への影響</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                    {% if old_budget_data_num == 0 %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.influence_for_quality | default_if_none:'' }}</textarea></font>
+                    {% elif budget_data.influence_for_quality == old_budget_data.influence_for_quality %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.influence_for_quality | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4" color="red"><textarea name="purpose" rows="5" cols="45" style="color:red;" readonly>{{ budget_data.influence_for_quality | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">除去資産</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                    {% if old_budget_data_num == 0 %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.remove_assets | default_if_none:'' }}</textarea></font>
+                    {% elif budget_data.remove_assets == old_budget_data.remove_assets %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.remove_assets | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4" color="red"><textarea name="purpose" rows="5" cols="45" style="color:red;" readonly>{{ budget_data.remove_assets | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+            <tr>
+                <td><div><font size="4">備考</font></div></td>
+                <td><div><font size="4">：　</font></div></td>
+                <td><div>
+                    {% if old_budget_data_num == 0 %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.budget_rem | default_if_none:'' }}</textarea></font>
+                    {% elif budget_data.budget_rem == old_budget_data.budget_rem %}
+                        <font size="4" color="black"><textarea name="purpose" rows="5" cols="45" style="color:black;" readonly>{{ budget_data.budget_rem | default_if_none:'' }}</textarea></font>
+                    {% else %}
+                        <font size="4" color="red"><textarea name="purpose" rows="5" cols="45" style="color:red;" readonly>{{ budget_data.budget_rem | default_if_none:'' }}</textarea></font>
+                    {% endif %}
+                </div></td>
+            </tr>
+        </table>
+    </div>
+    <div style="float:left;width:500px;" >
+        <div><h2 class="page-header">関係法規</h2>
+            <div id="budget_law_list_in_info"></div>
+        </div>
+        <div><h2 class="page-header">関連機器</h2>
+            <div id="budget_equipment_list_in_info"></div>
+        </div>
+    </div>
+    </div>
+        <!--UploadFileList        -->
+            <input type="hidden" id="file_target" name="file_target" value="{{ target }}">
+            <input type="hidden" id="file_budget_id" name="file_budget_id" value="{{ target_budget_id }}">
+            <input type="hidden" id="file_work_id" name="file_work_id" value="{{ target_work_id }}">
+            <input type="hidden" id="div_id_name" name="div_id_name" value="{{ div_id_name }}">
+            <div id="upload_file_list_{{ div_id_name }}"></div>
+        <!--UploadFileList        -->
+    <div style="clear: both;"></div>
+
+

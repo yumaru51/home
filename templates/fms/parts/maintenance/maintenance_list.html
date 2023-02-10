@@ -1,0 +1,397 @@
+<script>
+//異常報告一覧から選択された異常報告データの詳細の表示処理
+function phenomenon_detail(id,phenomenon_id,step_id) {
+    if (step_id == 999999999) {
+        alert('工程完了の情報は「MotionBoard」で確認してください！！');
+    }else{
+        if ('{{ list_type }}' == 'copy'){
+            // 常に別タブで表示するために新規タブ名をランダム化
+            target_tab = String(Math.random());
+            window.open('', target_tab);
+            var level5_step_id = 232009901;
+            // コピー対象詳細画面用にstep上書き
+            step_id = 232009902;
+        }else{
+            target_tab= ''
+            var level5_step_id = $('#level5_step_id').val();
+        }
+        var budget_id = 0;
+        var budget_unique_id = 0;
+        var user_division_cd = $('#user_division_cd').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var user_authority = $('#user_authority').val();
+        var confirm_user = $('#confirm_user').val();
+        var permit_user = $('#permit_user').val();
+        var new_step = Number(level5_step_id) + 1;
+        $('<form/>', {action: '/isk_tools/fms/parts/common/detail_template/', target: target_tab, method: 'post'})
+        .append($('<input/>', {type: 'hidden', name: 'progress_id', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_id', value: budget_id}))
+        .append($('<input/>', {type: 'hidden', name: 'budget_unique_id', value: budget_unique_id}))
+        .append($('<input/>', {type: 'hidden', name: 'phenomenon_unique_id', value: id}))
+        .append($('<input/>', {type: 'hidden', name: 'phenomenon_id', value: phenomenon_id}))
+        .append($('<input/>', {type: 'hidden', name: 'target', value: 'phenomenon'}))
+        .append($('<input/>', {type: 'hidden', name: 'new_step', value: new_step}))
+        .append($('<input/>', {type: 'hidden', name: 'user_division_cd', value: user_division_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_department_cd', value: user_department_cd}))
+        .append($('<input/>', {type: 'hidden', name: 'user_authority', value: user_authority}))
+        .append($('<input/>', {type: 'hidden', name: 'confirm_user', value: confirm_user}))
+        .append($('<input/>', {type: 'hidden', name: 'permit_user', value: permit_user}))
+        .append($('<input/>', {type: 'hidden', name: 'level5_step_id', value: level5_step_id}))
+        .append($('<input/>', {type: 'hidden', name: 'step_id', value: step_id}))
+        .append($('<input/>', {type: 'hidden', name: 'select_tab', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'copy_check', value: 0}))
+        .append($('<input/>', {type: 'hidden', name: 'csrfmiddlewaretoken', value: '{{ csrf_token }}'}))
+        .appendTo(document.body)
+        .submit();
+    }
+}
+
+//故障対応一覧のコピー選択時の処理
+function maintenance_copy_type(target_phenomenon_unique_id){
+    this_step = Number($('#this_step').val());
+    if (this_step == 231001001){
+        phenomenon_copy(target_phenomenon_unique_id);
+    }else if(this_step == 231001011){
+        measure_copy(target_phenomenon_unique_id);
+    }
+}
+
+//異常報告コピー処理
+function phenomenon_copy(target_phenomenon_unique_id){
+
+            $.ajax({
+                url: "/isk_tools/fms/action/phenomenon_copy/",
+                type: "POST",
+                data : {
+                    'target_phenomenon_unique_id': target_phenomenon_unique_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    // 案件名
+                    if (!$('#project_title').val()){
+                        $('#project_title').val(data.project_title);
+                    }
+                    // 発見者
+                    if (!$('#sel_discovery_person_div').val()){
+                        $('#sel_discovery_person_div').val(data.username);
+                    }
+                    // 状況
+                    if (!$('#condition').val()){
+                        $('#condition').val(data.m_condition_cd_skey);
+                    }
+                    // 管理区分
+                    if (!$('#mgt_cls').val()){
+                        $('#mgt_cls').val(data.m_mgt_cls_skey);
+                        equipment_list_change();
+                        condition_list_change(data.m_condition_cd_skey);
+                    }
+                    // 工場
+                    if (!$('#facility').val()){
+                        $('#facility').val(data.m_location_skey);
+                        equipment_list_change();
+                    }
+                    // 状況詳細
+                    if (!$('#condition_detail').val()){
+                        $('#condition_detail').val(data.condition_detail);
+                    }
+                    // 改善提案
+                    if (!$('#improvement_proposal').val()){
+                        $('#improvement_proposal').val(data.improvement_proposal);
+                    }
+
+                    alert(data.msg);
+                    if(data.measure_data_num > 0 ){
+                        if(window.confirm('対応方針をコピーしますか？')){
+                            measure_copy(data.id);
+                        }
+                    }
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+// 対応方針コピー処理
+function measure_copy(target_phenomenon_unique_id){
+
+    $.ajax({
+            url: "/isk_tools/fms/action/measure_copy/",
+            type: "POST",
+            data : {
+                'target_phenomenon_unique_id': target_phenomenon_unique_id,
+                'csrfmiddlewaretoken': "{{ csrf_token }}"
+            },
+            timeout: 10000,
+            dataType: 'json',
+            cache : false,
+            })
+            .done(function(data){
+                // 工事/依頼内容
+                if (!$('#measure_order_detail').val()){
+                    $('#measure_order_detail').val(data.measure_order_detail);
+                }
+                // 案件区分
+                if (!$('#sel_item_class').val()){
+                    $('#sel_item_class').val(data.m_exe_cls_skey);
+                    $('#item_class').val(data.m_exe_cls_skey);
+                }
+                // 故障/作業種別
+                if (!$('#sel_malfunction_class').val()){
+                    $('#sel_malfunction_class').val(data.malfunction_class);
+                    $('#malfunction_class').val(data.malfunction_class);
+                }
+                // 原課担当部署
+                if (!$('#order_department').val()){
+                    $('#order_department').val(data.department_cd);
+                    order_person_list_filter();
+                }
+                // 原課担当者
+                if (!$('#sel_person').val()){
+                    $('#sel_person').val(data.username);
+                    $('#person').val(data.username);
+                }
+                // 指図書No
+                if (!$('#sel_instruction_no').val()){
+                    $('#instruction_no').val(data.instruction_no);
+                    instruction_no_value_change();
+                }
+                // 原課センター
+                if (!$('#sel_cost_center').val()){
+                    $('#cost_center').val(data.cost_center);
+                    cost_center_value_change();
+                }
+                // 勘定コード
+                if (!$('#sel_account_code').val()){
+                    $('#sel_account_code').val(data.account_cd);
+                    $('#account_code').val(data.account_cd);
+                }
+                // 整備診断区分
+                $('#maintenance_diagnosis').val(data.diagnosis_class);
+                maintenance_diagnosis_radio_value_set();
+                // 想定依頼業者
+                if (!$('#desired_vendor').val()){
+                    $('#desired_vendor').val(data.desired_vendor);
+                }
+                // 依頼状況
+                if (!$('#maintenance_status').val()){
+                    $('#maintenance_status').val(data.maintenance_status);
+                    maintenance_status_radio_value_set();
+                }
+                // 依頼受付者
+                if (!$('#orders_received_person').val()){
+                    $('#orders_received_person').val(data.orders_received_person);
+                }
+                alert(data.msg);
+            })
+           .fail(function(jqXHR,textStatus,errorThrown){
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+</script>
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:420px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:57px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.return_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.copy_pb{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+    text-align: center;
+}
+.phenomenon_id{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.sub_no{
+    width:70px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.condition{
+    width:140px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.equip_no {
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.step{
+    width:160px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.next_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.discoverer{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.discovery_date{
+    width:150px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.business_year{
+    width:60px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.project_title{
+    width:340px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.department{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.construction_name{
+    width:280px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.order_person{
+    width:100px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.desired_date{
+    width:220px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.plan_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.PM_class{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.process{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.cost_center{
+    width:190px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.rem{
+    width:240px;
+    font-size: 120%;
+    padding: 7px 0px;
+    overflow: hidden;
+}
+.supplemental_task_flag{
+    width:50px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+.days_stay{
+    width:80px;
+    font-size: 120%;
+    padding: 7px 0px;
+}
+tr:nth-child(2n+1) {
+    {% if list_type == 'copy' %}
+    background: #DDDDDD;
+    {% else %}
+    background: #EEFFFF;
+    {% endif %}
+}
+</style>
+
+        {% if phenomenon_lists_num > 0 %}
+            表示件数：{{ phenomenon_lists_num }}件
+
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        {% if list_type == 'normal'  %}
+                            <th class="return_flag">差戻</th>
+                        {% elif list_type == 'copy' %}
+                            <th class="copy_pb"></th>
+                        {% else %}
+                        {% endif %}
+                        <th class="phenomenon_id">案件ID</th>
+                        <th class="step">進捗状況</th>
+                        <th class="project_title">案件名</th>
+                        <th class="department">担当部署</th>
+                        <th class="next_person">次作業者</th>
+                        <th class="discoverer">発見者</th>
+                        <th class="discovery_date">発見日</th>
+                        <th class="equip_no">機器番号</th>
+                        <th class="days_stay">滞留日数</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for phenomenon_lists in phenomenon_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" id="{{ phenomenon_lists.id }}" class="detailpb" onclick="phenomenon_detail({{ phenomenon_lists.id }},{{ phenomenon_lists.phenomenon_id }},{{ phenomenon_lists.step_id }});">詳細</a>
+                        </td>
+                        {% if list_type == 'copy' %}
+                        <th class="copy_pb">
+                            <a href="#" id="copy_pb" class="copypb" onclick="maintenance_copy_type({{ phenomenon_lists.id }});">コピー</a>
+                        </th>
+                        {% elif list_type == 'normal' and phenomenon_lists.return_flag == 1  %}
+                            <td class="return_flag"><font color="yellow" style="background-color:red; font-weight:bold">
+                                差戻
+                            </font></td>
+                        {% elif list_type == 'normal' and phenomenon_lists.return_flag != 1 %}
+                            <td class="return_flag"></td>
+                        {% endif %}
+                        <td class="phenomenon_id">{{ phenomenon_lists.phenomenon_id }}</td>
+                        <td class="step">{{ phenomenon_lists.step_name }}</td>
+                        <td class="project_title">{{ phenomenon_lists.project_title }}</td>
+                        <td class="department">{{ phenomenon_lists.department_name | default_if_none:'' }}</td>
+                        <td class="next_person">{{ phenomenon_lists.last_name }}　{{ phenomenon_lists.first_name }}</td>
+                        <td class="discoverer">{{ phenomenon_lists.user | default_if_none:''   }}</td>
+                        <td class="discovery_date">{{ phenomenon_lists.discovery_date | default_if_none:''   }}</td>
+                        <td class="equip_no">{{ phenomenon_lists.equipment_no | default_if_none:''  }}</td>
+                        <td class="days_stay">{{ phenomenon_lists.days_stay | default_if_none:''  }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% else %}
+
+            <div>対象データなし</div>
+
+        {% endif %}

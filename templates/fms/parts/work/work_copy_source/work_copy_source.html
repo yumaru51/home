@@ -1,0 +1,686 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+
+//対象の工事一覧の表示処理
+function get_work_lists_search() {
+        // 検索条件を保持する
+        session_value_work_write();
+        if($('#sel_copy_target_table').val() != ""){
+            // 検索
+            get_execution_work_lists();
+        }else{
+            $('#work_copy_source_list').empty();
+            $("#loading2").fadeOut();
+        }
+};
+
+//対象の工事一覧の表示処理
+function get_execution_work_lists() {
+        $("#loading2").show();
+        var sel_copy_budget_condition = $('#sel_copy_work_budget_condition').val();
+        var sel_copy_step = $('#sel_copy_work_step').val();
+        var sel_copy_business_year = $('#sel_copy_work_business_year').val();
+        var sel_copy_budget_class = $('#sel_copy_work_budget_class').val();
+        var sel_copy_budget_id = $('#sel_copy_work_budget_id').val();
+        var sel_copy_budget_no = $('#sel_copy_work_budget_no').val();
+        var sel_copy_budget_name = $('#sel_copy_work_budget_name').val();
+        var sel_copy_division = $('#sel_copy_work_division').val();
+        var sel_copy_department = $('#sel_copy_work_department').val();
+        var sel_copy_process = $('#sel_copy_work_process').val();
+        var sel_copy_next_division = $('#sel_copy_work_next_division').val();
+        var sel_copy_next_department = $('#sel_copy_work_next_department').val();
+        var sel_copy_next_parson = $('#sel_copy_work_next_parson').val();
+        var sel_copy_on_work = $('#sel_copy_work_on_work').prop('checked');
+        var level5_step_id = $('#level5_step_id').val();
+        var sel_copy_display_order = $("input[name='sel_copy_prospecificationunit_display_order']:checked").val();
+        var sel_copy_work_id = $('#sel_copy_work_id').val();
+        var sel_copy_work_name = $('#sel_copy_work_name').val();
+        var sel_copy_target_table = $('#sel_copy_target_table').val();
+        var sel_specification_person_in_charge = $('#sel_filter_specification_person_in_charge').val();
+        var sel_planning_charge_person = $('#sel_planning_charge_person').val();
+        if(sel_copy_target_table == 1){
+            target_url = "/isk_tools/fms/parts/work/work_list/"
+            {% if is_mplan_flag %}
+                level5_step_id = 132002000
+            {% else %}
+                level5_step_id = 133002000
+            {% endif %}
+        }else if(sel_copy_target_table == 3){
+            target_url = "/isk_tools/fms/parts/work/work_list/"
+            level5_step_id = 132002000
+        }else{
+            target_url = "/isk_tools/fms/parts/execution/execution_work_list/"
+            level5_step_id = 211002000
+        }
+        $.ajax({
+                url: target_url,
+                type: "POST",
+                data : {
+                    'sel_budget_condition': sel_copy_budget_condition,
+                    'sel_step': sel_copy_step,
+                    'sel_business_year': sel_copy_business_year,
+                    'sel_budget_class': sel_copy_budget_class,
+                    'sel_budget_id': sel_copy_budget_id,
+                    'sel_budget_no': sel_copy_budget_no,
+                    'sel_budget_name': sel_copy_budget_name,
+                    'sel_division': sel_copy_division,
+                    'sel_department': sel_copy_department,
+                    'sel_process': sel_copy_process,
+                    'sel_next_division': sel_copy_next_division,
+                    'sel_next_department': sel_copy_next_department,
+                    'sel_next_parson': sel_copy_next_parson,
+                    'sel_on_work': sel_copy_on_work,
+                    'level5_step_id' : level5_step_id,
+                    'sel_display_order': sel_copy_display_order,
+                    'list_kind': 'copy_work',
+                    'sel_work_id': sel_copy_work_id,
+                    'sel_work_name': sel_copy_work_name,
+                    'sel_specification_person_in_charge': sel_specification_person_in_charge,
+                    'sel_copy_target_table': sel_copy_target_table,
+                    'sel_planning_charge_person': sel_planning_charge_person,
+                    'sel_area_manager_parson': '',
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 100000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#work_copy_source_list').empty();
+                    $('#work_copy_source_list').html(data);
+                    $("#loading2").fadeOut();
+                    $("#work_copy_source_list").fadeIn();
+                    $('#selected_copy_target_table').val($('#sel_copy_target_table').val())
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $('#work_copy_source_list').empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+};
+
+// セッション情報削除
+function session_value_work_clear() {
+    sessionStorage.removeItem("sel_copy_prospecificationunit_budget_condition");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_step");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_business_year");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_budget_class");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_budget_id");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_budget_no");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_budget_name");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_division");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_department");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_process");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_next_division");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_next_department");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_next_parson");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_on_work");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_display_order");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_id");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_name");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_person_in_charge");
+    sessionStorage.removeItem("sel_copy_prospecificationunit_planning_charge_person");
+}
+
+
+// セッション情報読込
+function session_value_work_read() {
+    // 予算状態
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_budget_condition'))
+    {
+        set_combo_value('sel_copy_work_budget_condition', sessionStorage.getItem('sel_copy_prospecificationunit_budget_condition'));
+    }
+    // 進捗状況
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_step'))
+    {
+        set_combo_value('sel_copy_work_step', sessionStorage.getItem('sel_copy_prospecificationunit_step'));
+    }
+    // 年度
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_business_year'))
+    {
+        set_combo_value('sel_copy_work_business_year', sessionStorage.getItem('sel_copy_prospecificationunit_business_year'));
+    }
+    // 工事区分
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_budget_class'))
+    {
+        set_combo_value('sel_copy_work_budget_class', sessionStorage.getItem('sel_copy_prospecificationunit_budget_class'));
+    }
+    // 予算ID
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_budget_id'))
+    {
+        $('#sel_copy_work_budget_id').val(sessionStorage.getItem('sel_copy_prospecificationunit_budget_id'));
+    }
+    // 予算NO
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_budget_no'))
+    {
+        $('#sel_copy_work_budget_no').val(sessionStorage.getItem('sel_copy_prospecificationunit_budget_no'));
+    }
+    // 予算名
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_budget_name'))
+    {
+        $('#sel_copy_work_budget_name').val(sessionStorage.getItem('sel_copy_prospecificationunit_budget_name'));
+    }
+    // 部門
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_division'))
+    {
+        set_combo_value('sel_copy_work_division', sessionStorage.getItem('sel_copy_prospecificationunit_division'));
+    }
+    // 部署
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_department'))
+    {
+        set_combo_value('sel_copy_work_department', sessionStorage.getItem('sel_copy_prospecificationunit_department'));
+    }
+    // 工程
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_process'))
+    {
+         set_combo_value('sel_copy_work_process', sessionStorage.getItem('sel_copy_prospecificationunit_process'));
+    }
+    // 未処理のみ
+    if(sessionStorage.getItem('sel_copy_prospecificationunit_on_work'))
+    {
+        if(sessionStorage.getItem('sel_copy_prospecificationunit_on_work') == 'true')
+        {
+            $('#sel_copy_work_on_work').prop('checked', true);
+        }
+        else
+        {
+            $('#sel_copy_work_on_work').prop('checked', false);
+        }
+    }
+    // 表示順
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_display_order'))
+    {
+        $('input[name=sel_copy_prospecificationunit_display_order]:eq(' + (sessionStorage.getItem('sel_copy_prospecificationunit_display_order') - 1) + ')').prop('checked',true);
+    }
+    // 工事ID
+    value = sessionStorage.getItem('sel_copy_prospecificationunit_id');
+    if (value != "")
+    {
+        $('#sel_copy_work_id').val(value);
+    }
+    // 工事名
+    value = sessionStorage.getItem('sel_copy_prospecificationunit_name');
+    if (value != "")
+    {
+        $('#sel_copy_work_name').val(value);
+    }
+    // 仕様担当
+    if (sessionStorage.getItem('sel_copy_prospecificationunit_person_in_charge'))
+    {
+        set_combo_value('sel_filter_specification_person_in_charge', sessionStorage.getItem('sel_copy_prospecificationunit_person_in_charge'));
+    }
+    //// 計画担当
+    //if (sessionStorage.getItem('sel_copy_prospecificationunit_planning_charge_person'))
+    //{
+    //    set_combo_value('sel_planning_charge_person', sessionStorage.getItem('sel_copy_prospecificationunit_planning_charge_person'));
+    //}
+}
+
+// セッション情報書込み
+function session_value_work_write() {
+    // 予算状態
+    var value = $('#sel_copy_work_budget_condition').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_budget_condition', value);
+    // 進捗状況
+    value = $('#sel_copy_work_step').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_step', value);
+    // 年度
+    value = $('#sel_copy_work_business_year').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_business_year', value);
+    // 工事区分
+    value = $('#sel_copy_work_budget_class').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_budget_class', value);
+    // 予算ID
+    value = $('#sel_copy_work_budget_id').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_budget_id', value);
+    // 予算NO
+    value = $('#sel_copy_work_budget_no').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_budget_no', value);
+    // 予算名
+    value = $('#sel_copy_work_budget_name').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_budget_name', value);
+    // 部門
+    value = $('#sel_copy_work_division').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_division', value);
+    // 部署
+    value = $('#sel_copy_work_department').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_department', value);
+    // 工程
+    value = $('#sel_copy_work_process').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_process', value);
+    // 次作業者部門
+    value = $('#sel_copy_work_next_division').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_next_division', value);
+    // 次作業者部署
+    value = $('#sel_copy_work_next_department').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_next_department', value);
+    // 次作業者
+    value = $('#sel_copy_work_next_parson').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_next_parson', value);
+    // 未処理のみ
+    value = $('#sel_copy_work_on_prospecificationunit').prop('checked');
+    sessionStorage.setItem('sel_copy_prospecificationunit_on_work', value);
+    // 表示順
+    value = $("input[name='sel_copy_prospecificationunit_display_order']:checked").val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_display_order', value);
+    // 工事ID
+    value = $('#sel_copy_work_id').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_id', value);
+    // 工事名
+    value = $('#sel_copy_work_name').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_name', value);
+    // 仕様担当
+    value = $('#sel_filter_specification_person_in_charge').val();
+    sessionStorage.setItem('sel_copy_prospecificationunit_person_in_charge', value);
+    // 計画担当
+    /// value = $('#sel_planning_charge_person').val();
+    /// sessionStorage.setItem('sel_copy_prospecificationunit_planning_charge_person', value);
+}
+
+//次部門選択時処理
+function copy_work_select_next_division(division){
+    var division = division;
+    var target = 'copy_work';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_next_division/",
+                type: "POST",
+                data : {
+                    'division' : division,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(work_next_department).empty();
+                    $(work_next_department).html(data);
+                    copy_work_select_next_department('');
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(work_next_department).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//次部署選択時処理
+function copy_work_select_next_department(department){
+    var department = department;
+    var target = 'copy_work';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_next_department/",
+                type: "POST",
+                data : {
+                    'department' : department,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(work_next_person).empty();
+                    $(work_next_person).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(work_next_person).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//部門選択時処理
+function work_select_filter_division(division){
+    var division = division;
+    var target = 'copy_work';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_filter_division/",
+                type: "POST",
+                data : {
+                    'division' : division,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(work_filter_department).empty();
+                    $(work_filter_department).html(data);
+                    copy_work_select_filter_department('')
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(work_filter_department).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//部署選択時処理
+function copy_work_select_filter_department(department){
+    var department = department;
+    var target = 'copy_work';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_filter_department/",
+                type: "POST",
+                data : {
+                    'department' : department,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(work_filter_process_cd).empty();
+                    $(work_filter_process_cd).html(data);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(work_filter_process_cd).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//計画担当部門選択時処理
+function select_planning_charge_division(division){
+    var division = division;
+    var target = 'copy_work';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_planning_charge_division/",
+                type: "POST",
+                data : {
+                    'division' : division,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(filter_planning_charge_department).empty();
+                    $(filter_planning_charge_department).html(data);
+                    select_planning_charge_department('');
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(filter_planning_charge_department).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//計画担当部署選択時処理
+function select_planning_charge_department(department){
+    var department = department;
+    var target = 'copy_work';
+            $.ajax({
+                url: "/isk_tools/fms/parts/select_planning_charge_department/",
+                type: "POST",
+                data : {
+                    'department' : department,
+                    'target' : target,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'html',
+                cache : false,
+                })
+                .done(function(data){
+                    $(filter_planning_charge_person).empty();
+                    $(filter_planning_charge_person).html(data);
+                    set_combo_value('sel_copy_work_next_parson', '');
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    $(filter_planning_charge_person).empty();
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+
+//進捗状況リスト切り替え
+function work_select_work_step(copy_target_table){
+
+    $.ajax({
+        url: "/isk_tools/fms/parts/select_work_step/",
+        type: "POST",
+        data : {
+            'copy_target_table' : copy_target_table,
+            'csrfmiddlewaretoken': "{{ csrf_token }}"
+        },
+        timeout: 10000,
+        dataType: 'html',
+        cache : false,
+        })
+        .done(function(data){
+            $(work_filter_work_step).empty();
+            $(work_filter_work_step).html(data);
+        })
+       .fail(function(jqXHR,textStatus,errorThrown){
+            $(work_filter_work_step).empty();
+            alert('Error!' +textStatus+' ' +errorThrown);
+        });
+}
+
+//コンボボックスの選択値を設定する
+function set_combo_value(id, val) {
+    if (val != "") {
+        document.getElementById(id).value = val;
+    }
+}
+
+</script>
+<style type="text/css">
+#work_copy_source_list{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+</style>
+    <div class="fms_col-sm-9 fms_col-sm-offset-3 fms_col-md-10 fms_c0l-md-offset-2 main" style="width: auto;">
+        <h2 class="page-header">コピー元工事選択</h2>
+    </div>
+    <div>
+        <input type="button" name="get_work_list" value=" 　リスト更新　 " onclick="get_work_lists_search();">
+        <input type="button" name="reset_work_filter_button" value=" 　条件リセット　 " onclick="reset_work_filter();">
+        <input type="hidden" id="selected_copy_target_table" value="" >
+        {% if is_mplan_flag %}
+            <input type="hidden" id="sel_copy_target_table" value="1" >
+        {% else %}
+            <select id="sel_copy_target_table" name="sel_copy_target_table" onchange="work_select_work_step(value);">
+                <option value="" hidden>コピー対象の仕様書を選択してください</option>
+                    <option value=1>詳細仕様</option>
+                    <option value=2>本仕様</option>
+                    <option value=3>中計仕様</option>
+            </select>
+        {% endif %}
+    </div>
+    <div style="width: auto;height:160px;background:#99FF99; border-style:double none;">
+
+        絞込条件<br>
+        <div class="filter_item" style="float:left;">
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">
+                    予算状態：<select id="sel_copy_work_budget_condition" name="sel_copy_budget_condition">
+                    <option value=""></option>
+                        {% for copy_budget_condition_list in copy_budget_condition_list %}
+                            <option value="{{ copy_budget_condition_list.condition_id }}">{{ copy_budget_condition_list.condition_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" id="work_filter_work_step" style="float:left;margin-left:15px;">
+                    進捗状況：<select id="sel_copy_work_step" name="sel_copy_step">
+                    <option value=""></option>
+                        {% for copy_step_list in copy_step_list %}
+                            <option value="{{ copy_step_list.step_id }}">{{ copy_step_list.step_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    年度：<select id="sel_copy_work_business_year" name="sel_copy_business_year">
+                    <option value=""></option>
+                        {% for copy_business_year_list in copy_business_year_list %}
+                            <option value="{{ copy_business_year_list.business_year }}">{{ copy_business_year_list.business_year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">
+                    工事区分：<select id="sel_copy_work_budget_class" name="sel_copy_budget_class">
+                    <option value=""></option>
+                        {% for copy_budget_class_list in copy_budget_class_list %}
+                            <option value="{{ copy_budget_class_list.budget_class_cd }}">{{ copy_budget_class_list.budget_class_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">予算ID：<input type="text" id="sel_copy_work_budget_id" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">予算NO：<input type="text" id="sel_copy_work_budget_no" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">{{ budget_name_text }}：<input type="text" id="sel_copy_work_budget_name" value="" size="36">※あいまい</div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">部門：<select id="sel_copy_work_division" name="sel_copy_work_division" onchange="work_select_filter_division(value)">
+                    <option value=""></option>
+                        {% for copy_division_list in copy_division_list %}
+                            <option value="{{ copy_division_list.division_cd }}">{{ copy_division_list.division_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="work_filter_department" class="item" style="float:left;margin-left:15px;">部署：<select id="sel_copy_work_department" name="sel_copy_work_department" onchange="copy_work_select_filter_department(value)">
+                    <option value=""></option>
+                        {% for copy_departments_list in copy_departments_list %}
+                            <option value="{{ copy_departments_list.department_cd }}">{{ copy_departments_list.department_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="work_filter_process_cd" class="item" style="float:left;margin-left:15px;">工程：<select id="sel_copy_work_process" name="sel_copy_process">
+                        <option value=""></option>
+                        {% for copy_process_list in copy_process_list %}
+                            {% if copy_process_list.U_FCLSECTIONCD == "0" %}
+                                <option value="{{ copy_process_list.process_cd2 }}" selected>{{ copy_process_list.process_name }}</option>
+                            {% else %}
+                                <option value="{{ copy_process_list.process_cd2 }}">{{ copy_process_list.process_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="item" style="float:left;margin-left:15px;">次作業者部門：<select id="sel_copy_work_next_division" name="sel_copy_next_division" onchange="copy_work_select_next_division(value);">
+                    <option value=""></option>
+                        {% for copy_division_list in copy_division_list %}
+                            {% if copy_division_list.division_cd == copy_user_division_cd %}
+                                <option value="{{ copy_division_list.division_cd }}" selected>{{ copy_division_list.division_name }}</option>
+                            {% else %}
+                                <option value="{{ copy_division_list.division_cd }}">{{ copy_division_list.division_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="work_next_department" class="item" style="float:left;margin-left:15px;">次作業者部署：<select id="sel_copy_work_next_department" name="sel_copy_next_department" onchange="copy_work_select_next_department(value);">
+                    <option value=""></option>
+                        {% for copy_next_departments_list in copy_next_departments_list %}
+                            {% if copy_next_departments_list.department_cd == copy_user_department_cd %}
+                                <option value="{{ copy_next_departments_list.department_cd }}" selected>{{ copy_next_departments_list.department_name }}</option>
+                            {% else %}
+                                <option value="{{ copy_next_departments_list.department_cd }}">{{ copy_next_departments_list.department_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id="work_next_person" class="item" style="float:left;margin-left:15px;">次作業者：<select id="sel_copy_work_next_parson" name="sel_copy_next_parson">
+                    <option value=""></option>
+                        {% for copy_user_item in copy_user_list %}
+                            {% if copy_user_item.username == copy_user %}
+                                <option value="{{ copy_user_item.username }}" selected>{{ copy_user_item.full_name }}</option>
+                            {% else %}
+                                <option value="{{ copy_user_item.username }}">{{ copy_user_item.full_name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;">工事ID：<input type="text" id="sel_copy_work_id" value="" size="9"></div>
+                <div class="item" style="float:left;margin-left:15px;">工事名：<input type="text" id="sel_copy_work_name" value="" size="36">※あいまい</div>
+                <div id="specification_person_in_charge" class="item" style="float:left;margin-left:15px;">仕様書担当：<select id="sel_filter_specification_person_in_charge" name="sel_copy_next_parson_in_charge">
+                    <option value=""></option>
+                        {% for specification_person_in_charge_item in specification_person_in_charge_list %}
+                            <option value="{{ specification_person_in_charge_item.username }}">{{ specification_person_in_charge_item.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+<!--                <div class="item" style="float:left;margin-left:15px;">計画部門：<select id="sel_planning_charge_division" name="sel_planning_charge_division" onchange="select_planning_charge_division(value);">-->
+<!--                    <option value=""></option>-->
+<!--                        {% for planning_charge_division_list_item in planning_charge_division_list %}-->
+<!--                            {% if planning_charge_division_list_item.division_cd == user_division_cd %}-->
+<!--                                <option value="{{ planning_charge_division_list_item.division_cd }}" selected>{{ planning_charge_division_list_item.division_name }}</option>-->
+<!--                            {% else %}-->
+<!--                                <option value="{{ planning_charge_division_list_item.division_cd }}">{{ planning_charge_division_list_item.division_name }}</option>-->
+<!--                            {% endif %}-->
+<!--                        {% endfor %}-->
+<!--                    </select>-->
+<!--                </div>-->
+<!--                <div id="filter_planning_charge_department" class="item" style="float:left;margin-left:15px;">計画部署：<select id="sel_planning_charge_department" name="sel_planning_charge_department" onchange="select_planning_charge_department(value);">-->
+<!--                    <option value=""></option>-->
+<!--                        {% for planning_charge_departments_list_item in planning_charge_departments_list %}-->
+<!--                            {% if planning_charge_departments_list_item.department_cd == user_department_cd %}-->
+<!--                                <option value="{{ planning_charge_departments_list_item.department_cd }}" selected>{{ planning_charge_departments_list_item.department_name }}</option>-->
+<!--                            {% else %}-->
+<!--                                <option value="{{ planning_charge_departments_list_item.department_cd }}">{{ planning_charge_departments_list_item.department_name }}</option>-->
+<!--                            {% endif %}-->
+<!--                        {% endfor %}-->
+<!--                    </select>-->
+<!--                </div>-->
+                <div id="filter_planning_charge_person" class="item" style="float:left;margin-left:15px;">計画担当：<select id="sel_planning_charge_person" name="sel_planning_charge_person">
+                    <option value=""></option>
+                        {% for planning_charge_person_item in planning_charge_person_list %}
+                            <option value="{{ planning_charge_person_item.username }}">{{ planning_charge_person_item.full_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div style="clear: both;"></div>
+            <div class="line" style="float:left;">
+                <div class="item" style="float:left;margin-left:15px;"><input type="checkbox" id="sel_copy_work_on_work" size="18" checked>未処理のみ</div>
+                <div class="item" style="float:left;margin-left:15px;">表示順：
+                    <input type="radio" id="sel_copy_display_order1" value="1" name="sel_copy_prospecificationunit_display_order" size="18" checked>予算ID
+                    <input type="radio" id="sel_copy_display_order2" value="2" name="sel_copy_prospecificationunit_display_order" size="18" >予算NO
+                    <input type="radio" id="sel_copy_display_order3" value="3" name="sel_copy_prospecificationunit_display_order" size="18" >滞留日数
+                    <input type="radio" id="sel_copy_display_order4" value="4" name="sel_copy_prospecificationunit_display_order" size="18" >工事ID
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="loading2">
+        <img src="/static/img/loading/earth.gif">
+    </div>
+    <div id="work_copy_source_list">
+
+    </div>
+<script>
+    session_value_work_read();
+</script>

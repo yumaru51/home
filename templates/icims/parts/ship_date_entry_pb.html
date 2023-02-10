@@ -1,0 +1,42 @@
+<script>
+
+$('.datepicker').datepicker();
+
+jQuery(function($){
+    $.datepicker.regional['ja'] = {
+        closeText: '閉じる',
+        prevText: '<前',
+        nextText: '次>',
+        currentText: '今日',
+        monthNames: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        monthNamesShort: ['1月','2月','3月','4月','5月','6月',
+        '7月','8月','9月','10月','11月','12月'],
+        dayNames: ['日曜日','月曜日','火曜日','水曜日','木曜日','金曜日','土曜日'],
+        dayNamesShort: ['日','月','火','水','木','金','土'],
+        dayNamesMin: ['日','月','火','水','木','金','土'],
+        weekHeader: '週',
+        dateFormat: 'yy年m月d日',
+        changeYear: true,
+        firstDay: 0,
+        isRTL: false,
+        showMonthAfterYear: true,
+        yearSuffix: '年'};
+    $.datepicker.setDefaults($.datepicker.regional['ja']);
+});
+</script>
+
+    <div>
+        <font size="4">
+            <div>
+                指定納入期日：{{ delivery_date }}
+            </div>
+            <div>
+                出荷日　　　：<input type="text" id="ship_date" class="datepicker" value="{{ ship_date }}"><input type="button" class="date_clear_button" value="クリア" onclick="date_clear('ship_date');">
+            </div>
+            <div>
+                <input type="button" value=" 出荷日仮決定  " onclick="ship_date_entry(100401);" >　　
+                <input type="button" value="  出荷日決定   " onclick="ship_date_entry(100451);" >
+            </div>
+        </font>
+    </div>

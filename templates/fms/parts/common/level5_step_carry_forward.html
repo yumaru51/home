@@ -1,0 +1,161 @@
+{% extends 'fms/parts/common/level5_step_top_page.html' %}
+
+{% block sub_contents %}
+
+<script>
+
+// 予算絞込条件リセット
+function reset_budget_filter() {
+    //セッション情報の削除
+    session_value_budget_clear();
+    //予算フィルター再表示
+    budget_filter_call();
+}
+
+//予算一覧絞込パーツ表示処理
+function budget_filter_call() {
+        var level5_step_id = $('#level5_step_id').val();
+        var user = $('#user').val();
+        var user_department_cd = $('#user_department_cd').val();
+        var target = $('#target').val();
+
+        if (sessionStorage.getItem('sel_probudgetunit_next_division') == null) {
+            var next_division = "no_data";
+        }else{
+            var next_division = sessionStorage.getItem('sel_probudgetunit_next_division');
+        }
+
+        if (sessionStorage.getItem('sel_probudgetunit_next_department') == null) {
+            var next_department = "no_data";
+        }else{
+            var next_department = sessionStorage.getItem('sel_probudgetunit_next_department');
+        }
+
+        if (sessionStorage.getItem('sel_probudgetunit_next_parson') == null) {
+            var next_parson = "no_data";
+        }else{
+            var next_parson = sessionStorage.getItem('sel_probudgetunit_next_parson');
+        }
+
+        var start_work_stop_flag = Number($('#start_work_stop_flag').val());
+        if(isNaN(start_work_stop_flag)){
+            start_work_stop_flag = 0;
+        }
+        $.ajax({
+            url: "/isk_tools/fms/parts/execution/execution_budget_filter/",
+            type: "POST",
+            data : {
+                    'level5_step_id' : level5_step_id,
+                    'user' : user,
+                    'user_department_cd' : user_department_cd,
+                    'next_division' : next_division,
+                    'next_department' : next_department,
+                    'next_parson' : next_parson,
+                    'start_work_stop_flag' : start_work_stop_flag,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                    },
+            timeout: 1000000,
+            dataType: 'html',
+            cache : false,
+            })
+            .done(function(data){
+                $('#budget_filter').empty();
+                $('#budget_filter').html(data);
+                //get_execution_budget_lists();
+                //var division = $('#sel_budget_next_division').val();
+                //budget_select_next_division(division);
+                get_budget_lists_search();
+            })
+            .fail(function(jqXHR,textStatus,errorThrown){
+                $('#budget_filter').empty();
+                alert('Error!' +textStatus+' ' +errorThrown);
+            });
+}
+
+window.onload = function() {
+        budget_filter_call();//予算一覧絞込パーツを表示するJSを起動(このhtml内にプログラム有)
+};
+</script>
+<style type="text/css">
+
+.tool_box {
+    //border-top-left-radius: 20px;     /* 左上 */
+    border-top-right-radius: 20px;    /* 右上 */
+    border-bottom-right-radius: 20px; /* 右下 */
+    border-bottom-left-radius: 20px;  /* 左下 */
+    border: 1px green solid;
+    width: 490px;
+    height: 280px;
+    text-align: center;
+}
+.tool_title {
+    font-size: 24px;
+    font-weight: bold;
+}
+.square_small {
+   width: 160px;
+   height: 140px;
+   background: khaki;
+}
+.triangle_right_small {
+  width: 0;
+  height: 0;
+  border-left: 25px solid khaki;
+  border-top: 80px solid transparent;
+  border-bottom: 80px solid transparent;
+}
+#budget_lists{display:none;}
+#loading{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+#work_lists{display:none;}
+#loading2{
+	position:absolute;
+	left:50%;
+	top:20%;
+	margin-left:-300px;
+	margin-top:300px;
+}
+.button{
+    width:100px;
+}
+input {
+    font-size: 120%;
+}
+select {
+    font-size: 120%;
+    height: 35px;
+}
+
+</style>
+
+        <input type="hidden" id="level5_step_id" VALUE="{{level5_step_id}}" NAME=level5_step_id size=3 style="width:150px; height:20px"/>
+        <input type="hidden" id="select_tab" VALUE="{{select_tab}}" NAME=select_tab size=3 style="width:50px; height:20px"/>
+        <input type="hidden" id="default_tab" value="{{ default_tab }}">
+        <input type="hidden" id="target" value="{{ target }}">
+        <input type="hidden" id="start_work_stop_flag" value="{{ start_work_stop_flag }}">
+
+    <ul id="tab" style="width:auto;">
+        <li class="present"><a href="#page1">予算リスト</a></li>
+    </ul>
+    <div id="page1" class="pagetitle" >
+        <div>
+            <input type="button" name="get_budget_list" value=" 　リスト更新　 " onclick="get_budget_lists_search();">
+            <input type="button" name="reset_budget_filter_button" value=" 　条件リセット　 " onclick="reset_budget_filter();">
+        </div>
+
+        <div id="budget_filter"></div>
+        <div>
+                予算リスト
+        </div>
+        <div id="loading">
+            <img src="/static/img/loading/earth.gif">
+        </div>
+        <div id="budget_lists" style="width: 1920px;">
+        </div>
+    </div>
+{% endblock %}

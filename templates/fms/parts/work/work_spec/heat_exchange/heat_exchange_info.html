@@ -1,0 +1,377 @@
+    <div style="float:left; border-style: ridge;">
+        <div id="required_function_info">要求機能</div>
+    </div>
+    <div style="float:left;size=20px">　　　　　</div>
+    <div style="float:left;">
+
+        <div><h2 class="page-header">熱交換　詳細仕様</h2></div>
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;">
+            <table>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">機器タイプ</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_spec_data_num == 0 %}
+                            <font size="5" color="black">{{ work_spec_data.exchange_type }}</font>
+                        {% elif work_spec_data.exchange_type == old_work_spec_data_data.exchange_type %}
+                            <font size="5" color="black">{{ work_spec_data.exchange_type }}</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_spec_data.exchange_type }}</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">熱交換熱量</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_spec_data_num == 0 %}
+                            <font size="5" color="black">{{ work_spec_data.exchange_capacity }} Mcal</font>
+                        {% elif work_spec_data.exchange_capacity == old_work_spec_data_data.exchange_capacity %}
+                            <font size="5" color="black">{{ work_spec_data.exchange_capacity }} Mcal</font>
+                        {% else %}
+                            <font size="5" color="red">{{ work_spec_data.exchange_capacity }} Mcal</font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+                {% if display_template_item_for_function_list.display_exchange_area_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">伝熱面積</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.exchange_area }} m2</font>
+                            {% elif work_spec_data.exchange_area == old_work_spec_data_data.exchange_area %}
+                                <font size="5" color="black">{{ work_spec_data.exchange_area }} m2</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.exchange_area }} m2</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td><div style="padding: 5px 0px;"><font size="4">その他</font></div></td>
+                    <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                    <td><div style="padding: 5px 0px;">
+                        {% if old_work_spec_data_num == 0 %}
+                            <font size="4" color="black"><textarea name="heat_exchange_rem" rows="6" cols="25" style="color:black;" readonly>{{ work_spec_data.heat_exchange_rem }}</textarea></font>
+                        {% elif work_spec_data.heat_exchange_rem == old_work_spec_data_data.heat_exchange_rem %}
+                            <font size="4" color="black"><textarea name="heat_exchange_rem" rows="6" cols="25" style="color:black;" readonly>{{ work_spec_data.heat_exchange_rem }}</textarea></font>
+                        {% else %}
+                            <font size="4" color="red"><textarea name="heat_exchange_rem" rows="6" cols="25" style="color:red;" readonly>{{ work_spec_data.heat_exchange_rem }}</textarea></font>
+                        {% endif %}
+                    </div></td>
+                </tr>
+            </table>
+        </div>
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;">
+            <table>
+                {% if display_template_item_for_function_list.display_hot_fluid_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温物質</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_fluid }}</font>
+                            {% elif work_spec_data.hot_fluid == old_work_spec_data_data.hot_fluid %}
+                                <font size="5" color="black">{{ work_spec_data.hot_fluid }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_fluid }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_design_temperature_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温側設計温度</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_design_temperature }} ℃</font>
+                            {% elif work_spec_data.hot_design_temperature == old_work_spec_data_data.hot_design_temperature %}
+                                <font size="5" color="black">{{ work_spec_data.hot_design_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_design_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_regular_use_temperature_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温側常用温度</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_regular_use_temperature }} ℃</font>
+                            {% elif work_spec_data.hot_regular_use_temperature == old_work_spec_data_data.hot_regular_use_temperature %}
+                                <font size="5" color="black">{{ work_spec_data.hot_regular_use_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_regular_use_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_input_temperature_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温側入口温度</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_input_temperature }} ℃</font>
+                            {% elif work_spec_data.hot_input_temperature == old_work_spec_data_data.hot_input_temperature %}
+                                <font size="5" color="black">{{ work_spec_data.hot_input_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_input_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_output_temperature_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温側出口温度</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_output_temperature }} ℃</font>
+                            {% elif work_spec_data.hot_output_temperature == old_work_spec_data_data.hot_output_temperature %}
+                                <font size="5" color="black">{{ work_spec_data.hot_output_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_output_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_fluid_capacity_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温物質流量</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_fluid_capacity }}</font>
+                            {% elif work_spec_data.hot_fluid_capacity == old_work_spec_data_data.hot_fluid_capacity %}
+                                <font size="5" color="black">{{ work_spec_data.hot_fluid_capacity }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_fluid_capacity }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_fluid_capacity_unit_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温物質流量単位</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_fluid_capacity_unit }}</font>
+                            {% elif work_spec_data.hot_fluid_capacity_unit == old_work_spec_data_data.hot_fluid_capacity_unit %}
+                                <font size="5" color="black">{{ work_spec_data.hot_fluid_capacity_unit }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_fluid_capacity_unit }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_design_pressure_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温側設計圧力</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_design_pressure }}</font>
+                            {% elif work_spec_data.hot_design_pressure == old_work_spec_data_data.hot_design_pressure %}
+                                <font size="5" color="black">{{ work_spec_data.hot_design_pressure }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_design_pressure }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_regular_use_pressure_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">高温側常用圧力</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_regular_use_pressure }}</font>
+                            {% elif work_spec_data.hot_regular_use_pressure == old_work_spec_data_data.hot_regular_use_pressure %}
+                                <font size="5" color="black">{{ work_spec_data.hot_regular_use_pressure }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_regular_use_pressure }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_hot_pressure_unit_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">圧力単位</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.hot_pressure_unit }}</font>
+                            {% elif work_spec_data.hot_pressure_unit == old_work_spec_data_data.hot_pressure_unit %}
+                                <font size="5" color="black">{{ work_spec_data.hot_pressure_unit }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.hot_pressure_unit }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+        <div style="float:left;size=5px">　</div>
+        <div style="float:left;">
+            <table>
+                {% if display_template_item_for_function_list.display_cool_fluid_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温物質</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_fluid }}</font>
+                            {% elif work_spec_data.cool_fluid == old_work_spec_data_data.cool_fluid %}
+                                <font size="5" color="black">{{ work_spec_data.cool_fluid }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_fluid }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_design_temperature_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温側設計温度</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_design_temperature }} ℃</font>
+                            {% elif work_spec_data.cool_design_temperature == old_work_spec_data_data.cool_design_temperature %}
+                                <font size="5" color="black">{{ work_spec_data.cool_design_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_design_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_regular_use_temperature_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温側常用温度</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_regular_use_temperature }} ℃</font>
+                            {% elif work_spec_data.cool_regular_use_temperature == old_work_spec_data_data.cool_regular_use_temperature %}
+                                <font size="5" color="black">{{ work_spec_data.cool_regular_use_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_regular_use_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_input_temperature_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温側入口温度</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_input_temperature }} ℃</font>
+                            {% elif work_spec_data.cool_input_temperature == old_work_spec_data_data.cool_input_temperature %}
+                                <font size="5" color="black">{{ work_spec_data.cool_input_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_input_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_output_temperature_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温側出口温度</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_output_temperature }} ℃</font>
+                            {% elif work_spec_data.cool_output_temperature == old_work_spec_data_data.cool_output_temperature %}
+                                <font size="5" color="black">{{ work_spec_data.cool_output_temperature }} ℃</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_output_temperature }} ℃</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_fluid_capacity_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温物質流量</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_fluid_capacity }}</font>
+                            {% elif work_spec_data.cool_fluid_capacity == old_work_spec_data_data.cool_fluid_capacity %}
+                                <font size="5" color="black">{{ work_spec_data.cool_fluid_capacity }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_fluid_capacity }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_fluid_capacity_unit_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温物質流量単位</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_fluid_capacity_unit }}</font>
+                            {% elif work_spec_data.cool_fluid_capacity_unit == old_work_spec_data_data.cool_fluid_capacity_unit %}
+                                <font size="5" color="black">{{ work_spec_data.cool_fluid_capacity_unit }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_fluid_capacity_unit }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_design_pressure_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温側設計圧力</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_design_pressure }}</font>
+                            {% elif work_spec_data.cool_design_pressure == old_work_spec_data_data.cool_design_pressure %}
+                                <font size="5" color="black">{{ work_spec_data.cool_design_pressure }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_design_pressure }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_regular_use_pressure_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">低温側常用圧力</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_regular_use_pressure }}</font>
+                            {% elif work_spec_data.cool_regular_use_pressure == old_work_spec_data_data.cool_regular_use_pressure %}
+                                <font size="5" color="black">{{ work_spec_data.cool_regular_use_pressure }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_regular_use_pressure }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+                {% if display_template_item_for_function_list.display_cool_pressure_unit_flag == 1 %}
+                    <tr>
+                        <td><div style="padding: 5px 0px;"><font size="4">圧力単位</font></div></td>
+                        <td><div style="padding: 5px 0px;"><font size="4">：　</font></div></td>
+                        <td><div style="padding: 5px 0px;">
+                            {% if old_work_spec_data_num == 0 %}
+                                <font size="5" color="black">{{ work_spec_data.cool_pressure_unit }}</font>
+                            {% elif work_spec_data.cool_pressure_unit == old_work_spec_data_data.cool_pressure_unit %}
+                                <font size="5" color="black">{{ work_spec_data.cool_pressure_unit }}</font>
+                            {% else %}
+                                <font size="5" color="red">{{ work_spec_data.cool_pressure_unit }}</font>
+                            {% endif %}
+                        </div></td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>

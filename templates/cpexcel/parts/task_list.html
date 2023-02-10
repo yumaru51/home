@@ -1,0 +1,72 @@
+<script>
+
+function task_update(a,b) {
+    var task_id = a;
+    var program_id = b;
+    task_entry_page(program_id, task_id);
+}
+
+</script>
+
+
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    overflow-y:scroll;
+    height:590px;
+}
+td,th{
+    table-layout:fixed;
+}
+.detail_pb{
+    width:55px;
+    text-align: center;
+}
+.id{
+    width:80px;
+}
+.source_sheet_name{
+    width:100px;
+}
+.source_cell_name{
+    width:80px;
+}
+.post_to_sheet_name{
+    width:100px;
+}
+.post_to_cell_name{
+    width:80px;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+<div>　登録タスク数　：　{{ task_amount }} 件</div>
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="detail_pb"></th>
+                        <th class="id">id</th>
+                        <th class="source_sheet_name">コピー元シート</th>
+                        <th class="source_cell_name">コピー元セル</th>
+                        <th class="post_to_sheet_name">コピー先シート</th>
+                        <th class="post_to_cell_name">コピー先セル</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                {% for task_lists in task_lists %}
+                    <tr>
+                        <td class="detail_pb">
+                            <a href="#" class="detailpb" onclick="task_update({{ task_lists.id }},{{ task_lists.program_id }});">変更</a>
+                        </td>
+                        <td class="id">{{ task_lists.id }}</td>
+                        <td class="source_sheet_name">{{ task_lists.source_sheet_name }}</td>
+                        <td class="source_cell_name">{{ task_lists.source_cell_name }}</td>
+                        <td class="post_to_sheet_name">{{ task_lists.post_to_sheet_name }}</td>
+                        <td class="post_to_cell_name">{{ task_lists.post_to_cell_name }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>

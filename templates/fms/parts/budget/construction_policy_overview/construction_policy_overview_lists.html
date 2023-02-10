@@ -1,0 +1,92 @@
+<script>
+//選択した要求仕様の表示処理
+function policy_overview_detail(a) {
+        var construction_policy_id = a;
+            $.ajax({
+                url: "/isk_tools/fms/action/policy_overview_detail/",
+                type: "POST",
+                data : {
+                    'construction_policy_id' : construction_policy_id,
+                    'csrfmiddlewaretoken': "{{ csrf_token }}"
+                },
+                timeout: 10000,
+                dataType: 'json',
+                cache : false,
+                })
+                .done(function(data){
+                    $('#no').val(data.no);
+                    $('#rs_no').val(data.required_spec_no);
+                    $('#policy').val(data.policy);
+                    $('#overview').val(data.overview);
+                    $('#construction_policy_id').val(data.construction_policy_id);
+                })
+               .fail(function(jqXHR,textStatus,errorThrown){
+                    alert('Error!' +textStatus+' ' +errorThrown);
+                });
+}
+</script>
+<style type="text/css">
+thead.policy_overview_scrollHead,tbody.policy_overview_scrollBody{
+    display:block;
+}
+tbody.policy_overview_scrollBody{
+    overflow-y:scroll;
+    height:340px;
+}
+td,th{
+    table-layout:fixed;
+}
+.select_pb{
+    width:40px;
+    text-align: center;
+}
+.rs_no{
+    width:100px;
+    font-size: 120%;
+}
+.no{
+    width:40px;
+    font-size: 120%;
+}
+.policy{
+    width:560px;
+    font-size: 120%;
+}
+.overview{
+    width:560px;
+    font-size: 120%;
+}
+tr:nth-child(2n+1) {
+    background: #DDDDDD;
+}
+</style>
+            <table class="table table-strriped" border="1" cellspacing="0" cellpadding="5" bordercolor="#000000" style="border-collapse: collapse">
+                <thead class="policy_overview_scrollHead">
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <th class="select_pb" ></th>
+                        {% endif %}
+                        <th class="no" >No</th>
+                        <th class="rs_no" >要求仕様No</th>
+                        <th class="policy" >工事方針</th>
+                        <th class="overview" >工事概要</th>
+                    </tr>
+                </thead>
+                <tbody class="policy_overview_scrollBody">
+                {% if policy_overview_lists_num > 0 %}
+                {% for policy_overview_lists in policy_overview_lists %}
+                    <tr>
+                        {% if select_pb_disp_flag != 0 %}
+                            <td class="select_pb">
+                                <a href="#" id="{{ policy_overview_lists.id }}" class="select_pb" onclick="policy_overview_detail(id);">選択</a>
+                            </td>
+                        {% endif %}
+                        <td class="no">{{ policy_overview_lists.no }}</td>
+                        <td class="rs_no">{{ policy_overview_lists.required_spec_no }}</td>
+                        <td class="policy"><textarea rows="16" cols="60" readonly>{{ policy_overview_lists.policy }}</textarea></td>
+                        <td class="overview"><textarea rows="16" cols="60" readonly>{{ policy_overview_lists.overview }}</textarea></td>
+                    </tr>
+                {% endfor %}
+                {% endif %}
+                </tbody>
+            </table>

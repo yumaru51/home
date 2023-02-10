@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block contents %}
+
+<style type="text/css">
+thead.scrollHead,tbody.scrollBody{
+    display:block;
+}
+tbody.scrollBody{
+    height:80px;
+}
+td,th{
+    table-layout:fixed;
+}
+.status0_order_num{
+    width:200px;
+    height:20px;
+    text-align: center;
+    font-size: 130%;
+    padding: 10px;
+}
+.status1_order_num{
+    width:200px;
+    height:20px;
+    text-align: center;
+    font-size: 130%;
+    padding: 10px;
+}
+.status11_order_num{
+    width:200px;
+    height:20px;
+    text-align: center;
+    font-size: 130%;
+    padding: 10px;
+}
+.status21_order_num{
+    width:200px;
+    height:20px;
+    text-align: center;
+    font-size: 130%;
+    padding: 10px;
+}
+.status31_order_num{
+    width:200px;
+    height:20px;
+    text-align: center;
+    font-size: 130%;
+    padding: 10px;
+}
+.status41_order_num{
+    width:200px;
+    height:20px;
+    text-align: center;
+    font-size: 130%;
+    padding: 10px;
+}
+.status51_order_num{
+    width:200px;
+    height:20px;
+    text-align: center;
+    font-size: 130%;
+    padding: 10px;
+}
+
+</style>
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+        <h2 class="page-header">トップページ</h2>
+    </div>
+    <div style="">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+            <h2 class="page-header">進捗状況</h2>
+        </div>
+        <div>
+            <table>
+                <thead class="scrollHead">
+                    <tr>
+                        <th class="status0_order_num">受注仮登録</th>
+                        <th class="status1_order_num">受注登録完了</th>
+                        <th class="status11_order_num">仮引当未完</th>
+                        <th class="status21_order_num">仮引当完了</th>
+                        <th class="status31_order_num">付帯作業指示</th>
+                        <th class="status41_order_num">出荷待</th>
+                        <th class="status51_order_num">出荷完了</th>
+                    </tr>
+                </thead>
+                <tbody class="scrollBody">
+                    <tr>
+                        <td class="status0_order_num">{{ status0_order_num }}</td>
+                        <td class="status1_order_num">{{ status1_order_num }}</td>
+                        <td class="status11_order_num">{{ status11_order_num }}</td>
+                        <td class="status21_order_num">{{ status21_order_num }}</td>
+                        <td class="status31_order_num">{{ status31_order_num }}</td>
+                        <td class="status41_order_num">{{ status41_order_num }}</td>
+                        <td class="status51_order_num">{{ status51_order_num }}</td>
+                </tbody>
+            </table>
+        </div>
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 c0l-md-offset-2 main">
+            <h2 class="page-header">お知らせ</h2>
+        </div>
+    </div>
+{% endblock %}

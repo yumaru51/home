@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class ReportoutputConfig(AppConfig):
+class ReportOutputConfig(AppConfig):
     name = 'report_output'

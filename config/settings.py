@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'fms.apps.FmsConfig',
     'quality_change_management.apps.QualityChangeManagementConfig',
-    'report_output.apps.ReportoutputConfig'
+    'report_output.apps.ReportOutputConfig'
 ]
 
 MIDDLEWARE = [
@@ -76,6 +76,21 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     },
+#     'fmsdb': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'fmsdb.sqlite3'),
+#     },
+#     'quality_change_management': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'quality_change_management.sqlite3'),
+#     },
+# }
 
 DATABASES = {
     'default': {
@@ -83,8 +98,8 @@ DATABASES = {
         'NAME': 'isk_tools_base',
         'USER': 'isk_tools_user',
         'PASSWORD': 'iskisk6117',
-        'HOST': 'Y0033OUT\SQLEXPRESS',  # 会社
-        # 'HOST': 'localhost\SQLEXPRESS',  # 自宅
+        'HOST': 'Y0033OUT\SQLEXPRESS',      # 会社
+        # 'HOST': 'localhost\SQLEXPRESS',     # 自宅
         'PORT': '',
 
         'OPTIONS': {
@@ -97,8 +112,8 @@ DATABASES = {
         'NAME': 'fms',
         'USER': 'isk_tools_user',
         'PASSWORD': 'iskisk6117',
-        'HOST': 'Y0033OUT\SQLEXPRESS',  # 会社
-        # 'HOST': 'localhost\SQLEXPRESS',  # 自宅
+        'HOST': 'Y0033OUT\SQLEXPRESS',      # 会社
+        # 'HOST': 'localhost\SQLEXPRESS',     # 自宅
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 13 for SQL Server',
@@ -110,8 +125,8 @@ DATABASES = {
         'NAME': 'quality_change_management',
         'USER': 'isk_tools_user',
         'PASSWORD': 'iskisk6117',
-        'HOST': 'Y0033OUT\SQLEXPRESS',  # 会社
-        # 'HOST': 'localhost\SQLEXPRESS',  # 自宅
+        'HOST': 'Y0033OUT\SQLEXPRESS',      # 会社
+        # 'HOST': 'localhost\SQLEXPRESS',     # 自宅
         'PORT': '',
 
         'OPTIONS': {

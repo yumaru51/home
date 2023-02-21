@@ -1,0 +1,17 @@
+{
+  "name": "Sample",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "description": "Sample Chrome Extension",
+  "content_scripts": [
+    {
+      "matches": ["http://i7161dd6:8080/isk_tools/quality_change_management//*",
+		"file:///C:/Users/y-kawauchi/Desktop/add-on/test.html"],
+      "js": ["content.js"]
+    },
+    {
+      "matches": ["http://i7161dd6:8080/isk_tools/quality_change_management//*"],
+      "css": ["content.css"]
+    }
+  ]
+}

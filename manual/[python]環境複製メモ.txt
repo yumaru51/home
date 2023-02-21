@@ -1,0 +1,94 @@
+
+■[setting]▼[backup]●[program]★[project]
+
+【GitHub】
+①
+yumaru51@yahoo.co.jp
+URL：https://github.com/yumaru51/isk-tools.git
+user：yumaru51
+pass：
+②
+y-kawauchi@iskweb.co.jp
+URL：https://github.com/Kawauchi-Yuki/isk-tools.git
+user：Kawauchi-Yuki
+pass：iskisk6117
+トークン：isk-tools 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
+
+【GitLab】
+①
+URL：https://gitlab.com/shuji-esu/isk-tools.git
+user：shuji-esu
+pass：iskisk6117
+トークン：isk_bms_pj 6vF4sU9-2XXU2JYc4tsq
+②
+URL：
+user：yumaru51
+pass：
+トークン：yumaru51 glpat-tg687x5AXjiihxfy_z6n
+
+【プロキシ】
+git config --global http.proxy 10.100.2.10:8080
+git config --global https.proxy 10.100.2.10:8080
+
+【ターミナルの開始ディレクト】
+C:\python_tool_development\isk-tools
+【ターミナルのシェル設定】
+"cmd.exe" /k ""C:\python_tool_development\isk-tools\Scripts\activate.bat""
+
+【ターミナルコマンド】
+python -m django --version
+
+django-admin startproject config(フォルダが2重にできる)
+django-admin startproject config .(フォルダを1つに、同階層にmanage.py)
+django-admin startproject config ../.(1階層上に、同階層にmanage.py)
+
+
+cd C:\Program Files\Python311\Lib 
+pip install django -t ./
+pip install --upgrade django
+
+python manage.py startapp fms
+python manage.py runserver
+python ../manage.py runserver
+
+django.get_version()
+
+【ライブラリ一括DL】
+プロジェクトフォルダ内の「requirements.txt」に記入しておくとpycharmが読み込んでインストールするか聞いてくれる。
+pip install ライブラリ==version
+
+【Anacondaのインタプリタは不要！メリット！】
+　ネットでpythonをダウンロードしてインタプリタに設定すればpythonファイルは動作可能。
+　プロジェクト現場ではネット上からインストール(pip install)することができないため、
+　既存のAnaconda環境にあるパッケージ群を使用する方針がある。
+　Anacondaはいろいろなツールがパッケージ
+　(参考)https://engineer-lifestyle-blog.com/code/python/pycharm-anaconda-venv-link/
+
+【SQLSERVERのversion】
+　pyodbcライブラリ内で、バージョンをチェックしている箇所を修正
+　C:\python_tool_development\isk-tools\venv\Lib\site-packages\sql_server\pyodbc\base.py
+    　_sql_server_versions = {
+        　10: 2008,
+        　11: 2012,
+        　12: 2014,
+        　13: 2016,
+        　14: 2017,
+    　}
+        　15: 2018,を書き加えるとアクセスできる
+
+
+【環境構築時DLLエラー】
+　Anacondaインストールフォルダ以下Libraryフォルダ内にある以下2ファイルをDLLフォルダにコピーで解消。
+
+　格納元
+　　Anaconda\Library\bin\ 
+　格納先
+　　Anaconda\DLLs\
+
+　DLLファイル
+　　libcrypto-1_1-x64.dll
+　　libssl-1_1-x64.dll
+
+　
+　
+　

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    {% load staticfiles %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="styleSheet" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <title>カフェ Mr. M COFFEE(ミスターエムコーヒー)</title>
+</head>
+<body>
+<!-- ヘッダー -->
+<header class="py-4">
+    <div class="container text-center">
+        <h1><a href="index.html"><img src="{% static 'img/logo.png' %}" alt="カフェ Mr. M COFFEE"></a></h1>
+    </div>
+</header>
+<!-- /ヘッダー -->
+<!-- ナビゲーションバー -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
+    <!-- サブコンポーネント -->
+    <div class="container">
+        <!-- ブランド -->
+        <a class="navbar-brand" href="index.html">Mr. M COFFEE</a>
+        <!-- 切り替えボタン -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar-content"
+                aria-controls="navbar-content" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- ナビゲーション -->
+        <div class="collapse navbar-collapse" id="navbar-content">
+            <!-- ナビゲーションメニュー -->
+            <!-- 左側メニュー：トップページの各コンテンツへのリンク -->
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Top<span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#menu">Menu</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#coupon">Coupon</a>
+                </li>
+                <!-- ドロップダウン -->
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Information
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="#shop">Shop</a>
+                        <a class="dropdown-item" href="#access">Access</a>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- 右側メニュー：Contactページへのリンク -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a href="contact.html" class="nav-link btn btn-info">Contact</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /ナビゲーションメニュー -->
+    </div>
+    <!-- /サブコンポーネント -->
+</nav>
+<!-- /ナビゲーションバー -->
+<!-- メイン -->
+<main>
+    <!-- メインビジュアル -->
+    <div class="py-4">
+        <div class="container">
+            <!-- カルーセル外枠 -->
+            <div id="main_visual" class="carousel slide" data-ride="carousel">
+                <!-- インジゲーター -->
+                <ol class="carousel-indicators">
+                    <li data-target="#main_visual" data-slide-to="0" class="active"></li>
+                    <li data-target="#main_visual" data-slide-to="1"></li>
+                    <li data-target="#main_visual" data-slide-to="2"></li>
+                </ol>
+                <!-- / インジケーター -->
+                <!-- カルーセル内枠 -->
+                <div class="carousel-inner">
+                    <!-- スライド01 -->
+                    <div class="carousel-item active">
+                        <img class="img-fluid" src="{% static 'img/slide_01.jpg' %}" alt="コーヒー写真">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h2>Mr. M COFFEEのこだわり</h2>
+                            <p>店主が世界中のコーヒー豆を厳選し、コーヒー豆の種類にあわせ、心を込めて焙煎、抽出しております。</p>
+                        </div>
+                    </div>
+                    <!-- / スライド01 -->
+                    <!-- スライド02 -->
+                    <div class="carousel-item">
+                        <img class="img-fluid" src="{% static 'img/slide_02.jpg' %}" alt="ランチ写真">
+                        <div class="carousel-caption d-none dmb-block">
+                            <h2>Mr. M COFFEEのメニュー</h2>
+                            <p>コーヒーはもちろん、モーニングやワンプレートランチ、季節のスイーツなどもご好評いただいております。</p>
+                        </div>
+                    </div>
+                    <!-- / スライド02 -->
+                    <!-- スライド03 -->
+                    <div class="carousel-item">
+                        <img class="img-fluid" src="{% static 'img/slide_03.jpg' %}" alt="店内写真">
+                        <div class="carousel-caption d-none d-md-block">
+                            <h2>Mr. M COFFEEの空間</h2>
+                            <p>座り心地の良いソファと丁度良い高さのテーブル。くつろぎの空間を満喫してください。</p>
+                        </div>
+                    </div>
+                    <!-- / スライド03 -->
+                </div>
+                <!-- / カルーセル内枠 -->
+                <!-- コントローラー -->
+                <a class="carousel-control-prev" href="#main_visual" role="button" data-slide="prev">
+                    前に戻るコントローラー「＜」が入ります
+                </a>
+                <a class="carousel-control-next" href="#main_visual" role="button" data-slide="next">
+                    次に進むコントローラ「＞」が入ります
+                </a>
+                <!-- / コントローラー -->
+            </div>
+            <!-- / カルーセル -->
+        </div>
+    </div>
+    <!-- /メインビジュアル -->
+    <!-- コンテンツ01 -->
+    <div class="py-4">
+
+    </div>
+    <!-- /コンテンツ01 -->
+    <!-- コンテンツ02 -->
+    <div class="py-4">
+
+    </div>
+    <!-- /コンテンツ02 -->
+    <!-- コンテンツ03 -->
+    <div class="py-4">
+
+    </div>
+    <!-- /コンテンツ03 -->
+    <!-- コンテンツ04 -->
+    <div class="py-4">
+
+    </div>
+    <!-- /コンテンツ04 -->
+    <!-- コンテンツ05 -->
+    <div class="py-4">
+
+    </div>
+    <!-- /コンテンツ05 -->
+</main>
+<!-- /メイン -->
+<!-- フッター -->
+<footer class="py-4">
+
+</footer>
+<!-- /フッター -->
+
+<script src="{% static 'js/jquery-3.3.1.slim.min.js' %}"></script>
+<script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>

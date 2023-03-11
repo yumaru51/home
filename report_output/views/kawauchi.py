@@ -21,6 +21,15 @@ from .pybot import pybot
 def bootstrap(request):
     return render(request, 'report_output/bootstrap.html', )
 
+
+def bootstrap5(request):
+    return render(request, 'report_output/bootstrap5.html', )
+
+
+def index(request):
+    return render(request, 'report_output/index.html', )
+
+
 def report(request):
     # DB接続
     # server = 'YSQLSERV4'

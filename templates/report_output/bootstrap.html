@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     {% load staticfiles %}
     <meta charset="UTF-8">
@@ -8,17 +7,16 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<!--    <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">-->
 
     <title>Hello, world!</title>
 </head>
-
 <style>
 </style>
+<body data-spy="scroll" data-target="#navbar" style="padding-top:50px; padding-bottom:50px;">
 
-<body style="padding-top:50px; padding-bottom:50px">
 
 <!-- navbar nav上のdropdownのoffsetは？ -->
-
 <nav class="navbar navbar-expand fixed-bottom navbar-dark bg-dark" role="navigation" style="height:50px">
     <div class="col-3">
         <a class="navbar-brand" href="#">ページの先頭へ</a>
@@ -38,16 +36,14 @@
         </ul>
     </div>
 </nav>
-
-
-<nav class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark" role="navigation">
+<nav id="navbar" class="navbar navbar-expand-lg fixed-top navbar-dark bg-dark" aria-label="breadcrumb" role="navigation">
 <!--<nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark" role="navigation">-->
-<!--    <a class="navbar-brand" href="#">ISK-TOOLS</a>-->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#切り替え表示されるコンテンツ名"
             aria-controls="切り替え表示されるコンテンツ名" aria-expanded="false" aria-label="ナビゲーション切り替え">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="切り替え表示されるコンテンツ名">
+<!--        <ul class="navbar-nav mr-auto">-->
         <ul class="navbar-nav mr-auto">
             <li class="navbar-item dropdown">
 <!--                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenu" data-toggle="dropdown"-->
@@ -60,23 +56,39 @@
             </li>
             <li class="nav-item"><a class="nav-link" href="#">HOME</a></li>
         </ul>
-        <span class="navbar-text mr-3">ナビゲーションバー内テキスト</span>
-        <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="検索キーワード" aria-label="検索キーワード">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">検索</button>
-        </form>
+        <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="#title">title</a></li>
+            <li class="nav-item"><a class="nav-link" href="#button">button</a></li>
+            <li class="nav-item"><a class="nav-link" href="#card">card</a></li>
+            <li class="nav-item"><a class="nav-link" href="#float">float</a></li>
+        </ul>
+<!--        <span class="navbar-text mr-3">ナビゲーションバー内テキスト</span>-->
+<!--        <form class="form-inline my-2 my-lg-0">-->
+<!--            <input class="form-control mr-sm-2" type="search" placeholder="検索キーワード" aria-label="検索キーワード">-->
+<!--            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">検索</button>-->
+<!--        </form>-->
     </div>
 </nav>
 
+<!-- パンくずリスト スクロール調整　スクロールしたら位置が変わるように、 -->
+<!--<nav class="sticky-top" aria-label="breadcrumb" role="navigation" style="padding-top:50px">-->
+<!--    <ol class="breadcrumb">-->
+<!--        <li class="breadcrumb-item"><a href="#">ホーム</a></li>-->
+<!--        <li class="breadcrumb-item"><a href="#">ライブラリー</a></li>-->
+<!--        <li class="breadcrumb-item active" aria-current="page">データ</li>-->
+<!--    </ol>-->
+<!--</nav>-->
+
 <!-- title　エリア微調整したい。大きすぎる -->
-<div class="jumbotron jumbotron-fluid">
+<div id="title" class="jumbotron jumbotron-fluid" style="margin-top:-50px; padding-top:100px;">
     <div class="container">
         <h1 class="display-3">Chatbot</h1>
         <p class="lead">これはジャンボトロンのサンプルです。</p>
     </div>
 </div>
 
-<!-- カルーセル -->{% comment %}
+<!-- カルーセル -->
+{% comment %}
 <div id="carouselControls" class="carousel slide carousel-fade" data-ride="carousel" data-interval="3000" data-keyboard="true"
 data-pause="hover" data-wrap="true">
     <div class="carousel-indicators">
@@ -119,15 +131,6 @@ data-pause="hover" data-wrap="true">
     </a>
 </div>
 {% endcomment %}
-
-<!-- パンくずリスト スクロール調整　スクロールしたら位置が変わるように、 -->
-<nav class="sticky-top" aria-label="breadcrumb" role="navigation" style="padding-top:50px">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="#">ホーム</a></li>
-        <li class="breadcrumb-item"><a href="#">ライブラリー</a></li>
-        <li class="breadcrumb-item active" aria-current="page">データ</li>
-    </ol>
-</nav>
 
 <!-- nav　左サイドに固定化したい -->
 <nav>
@@ -191,7 +194,7 @@ data-pause="hover" data-wrap="true">
 <br>
 
 <!-- button　押したら消えるやつ -->
-<div class="btn-toolbar" role="toolbar" aria-label="ボタンツールバー">
+<div id="button" class="btn-toolbar" role="toolbar" aria-label="ボタンツールバー" style="margin-top:-60px; padding-top:60px;">
     <div class="btn-group mr-2" role="group" aria-label="ボタングループ1">
         <button type="button" class="btn btn-secondary">新規作成</button>
         <button type="button" class="btn btn-secondary">編集</button>
@@ -249,40 +252,61 @@ data-pause="hover" data-wrap="true">
         <a class="dropdown-item" href="#">パスワードをお忘れの方</a>
     </div>
 </div>
-
-
 <br>
 <br>
-
 <button type="button" class="btn btn-primary" aria-pressed="true" autocomplete="off" id="toggle-btn">押してね</button>
 <br>
 <br>
 
-<!-- 折り畳み 説明表示に使えるね。見えなくなるだけでエリアは確保するのでレイアウト崩れる。navのほうが汎用性高そう -->
+<!-- 折り畳み 説明表示に使えるね。縦方向にはレイアウト自動調整されるが横方向はレイアウト自動調整されない？ -->
 <p>
     <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target=".contents" aria-expanded="false"
             aria-controls="collapseContent01 collapseContent02">button要素とdata-target属性によるボタン</button>
 </p>
-
 <p>
     <a class="btn btn-secondary" data-toggle="collapse" href="#collapseContent01" role="button" aria-expanded="false"
        aria-controls="collapseContent01">a要素とhref属性によるボタン</a>
+</p>
+<p>
+    <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseContent02
+" aria-expanded="false"
+            aria-controls="collapseContent02">button要素とdata-target属性によるボタン</button>
 </p>
 <div class="collapse contents" id="collapseContent01">
     <div class="card card-body">
         a要素の切り替えボタンをクリックすることで表示と非表示とが切り替わるコンテンツ
     </div>
 </div>
-
-<p>
-    <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseContent02" aria-expanded="false"
-            aria-controls="collapseContent02">button要素とdata-target属性によるボタン</button>
-</p>
 <div class="collapse contents" id="collapseContent02">
     <div class="card card-body">
         button要素の切り替えボタンをクリックすることで表示と非表示とが切り替わるコンテンツ
     </div>
 </div>
+
+<!-- モーダル alertとの使い分けは？ -->
+<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
+    切り替えボタン
+</button>
+<div class="modal" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">モーダルのタイトル</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                モーダルの本文が入ります。
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
 <!-- ページネーション -->
 <nav aria-label="ページネーションの例">
@@ -353,7 +377,7 @@ data-pause="hover" data-wrap="true">
 <br>
 
 <!-- card　タブ変えたときの枠の高さを統一したい -->
-<div class="row">
+<div id="card" class="row" style="margin-top:-60px; padding-top:60px;">
     <div class="col-sm-3">
         <div class="card" style="max-width: 25rem">
             <div class="card-header">
@@ -485,7 +509,7 @@ data-pause="hover" data-wrap="true">
 <br>
 
 <!-- グリッドシステム -->
-<div class="container">
+<div id="grid" class="container">
     <div class="row">
         <div class="col-sm-9">第一階層:col-sm-9
             <div class="row">
@@ -532,10 +556,18 @@ data-pause="hover" data-wrap="true">
 <br>
 <br>
 
-<!-- float -->
-<div class="clearfix">
+<!-- float chatbotでつかえる -->
+<div id="float" class="clearfix" style="margin-top:-60px; padding-top:60px;">
     <img src="{% static 'img/ゾロ.png' %}" class="rounded float-right" alt="揃え画像" style="max-width: 25rem">
     <img src="{% static 'img/ルフィ.png' %}" class="rounded float-left" alt="左揃え画像" style="max-width: 25rem">
+</div>
+<div class="container">
+    <span class="float-left">float-left </span><br>
+    <span class="float-right">float-right </span><br>
+    <span class="float-left">float-left </span><br>
+    <span class="float-right">float-right </span><br>
+    <span class="float-left">float-left </span><br>
+    <span class="float-right">float-right </span><br>
 </div>
 <br>
 <br>
@@ -564,12 +596,14 @@ data-pause="hover" data-wrap="true">
 $(function(){
     $('#navbarDropdownMenu2').dropdown('toggle');
 });
+{% comment %}
 $(function(){
     $(".dropdown").on("show.bs.dropdown", function(event){
         var x = $(event.relatedTarget).text();
         alert(x + 'なくなり次第終了!');
     });
 });
+{% endcomment %}
 </script>
 </body>
 </html>

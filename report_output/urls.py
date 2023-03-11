@@ -25,5 +25,7 @@ urlpatterns = [
     path('川内/report/', kawauchi.report, name='report'),
     path('川内/chatwindow/', kawauchi.chatwindow, name='chatwindow'),
     path('川内/bootstrap/', kawauchi.bootstrap, name='bootstrap'),
+    path('川内/bootstrap5/', kawauchi.bootstrap5, name='bootstrap5'),
+    path('川内/index/', kawauchi.index, name='index'),
 
 ]

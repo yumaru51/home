@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'fms.apps.FmsConfig',
     'quality_change_management.apps.QualityChangeManagementConfig',
-    # 'report_output.apps.ReportoutputConfig'
+    'report_output.apps.ReportoutputConfig'
 ]
 
 MIDDLEWARE = [

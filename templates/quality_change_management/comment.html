@@ -1,7 +1,6 @@
 {% load staticfiles %}
 
 <table class="table table-striped table-sm">
-
     <thead>
     <tr>
         <td>日時</td>
@@ -12,12 +11,11 @@
         <td>ID</td>
     </tr>
     </thead>
-
     <tbody>
     {% for log_list in log_list %}
     <tr>
         <td>{{ log_list.operation_datetime }}</td>
-        <td>{{ log_list.username }}</td>
+        <td>{{ log_list.operator }}</td>
         <td>{{ log_list.step.step_name }}</td>
         <td>{{ log_list.action.action_name }}</td>
         <td>{{ log_list.comment }}</td>
@@ -25,11 +23,4 @@
     </tr>
     {% endfor %}
     </tbody>
-
 </table>
-
-
-
-
-
-

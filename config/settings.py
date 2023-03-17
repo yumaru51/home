@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'fms.apps.FmsConfig',
     'quality_change_management.apps.QualityChangeManagementConfig',
-    'report_output.apps.ReportoutputConfig'
+    # 'report_output.apps.ReportoutputConfig'
 ]
 
 MIDDLEWARE = [
@@ -76,48 +76,19 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'isk_tools_base',
-        'USER': 'isk_tools_user',
-        'PASSWORD': 'iskisk6117',
-        # 'HOST': 'localhost\SQLEXPRESS',
-        'HOST': 'localhost\SQLEXPRESS',
-        'PORT': '',
-
-        'OPTIONS': {
-            'driver': 'ODBC Driver 13 for SQL Server',
-        },
-        'ATOMIC_REQUESTS': True
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     },
-    'fmsdb': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'fms',
-        'USER': 'isk_tools_user',
-        'PASSWORD': 'iskisk6117',
-        # 'HOST': 'localhost\SQLEXPRESS',
-        'HOST': 'localhost\SQLEXPRESS',  # テストDB
-        'PORT': '',
-        'OPTIONS': {
-            'driver': 'ODBC Driver 13 for SQL Server',
-        },
-        'ATOMIC_REQUESTS': True
+    'fms': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'fms_db.sqlite3'),
     },
     'quality_change_management': {
-        'ENGINE': 'sql_server.pyodbc',
-        'NAME': 'quality_change_management',
-        'USER': 'isk_tools_user',
-        'PASSWORD': 'iskisk6117',
-        'HOST': 'localhost\SQLEXPRESS',
-        'PORT': '',
-
-        'OPTIONS': {
-            'driver': 'ODBC Driver 13 for SQL Server',
-        },
-        'ATOMIC_REQUESTS': True
-    },
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'quality_change_management_db.sqlite3'),
+    }
 }
 DATABASE_ROUTERS = ['config.db_router.DBRouter']
 

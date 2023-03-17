@@ -1,14 +1,14 @@
 class DBRouter:
     def db_for_read(self, model, **hints):
         if model._meta.app_label == 'fms':
-            return 'fmsdb'
+            return 'fms'
         if model._meta.app_label == 'quality_change_management':
             return 'quality_change_management'
         return None
 
     def db_for_write(self, model, **hints):
         if model._meta.app_label == 'fms':
-            return 'fmsdb'
+            return 'fms'
         if model._meta.app_label == 'quality_change_management':
             return 'quality_change_management'
         return None
@@ -22,7 +22,7 @@ class DBRouter:
         if app_label == 'auth' or app_label == 'contenttypes' or app_label == 'sessions' or app_label == 'admin':
             return db == 'default'
         if app_label == 'fms':
-            return db == 'fmsdb'
+            return db == 'fms'
         if app_label == 'quality_change_management':
             return db == 'quality_change_management'
         return None

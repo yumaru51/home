@@ -1,60 +1,61 @@
 {% extends 'quality_change_management/layout.html' %}
 {% load staticfiles %}
+
 {% block title %}変更管理ツール{% endblock %}
 
 {% block header %}
+<script>
+window.onload = function() {
+    user('id_next_department', 'id_next_user');
+};
+</script>
 {% endblock %}
 
 {% block content %}
+<h1>品質・安全変更管理ツール</h1>
+<button class="btn btn-primary w-10 btn-lg" type="button" onclick="location.href='{% url 'quality_change_management:detail' 1102 'request' 0 %}'">変更管理新規登録</button>
+　　　<button class="btn btn-primary w-10 btn-lg" type="button" onclick="location.href='{% url 'quality_change_management:report' 0 %}'">レポートの出力</button><br><br>
 
-<h1>変更管理</h1>
-<button class="w-10 btn btn-primary btn-lg" type="button" onclick="location.href='{% url 'detail' 0 %}'">新規登録</button>
-　{{ department }}　{{ request.user.last_name }}　{{ request.user.first_name }}
-<br><br>
 
-<table class="table table-bordered border-dark">
-    <tr class="row">
-        <th class="col">原課<br>原課変更登録作成中</th>
-        <th class="col">原課<br>原課変更承認待</th>
-        <th class="col">原課<br>原課変更部長承認待</th>
-        <th class="col">設備管理<br>工務部長承認待</th>
-        <th class="col">安全/品質<br>所管部長承認待</th>
-        <th class="col">安全/品質(Ⅲ)<br>委員会承認結果待</th>
-        <th class="col">原課<br>変更実施待</th>
-        <th class="col">安全/品質<br>所管変更評価待</th>
-        <th class="col">原課<br>原課変更評価確認待</th>
-        <th class="col"><br>却下通達確認待</th>
-    </tr>
-    <tr class="row">
-        {% for progress_count in progress_count %}
-        <td class="col">{{ progress_count }}</td>
+<h3>進捗選択表</h3>
+<div class="sw-theme-arrows" id="smartwizard">
+    <ul class="nav nav-tabs step-anchor">
+        {% for key, value in progress_count_dict.items %}
+        {% if key == present_step_id %}
+        <li class="active"><a href="javascript:$('#id_present_step_id').val({{ key }});form_top_page.submit();">Step {{ key }}<br>
+            <small>{{ value.step_name }}</small><br>
+            部門:<input type="text" size=2 value="{{ value.count1 }}" disabled><br>
+            部署:<input type="text" size=2 value="{{ value.count2 }}" disabled><br>
+            担当:<input type="text" size=2 value="{{ value.count3 }}" disabled></a></li>
+        {% else %}
+        <li><a href="javascript:$('#id_present_step_id').val({{ key }});form_top_page.submit();">Step {{ key }}<br>
+            <small>{{ value.step_name }}</small><br>
+            部門:<input type="text" size=2 value="{{ value.count1 }}" disabled><br>
+            部署:<input type="text" size=2 value="{{ value.count2 }}" disabled><br>
+            担当:<input type="text" size=2 value="{{ value.count3 }}" disabled></a></li>
+        {% endif %}
         {% endfor %}
-    </tr>
-</table>
+    </ul>
+</div><br>
 
-<br><br>
 
-<form action="{% url 'top_page' %}" method="post">
+<h3>データ絞り込み</h3>
+<form action="{% url 'quality_change_management:top_page' %}" name="form_top_page" id="form_top_page" method="post">
     {% csrf_token %}
     <div class="form-control">
         <div class="row">
-            <div style="display:inline-flex">
+            <div style="display:inline-flex; flex-wrap:wrap;">
                 {% for progress_form in progress_form %}
                 <div class="col-2">{{ progress_form.label }}{{ progress_form }}</div>
                 {% endfor %}
-                <div class="col-2"><input type="submit" value="click" class="btn btn-primary mt-2"></div>
+                <div class="col-2"><button class="btn btn-primary mt-2" type="submit">絞り込み</button></div>
             </div>
-            {% comment %}
-            <table clase="table">
-                {{ progress_form.as_table }}
-            </table>
-            {% endcomment %}
         </div>
     </div>
-</form>
+</form><br>
 
-<br><br>
 
+<h3>データ一覧</h3>
 <table class="table table-bordered border-dark">
     <thead class="table-info">
     <tr>
@@ -64,35 +65,39 @@
         <th scope="col">作業区分</th>
         <th scope="col">次作業者</th>
         <th scope="col">タイトル</th>
-        <th scope="col">変更レベル(品質、安全)</th>
-        <th scope="col">所管判定(品質、安全)</th>
+        <th scope="col">変更レベル(安全)</th>
+        <th scope="col">変更レベル(品質)</th>
+        <th scope="col">所管判定(安全)</th>
+        <th scope="col">所管判定(品質)</th>
         <th scope="col">変更日</th>
-        <th scope="col">変更対象(方法、設備、原料など、人)</th>
-        <th scope="col">Last</th>
-        <th scope="col">Handle</th>
+        <th scope="col">変更対象(方法、設備、原料、人)</th>
     </tr>
     </thead>
-    {% for progress in progress_list %}
     <tbody>
+    {% for key, value in progress_dict.items %}
     <tr>
-        <th scope="row"><a href="{% url 'detail' progress.request_id %}">開く</a></th>
-        <td>{{ progress.request_id }}</td>
-        <td>{{ progress.present_step.step_name }}</td>
-        <td>作業区分</td>
-        <td>{{ progress.present_operator }}</td>
-        <td>{{ progress.request.title }}</td>
-        <td>{{ progress.request.level }}</td>
-        <td>所管判定(品質、安全)</td>
-        <td>{{ progress.request.delivery_date }}</td>
-        <td>{{ progress.request.method }}</td>
-        <td>Last</td>
-        <td>@Handle</td>
+        <td scope="row"><a href="{% url 'quality_change_management:detail' value.present_step value.target value.request_id %}">開く</a></td>
+        <td>{{ value.request_id }}</td>
+        <td>{{ value.step_name }}</td>
+        <td>{{ value.work_class }}</td>
+        <td>{{ value.present_operator }}</td>
+        <td>{{ value.title }}</td>
+        <td>{{ value.safety_aspect }}</td>
+        <td>{{ value.quality_aspect }}</td>
+        <td>{{ value.safety_aspect2 }}</td>
+        <td>{{ value.quality_aspect2 }}</td>
+        <td>{{ value.delivery_date }}</td>
+        <td>{{ value.change_target }}</td>
     </tr>
-    </tbody>
     {% endfor %}
+    </tbody>
 </table>
 
-<br><br><br><br><br><br><br><br>
-
-
+<script>
+//var user_list = {{ user_list | safe }}
+//function change_user(value){
+//    document.getElementById('id_next_user').innerHTML = user_list[value];
+//}
+document.getElementById('id_next_department').onclick = function(){user('id_next_department', 'id_next_user');};
+</script>
 {% endblock %}

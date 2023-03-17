@@ -1,0 +1,66 @@
+{% extends 'quality_change_management/layout.html' %}
+{% load staticfiles %}
+
+{% block title %}変更管理ツール{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+<h1>変更管理データエクスポート</h1>
+<div class="row">
+    <div class="col-8"><button class="btn btn-primary w-10 btn-lg" type="submit" formaction="{% url 'quality_change_management:report' 1 %}" form="form_report">エクスポート</button></div>
+    <div class="col-4"><button class="btn btn-primary w-10 btn-lg" type="button" onclick="location.href='{% url 'quality_change_management:top_page' %}';">TOPに戻る</button></div>
+</div><br>
+
+
+<h3>データ絞り込み</h3>
+<form action="{% url 'quality_change_management:report' 0 %}" name="form_report" id="form_report" method="post">
+    {% csrf_token %}
+    <div class="form-control">
+        <div class="row">
+            {% for report_form in report_form %}
+            <div class="col-2">{{ report_form.label }}{{ report_form }}</div>
+            {% endfor %}
+            <div class="col-2"><button class="btn btn-primary mt-2" type="submit">絞り込み</button></div>
+        </div>
+    </div>
+</form><br>
+
+
+<h3>データ一覧</h3>
+<table class="table table-bordered border-dark">
+    <thead class="table-info">
+    <tr>
+        <th scope="col">管理No</th>
+        <th scope="col">進捗状況</th>
+        <th scope="col">作業区分</th>
+        <th scope="col">次作業者</th>
+        <th scope="col">タイトル</th>
+        <th scope="col">変更レベル(安全)</th>
+        <th scope="col">変更レベル(品質)</th>
+        <th scope="col">所管判定(安全)</th>
+        <th scope="col">所管判定(品質)</th>
+        <th scope="col">変更日希望日</th>
+        <th scope="col">変更対象(方法、設備、原料、人)</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for key, value in progress_dict.items %}
+    <tr>
+        <td>{{ value.request_id }}</td>
+        <td>{{ value.step_name }}</td>
+        <td>{{ value.work_class }}</td>
+        <td>{{ value.present_operator }}</td>
+        <td>{{ value.title }}</td>
+        <td>{{ value.safety_aspect }}</td>
+        <td>{{ value.quality_aspect }}</td>
+        <td>{{ value.safety_aspect2 }}</td>
+        <td>{{ value.quality_aspect2 }}</td>
+        <td>{{ value.delivery_date }}</td>
+        <td>{{ value.change_target }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

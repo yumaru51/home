@@ -4,7 +4,7 @@ from .models import User, DepartmentMaster, DivisionMaster, UserAttribute
 
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'first_name', 'last_name', 'display_order', 'lost_flag')
-    list_filter = ['username', 'first_name', 'last_name', 'display_order', 'lost_flag']
+    list_filter = ['lost_flag']
     search_fields = ['username', 'first_name', 'last_name', 'display_order', 'lost_flag']
 
 

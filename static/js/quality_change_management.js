@@ -73,6 +73,7 @@ function department(id_division, id_department, id_user) {
 
 //部署変更時のユーザーリスト絞り込み処理
 function user(id_department, id_user){
+    alert('通ります')
     $.ajax({
         url: ajax_user,
         type: "POST",

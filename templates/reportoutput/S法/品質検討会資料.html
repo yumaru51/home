@@ -1,0 +1,77 @@
+{% extends 'reportoutput/layout.html' %}
+{% load staticfiles %}
+
+{% block title %}品質検討会資料(S法){% endblock %}
+
+{% block header %}
+<meta charset="UTF-8">
+{% endblock %}
+
+{% block content %}
+<div id="loading_gif" style="position:absolute; left:50%; top:20%; margin-left:-300px; margin-top:300px; z-index: 10; display: none">
+    <img src="{% static 'img/loading/earth.gif' %}">
+</div>
+<!--品質検討会資料-->
+<h1>品質検討会資料</h1>
+<form action="#" method="post" class="rounded border border-info">
+    <br>
+    <div class="col-1">
+        <input class="form-control" type="button" value="帳票出力" onclick="trace_report();">
+    </div>
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-4">
+                銘柄を選択してください：<br>
+                <select class="form-control" id="brand" name="brand" size="30" onclick="__select__brand(this.value);">
+                    {% for tracereport1 in tracereport1 %}
+                    <option value="{{ tracereport1.銘柄 }}">{{ tracereport1.銘柄 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-4">
+                ランNoを3つまで選択して下さい：<br>
+                <select class="form-control" id="while" name="while" width="30" size="30" multiple>
+                </select>
+            </div>
+        </div>
+    </div>
+    <br>
+</form>
+<br><br>
+
+
+<!--トレースNO採番処理-->
+<h1>トレースNO採番処理</h1>
+<form action="#" method="post" class="rounded border border-info">
+    <br>
+    <div class="container-fluid" >
+        <div class="row">
+            <div class="col-1">
+                <input type="date" id="from_date" class="form-control">(00:00)
+            </div>
+            <div class="col-auto">
+                ～
+            </div>
+            <div class="col-1">
+                <input type="date" id="to_date" class="form-control">(23:59)
+            </div>
+            <div class="col-1">
+                <input class="form-control" type="button" value="処理開始" onclick="trace_no_numbering();">
+            </div>
+        </div>
+    </div>
+    <br>
+</form>
+<br><br>
+
+
+<!--javascript処理-->
+<script type="text/javascript">
+    var group = 'S法';
+    var csrf_token = '{{ csrf_token }}';
+</script>
+<script src="{% static 'js/reportoutput.js' %}"></script>
+
+{% endblock %}
+

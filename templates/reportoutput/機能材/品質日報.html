@@ -1,0 +1,39 @@
+{% extends 'reportoutput/layout.html' %}
+{% load staticfiles %}
+
+{% block title %}品質日報{% endblock %}
+{% block header %}{% endblock %}
+
+{% block content %}
+<!--品質日報-->
+<h1>品質日報</h1>
+<form action="#" method="post" class="rounded border border-info">
+    <br>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-1">
+                <input type="date" id="startTime" class="form-control">(07:00)
+            </div>
+            <div class="col-auto">
+                ～
+            </div>
+            <div class="col-1">
+                <input type="date" id="endTime" class="form-control">(07:00)
+            </div>
+            <div class="col-1">
+                <input class="form-control" type="button" value="帳票出力" onclick="report_download();">
+            </div>
+        </div>
+    </div>
+    <br>
+</form>
+<br><br>
+
+
+<!--javascript処理-->
+<script type="text/javascript">
+    var csrf_token = '{{ csrf_token }}';
+</script>
+<script src="{% static 'js/reportoutput.js' %}"></script>
+
+{% endblock %}

@@ -1,0 +1,29 @@
+
+【予定】
+・
+
+【memo】
+・__init__.py以外のファイルを削除してから、makemigrations, migrateを再実行する
+・デバック実行してエラーが表示されるときは、マイグレーションもできない！
+　ソースコードをコピる場合、一旦modelだけコピってマイグレーションしたほうが良さそう。
+
+
+予定
+・届出の処理速度の件
+・設定ファイルなど一部除外したい！
+・テスト環境でGIT
+・マニュアルまとめる。
+
+
+開発環境
+・django「2.1.15」
+・pycharm「C:\Program Files\JetBrains\PyCharm Community Edition 2022.2.1\bin」、
+・python「C:\Program Files\Python311」
+テスト環境
+・django「2.1.15」
+・pycharm「C:\Program Files\JetBrains\PyCharm Community Edition 2019.1.2\bin」、
+・python「Anaconda」
+本番環境
+・django「2.1.15」
+・pycharm「C:\Program Files\JetBrains\PyCharm Community Edition 2019.1.2\bin」、
+・python「Anaconda」

@@ -1,0 +1,7 @@
+【その他】
+
+・静的ファイル
+　「static」がpycahrm
+　「static_for_deploy」がアパッチ
+
+・ツールの手順書は情シの「業務」フォルダ

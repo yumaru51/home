@@ -1,6 +1,4 @@
 
-■[setting]▼[backup]●[program]★[project]
-
 【GitHub】
 ①
 yumaru51@yahoo.co.jp
@@ -37,11 +35,10 @@ C:\python_tool_development\isk-tools
 
 【ターミナルコマンド】
 python -m django --version
+django.get_version()
 
 django-admin startproject config(フォルダが2重にできる)
 django-admin startproject config .(フォルダを1つに、同階層にmanage.py)
-django-admin startproject config ../.(1階層上に、同階層にmanage.py)
-
 
 cd C:\Program Files\Python311\Lib 
 pip install django -t ./
@@ -49,9 +46,10 @@ pip install --upgrade django
 
 python manage.py startapp fms
 python manage.py runserver
-python ../manage.py runserver
 
-django.get_version()
+python manage.py makemigrations
+python manage.py migrate --database=quality_change_management
+python manage.py createsuperuser
 
 【ライブラリ一括DL】
 プロジェクトフォルダ内の「requirements.txt」に記入しておくとpycharmが読み込んでインストールするか聞いてくれる。
